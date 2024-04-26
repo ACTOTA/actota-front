@@ -1,22 +1,27 @@
 'use client';
 
-import axios, { Axios } from "axios";
+import axios from "axios";
 import { AiFillGithub } from "react-icons/ai";
+import { signIn } from "next-auth/react";
 import { FcGoogle } from "react-icons/fc";
 import { useCallback, useState } from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import useregisterModal from "@/app/hooks/useRegisterModal";
-import { register } from "module";
-import Modal from "./Modal";
-import Heading from "../Heading";
-import Input from "@/app/components/inputs/input";
 import { toast } from "react-hot-toast";
+import { 
+  FieldValues, 
+  SubmitHandler,
+  useForm
+} from "react-hook-form";
 
+// import useLoginModal from "@/app/hooks/useLoginModal";
+import useRegisterModal from "@/app/hooks/useRegisterModal";
 
-
+import Modal from "./Modal";
+import Input from "../inputs/input";
+import Heading from "../Heading";
+import Button from "../Button";
 
 const RegisterModal = () => {
-    const registerModal = useregisterModal();
+    const registerModal = useRegisterModal();
     const [isLoading, setIsLoading] = useState(false);
     
     const{
@@ -81,6 +86,18 @@ const RegisterModal = () => {
             />
         </div>
     )
+
+    const footerContent = (
+        <div className="flex flex-col gap-4 mt-3">
+          <hr />
+          <Button 
+            outline 
+            label="Continue with Google"
+            icon={FcGoogle}
+            onClick={() => {}} 
+          />
+          </div>
+    )   
     return (  
         <Modal 
         disabled={isLoading}
@@ -90,6 +107,7 @@ const RegisterModal = () => {
         onClose={registerModal.onClose}
         onSubmit={handleSubmit(onSubmit)}
         body={bodyContent}
+        footer={footerContent}
         />
     );
 }
