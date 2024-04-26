@@ -10,6 +10,7 @@ import { register } from "module";
 import Modal from "./Modal";
 import Heading from "../Heading";
 import Input from "@/app/components/inputs/input";
+import { toast } from "react-hot-toast";
 
 
 
@@ -39,7 +40,7 @@ const RegisterModal = () => {
             registerModal.onClose();
         })
         .catch((error) => {
-            console.error(error);
+            toast.error('Something Went Wrong');
         })
         .finally(() => {
             setIsLoading(false);
