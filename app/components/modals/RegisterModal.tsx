@@ -2,7 +2,7 @@
 
 
 import axios from "axios";
-import { AiFillGithub } from "react-icons/ai";
+import { AiFillApple } from "react-icons/ai";
 import { signIn } from "next-auth/react";
 import { FcGoogle } from "react-icons/fc";
 import { useCallback, useState } from "react";
@@ -99,9 +99,9 @@ const RegisterModal = () => {
           />
           <Button 
             outline 
-            label="Continue with Github"
-            icon={AiFillGithub}
-            onClick={() => signIn('github')}
+            label="Continue with Apple"
+            icon={AiFillApple}
+            onClick={() => signIn('apple')}
           />
           <div 
             className="
