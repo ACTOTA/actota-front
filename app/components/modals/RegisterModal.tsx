@@ -40,7 +40,7 @@ const RegisterModal = () => {
     const onSubmit: SubmitHandler<FieldValues> = (data) => {
         setIsLoading(true);
         
-        axios.post("/api/auth/register", data)
+        axios.post("/api/register", data)
         .then(() => {
             registerModal.onClose();
         })
@@ -110,7 +110,7 @@ const RegisterModal = () => {
               font-light
             "
           >
-            <div ClassName="
+            <div className="
                 justify-center flex flex-row items-center gap-2">
                 <div>
                     Already have an account?
