@@ -1,3 +1,4 @@
+import React from "react";
 import { Nunito } from 'next/font/google';
 
 import "./globals.css";
@@ -11,7 +12,9 @@ export const metadata = {
   description: "Personalized Tours Made Easy",
 };
 
-const font = ({ subsets: ["latin"] });
+const font = Nunito({ 
+  subsets: ['latin'], 
+});
 
 export default function RootLayout({
   children,
