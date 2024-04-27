@@ -20,6 +20,10 @@ const UserMenu: React.FC<UserMenuProps> = (
     const loginModal = useLoginModal();
     const [isOpen, setIsOpen] = useState(false);
 
+    console.log("UserMenu currentUser: ", currentUser != null)
+    console.log("UserMenu object: ", currentUser?.currentUser)
+
+
     const toggleOpen = useCallback(() => {
         setIsOpen((value) => !value);
     }, []);
@@ -88,7 +92,7 @@ const UserMenu: React.FC<UserMenuProps> = (
                 >
                     <div className="flex flex-col cursor-pointer">
                         
-                        {currentUser ? (
+                        {currentUser?.currentUser ? (
                         <>
                             <MenuItem 
                                 onClick={() => {}}
