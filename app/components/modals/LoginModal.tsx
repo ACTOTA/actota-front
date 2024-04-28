@@ -9,7 +9,7 @@ import {
   useForm
 } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
-import { AiFillGithub } from "react-icons/ai";
+import { AiFillApple, AiFillGithub } from "react-icons/ai";
 import { useRouter } from "next/navigation";
 
 import useRegisterModal from "@/app/hooks/useRegisterModal";
@@ -104,9 +104,9 @@ const LoginModal = () => {
       />
       <Button 
         outline 
-        label="Continue with Github"
-        icon={AiFillGithub}
-        onClick={() => signIn('github')}
+        label="Continue with Apple"
+        icon={AiFillApple}
+        onClick={() => signIn('apple')}
       />
       <div className="
       text-neutral-500 text-center mt-4 font-light">
