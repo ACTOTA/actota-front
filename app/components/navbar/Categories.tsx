@@ -173,12 +173,14 @@ const Categories = () => {
     <Container>
       <div
         className="
-          pt-4
-          flex 
-          flex-row 
-          items-center 
-          justify-between
-          overflow-x-auto
+          w-full
+          grid
+          gap-4
+          grid-cols-4
+          
+          max-xl:grid-cols-3
+          max-lg:grid-cols-2
+          max-sm:grid-cols-1
         "
       >
         {categories.map((item) => (

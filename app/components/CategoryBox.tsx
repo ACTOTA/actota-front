@@ -48,13 +48,10 @@ const handleClick = useCallback(() => {
     <div
       onClick={handleClick}
       className={`
-        flex 
-        flex-col 
-        items-center 
-        justify-center 
-        gap-2
-        p-3
-        border-b-2
+        m-auto
+        flex
+        gap-6
+        w-1/2
         hover:text-logo-blue
         transition
         cursor-pointer
@@ -63,7 +60,7 @@ const handleClick = useCallback(() => {
       `}
     >
       <Icon size={26} />
-      <div className="font-medium text-sm">
+      <div className="font-medium text-sm my-auto">
         {label}
       </div>
     </div>

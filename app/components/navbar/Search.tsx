@@ -1,7 +1,15 @@
 'use client';
+import { useEffect, useState } from "react";
 import { BiSearch } from "react-icons/bi";
 
 const Search = () => {
+
+    const [search, setSearch] = useState(false);
+
+    useEffect(() => {
+        
+    }, [search]);
+
     return (  
         <div
             className="
@@ -22,7 +30,6 @@ const Search = () => {
                     flex-row
                     items-center
                     justify-between
-
                 "
                 >
                 <div
@@ -30,6 +37,7 @@ const Search = () => {
                     text-sm
                     font-semibold
                     px-6
+                    h-full
                 "
                 >
                 Denver, CO
@@ -102,7 +110,7 @@ const Search = () => {
                         text-white
                         "
                     >
-                        <BiSearch size={18}/>
+                        <BiSearch onClick={() => console.log("clicked")} size={18}/>
                     </div>
                 </div>
             </div>
