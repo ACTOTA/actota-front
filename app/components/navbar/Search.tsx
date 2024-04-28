@@ -72,7 +72,6 @@ const Search = () => {
                 <div onClick={activitiesModal.onOpen}
                     className="
                         hidden
-                        bg-slate-300
                         sm:block
                         text-sm
                         text-black-600
