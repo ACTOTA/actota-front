@@ -6,13 +6,13 @@ import { useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 
-interface CategoryBoxProps {
+interface ActivityBoxProps {
   icon: IconType,
   label: string;
   selected?: boolean;
 }
 
-const CategoryBox: React.FC<CategoryBoxProps> = ({
+const ActivityBox: React.FC<ActivityBoxProps> = ({
   icon: Icon,
   label,
   selected,
@@ -29,11 +29,11 @@ const handleClick = useCallback(() => {
 
     const updatedQuery: any = {
       ...currentQuery,
-      category: label
+      activity: label
     }
 
-    if (params?.get('category') === label) {
-      delete updatedQuery.category;
+    if (params?.get('activity') === label) {
+      delete updatedQuery.activity;
     }
 
     const url = qs.stringifyUrl({
@@ -48,18 +48,22 @@ const handleClick = useCallback(() => {
     <div
       onClick={handleClick}
       className={`
+      hover:bg-slate-300
+        border-blue-100
+        border-2
+        rounded-full
         m-auto
         flex
         gap-6
+        h-14
         w-1/2
         hover:text-logo-blue
         transition
         cursor-pointer
-        ${selected ? 'border-b-neutral-800' : 'border-transparent'}
         ${selected ? 'text-logo-blue' : 'text-neutral-500'}
       `}
     >
-      <Icon size={26} />
+      <Icon size={26} className="my-auto"/>
       <div className="font-medium text-sm my-auto">
         {label}
       </div>
@@ -67,4 +71,4 @@ const handleClick = useCallback(() => {
    );
 }
  
-export default CategoryBox;
+export default ActivityBox;

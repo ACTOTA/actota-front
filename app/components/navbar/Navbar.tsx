@@ -1,7 +1,7 @@
 'use client';
 
 import Container from "../Container";
-import Categories from "./Categories";
+import Activities from "./Activities";
 import Logo from "./Logo";
 import Search from "./Search";
 import UserMenu from "./UserMenu";
@@ -39,7 +39,7 @@ const Navbar: React.FC<NavbarProps>  = ({
                 </div>
             </Container>
             </div>
-            <Categories />
+            <Activities />
         </div>
     );
 }

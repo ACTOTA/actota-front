@@ -28,12 +28,12 @@ import { IoDiamond } from 'react-icons/io5';
 
 import { MdOutlineKayaking, MdGolfCourse, MdSnowmobile, MdSnowshoeing } from "react-icons/md";
 
-import CategoryBox from "../CategoryBox";
+import ActivityBox from "../ActivityBox";
 import Container from '../Container';
 import { FaT } from 'react-icons/fa6';
 
 
-export const categories = [
+export const activities = [
   {
     label: 'Surprise Me!',
     icon: FaRandom,
@@ -159,9 +159,9 @@ export const categories = [
   
 ]
 
-const Categories = () => {
+const Activities = () => {
   const params = useSearchParams();
-  const category = params?.get('category');
+  const activity = params?.get('activity');
   const pathname = usePathname();
   const isMainPage = pathname === '/';
 
@@ -174,21 +174,23 @@ const Categories = () => {
       <div
         className="
           w-full
+          m-4
           grid
           gap-4
+          gap-y-2
           grid-cols-4
-          
+
           max-xl:grid-cols-3
           max-lg:grid-cols-2
           max-sm:grid-cols-1
         "
       >
-        {categories.map((item) => (
-          <CategoryBox 
+        {activities.map((item) => (
+          <ActivityBox 
             key={item.label}
             label={item.label}
             icon={item.icon}
-            selected={category === item.label}
+            selected={activity === item.label}
           />
         ))}
       </div>
@@ -196,4 +198,4 @@ const Categories = () => {
   );
 }
  
-export default Categories;
+export default Activities;
