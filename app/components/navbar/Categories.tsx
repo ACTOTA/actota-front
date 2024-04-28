@@ -1,7 +1,11 @@
 'use client';
 
 import { usePathname, useSearchParams } from 'next/navigation';
-import { TbBeach, TbMountain, TbPool } from 'react-icons/tb';
+import { TbBeach, TbMountain, TbPool, TbChefHat } from 'react-icons/tb';
+import { FaSkiing, FaHiking, FaCampground, FaHotTub, FaBiking, FaHatCowboy, FaRandom, } from "react-icons/fa";
+import { FaTrainSubway } from "react-icons/fa6"
+import { BsBackpack2, BsFillBackpack2Fill, BsSnow } from "react-icons/bs";
+import { BiSolidBinoculars } from "react-icons/bi";
 import { 
   GiBarn, 
   GiBoatFishing, 
@@ -10,67 +14,45 @@ import {
   GiCaveEntrance, 
   GiForestCamp, 
   GiIsland,
-  GiWindmill
+  GiMineWagon,
+  GiWindmill,
+  GiHorseHead,
+  GiChefToque,
+  GiJumpAcross,
+  GiWaterSplash,
+  GiRiver,
+
 } from 'react-icons/gi';
-import { FaSkiing } from 'react-icons/fa';
-import { BsSnow } from 'react-icons/bs';
+
 import { IoDiamond } from 'react-icons/io5';
-import { MdOutlineVilla } from 'react-icons/md';
+
+import { MdOutlineKayaking, MdGolfCourse, MdSnowmobile, MdSnowshoeing } from "react-icons/md";
 
 import CategoryBox from "../CategoryBox";
 import Container from '../Container';
+import { FaT } from 'react-icons/fa6';
 
 
 export const categories = [
   {
-    label: 'Beach',
-    icon: TbBeach,
-    description: 'This property is close to the beach!',
+    label: 'Surprise Me!',
+    icon: FaRandom,
+    description: 'This property is in a barn!'
   },
   {
-    label: 'Windmills',
+    label: 'ATVing',
     icon: GiWindmill,
-    description: 'This property is has windmills!',
+    description: 'Go on the best ATVing in Colorado!',
   },
   {
-    label: 'Modern',
-    icon: MdOutlineVilla,
-    description: 'This property is modern!'
+    label: 'Backpacking',
+    icon: BsFillBackpack2Fill,
+    description: 'Best backpacking spots in Colorado!',
   },
   {
-    label: 'Countryside',
-    icon: TbMountain,
-    description: 'This property is in the countryside!'
-  },
-  {
-    label: 'Pools',
-    icon: TbPool,
-    description: 'This is property has a beautiful pool!'
-  },
-  {
-    label: 'Islands',
-    icon: GiIsland,
-    description: 'This property is on an island!'
-  },
-  {
-    label: 'Lake',
-    icon: GiBoatFishing,
-    description: 'This property is near a lake!'
-  },
-  {
-    label: 'Skiing',
-    icon: FaSkiing,
-    description: 'This property has skiing activies!'
-  },
-  {
-    label: 'Castles',
-    icon: GiCastle,
-    description: 'This property is an ancient castle!'
-  },
-  {
-    label: 'Caves',
-    icon: GiCaveEntrance,
-    description: 'This property is in a spooky cave!'
+    label: 'Biking',
+    icon: FaBiking,
+    description: 'Best biking trails in Colorado!'
   },
   {
     label: 'Camping',
@@ -78,25 +60,103 @@ export const categories = [
     description: 'This property offers camping activities!'
   },
   {
-    label: 'Arctic',
-    icon: BsSnow,
-    description: 'This property is in arctic environment!'
+    label: 'Caves',
+    icon: GiCaveEntrance,
+    description: 'Explore the best caves in Colorado!',
   },
   {
-    label: 'Desert',
-    icon: GiCactus,
-    description: 'This property is in the desert!'
+    label: 'Challenge',
+    icon: GiJumpAcross,
+    description: 'Experience the best challenges in Colorado!'
   },
   {
-    label: 'Barns',
-    icon: GiBarn,
-    description: 'This property is in a barn!'
+    label: 'Chefs',
+    icon: GiChefToque,
+    description: 'Best chefs in Colorado!'
   },
+  {
+    label: 'Fishing',
+    icon: GiBoatFishing,
+    description: 'Go fishing in the best spots in Colorado!',
+  },
+  {
+    label: 'Golfing',
+    icon: MdGolfCourse,
+    description: 'Best golf courses in Colorado!'
+  },
+  {
+    label: 'Mines',
+    icon: GiMineWagon,
+    description: 'Experience the best gold mines in Colorado!',
+  },
+  {
+    label: 'Hiking',
+    icon: FaHiking,
+    description: 'Hike on the best hiking trails in Colorado!',
+  },
+  {
+    label: 'History',
+    icon: FaHatCowboy,
+    description: 'Learn about the history of Colorado!'
+  },
+  {
+    label: 'Horseback',
+    icon: GiHorseHead,
+    description: 'Best horse riding in Colorado!'
+  },
+
   {
     label: 'Lux',
     icon: IoDiamond,
-    description: 'This property is brand new and luxurious!'
-  }
+    description: 'Experience most luxurious places in Colorado!'
+  },
+
+  {
+    label: 'Sightseeing',
+    icon: BiSolidBinoculars,
+    description: 'Best sightseeing in Colorado!'
+  },
+  {
+    label: 'Snowshoeing',
+    icon: MdSnowshoeing,
+    description: 'Best snowshoeing in Colorado!'
+  },
+  {
+    label: 'Snowmobiling',
+    icon: MdSnowmobile,
+    description: 'Best Snowmobiling in Colorado!'
+  },
+
+  {
+    label: 'Water',
+    icon: MdOutlineKayaking,
+    description: 'Paddleboard, kayak, and more!'
+  },
+  {
+    label: 'Trains',
+    icon: FaTrainSubway,
+    description: 'Experience most luxurious places in Colorado!'
+  },
+
+  {
+    label: 'Springs',
+    icon: FaHotTub,
+    description: 'Experience the best hot springs in Colorado!',
+  },
+
+  {
+    label: 'Skiing',
+    icon: FaSkiing,
+    description: 'Experience the best skiing in Colorado!'
+  },
+  {
+    label: 'White Water',
+    icon: GiRiver,
+    description: 'Best white water rafting in Colorado!'
+  },
+  
+
+  
 ]
 
 const Categories = () => {
