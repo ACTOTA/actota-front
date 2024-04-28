@@ -185,14 +185,13 @@ const Activities = () => {
           max-sm:grid-cols-1
         "
       >
-        {activities.map((item) => (
+        {activities.map((item) => 
           <ActivityBox 
             key={item.label}
             label={item.label}
             icon={item.icon}
-            selected={activity === item.label}
           />
-        ))}
+        )}
       </div>
     </Container>
   );

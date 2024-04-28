@@ -1,48 +1,34 @@
 'use client';
 
-import qs from "query-string";
 import { IconType } from "react-icons";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 
 interface ActivityBoxProps {
   icon: IconType,
   label: string;
-  selected?: boolean;
+  checked?: [];
 }
 
 const ActivityBox: React.FC<ActivityBoxProps> = ({
   icon: Icon,
   label,
-  selected,
 }) => {
-const router = useRouter();
-const params = useSearchParams();
+  const router = useRouter();
+  const params = useSearchParams();
+  const [check, setCheck] = useState(false);
 
-const handleClick = useCallback(() => {
-    let currentQuery = {};
-    
-    if (params) {
-      currentQuery = qs.parse(params.toString())
-    }
 
-    const updatedQuery: any = {
-      ...currentQuery,
-      activity: label
-    }
+  const handleClick = useCallback(() => {
 
-    if (params?.get('activity') === label) {
-      delete updatedQuery.activity;
-    }
+    setCheck(!check);
 
-    const url = qs.stringifyUrl({
-      url: '/',
-      query: updatedQuery
-    }, { skipNull: true });
+  }, [router, params, check]); 
 
-    router.push(url);
-  }, [label, router, params]);
+  useEffect(() => {
+    console.log("ActivityBox check:    ", check);
+  }, [check, handleClick]);
 
   return ( 
     <div
@@ -60,7 +46,7 @@ const handleClick = useCallback(() => {
         hover:text-logo-blue
         transition
         cursor-pointer
-        ${selected ? 'text-logo-blue' : 'text-neutral-500'}
+        ${check ? 'bg-slate-300' : 'bg-white'}
       `}
     >
       <Icon size={26} className="my-auto"/>
