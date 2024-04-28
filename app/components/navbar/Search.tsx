@@ -1,14 +1,27 @@
 'use client';
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { BiSearch } from "react-icons/bi";
+import useLoginModal from "@/app/hooks/useLoginModal";
+import useActivitiesModal from "@/app/hooks/useActivitiesModal";
+import ActivitiesModal from "../modals/ActivitiesModal";
 
 const Search = () => {
 
     const [search, setSearch] = useState(false);
+    const activitiesModal = useActivitiesModal();
+    const loginModal = useLoginModal();
 
-    useEffect(() => {
-        
-    }, [search]);
+    const handleClick = useCallback(() => {
+
+        setSearch(!search);
+        console.log("search: ", search);
+
+        if(search) {
+            activitiesModal.onOpen();
+        }
+    
+    }, [search]); 
+    
 
     return (  
         <div
@@ -56,9 +69,10 @@ const Search = () => {
                 >
                 Any Week
                 </div>
-                <div
+                <div onClick={activitiesModal.onOpen}
                     className="
                         hidden
+                        bg-slate-300
                         sm:block
                         text-sm
                         text-black-600
@@ -71,6 +85,7 @@ const Search = () => {
                 >
                 Any Activities
                 </div>
+
                 <div
                 className="
                     hidden
@@ -113,6 +128,7 @@ const Search = () => {
                         <BiSearch onClick={() => console.log("clicked")} size={18}/>
                     </div>
                 </div>
+                <ActivitiesModal />
             </div>
         </div>
     );

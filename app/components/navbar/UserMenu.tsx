@@ -10,6 +10,7 @@ import useLoginModal from "@/app/hooks/useLoginModal";
 import { signOut } from "next-auth/react";
 import { SafeUser } from "@/app/types";
 import LoginModal from "../modals/LoginModal";
+import useActivitiesModal from "@/app/hooks/useActivitiesModal";
 
 interface UserMenuProps {
     currentUser?: SafeUser | null;
@@ -20,6 +21,7 @@ const UserMenu: React.FC<UserMenuProps> = (
     currentUser
 ) => {
     const registerModal = useRegisterModal();
+    const activitiesModal = useActivitiesModal();
     const loginModal = useLoginModal();
     const [isOpen, setIsOpen] = useState(false);
 
@@ -126,7 +128,7 @@ const UserMenu: React.FC<UserMenuProps> = (
                         ) : (
                         <>
                             <MenuItem 
-                                onClick={loginModal.onOpen}
+                                onClick={activitiesModal.onOpen}
                                 label="Log In"
                             />
                             <MenuItem 

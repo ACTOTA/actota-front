@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { signIn } from 'next-auth/react';
 import { 
@@ -19,13 +19,18 @@ import Modal from "./Modal";
 import Input from "../inputs/input";
 import Heading from "../Heading";
 import Button from "../Button";
+import Activities from "../navbar/Activities";
 import useActivitiesModal from "@/app/hooks/useActivitiesModal";
 
-const LoginModal = () => {
+const ActivitiesModal = () => {
   const router = useRouter();
-  const loginModal = useLoginModal();
+  const loginModal = useActivitiesModal();
   const registerModal = useRegisterModal();
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    console.log("ActivitiesModal");
+  }, []);
 
   const { 
     register, 
@@ -129,7 +134,7 @@ const LoginModal = () => {
     <Modal
       disabled={isLoading}
       isOpen={loginModal.isOpen}
-      title="Login"
+      title="Activities"
       actionLabel="Continue"
       onClose={loginModal.onClose}
       onSubmit={handleSubmit(onSubmit)}
@@ -139,4 +144,4 @@ const LoginModal = () => {
   );
 }
 
-export default LoginModal;
+export default ActivitiesModal;
