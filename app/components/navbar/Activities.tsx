@@ -37,7 +37,7 @@ export const activities = [
   {
     label: 'Surprise Me!',
     icon: FaRandom,
-    description: 'This property is in a barn!'
+    description: 'We will randomly select an activities for you!'
   },
   {
     label: 'ATVing',
@@ -173,12 +173,13 @@ const Activities = () => {
     <Container>
       <div
         className="
-          w-full
+          width-full
           h-auto
           m-0
           grid
           gap-1
-          gap-y-1.5
+          gap-y-2
+          gap-x-4
           grid-cols-3
         
 

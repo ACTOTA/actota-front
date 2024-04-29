@@ -5,13 +5,13 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 
-interface ActivityBoxProps {
+interface TypesBoxProps {
   icon: IconType,
   label: string;
   checked?: [];
 }
 
-const ActivityBox: React.FC<ActivityBoxProps> = ({
+const TypesBox: React.FC<TypesBoxProps> = ({
   icon: Icon,
   label,
 }) => {
@@ -27,14 +27,13 @@ const ActivityBox: React.FC<ActivityBoxProps> = ({
   }, [ check]); 
 
   useEffect(() => {
-    console.log("ActivityBox check:    ", check);
+    console.log("Types Box check:    ", check);
   }, [check, handleClick]);
 
   return ( 
     <div
       onClick={handleClick}
       className={`
-
         border-2
         rounded-full
         m-auto
@@ -74,4 +73,4 @@ const ActivityBox: React.FC<ActivityBoxProps> = ({
    );
 }
  
-export default ActivityBox;
+export default TypesBox;

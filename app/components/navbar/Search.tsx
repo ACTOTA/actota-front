@@ -2,13 +2,20 @@
 import { useCallback, useEffect, useState } from "react";
 import { BiSearch } from "react-icons/bi";
 import useLoginModal from "@/app/hooks/useLoginModal";
-import useActivitiesModal from "@/app/hooks/useActivitiesModal";
+
 import ActivitiesModal from "../modals/ActivitiesModal";
+import useActivitiesModal from "@/app/hooks/useActivitiesModal";
+
+import TypesModal from "../modals/TypesModal";
+import useTypesModal from "@/app/hooks/useTypesModal";
+import { types } from "util";
+
 
 const Search = () => {
 
     const [search, setSearch] = useState(false);
     const activitiesModal = useActivitiesModal();
+    const typesModal = useTypesModal();
     const loginModal = useLoginModal();
 
     const handleClick = useCallback(() => {
@@ -85,7 +92,7 @@ const Search = () => {
                 Any Activities
                 </div>
 
-                <div
+                <div onClick={typesModal.onOpen}
                 className="
                     hidden
                     sm:block
@@ -113,7 +120,11 @@ const Search = () => {
                 >
 
                 
-                <div className="hidden sm:block">
+                <div 
+                    className="
+                    hidden sm:block
+                    "
+                >
                 Add Guests
                 </div>
                     <div
@@ -128,8 +139,11 @@ const Search = () => {
                     </div>
                 </div>
                 <ActivitiesModal />
+                <TypesModal />
             </div>
         </div>
     );
 }
+
+
 export default Search;
