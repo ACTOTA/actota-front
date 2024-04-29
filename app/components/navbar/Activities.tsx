@@ -100,7 +100,7 @@ export const activities = [
     description: 'Learn about the history of Colorado!'
   },
   {
-    label: 'Horseback',
+    label: 'Horse back',
     icon: GiHorseHead,
     description: 'Best horse riding in Colorado!'
   },
@@ -174,11 +174,13 @@ const Activities = () => {
       <div
         className="
           w-full
-          m-4
+          h-auto
+          m-0
           grid
-          gap-4
-          gap-y-2
-          grid-cols-4
+          gap-1
+          gap-y-1.5
+          grid-cols-3
+        
 
           max-xl:grid-cols-3
           max-lg:grid-cols-2

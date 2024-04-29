@@ -34,23 +34,37 @@ const ActivityBox: React.FC<ActivityBoxProps> = ({
     <div
       onClick={handleClick}
       className={`
-      hover:bg-slate-300
-        border-blue-100
+
         border-2
         rounded-full
         m-auto
         flex
         gap-6
-        h-14
-        w-1/2
-        hover:text-logo-blue
+        h-12
+        w-full
+      
         transition
         cursor-pointer
-        ${check ? 'bg-slate-300' : 'bg-white'}
+        ${check ? 'bg-logo-blue text-white border-3' : ' hover:bg-slate-200 bg-white'}
       `}
     >
-      <Icon size={26} className="my-auto"/>
-      <div className="font-medium text-sm my-auto">
+      
+      {/* <Icon size={40} className= "bg-logo-blue border-2 border-black my-auto rounded-full text-white" style={{ marginLeft: '5px' }} /> */}
+      <Icon
+        size={40}
+        className={`
+          bg-white 
+          border-2
+          
+          my-auto 
+          rounded-full 
+          text-black
+          ${check ? ' bg-logo-blue  border-logo-yellow' : 'text-slate-500 bg-logo-blue '
+          }
+        `}
+        style={{ marginLeft: '5px' }}
+      />
+      <div className="font-medium text-sm my-auto ">
         {label}
       </div>
     </div>

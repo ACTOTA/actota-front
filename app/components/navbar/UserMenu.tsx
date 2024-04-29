@@ -128,7 +128,7 @@ const UserMenu: React.FC<UserMenuProps> = (
                         ) : (
                         <>
                             <MenuItem 
-                                onClick={activitiesModal.onOpen}
+                                onClick={loginModal.onOpen}
                                 label="Log In"
                             />
                             <MenuItem 
