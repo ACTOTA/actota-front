@@ -39,7 +39,7 @@ const Navbar: React.FC<NavbarProps>  = ({
                 </div>
             </Container>
             </div>
-            <Activities />
+            
         </div>
     );
 }

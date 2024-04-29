@@ -27,7 +27,7 @@ const Search = () => {
             activitiesModal.onOpen();
         }
     
-    }, [search]); 
+    }, [search, activitiesModal]); 
     
 
     return (  
