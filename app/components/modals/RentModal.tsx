@@ -21,7 +21,8 @@ import Heading from '../Heading';
 import { activities } from '../navbar/Activities';
 import CountrySelect from '../inputs/TownSelect';
 import ImageUpload from '../inputs/ImageUpload';
-import LodgingDetailsCounter from '../LodgingDetailsCounter';
+import TownSelect from '../inputs/TownSelect';
+
 
 
 enum STEPS {
@@ -163,20 +164,30 @@ const RentModal = () => {
   )
 
   if (step === STEPS.LOCATION) {
+    const handleLocationChange = (value) => {
+      if (value && value.latlng) {
+        setCustomValue('location', value);
+      } else {
+        // Handle cases where value is null (e.g., cleared selection)
+        setCustomValue('location', null);
+      }
+    };
+  
     bodyContent = (
       <div className="flex flex-col gap-8">
         <Heading
           title="Where is your ACTivity located?"
           subtitle="Help guests find you!"
         />
-        <CountrySelect 
+        <TownSelect 
           value={location} 
-          onChange={(value) => setCustomValue('location', value)} 
+          onChange={handleLocationChange}
         /> 
-        <Map center={location?.latlng} />
+        <Map center={location ? { lat: location.latlng[0], lng: location.latlng[1] } : undefined} />
       </div>
     );
   }
+  
 
   if (step === STEPS.INFO) {
     bodyContent = (
