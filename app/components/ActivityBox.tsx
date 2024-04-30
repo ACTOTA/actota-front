@@ -1,53 +1,39 @@
-'use Client';
+'use client';
 
-import qs from 'query-string';
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
 import { IconType } from "react-icons";
+import { useCallback, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+
 
 interface ActivityBoxProps {
   icon: IconType,
   label: string;
-  selected?: boolean;
+  checked?: [];
 }
 
 const ActivityBox: React.FC<ActivityBoxProps> = ({
   icon: Icon,
   label,
-  selected,
 }) => {
   const router = useRouter();
   const params = useSearchParams();
+  const [check, setCheck] = useState(false);
+
 
   const handleClick = useCallback(() => {
-    let currentQuery = {};
-    
-    if (params) {
-      currentQuery = qs.parse(params.toString())
-    }
 
-    const updatedQuery: any = {
-      ...currentQuery,
-      activity: label
-    }
+    setCheck(!check);
 
-    if (params?.get('activity') === label) {
-      delete updatedQuery.activity;
-    }
+  }, [ check]); 
 
-    const url = qs.stringifyUrl({
-      url: '/',
-      query: updatedQuery
-    }, { skipNull: true });
-
-    router.push(url);
-  }, [label, router, params]);
+  useEffect(() => {
+    console.log("Activity Box check:    ", check);
+  }, [check, handleClick]);
 
   return ( 
     <div
       onClick={handleClick}
       className={`
-
         border-2
         rounded-full
         m-auto
@@ -61,7 +47,7 @@ const ActivityBox: React.FC<ActivityBoxProps> = ({
         duration-200 
         ease-in
         cursor-pointer
-        ${selected ? 'bg-logo-blue text-white border-3' : ' hover:bg-slate-200 bg-white'}
+        ${check ? 'bg-logo-blue text-white border-3' : ' hover:bg-slate-200 bg-white'}
       `}
     >
       
@@ -75,7 +61,7 @@ const ActivityBox: React.FC<ActivityBoxProps> = ({
           my-auto 
           rounded-full 
           text-black
-          ${selected ? ' bg-logo-blue  border-logo-yellow' : 'text-slate-500 bg-logo-blue '
+          ${check ? ' bg-logo-blue  border-logo-yellow' : 'text-slate-500 bg-logo-blue '
           }
         `}
         style={{ marginLeft: '5px' }}
