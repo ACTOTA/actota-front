@@ -1,34 +1,47 @@
-'use client';
+'use Client';
 
-import { IconType } from "react-icons";
-import { useCallback, useEffect, useState } from "react";
+import qs from 'query-string';
 import { useRouter, useSearchParams } from "next/navigation";
-
+import { useCallback } from "react";
+import { IconType } from "react-icons";
 
 interface ActivityBoxProps {
   icon: IconType,
   label: string;
-  checked?: [];
+  selected?: boolean;
 }
 
 const ActivityBox: React.FC<ActivityBoxProps> = ({
   icon: Icon,
   label,
+  selected,
 }) => {
   const router = useRouter();
   const params = useSearchParams();
-  const [check, setCheck] = useState(false);
-
 
   const handleClick = useCallback(() => {
+    let currentQuery = {};
+    
+    if (params) {
+      currentQuery = qs.parse(params.toString())
+    }
 
-    setCheck(!check);
+    const updatedQuery: any = {
+      ...currentQuery,
+      activity: label
+    }
 
-  }, [ check]); 
+    if (params?.get('activity') === label) {
+      delete updatedQuery.activity;
+    }
 
-  useEffect(() => {
-    console.log("ActivityBox check:    ", check);
-  }, [check, handleClick]);
+    const url = qs.stringifyUrl({
+      url: '/',
+      query: updatedQuery
+    }, { skipNull: true });
+
+    router.push(url);
+  }, [label, router, params]);
 
   return ( 
     <div
@@ -48,7 +61,7 @@ const ActivityBox: React.FC<ActivityBoxProps> = ({
         duration-200 
         ease-in
         cursor-pointer
-        ${check ? 'bg-logo-blue text-white border-3' : ' hover:bg-slate-200 bg-white'}
+        ${selected ? 'bg-logo-blue text-white border-3' : ' hover:bg-slate-200 bg-white'}
       `}
     >
       
@@ -62,7 +75,7 @@ const ActivityBox: React.FC<ActivityBoxProps> = ({
           my-auto 
           rounded-full 
           text-black
-          ${check ? ' bg-logo-blue  border-logo-yellow' : 'text-slate-500 bg-logo-blue '
+          ${selected ? ' bg-logo-blue  border-logo-yellow' : 'text-slate-500 bg-logo-blue '
           }
         `}
         style={{ marginLeft: '5px' }}

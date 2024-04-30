@@ -21,6 +21,7 @@ import Heading from '../Heading';
 import { activities } from '../navbar/Activities';
 import CountrySelect from '../inputs/CountrySelect';
 import ImageUpload from '../inputs/ImageUpload';
+import LodgingDetailsCounter from '../LodgingDetailsCounter';
 
 
 enum STEPS {
@@ -51,7 +52,7 @@ const RentModal = () => {
     reset,
   } = useForm<FieldValues>({
     defaultValues: {
-      activity: '',
+      activity: 'Surprise Me!',
       location: null,
       guestCount: 1,
       roomCount: 1,
@@ -180,8 +181,8 @@ const RentModal = () => {
   if (step === STEPS.INFO) {
     bodyContent = (
       <div className="flex flex-col gap-8">
-        <Heading
-          title="Share some basics about your ACTivity"
+       <Heading
+          title="Share some basics about your place"
           subtitle="What amenitis do you have?"
         />
         <Counter 
@@ -209,7 +210,7 @@ const RentModal = () => {
   }
 
   if (step === STEPS.IMAGES) {
-    const imageSrc = ''; // Declare the variable imageSrc
+    const imageSrc = watch('imageSrc');
     bodyContent = (
       <div className="flex flex-col gap-8">
         <Heading
