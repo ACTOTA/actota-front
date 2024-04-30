@@ -19,7 +19,7 @@ import ActivityInput from '../inputs/ActivityInput';
 import Input from '../inputs/input';
 import Heading from '../Heading';
 import { activities } from '../navbar/Activities';
-import CountrySelect from '../inputs/CountrySelect';
+import CountrySelect from '../inputs/TownSelect';
 import ImageUpload from '../inputs/ImageUpload';
 import LodgingDetailsCounter from '../LodgingDetailsCounter';
 
