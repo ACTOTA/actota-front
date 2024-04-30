@@ -1,6 +1,5 @@
 'use client';
 
-
 import { usePathname, useSearchParams } from 'next/navigation';
 import { TbBeach, TbMountain, TbPool, TbChefHat } from 'react-icons/tb';
 import { FaSkiing, FaHiking, FaCampground, FaHotTub, FaBiking, FaHatCowboy, FaRandom, } from "react-icons/fa";

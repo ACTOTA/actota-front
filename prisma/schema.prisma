@@ -51,11 +51,11 @@ model Listing {
   description String
   imageSrc String
   createdAt DateTime @default(now())
-  category  String
+  activity  String
   roomCount Int
   bathroomCount Int
   guestCount Int
-  locationValue String
+  location Json
   userId String @db.ObjectId
   price Int
 
