@@ -1,45 +1,43 @@
-'use client';
+import React from 'react';
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 
-import L from 'leaflet';
-import { MapContainer, Marker, TileLayer } from 'react-leaflet'
+const containerStyle = {
+  width: '100%',
+  height: '400px'  // Ensure you have a set height for visibility
+};
 
-import 'leaflet/dist/leaflet.css'
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-// @ts-ignore
-delete L.Icon.Default.prototype._getIconUrl; 
-L.Icon.Default.mergeOptions({
-    iconUrl: markerIcon.src,
-    iconRetinaUrl: markerIcon2x.src,
-    shadowUrl: markerShadow.src,
-});
+const defaultCenter = { lat: 39.7392, lng: -104.9903 };
 
 interface MapProps {
-  center?: number[]
+  center?: {
+    lat: number,
+    lng: number
+  };
+  zoom?: number;
 }
 
-const url = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
-const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+const Map: React.FC<MapProps> = ({ center = defaultCenter, zoom = 11 }) => {
+  // Ensure that the center values are numbers and valid
+  const safeCenter = {
+    lat: isNaN(center.lat) ? defaultCenter.lat : center.lat,
+    lng: isNaN(center.lng) ? defaultCenter.lng : center.lng
+  };
 
-const Map: React.FC<MapProps> = ({ center }) => {
   return (
-      <MapContainer 
-        center={center as L.LatLngExpression || [51, -0.09]} 
-        zoom={center ? 4 : 2} 
-        scrollWheelZoom={false} 
-        className="h-[35vh] rounded-lg"
+    <LoadScript
+      googleMapsApiKey="AIzaSyAWYB3EXLSD-3fT8A-NFXX7nG8KBvJQMCw"
+      loadingElement={<div>Loading...</div>}
+    >
+      <GoogleMap
+        mapContainerStyle={containerStyle}
+        center={safeCenter}
+        zoom={zoom}
       >
-        <TileLayer
-          url={url}
-          attribution={attribution}
-        />
-        {center && (
-          <Marker position={center as L.LatLngExpression} />
-        )}
-      </MapContainer>
-  )
+        {/* Ensure Marker is conditionally rendered only if coordinates are valid */}
+        <Marker position={safeCenter} />
+      </GoogleMap>
+    </LoadScript>
+  );
 }
 
-export default Map
+export default Map;
