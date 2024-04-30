@@ -1,5 +1,3 @@
-//by default a server component 
-
 import React from "react";
 import { Nunito } from 'next/font/google';
 
@@ -11,6 +9,7 @@ import ToasterProvider from './providers/ToasterProvider';
 import LoginModal from "./components/modals/LoginModal";
 import getCurrentUser from "./actions/getCurrentUser";
 import RentModal from "./components/modals/RentModal";
+import Filter from "./components/Filter"; // Make sure this path is correct
 
 export const metadata = {
   title: "ACTOTA!",
@@ -36,6 +35,7 @@ export default async function RootLayout({
           <LoginModal />
           <RegisterModal />
           <Navbar currentUser={currentUser} />
+          <Filter /> 
         </ClientOnly>
         {children}
       </body>
