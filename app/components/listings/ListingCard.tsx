@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { SafeReservation } from '@/app/types';
 import Image from 'next/image';
 import StarButton from '../StarButton';
+import Button from '../Button';
  
 type Location = {
     value: string;
@@ -45,9 +46,7 @@ function parseLocation(locationJson: any): Location | null {
       return null;
     }
   }
-  
-
-  interface ListingCardProps {
+interface ListingCardProps {
     data: Listing;
     reservation?: SafeReservation;
     onAction?: (id: string) => void;
@@ -107,20 +106,31 @@ const ListingCard: React.FC<ListingCardProps> = ({
                         />
                     </div>
                 </div>
-                
-            </div>
-
-            <h3>{data.title}</h3>
-            <p>Location: {location ? `${location.label} (${location.value})` : 'Location unavailable'}</p>
-            <p>Price: ${price}</p>
-            {reservationDate && <p>Reserved: {reservationDate}</p>}
-            {actionLabel && (
-                <button onClick={handleCancel} disabled={disabled}>
-                    {actionLabel}
-                </button>
-            )}
+                <div className="text-lg font-semibold">
+                {location?.label}, {location?.region}
         </div>
-    );
-};
-
+        <div className="font-light text-neutral-500">
+          {reservationDate || data.activity}
+        </div>
+        <div className="flex flex-row items-center gap-1">
+          <div className="font-semibold">
+            $ {price}
+          </div>
+          {!reservation && (
+            <div className="font-light">night</div>
+          )}
+        </div>
+        {onAction && actionLabel && (
+          <Button
+            disabled={disabled}
+            small
+            label={actionLabel} 
+            onClick={handleCancel}
+          />
+        )}
+      </div>
+    </div>
+   );
+}
+ 
 export default ListingCard;
