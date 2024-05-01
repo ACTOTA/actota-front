@@ -9,18 +9,16 @@ import useTowns from '@/app/hooks/useTowns';
 import React, { useCallback, useMemo } from 'react';
 import { format } from 'date-fns';
 import { SafeReservation } from '@/app/types';
-
-
-// Define a TypeScript type for the Location to enforce structure in your application code
+import Image from 'next/image';
+import StarButton from '../StarButton';
+ 
 type Location = {
     value: string;
     label: string;
     flag: string;
-    latlng: [number, number];  // Assuming latlng is always an array of two numbers
+    latlng: [number, number]; 
     region: string;
 };
-
-// Adjust the Listing type to include this Location type for the location field
 interface Listing {
   id: string;
   title: string;
@@ -31,18 +29,17 @@ interface Listing {
   roomCount: number;
   bathroomCount: number;
   guestCount: number;
-  location: Location;  // Use Location type instead of Json for type safety
+  location: Location;  
   userId: string;
   price: number;
 }
 
-// Example function to safely parse location data
 function parseLocation(locationJson: any): Location | null {
     try {
       if (typeof locationJson === 'string') {
         return JSON.parse(locationJson);
       }
-      return locationJson as Location;  // Assume it's already parsed as JSON (common with MongoDB)
+      return locationJson as Location;  
     } catch (error) {
       console.error('Failed to parse location JSON', error);
       return null;
@@ -72,7 +69,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
     const router = useRouter();
     const { getByValue } = useTowns();
 
-    // Parse location using the imported function
+
     const location = parseLocation(data.location);
 
     const handleCancel = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
@@ -92,12 +89,27 @@ const ListingCard: React.FC<ListingCardProps> = ({
     }, [reservation]);
 
     return (
-        <div 
-            onClick={() => router.push(`/listing/${data.id}`)}
-            className='flex flex-col p-4 border border-gray-200 rounded-md cursor-pointer hover:shadow-md transition duration-300 ease-in-out'
-        
+        <div onClick={() => router.push(`/listing/${data.id}`)} 
+            className='col-span-1 cusrsor-pointer group'
         >
-            
+            <div className='flex flex-col w-full gap-2'>
+                <div className='relative w-full overflow-hidden aspect-square rounded-xl'>
+                    <Image
+                        fill
+                        alt="Listing"
+                        src={data.imageSrc}
+                        className='object-cover w-full h-full transition-transform duration-200 ease-in-out group-hover:scale-110'
+                    />
+                    <div className='absolute top-3 right-3'>
+                        <StarButton
+                            listingId={data.id}
+                            currentUser={currentUser}
+                        />
+                    </div>
+                </div>
+                
+            </div>
+
             <h3>{data.title}</h3>
             <p>Location: {location ? `${location.label} (${location.value})` : 'Location unavailable'}</p>
             <p>Price: ${price}</p>
