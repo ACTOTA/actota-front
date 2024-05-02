@@ -12,40 +12,40 @@ import React, { useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import StarButton from '../StarButton';
 import Button from '../Button';
- 
+
 type Location = {
     value: string;
     label: string;
     flag: string;
-    latlng: [number, number]; 
+    latlng: [number, number];
     region: string;
 };
 interface Listing {
-  id: string;
-  title: string;
-  description: string;
-  imageSrc: string;
-  createdAt: Date;
-  activity: string;
-  roomCount: number;
-  bathroomCount: number;
-  guestCount: number;
-  location: Location;  
-  userId: string;
-  price: number;
+    id: string;
+    title: string;
+    description: string;
+    imageSrc: string;
+    createdAt: Date;
+    activity: string;
+    roomCount: number;
+    bathroomCount: number;
+    guestCount: number;
+    location: Location;
+    userId: string;
+    price: number;
 }
 
 function parseLocation(locationJson: any): Location | null {
     try {
-      if (typeof locationJson === 'string') {
-        return JSON.parse(locationJson);
-      }
-      return locationJson as Location;  
+        if (typeof locationJson === 'string') {
+            return JSON.parse(locationJson);
+        }
+        return locationJson as Location;
     } catch (error) {
-      console.error('Failed to parse location JSON', error);
-      return null;
+        console.error('Failed to parse location JSON', error);
+        return null;
     }
-  }
+}
 interface ListingCardProps {
     data: SafeListing;
     reservation?: Reservation;
@@ -74,7 +74,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
     // const price = useMemo(() => reservation?.totalPrice || data.price, [reservation, data.price]);
 
     return (
-        <div onClick={() => router.push(`/listing/${data.id}`)} 
+        <div onClick={() => router.push(`/listings/${data.id}`)}
             className='col-span-1 cusrsor-pointer group'
         >
             <div className='flex flex-col w-full gap-2'>
@@ -93,12 +93,12 @@ const ListingCard: React.FC<ListingCardProps> = ({
                     </div>
                 </div>
                 <div className="text-lg font-semibold">
-                {location?.label}, {location?.region}
-        </div>
-        {/* <div className="font-light text-neutral-500">
+                    {location?.label}, {location?.region}
+                </div>
+                {/* <div className="font-light text-neutral-500">
           {reservationDate || data.activity}
         </div> */}
-        {/* <div className="flex flex-row items-center gap-1">
+                {/* <div className="flex flex-row items-center gap-1">
           <div className="font-semibold">
             $ {price}
           </div>
@@ -106,7 +106,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
             <div className="font-light">night</div>
           )}
         </div> */}
-        {/* {onAction && actionLabel && (
+                {/* {onAction && actionLabel && (
           <Button
             disabled={disabled}
             small
@@ -114,9 +114,9 @@ const ListingCard: React.FC<ListingCardProps> = ({
             onClick={handleCancel}
           />
         )} */}
-      </div>
-    </div>
-   );
+            </div>
+        </div>
+    );
 }
- 
+
 export default ListingCard;
