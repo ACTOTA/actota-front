@@ -1,14 +1,14 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Listing as PrismaListing } from '@prisma/client';
+import { Listing as PrismaListing, Reservation } from '@prisma/client';
 
 
-import { SafeUser } from '@/app/types'; // Make sure this path is correct
+import { SafeListing, SafeUser } from '@/app/types'; // Make sure this path is correct
 import useTowns from '@/app/hooks/useTowns';
 import React, { useCallback, useMemo } from 'react';
 import { format } from 'date-fns';
-import { SafeReservation } from '@/app/types';
+// import { SafeReservation } from '@/app/types';
 import Image from 'next/image';
 import StarButton from '../StarButton';
 import Button from '../Button';
@@ -47,8 +47,8 @@ function parseLocation(locationJson: any): Location | null {
     }
   }
 interface ListingCardProps {
-    data: Listing;
-    reservation?: SafeReservation;
+    data: SafeListing;
+    reservation?: Reservation;
     onAction?: (id: string) => void;
     disabled?: boolean;
     actionLabel?: string;
@@ -58,7 +58,7 @@ interface ListingCardProps {
 
 const ListingCard: React.FC<ListingCardProps> = ({
     data,
-    reservation,
+    // reservation,
     onAction,
     disabled = false,
     actionLabel,
@@ -71,21 +71,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
     const location = parseLocation(data.location);
 
-    const handleCancel = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-        e.stopPropagation();
-        if (!disabled) {
-            onAction?.(actionId);
-        }
-    }, [onAction, actionId, disabled]);
-
-    const price = useMemo(() => reservation?.totalPrice || data.price, [reservation, data.price]);
-
-    const reservationDate = useMemo(() => {
-        if (!reservation) return null;
-        const start = new Date(reservation.startDate);
-        const end = new Date(reservation.endDate);
-        return `${format(start, 'PP')} - ${format(end, 'PP')}`;
-    }, [reservation]);
+    // const price = useMemo(() => reservation?.totalPrice || data.price, [reservation, data.price]);
 
     return (
         <div onClick={() => router.push(`/listing/${data.id}`)} 
@@ -109,25 +95,25 @@ const ListingCard: React.FC<ListingCardProps> = ({
                 <div className="text-lg font-semibold">
                 {location?.label}, {location?.region}
         </div>
-        <div className="font-light text-neutral-500">
+        {/* <div className="font-light text-neutral-500">
           {reservationDate || data.activity}
-        </div>
-        <div className="flex flex-row items-center gap-1">
+        </div> */}
+        {/* <div className="flex flex-row items-center gap-1">
           <div className="font-semibold">
             $ {price}
           </div>
           {!reservation && (
             <div className="font-light">night</div>
           )}
-        </div>
-        {onAction && actionLabel && (
+        </div> */}
+        {/* {onAction && actionLabel && (
           <Button
             disabled={disabled}
             small
             label={actionLabel} 
             onClick={handleCancel}
           />
-        )}
+        )} */}
       </div>
     </div>
    );
