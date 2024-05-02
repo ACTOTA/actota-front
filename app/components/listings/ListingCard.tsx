@@ -7,7 +7,7 @@ import { Listing as PrismaListing, Reservation } from '@prisma/client';
 import { SafeListing, SafeUser } from '@/app/types'; // Make sure this path is correct
 import useTowns from '@/app/hooks/useTowns';
 import React, { useCallback, useMemo } from 'react';
-import { format } from 'date-fns';
+// import { format } from 'date-fns';
 // import { SafeReservation } from '@/app/types';
 import Image from 'next/image';
 import StarButton from '../StarButton';
