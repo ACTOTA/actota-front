@@ -8,7 +8,7 @@ import { SafeListing, SafeUser } from '@/app/types'; // Make sure this path is c
 import useTowns from '@/app/hooks/useTowns';
 import React, { useCallback, useMemo } from 'react';
 // import { format } from 'date-fns';
-// import { SafeReservation } from '@/app/types';
+
 import Image from 'next/image';
 import StarButton from '../StarButton';
 import Button from '../Button';
@@ -58,7 +58,7 @@ interface ListingCardProps {
 
 const ListingCard: React.FC<ListingCardProps> = ({
     data,
-    // reservation,
+    reservation,
     onAction,
     disabled = false,
     actionLabel,
@@ -71,7 +71,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
     const location = parseLocation(data.location);
 
-    // const price = useMemo(() => reservation?.totalPrice || data.price, [reservation, data.price]);
+    const price = useMemo(() => reservation?.totalPrice || data.price, [reservation, data.price]);
 
     return (
         <div onClick={() => router.push(`/listings/${data.id}`)}
@@ -95,25 +95,25 @@ const ListingCard: React.FC<ListingCardProps> = ({
                 <div className="text-lg font-semibold">
                     {location?.label}, {location?.region}
                 </div>
-                {/* <div className="font-light text-neutral-500">
-          {reservationDate || data.activity}
-        </div> */}
-                {/* <div className="flex flex-row items-center gap-1">
+                <div className="font-light text-neutral-500">
+          {data.activity}
+        </div>
+                <div className="flex flex-row items-center gap-1">
           <div className="font-semibold">
             $ {price}
           </div>
           {!reservation && (
             <div className="font-light">night</div>
           )}
-        </div> */}
-                {/* {onAction && actionLabel && (
+        </div>
+                {onAction && actionLabel && (
           <Button
             disabled={disabled}
             small
             label={actionLabel} 
             onClick={handleCancel}
           />
-        )} */}
+        )}
             </div>
         </div>
     );
