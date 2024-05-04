@@ -6,7 +6,7 @@ import { Reservation } from "@prisma/client";
 import { SafeListing, SafeUser } from "@/app/types";
 import { activities } from "@/app/components/navbar/Activities";
 import Container from "@/app/components/Container";
-import ListingHead from "./ListingHead";
+import ListingHead from "@/app/components/listings/ListingHead";
 import ListingInfo from "@/app/components/listings/ListingInfo";
 import ListingReservation from "@/app/components/listings/ListingReservation";
 
