@@ -19,7 +19,7 @@ import Modal from "./Modal";
 import Input from "../inputs/input";
 import Heading from "../Heading";
 import Button from "../Button";
-import Activities from "../navbar/Activities";
+import Activities from "../Activities";
 import useActivitiesModal from "@/app/hooks/useActivitiesModal";
 
 const ActivitiesModal = () => {

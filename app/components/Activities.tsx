@@ -1,6 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import Container from './Container';
+import ActivityBox from './ActivityBox';
+
 
 import { usePathname, useSearchParams } from 'next/navigation';
 import { TbBeach, TbMountain, TbPool, TbChefHat } from 'react-icons/tb';
@@ -30,10 +33,8 @@ import { IoDiamond } from 'react-icons/io5';
 
 import { MdOutlineKayaking, MdGolfCourse, MdSnowmobile, MdSnowshoeing } from "react-icons/md";
 
-import ActivityBox from "../ActivityBox";
-import Container from '../Container';
 import { FaT } from 'react-icons/fa6';
-import { ActivitySelectValue } from '../inputs/ActivityInput';
+
 
 
 export const activities = [
@@ -185,20 +186,29 @@ export const activities = [
 
   
 ]
-const Activities = () => {
-  const [selectedActivities, setSelectedActivities] = useState<ActivitySelectValue[]>([]);
-  
+
+interface ActivitySelectValue {
+  label: string;
+  duration: number;
+}
+
+interface ActivitiesProps {
+  value: ActivitySelectValue[];
+  onChange: (activities: ActivitySelectValue[]) => void;
+}
+
+const Activities: React.FC<ActivitiesProps> = ({ value, onChange }) => {
   const handleActivityClick = (activity: ActivitySelectValue) => {
-    const isAlreadySelected = selectedActivities.some(a => a.label === activity.label);
+    const isAlreadySelected = value.some(a => a.label === activity.label);
     if (isAlreadySelected) {
-      setSelectedActivities(selectedActivities.filter(a => a.label !== activity.label));
+      onChange(value.filter(a => a.label !== activity.label));
     } else {
-      setSelectedActivities([...selectedActivities, activity]);
+      onChange([...value, activity]);
     }
   };
 
-  const activityCount = selectedActivities.length;
-  const activityDuration = selectedActivities.reduce((acc, a) => acc + a.duration, 0);
+  const activityCount = value.length;
+  const activityDuration = value.reduce((acc, a) => acc + a.duration, 0);
 
   return (
     <Container>
@@ -209,13 +219,13 @@ const Activities = () => {
             label={item.label}
             icon={item.icon}
             duration={item.duration}
-            selected={selectedActivities.some(a => a.label === item.label)}
-            onClick={handleActivityClick}
+            selected={value.some(a => a.label === item.label)}
+            onClick={() => handleActivityClick(item)}
           />
         )}
       </div>
       <div>
-        Selected Activities: {selectedActivities.map(a => a.label).join(', ')}
+        Selected Activities: {value.map(a => a.label).join(', ')}
       </div>
       <div>
         Activity Count: {activityCount}
@@ -225,6 +235,6 @@ const Activities = () => {
       </div>
     </Container>
   );
-}
+};
 
 export default Activities;

@@ -20,7 +20,6 @@ const Search = () => {
   const  endDate = params?.get('endDate');
   const  guestCount = params?.get('guestCount');
 
-  const activitiesModal = useActivitiesModal();
   const initialActivities = params?.get('activities');
   const [selectedActivitiesCount, setSelectedActivitiesCount] = useState<number>(initialActivities ? initialActivities.split(',').length : 0);
 
@@ -57,19 +56,12 @@ const Search = () => {
   }, [guestCount]);
 
   const activitiesLabel = useMemo(() => {
-    return `${selectedActivitiesCount} Activities`;
+    if (selectedActivitiesCount > 0) {
+      return `${selectedActivitiesCount} Activities`;
+    }
+    return 'Add Activities';
   }, [selectedActivitiesCount]);
 
-  const handleActivityClick = useCallback(() => {
-    setSearch(!search);
-    console.log("search: ", search);
-
-    if(search) {
-      activitiesModal.onOpen();
-    }
-
-    setSelectedActivitiesCount(prevCount => prevCount + 1); // Increment count on activity click
-  }, [search, activitiesModal]); 
 
   return ( 
     <div
@@ -96,21 +88,6 @@ const Search = () => {
         </div>
         <div 
           className="
-            hidden
-            sm:block
-            text-sm
-            text-black-600
-            font-semibold
-            px-6
-            border-r-[1px]
-            flex-1
-            text-center
-          "
-        >
-          {activitiesLabel}
-        </div>
-        <div 
-          className="
             hidden 
             sm:block 
             text-sm 
@@ -126,9 +103,39 @@ const Search = () => {
         <div 
           className="flex flex-row items-center gap-3 pl-6 pr-2 text-sm text-gray-600 "
         >
-          <div className="hidden sm:block">{guestLabel}</div>
+          <div className="hidden sm:block">{guestLabel}
+          </div>
           <div 
-            className="p-2 text-white rounded-full bg-rose-500"
+          className="
+            hidden
+            sm:block
+            text-sm
+            text-black-600
+            font-semibold
+            px-6
+            border-r-[1px]
+            flex-1
+            text-center
+          "
+           >
+          {activitiesLabel}
+        </div>
+          <div 
+                className="
+                    hidden
+                    sm:block
+                    text-sm
+                    font-semibold
+                    px-6
+                    border-r-[1px]
+                    flex-1
+                    text-center
+                "
+                >
+                Any Type
+                </div>         
+          <div 
+            className="p-2 text-white rounded-full bg-logo-blue"
           >
             <BiSearch size={18} />
           </div>

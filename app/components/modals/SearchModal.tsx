@@ -15,14 +15,16 @@ import TownSelect, { TownSelectValue } from "../inputs/TownSelect";
 import ActivityBox, { ActivitySelectValue } from '../inputs/ActivityInput';
 import Heading from '../Heading';
 import ActivitiesModal from './ActivitiesModal';
-import Activities from '../navbar/Activities';
+import Activities from '../Activities';
 import useActivitiesModal from '@/app/hooks/useActivitiesModal';
+import Types from '../Types';
 
 enum STEPS {
   LOCATION = 0,
   DATE = 1,
   INFO = 2,
   ACTIVITIES = 3,
+  TYPE = 4,
 }
 
 const SearchModal = () => {
@@ -58,7 +60,7 @@ const SearchModal = () => {
   }, []);
 
   const onSubmit = useCallback(async () => {
-    if (step !== STEPS.ACTIVITIES) {
+    if (step !== STEPS.TYPE) {
       return onNext();
     }
 
@@ -109,7 +111,7 @@ const SearchModal = () => {
   ]);
 
   const actionLabel = useMemo(() => {
-    if (step === STEPS.ACTIVITIES) {
+    if (step === STEPS.TYPE) {
       return 'Search'
     }
 
@@ -192,11 +194,15 @@ const SearchModal = () => {
     bodyContent = (
       <Activities
         value={selectedActivities} 
-        onChange={(value) => setSelectedActivities(value as ActivitySelectValue[])} // Update the selected activities
+        onChange={setSelectedActivities} 
       />
+    );
+  }
+  if (step === STEPS.TYPE) {
+    bodyContent = (
+     <Types />
     )
   }
-
   return (
     <Modal
       isOpen={searchModal.isOpen}

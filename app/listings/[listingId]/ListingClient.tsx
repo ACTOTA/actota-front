@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { Reservation } from "@prisma/client";
 
 import { SafeListing, SafeUser } from "@/app/types";
-import { activities } from "@/app/components/navbar/Activities";
+import { activities } from "@/app/components/Activities";
 import Container from "@/app/components/Container";
 import ListingHead from "@/app/components/listings/ListingHead";
 import ListingInfo from "@/app/components/listings/ListingInfo";
