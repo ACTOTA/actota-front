@@ -107,7 +107,7 @@ const SearchModal = () => {
     onNext,
     bathroomCount,
     params,
-    selectedActivities, // Include selectedActivities in dependencies
+    selectedActivities, 
   ]);
 
   const actionLabel = useMemo(() => {
