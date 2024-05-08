@@ -34,8 +34,8 @@ const TypesBox: React.FC<TypesBoxProps> = ({
     <div
       onClick={handleClick}
       className={`
-        border-2
-        rounded-full
+        border-b-2
+       
         m-auto
         flex
         gap-6
@@ -51,7 +51,7 @@ const TypesBox: React.FC<TypesBoxProps> = ({
       `}
     >
       
-      {/* <Icon size={40} className= "bg-logo-blue border-2 border-black my-auto rounded-full text-white" style={{ marginLeft: '5px' }} /> */}
+      {/* <Icon size={40} className= "my-auto text-white border-2 border-black rounded-full bg-logo-blue" style={{ marginLeft: '5px' }} /> */}
       <Icon
         size={40}
         className={`
@@ -66,7 +66,7 @@ const TypesBox: React.FC<TypesBoxProps> = ({
         `}
         style={{ marginLeft: '5px' }}
       />
-      <div className="font-medium text-sm my-auto ">
+      <div className="my-auto text-sm font-medium ">
         {label}
       </div>
     </div>

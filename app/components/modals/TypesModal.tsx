@@ -19,9 +19,9 @@ import Modal from "./Modal";
 import Input from "../inputs/input";
 import Heading from "../Heading";
 import Button from "../Button";
-import Activities from "../navbar/Activities";
+import Activities from "../Activities";
 import useTypesModal from "@/app/hooks/useTypesModal";
-import Types from "../navbar/Types";
+import Types from "../Types";
 
 const TypesModal = () => {
     

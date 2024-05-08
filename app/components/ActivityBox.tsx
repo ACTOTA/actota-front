@@ -1,36 +1,38 @@
-'use client';
-
 import { IconType } from "react-icons";
 import { useCallback, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-
 
 interface ActivityBoxProps {
-  icon: IconType,
+  icon: IconType;
   label: string;
-  checked?: [];
+  duration: number;
+  selected?: boolean;
+  onClick: (activity: ActivitySelectValue) => void;
 }
+
+type ActivitySelectValue = {
+  label: string;
+  duration: number;
+};
 
 const ActivityBox: React.FC<ActivityBoxProps> = ({
   icon: Icon,
   label,
+  duration,
+  selected,
+  onClick,
 }) => {
-  const router = useRouter();
-  const params = useSearchParams();
-  const [check, setCheck] = useState(false);
-
-
-  const handleClick = useCallback(() => {
-
-    setCheck(!check);
-
-  }, [ check]); 
+  const [isChecked, setIsChecked] = useState(selected);
 
   useEffect(() => {
-    console.log("Activity Box check:    ", check);
-  }, [check, handleClick]);
+    setIsChecked(selected);
+  }, [selected]);
 
-  return ( 
+  const handleClick = useCallback(() => {
+    setIsChecked(!isChecked);
+    onClick({ label, duration }); // Pass label and duration to the onClick function
+  }, [isChecked, label, duration, onClick]);
+
+  return (
     <div
       onClick={handleClick}
       className={`
@@ -47,30 +49,26 @@ const ActivityBox: React.FC<ActivityBoxProps> = ({
         duration-200 
         ease-in
         cursor-pointer
-        ${check ? 'bg-logo-blue text-white border-3' : ' hover:bg-slate-200 bg-white'}
+        ${isChecked ? 'bg-logo-blue text-white border-3' : 'hover:bg-slate-200 bg-white'}
       `}
     >
-      
-      {/* <Icon size={40} className= "bg-logo-blue border-2 border-black my-auto rounded-full text-white" style={{ marginLeft: '5px' }} /> */}
       <Icon
         size={40}
         className={`
           bg-white 
           border-2
-          
           my-auto 
           rounded-full 
           text-black
-          ${check ? ' bg-logo-blue  border-logo-yellow' : 'text-slate-500 bg-logo-blue '
-          }
+          ${isChecked ? ' bg-logo-blue  border-logo-yellow' : 'text-slate-500 bg-logo-blue'}
         `}
         style={{ marginLeft: '5px' }}
       />
-      <div className="font-medium text-sm my-auto ">
+      <div className="my-auto text-sm font-medium">
         {label}
       </div>
     </div>
-   );
+  );
 }
- 
+
 export default ActivityBox;

@@ -28,10 +28,23 @@ import { IoDiamond } from 'react-icons/io5';
 
 import { MdOutlineKayaking, MdGolfCourse, MdSnowmobile, MdSnowshoeing } from "react-icons/md";
 
-import TypesBox from '../TypesBox';
-import Container from '../Container';
+import TypesBox from './TypesBox';
+import Container from './Container';
 import { FaT } from 'react-icons/fa6';
 
+interface Types {
+  id: string;
+  title: string;
+  description: string;
+  imageSrc: string;
+  activityCount: number;
+  roomCount: number;
+  bathroomCount: number;
+  guestCount: number;
+  location: Location;
+  maxddt: number;
+  price: number;
+}
 
 export const types = [
   {
@@ -39,6 +52,7 @@ export const types = [
     icon: FaRandom,
     description: 'This property is in a barn!'
   },
+  
 
 ]
 
@@ -55,21 +69,7 @@ const Types = () => {
   return (
     <Container>
       <div
-        className="
-          width-full
-          h-auto
-          m-0
-          grid
-          gap-1
-          gap-y-2
-          gap-x-4
-          grid-cols-3
-        
-
-          max-xl:grid-cols-3
-          max-lg:grid-cols-2
-          max-sm:grid-cols-1
-        "
+        className="grid h-auto grid-cols-3 gap-1 m-0 width-full gap-y-2 gap-x-4 max-xl:grid-cols-3 max-lg:grid-cols-2 max-sm:grid-cols-1"
       >
         {types.map((item) => 
           <TypesBox 

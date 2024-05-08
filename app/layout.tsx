@@ -1,15 +1,17 @@
 import React from "react";
 import { Nunito } from 'next/font/google';
-
 import "./globals.css";
+
 import Navbar from "./components/navbar/Navbar";
 import ClientOnly from './components/ClientOnly';
 import RegisterModal from './components/modals/RegisterModal';
-import ToasterProvider from './providers/ToasterProvider';
 import LoginModal from "./components/modals/LoginModal";
-import getCurrentUser from "./actions/getCurrentUser";
 import RentModal from "./components/modals/RentModal";
 import Filter from "./components/Filter"; // Make sure this path is correct
+import SearchModal from "./components/modals/SearchModal";
+
+import ToasterProvider from './providers/ToasterProvider';
+import getCurrentUser from "./actions/getCurrentUser";
 
 export const metadata = {
   title: "ACTOTA!",
@@ -31,6 +33,7 @@ export default async function RootLayout({
       <body className={font.className}>
         <ClientOnly>
           <ToasterProvider />
+          <SearchModal />
           <RentModal />
           <LoginModal />
           <RegisterModal />

@@ -1,98 +1,100 @@
-'use client';
-import { useCallback, useEffect, useState } from "react";
-import { BiSearch } from "react-icons/bi";
-import useLoginModal from "@/app/hooks/useLoginModal";
+import { useCallback, useEffect, useState, useMemo } from "react";
+import { useSearchParams } from 'next/navigation';
+import { BiSearch } from 'react-icons/bi';
+import { differenceInDays } from 'date-fns';
 
-import ActivitiesModal from "../modals/ActivitiesModal";
-import useActivitiesModal from "@/app/hooks/useActivitiesModal";
+import useSearchModal from '@/app/hooks/useSearchModal';
+import useTowns from '@/app/hooks/useTowns';
+import useActivitiesModal from '@/app/hooks/useActivitiesModal';
 
-import TypesModal from "../modals/TypesModal";
-import useTypesModal from "@/app/hooks/useTypesModal";
-import { types } from "util";
-
-
+// Assuming useSearchModal returns a function to close the modal
 const Search = () => {
+  const searchModal = useSearchModal();
+  const [search, setSearch] = useState(false);
+  
+  const params = useSearchParams();
+  const { getByValue } = useTowns();
 
-    const [search, setSearch] = useState(false);
-    const activitiesModal = useActivitiesModal();
-    const typesModal = useTypesModal();
-    const loginModal = useLoginModal();
+  const locationValue = params?.get('locationValue'); 
+  const startDate = params?.get('startDate');
+  const endDate = params?.get('endDate');
+  const guestCount = params?.get('guestCount');
+  const initialActivities = params?.get('activities');
 
-    const handleClick = useCallback(() => {
+  const [selectedActivities, setSelectedActivities] = useState<string[]>(initialActivities ? initialActivities.split(',') : []);
+  const [selectedActivitiesCount, setSelectedActivitiesCount] = useState(selectedActivities.length);
 
-        setSearch(!search);
-        console.log("search: ", search);
+  useEffect(() => {
+    // This effect runs when `initialActivities` changes.
+    const activitiesArray = initialActivities ? initialActivities.split(',') : [];
+    setSelectedActivities(activitiesArray);
+    setSelectedActivitiesCount(activitiesArray.length);
+  }, [initialActivities]);
 
-        if(search) {
-            activitiesModal.onOpen();
-        }
-    
-    }, [search, activitiesModal]); 
-    
+  const locationLabel = useMemo(() => locationValue ? getByValue(locationValue as string)?.label : 'Denver, CO', [locationValue, getByValue]);
+  const durationLabel = useMemo(() => startDate && endDate ? `${differenceInDays(new Date(endDate), new Date(startDate)) || 1} Days` : 'Any Week', [startDate, endDate]);
+  const guestLabel = useMemo(() => guestCount ? `${guestCount} Guests` : 'Add Guests', [guestCount]);
+  const activitiesLabel = useMemo(() => selectedActivitiesCount > 0 ? `${selectedActivitiesCount} Activities` : 'Add Activities', [selectedActivitiesCount]);
 
-    return (  
-        <div
-            className="
-                boarder-[1px]
-                w-full
-                md:w-auto
-                py-2
-                rounded-full
-                shadow-sm
-                hover:shadow-md
-                transistion
-                cursor-pointer
-            "
+
+  return ( 
+    <div
+      onClick={searchModal.onOpen}
+      className="
+        border-[1px] 
+        w-full 
+        md:w-auto 
+        py-2 
+        rounded-full 
+        shadow-sm 
+        hover:shadow-md 
+        transition 
+        cursor-pointer
+      "
+    >
+      <div 
+        className="flex flex-row items-center justify-between "
+      >
+        <div 
+          className="px-6 text-sm font-semibold "
         >
-            <div
-                className="
-                    flex
-                    flex-row
-                    items-center
-                    justify-between
-                "
-                >
-                <div
-                className="
-                    text-sm
-                    font-semibold
-                    px-6
-                    h-full
-                "
-                >
-                Denver, CO
-                </div>
-                <div
-                className="
-                    hidden
-                    sm:block
-                    text-sm
-                    font-semibold
-                    px-6
-                    border-x-[1px]
-                    flex-1
-                    text-center
-                "
-                >
-                Any Week
-                </div>
-                <div onClick={activitiesModal.onOpen}
-                    className="
-                        hidden
-                        sm:block
-                        text-sm
-                        text-black-600
-                        font-semibold
-                        px-6
-                        border-r-[1px]
-                        flex-1
-                        text-center
-                    "
-                >
-                Any Activities
-                </div>
-
-                <div onClick={typesModal.onOpen}
+          {locationLabel}
+        </div>
+        <div 
+          className="
+            hidden 
+            sm:block 
+            text-sm 
+            font-semibold 
+            px-6 
+            border-x-[1px] 
+            flex-1 
+            text-center
+          "
+        >
+          {durationLabel}
+        </div>
+        <div 
+          className="flex flex-row items-center gap-3 pl-6 pr-2 text-sm text-gray-600 "
+        >
+          <div className="hidden sm:block">{guestLabel}
+          </div>
+          <div 
+          className="
+            hidden
+            sm:block
+            text-sm
+            text-black-600
+            font-semibold
+            px-6
+            border-r-[1px]
+            flex-1
+            text-center
+          "
+           >
+          {activitiesLabel}
+        </div>
+          <div 
                 className="
                     hidden
                     sm:block
@@ -105,45 +107,22 @@ const Search = () => {
                 "
                 >
                 Any Type
-                </div>
-                <div
-                    className="
-                    text-sm
-                    pl-6
-                    pr-2
-                    text-gray-600
-                    flex
-                    flex-row
-                    items-center
-                    gap-3
-                "
-                >
-
-                
-                <div 
-                    className="
-                    hidden sm:block
-                    "
-                >
-                Add Guests
-                </div>
-                    <div
-                        className="
-                        p-2
-                        bg-logo-blue
-                        rounded-full
-                        text-white
-                        "
-                    >
-                        <BiSearch onClick={() => console.log("clicked")} size={18}/>
+                </div>         
+                  <div 
+                    className="p-2 text-white rounded-full bg-logo-blue"
+                  >
+                      <div className="icon-container">
+                    <BiSearch size={18} style={{ position: 'relative', zIndex: 1 }} />
+                    <div className="icon-gradient-outline">
+                      
                     </div>
                 </div>
-                <ActivitiesModal />
-                <TypesModal />
             </div>
         </div>
-    );
+       
+      </div>
+    </div>
+  );
 }
-
-
+ 
 export default Search;

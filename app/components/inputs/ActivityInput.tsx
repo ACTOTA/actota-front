@@ -2,6 +2,7 @@
 
 import { IconType } from "react-icons";
 
+
 interface ActivityBoxProps {
   icon: IconType,
   label: string;
@@ -9,6 +10,10 @@ interface ActivityBoxProps {
   onClick: (value: string) => void;
 }
 
+export type ActivitySelectValue = {
+  label: string;
+  duration: number;
+}
 const ActivityBox: React.FC<ActivityBoxProps> = ({
   icon: Icon,
   label,

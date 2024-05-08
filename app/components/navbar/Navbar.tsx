@@ -1,7 +1,7 @@
 'use client';
 
 import Container from "../Container";
-import Activities from "./Activities";
+import Activities from "../Activities";
 import Logo from "./Logo";
 import Search from "./Search";
 import UserMenu from "./UserMenu";
