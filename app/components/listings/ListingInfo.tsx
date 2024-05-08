@@ -7,6 +7,7 @@ import { IconType } from "react-icons";
 
 import Avatar from "../Avatar";
 import ListingActivity from "./ListingActivity";
+import ListingDays from "./ListingDays";
 interface ListingInfoProps {
   user: SafeUser,
   description: string;
@@ -71,6 +72,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
             {description}
           </div>
           <hr />
+          
           <Map center={coordinates} />
         </div>
        );
