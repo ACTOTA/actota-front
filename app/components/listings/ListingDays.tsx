@@ -25,7 +25,7 @@ export default function Example() {
     <nav aria-label="Progress">
       <ol role="list" className="space-y-4 md:flex md:space-x-8 md:space-y-0">
         {days.map((day) => (
-          <li key={day.name} className="md:flex-1">
+          <li key={day.town} className="md:flex-1">
             {day.status === 'complete' ? (
               <a
                 href={day.href}
@@ -39,7 +39,7 @@ export default function Example() {
               <a
                 href={day.href}
                 className="flex flex-col py-2 pl-4 border-l-4 border-logo-blue md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4"
-                aria-current="day"
+                aria-current={true}
               >
                 <span className="text-sm font-medium text-logo-blue">{day.id}</span>
                 <span className="text-sm font-medium">{day.town}</span>

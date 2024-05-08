@@ -14,9 +14,9 @@ const sortOptions = [
   { name: 'Price: Low to High', href: '#', current: false },
   { name: 'Price: High to Low', href: '#', current: false },
 ];
-const subCategories = [
-  { name: 'Featured', href: '#' },
-];
+// const subCategories = [
+//   { name: 'Featured', href: '#' },
+// ];
 
 const filters = [
   {
@@ -100,7 +100,8 @@ export default function Filter() {
             >
               <Dialog.Panel className="relative flex flex-col w-full h-full max-w-xs py-4 pb-12 ml-auto overflow-y-auto bg-white shadow-xl">
                 <div className="flex items-center justify-between px-4">
-                  <h2 className="text-lg font-medium text-gray-900">Filters</h2>
+                <h2 className="text-lg font-medium gray-900 gradient-underline">Itinerary Tuner</h2>
+
                   <button
                     type="button"
                     className="flex items-center justify-center w-10 h-10 p-2 -mr-2 text-gray-400 bg-white rounded-md"
@@ -114,7 +115,7 @@ export default function Filter() {
 {/* Filters */}
 <form className="mt-4 border-t border-gray-200">
   <h3 className="sr-only">Categories</h3>
-  <ul role="list" className="px-2 py-3 font-medium text-gray-900">
+  {/* <ul role="list" className="px-2 py-3 font-medium text-gray-900">
     {subCategories.map((category) => (
       <li key={category.name}>
         <a href={category.href} className="block px-2 py-3">
@@ -122,7 +123,7 @@ export default function Filter() {
         </a>
       </li>
     ))}
-  </ul>
+  </ul> */}
 
   {filters.map((section) => (
     <Disclosure as="div" key={section.id} className="px-4 py-6 border-t border-gray-200">
@@ -242,7 +243,7 @@ onClick={() => setMobileFiltersOpen(true)}
 <h2 id="products-heading" className="sr-only">Products</h2>
 
 <div className="grid grid-cols-1 gap-x-8 gap-y-10">
-Product grid
+Product Grid
 <div className="col-span-1">
 </div>
 </div>

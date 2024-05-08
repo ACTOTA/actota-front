@@ -5,6 +5,7 @@ import EmptyState from "@/app/components/EmptyState";
 import ClientOnly from "./components/ClientOnly";
 import getCurrentUser from "./actions/getCurrentUser";
 import ListingCard from "./components/listings/ListingCard";
+import Filter from "./components/Filter";
 
 
 export default async function Home() {

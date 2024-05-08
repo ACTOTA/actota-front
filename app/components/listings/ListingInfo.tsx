@@ -8,6 +8,7 @@ import { IconType } from "react-icons";
 import Avatar from "../Avatar";
 import ListingActivity from "./ListingActivity";
 import ListingDays from "./ListingDays";
+import ListingItinerary from "./ListingItinerary";
 interface ListingInfoProps {
   user: SafeUser,
   description: string;
@@ -72,9 +73,14 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
             {description}
           </div>
           <hr />
-          
+          <div className="display: max-w-screen-lg mx-auto flex; justify-content: center; align-items: center; height: 100%;">
+              <ListingDays />
+              <ListingItinerary/>
+          </div>
           <Map center={coordinates} />
+          
         </div>
+        
        );
     }
      

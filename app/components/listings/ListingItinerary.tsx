@@ -1,85 +1,30 @@
+import React from 'react';
+import { DateRange } from 'react-date-range';
+
 const ListingItinerary = () => {
-  return (  
-    <div>Listing Itinerary</div>
+  const itinerary = {
+    title: "Tubing in Glenwood Springs",
+    dayDescription: "enjoy the day tubing down the river",
+    date: "July 4, 2022",
+    startTime: "8:00 AM",
+    endTime: "5:00 PM",
+    driveTime: "2 hours",
+    dayActivities: "tubing, lunch, hiking",
+    dayLodging: "Hotel Colorado",
+  };
+
+  return (
+    <div>
+      <h1>{itinerary.title}</h1>
+      <p>Description: {itinerary.dayDescription}</p>
+      <p>Date: {itinerary.date}</p>
+      <p>Start Time: {itinerary.startTime}</p>
+      <p>End Time: {itinerary.endTime}</p>
+      <p>Drive Time: {itinerary.driveTime}</p>
+      <p>Activities: {itinerary.dayActivities}</p>
+      <p>Lodging: {itinerary.dayLodging}</p>
+    </div>
   );
 }
- 
+
 export default ListingItinerary;
-
-// 'use client';
-
-// import { Range } from "react-date-range";
-
-// import Button from "../Button";
-// import Calendar from "../inputs/Calendar";
-
-// interface ListingReservationProps {
-//   price: number;
-//   dateRange: Range,
-//   totalPrice: number;
-//   onChangeDate: (value: Range) => void;
-//   onSubmit: () => void;
-//   disabled?: boolean;
-//   disabledDates: Date[];
-// }
-
-// const ListingReservation: React.FC<
-//   ListingReservationProps
-// > = ({
-//   price,
-//   dateRange,
-//   totalPrice,
-//   onChangeDate,
-//   onSubmit,
-//   disabled,
-//   disabledDates
-// }) => {
-//   return ( 
-//     <div 
-//       className="
-//       bg-white 
-//         rounded-xl 
-//         border-[1px]
-//       border-neutral-200 
-//         overflow-hidden
-//       "
-//     >
-//       <div className="flex flex-row items-center gap-1 p-4 //">
-//         <div className="text-2xl font-semibold">
-//           $ {price}
-//         </div>
-//         <div className="font-light text-neutral-600">
-//           night
-//         </div>
-//       </div>
-//       <hr />
-//       <Calendar
-//         value={dateRange}
-//         disabledDates={disabledDates}
-//         onChange={(value) => 
-//           onChangeDate(value.selection)}
-//       />
-//       <hr />
-//       <div className="p-4">
-//         <Button 
-//           disabled={disabled} 
-//           label="Reserve" 
-//           onClick={onSubmit}
-//         />
-//       </div>
-//       <hr />
-//       <div 
-//         className="flex flex-row items-center justify-between p-4 text-lg font-semibold //"
-//       >
-//         <div>
-//           Total
-//         </div>
-//         <div>
-//           $ {totalPrice}
-//         </div>
-//       </div>
-//     </div>
-//    );
-// }
- 
-// export default ListingReservation;

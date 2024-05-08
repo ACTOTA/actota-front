@@ -14,11 +14,54 @@ body,
       z-index: 0 !important;
     }
     
-    /* .rdrMonth {
+    .rdrMonth {
       width: 100% !important;
     }
     
     .rdrCalendarWrapper {
       font-size: 16px !important;
       width: 100% !important;
-    } */
+    }
+
+    .rainbow-text {
+      background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block; /* Required for gradient to apply correctly */
+    }
+    
+.gradient-underline {
+  position: relative;
+  color: #333; /* Ensure text color is set for contrast */
+  display: inline-block; /* Needed for correct positioning of pseudo-element */
+}
+
+.gradient-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px; /* Adjust position slightly below the text */
+  height: 2px; /* Thickness of the underline */
+  background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+  display: block;
+}
+
+    
+    .rainbow-gradient {
+      background: linear-gradient(
+        to right,
+        red,
+        orange,
+        yellow,
+        green,
+        blue,
+        indigo,
+        violet
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      fill: currentColor;
+    }
+    
