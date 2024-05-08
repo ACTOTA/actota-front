@@ -1,14 +1,14 @@
 
 
 const days = [
-  { id: 'Day 1', href: '#', town: 'Arrival',  activities: 'A1,A2,A3', status: 'complete' },
-  { id: 'Day 2', href: '#', town: 'Town',  activities: 'A1,A2,A3', status: 'complete' },
-  { id: 'Day 3', href: '#', town: 'Town',  activities: 'A1,A2,A3', status: 'in progress' },
-  { id: 'Day 4', href: '#', town: 'Town',  activities: 'A1,A2,A3', status: 'complete' },
-  { id: 'Day 5', href: '#', town: 'Town',  activities: 'A1,A2,A3', status: 'upcoming' },
-  { id: 'Day 6', href: '#', town: 'Town',  activities: 'A1,A2,A3', status: 'upcoming' },
-  { id: 'Day 7', href: '#', town: 'Town',  activities: 'A1,A2,A3', status: 'complete' },
-  { id: 'Day 8', href: '#', town: 'Town',  activities: 'A1,A2,A3', status: 'complete' },
+  { id: 'Day 1', href: '#', town: 'Arrival', activities: 'A1,A2,A3', status: 'complete' },
+  { id: 'Day 2', href: '#', town: 'Town', activities: 'A1,A2,A3', status: 'complete' },
+  { id: 'Day 3', href: '#', town: 'Town', activities: 'A1,A2,A3', status: 'in progress' },
+  { id: 'Day 4', href: '#', town: 'Town', activities: 'A1,A2,A3', status: 'complete' },
+  { id: 'Day 5', href: '#', town: 'Town', activities: 'A1,A2,A3', status: 'upcoming' },
+  { id: 'Day 6', href: '#', town: 'Town', activities: 'A1,A2,A3', status: 'upcoming' },
+  { id: 'Day 7', href: '#', town: 'Town', activities: 'A1,A2,A3', status: 'complete' },
+  { id: 'Day 8', href: '#', town: 'Town', activities: 'A1,A2,A3', status: 'complete' },
 
 ]
 
@@ -20,15 +20,20 @@ const days = [
 //set current day = day clicked. current day should be the only one that is highlighted
 
 
-export default function Example() {
+export default function Example({ day, setDay }) {
+
+  const handleDayClick = (dayId: string) => {
+    setDay(dayId)
+    console.log(day)
+  }
+
   return (
     <nav aria-label="Progress">
       <ol role="list" className="space-y-4 md:flex md:space-x-8 md:space-y-0">
         {days.map((day) => (
-          <li key={day.town} className="md:flex-1">
+          <li key={day.town} className="md:flex-1" onClick={() => handleDayClick(day.id)}>
             {day.status === 'complete' ? (
               <a
-                href={day.href}
                 className="flex flex-col py-2 pl-4 border-l-4 border-logo-blue group hover:border-logo-blue md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4"
               >
                 <span className="text-sm font-medium text-logo-blue group-hover:text-logo-blue">{day.id}</span>
@@ -37,7 +42,6 @@ export default function Example() {
               </a>
             ) : day.status === 'current' ? (
               <a
-                href={day.href}
                 className="flex flex-col py-2 pl-4 border-l-4 border-logo-blue md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4"
                 aria-current={true}
               >
@@ -46,7 +50,6 @@ export default function Example() {
               </a>
             ) : (
               <a
-                href={day.href}
                 className="flex flex-col py-2 pl-4 border-l-4 border-gray-200 group hover:border-gray-300 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4"
               >
                 <span className="text-sm font-medium text-gray-500 group-hover:text-gray-700">{day.id}</span>
