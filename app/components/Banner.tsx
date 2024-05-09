@@ -14,8 +14,23 @@ function Banner() {
                 left: 0,
                 width: '100%',
                 height: '100%',
-                background: 'linear-gradient(to bottom, rgba(255,255,255,0) 80%, rgba(255,255,255,1) 100%)'  // Gradient only at the bottom
+                background: 'linear-gradient(to bottom, rgba(255,255,255,0) 80%, rgba(255,255,255,1) 100%)'
             }}></div>
+            <button style={{
+                position: 'absolute',
+                top: '80%', // Align with the start of the gradient
+                left: '50%', // Center horizontally
+                transform: 'translate(-50%, -50%)', // Center the button
+                padding: '10px 20px',
+                fontSize: '16px',
+                color: '#fff',
+                backgroundColor: '#007BFF', // Example blue color
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer'
+            }}>
+                Surprise Me! 
+            </button>
         </div>
     );
 }
