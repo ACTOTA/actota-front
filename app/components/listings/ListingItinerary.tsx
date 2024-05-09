@@ -1,28 +1,41 @@
 import React from 'react';
 import { DateRange } from 'react-date-range';
 
-const ListingItinerary = () => {
-  const itinerary = {
-    title: "Tubing in Glenwood Springs",
-    dayDescription: "enjoy the day tubing down the river",
-    date: "July 4, 2022",
-    startTime: "8:00 AM",
-    endTime: "5:00 PM",
-    driveTime: "2 hours",
-    dayActivities: "tubing, lunch, hiking",
-    dayLodging: "Hotel Colorado",
-  };
+interface DayItineraryProps {
+  title: string;
+  dayDescription: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  driveTime: string;
+  dayActivities: string;
+  dayLodging: string;
+  dayActivityCount: number;
+};
+
+const ListingItinerary: React.FC<DayItineraryProps> = ({
+  title,
+  dayDescription,
+  date,
+  startTime,
+  endTime,
+  driveTime,
+  dayActivities,
+  dayLodging,
+  dayActivityCount
+}) => {
+
 
   return (
     <div>
-      <h1>{itinerary.title}</h1>
-      <p>Description: {itinerary.dayDescription}</p>
-      <p>Date: {itinerary.date}</p>
-      <p>Start Time: {itinerary.startTime}</p>
-      <p>End Time: {itinerary.endTime}</p>
-      <p>Drive Time: {itinerary.driveTime}</p>
-      <p>Activities: {itinerary.dayActivities}</p>
-      <p>Lodging: {itinerary.dayLodging}</p>
+      <h1>{title}</h1>
+      <p>Description: {dayDescription}</p>
+      <p>Date: {date}</p>
+      <p>Start Time: {startTime}</p>
+      <p>End Time: {endTime}</p>
+      <p>Drive Time: {driveTime}</p>
+      <p>Activities: {dayActivities}</p>
+      <p>Lodging: {dayLodging}</p>
     </div>
   );
 }
