@@ -6,6 +6,7 @@ import ClientOnly from "./components/ClientOnly";
 import getCurrentUser from "./actions/getCurrentUser";
 import ListingCard from "./components/listings/ListingCard";
 import Filter from "./components/Filter";
+import Banner from "./components/Banner";
 
 
 export default async function Home() {
@@ -31,15 +32,15 @@ export default async function Home() {
           {listings.map((listing) => {
             return (
               <ListingCard 
-              currentUser={currentUser} 
-              key={listing.id} 
-              data={listing} 
+                currentUser={currentUser} 
+                key={listing.id} 
+                data={listing} 
               />
             )
           })}
         </div>
       </Container>
     </ClientOnly>
-  )
+  )  
 }
 

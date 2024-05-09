@@ -12,6 +12,7 @@ import SearchModal from "./components/modals/SearchModal";
 
 import ToasterProvider from './providers/ToasterProvider';
 import getCurrentUser from "./actions/getCurrentUser";
+import Banner from "./components/Banner";
 
 export const metadata = {
   title: "ACTOTA!",
@@ -33,16 +34,13 @@ export default async function RootLayout({
       <body className={font.className}>
         <ClientOnly>
           <ToasterProvider />
-          <SearchModal />
-          <RentModal />
-          <LoginModal />
-          <RegisterModal />
           <Navbar currentUser={currentUser} />
-          <Filter /> 
+          <Banner /> 
         </ClientOnly>
         <div className="pb-20 pt-28">
-        {children}
+          {children}
         </div>
+        <Filter /> 
       </body>
     </html>
   );
