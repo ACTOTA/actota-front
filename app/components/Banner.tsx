@@ -3,7 +3,26 @@ import React from 'react';
 function Banner() {
     return (
         <div className="banner" style={{ width: '100%', height: '100vh', overflow: 'hidden', position: 'relative' }}>
-            <video autoPlay muted loop style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 }}>
+            <div style={{
+                position: 'absolute',
+                top: '75%',  
+                left: '50%', 
+                transform: 'translate(-50%, -100%)',
+                width: '100%',
+                textAlign: 'center',
+                zIndex: 2, 
+            }}>
+                <p className="text-lg text-white">Not sure where to go? Perfect.</p>
+            </div>
+            <video autoPlay muted loop style={{
+                width: '100%', 
+                height: '100%', 
+                objectFit: 'cover', 
+                position: 'absolute', 
+                top: 0, 
+                left: 0,
+                zIndex: 1  // Explicit z-index lower than the text
+            }}>
                 <source src="/videos/DVbanner.mp4" type="video/mp4" />
                 <source src="/videos/DVbanner.webm" type="video/webm" />
                 Your browser does not support the video tag.
@@ -14,7 +33,8 @@ function Banner() {
                 left: 0,
                 width: '100%',
                 height: '100%',
-                background: 'linear-gradient(to bottom, rgba(255,255,255,0) 80%, rgba(255,255,255,1) 100%)'
+                background: 'linear-gradient(to bottom, rgba(255,255,255,0) 80%, rgba(255,255,255,1) 100%)',
+                zIndex: 1  // Same z-index as video to ensure consistent layering
             }}></div>
             <button style={{
                 position: 'absolute',
@@ -23,13 +43,14 @@ function Banner() {
                 transform: 'translate(-50%, -50%)', // Center the button
                 padding: '10px 20px',
                 fontSize: '16px',
-                color: '#fff',
-                backgroundColor: '#007BFF', // Example blue color
+                color: 'black',
+                backgroundColor: 'white',
                 border: 'none',
                 borderRadius: '5px',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                zIndex: 2  // Ensures it is above the video
             }}>
-                Surprise Me! 
+                Surprise Me!
             </button>
         </div>
     );
