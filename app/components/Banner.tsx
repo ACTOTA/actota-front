@@ -3,14 +3,15 @@ import React from 'react';
 function Banner() {
     return (
         <div className="banner" style={{ width: '100%', height: '100vh', overflow: 'hidden', position: 'relative' }}>
+            {/* Text container with adjusted z-index */}
             <div style={{
                 position: 'absolute',
-                top: '75%',  
-                left: '50%', 
-                transform: 'translate(-50%, -100%)',
+                top: '75%',  // Adjusted for visual positioning above the button
+                left: '50%', // Center horizontally
+                transform: 'translate(-50%, -100%)', // Center and move up based on its own height
                 width: '100%',
                 textAlign: 'center',
-                zIndex: 2, 
+                zIndex: 2, // Ensures it is above the video
             }}>
                 <p className="text-lg text-white">Not sure where to go? Perfect.</p>
             </div>
@@ -43,8 +44,8 @@ function Banner() {
                 transform: 'translate(-50%, -50%)', // Center the button
                 padding: '10px 20px',
                 fontSize: '16px',
-                color: 'black',
-                backgroundColor: 'white',
+                color: '#fff',
+                backgroundColor: '#007BFF', // Example blue color
                 border: 'none',
                 borderRadius: '5px',
                 cursor: 'pointer',
