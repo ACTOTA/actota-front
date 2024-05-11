@@ -16,11 +16,11 @@ function Banner() {
                 <p className="text-lg text-white">Not sure where to go? Perfect.</p>
             </div>
             <video autoPlay muted loop style={{
-                width: '100%', 
-                height: '100%', 
-                objectFit: 'cover', 
-                position: 'absolute', 
-                top: 0, 
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                position: 'absolute',
+                top: 0,
                 left: 0,
                 zIndex: 1  // Explicit z-index lower than the text
             }}>

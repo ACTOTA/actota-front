@@ -17,30 +17,31 @@ export default async function Home() {
     return (
       <ClientOnly>
         <Container>
-          <EmptyState showReset/>
+          <EmptyState showReset />
         </Container>
       </ClientOnly>
     )
-  } 
+  }
 
   return (
     <ClientOnly>
+      <Banner />
       <Container>
-        <div 
+        <div
           className="grid grid-cols-1 gap-8 pt-24 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6"
         >
           {listings.map((listing) => {
             return (
-              <ListingCard 
-                currentUser={currentUser} 
-                key={listing.id} 
-                data={listing} 
+              <ListingCard
+                currentUser={currentUser}
+                key={listing.id}
+                data={listing}
               />
             )
           })}
         </div>
       </Container>
     </ClientOnly>
-  )  
+  )
 }
 

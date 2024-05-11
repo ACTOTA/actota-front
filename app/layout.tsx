@@ -12,15 +12,15 @@ import SearchModal from "./components/modals/SearchModal";
 
 import ToasterProvider from './providers/ToasterProvider';
 import getCurrentUser from "./actions/getCurrentUser";
-import Banner from "./components/Banner";
+import Home from "../pages/home/page";
 
 export const metadata = {
   title: "ACTOTA!",
   description: "Personalized Tours Made Easy",
 };
 
-const font = Nunito({ 
-  subsets: ['latin'], 
+const font = Nunito({
+  subsets: ['latin'],
 });
 
 export default async function RootLayout({
@@ -29,6 +29,7 @@ export default async function RootLayout({
   children: React.ReactNode
 }) {
   const currentUser = await getCurrentUser();
+
   return (
     <html lang="en">
       <body className={font.className}>
@@ -39,21 +40,11 @@ export default async function RootLayout({
           <LoginModal />
           <RegisterModal />
           <Navbar currentUser={currentUser} />
-          <Banner />
-          <div>
-            <main className="px-8 mx-auto max-w-7xl sm:px-16">
-              <section className="pt-6">
-                <h2 className="pb-5 text-4xl font-semibold">
-                  Featured Listings
-                </h2>
-              </section>
-            </main>
-          </div>
         </ClientOnly>
-        <div className="pb-20 pt-28">
-        {children}
+        <div>
+          {children}
         </div>
-        <Filter /> 
+        <Filter />
       </body>
     </html>
   );
