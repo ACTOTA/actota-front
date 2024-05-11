@@ -40,17 +40,8 @@ export default async function RootLayout({
           <LoginModal />
           <RegisterModal />
           <Navbar currentUser={currentUser} />
-          <div>
-            <main className="px-8 mx-auto max-w-7xl sm:px-16">
-              <section className="pt-6">
-                <h2 className="pb-5 text-4xl font-semibold">
-                  Featured Listings
-                </h2>
-              </section>
-            </main>
-          </div>
         </ClientOnly>
-        <div className="pb-20 pt-28">
+        <div>
           {children}
         </div>
         <Filter />
