@@ -28,10 +28,6 @@ const UserMenu: React.FC<UserMenuProps> = ({
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleOpen = useCallback(() => {
-    setIsOpen((value) => !value);
-  }, []);
-
   const onRent = useCallback(() => {
     if (!currentUser) {
       return loginModal.onOpen();
@@ -40,26 +36,20 @@ const UserMenu: React.FC<UserMenuProps> = ({
     rentModal.onOpen();
   }, [loginModal, rentModal, currentUser]);
 
-  const ref = useRef<HTMLDivElement>(null);
+  const openMenu = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        // Click occurred outside the ref element
-        console.log("Clicked outside!");
-        // Do your action here
+    document.addEventListener("click", (e) => {
+      if (!openMenu.current?.contains(e.target as Node)) {
         setIsOpen(false);
       }
-    };
+    });
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+    console.log("UserMenu isOpen:    ", isOpen);
+  }, [isOpen]);
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative" ref={openMenu}>
       <div className="flex flex-row items-center gap-3">
         <div
           onClick={onRent}
@@ -79,7 +69,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
           ACT with Us
         </div>
         <div
-          onClick={toggleOpen}
+          onClick={() => setIsOpen(!isOpen)}
           className="
           p-4
           md:py-1
