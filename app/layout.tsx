@@ -12,7 +12,7 @@ import SearchModal from "./components/modals/SearchModal";
 
 import ToasterProvider from './providers/ToasterProvider';
 import getCurrentUser from "./actions/getCurrentUser";
-import Home from "../pages/home/page";
+import Home from "./page";
 
 export const metadata = {
   title: "ACTOTA!",
