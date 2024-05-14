@@ -26,10 +26,9 @@ const types = [
   },
   // More types...
 ];
-
 export default function ListingType() {
   return (
-    <div className="p-4 rounded-lg shadow-lg bg-slate-100 ">
+    <div className="p-4 rounded-lg shadow-lg bg-slate-100">
       <h1 className="mb-4 text-xl font-bold text-center text-black">Itinerary Details</h1>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-1">
         {types.map((type) => (
