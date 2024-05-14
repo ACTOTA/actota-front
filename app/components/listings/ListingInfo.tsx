@@ -81,7 +81,6 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
           </div>
 
         </div>
-
       </div>
       <hr />
       {activity && (
