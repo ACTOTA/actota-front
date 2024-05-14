@@ -69,35 +69,40 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
   });
   return (
     <div className="flex flex-col col-span-4 gap-8">
-      <div className="flex flex-col gap-2">
-        <Heading title="Dynamic Title Goes Here" />
+    <div className="flex flex-col gap-2">
+      <Heading title="Dynamic Listing Heading Here" />
+      <h2>Dyanimic Locations Here</h2>
+      <div 
+        className="flex flex-row items-center gap-2 text-xl font-semibold "
+      >
         <div>Hosted by {user?.name}</div>
-          <Avatar src={user?.image} />
-        <div className="flex flex-row items-center gap-2 font-light // text-neutral-500"
-        >
-
-        </div>
-        <div
-          className="flex flex-row items-center gap-2 text-xl font-semibold //"
-        >
-
-        </div>
-        
-        
+        <Avatar src={user?.image} />
       </div>
-      <hr />
+      <div className="flex flex-row items-center gap-4 font-light text-neutral-500"
+      >
+        
+        {/* <div>
+          {guestCount} guests
+        </div>
+        <div>
+          {roomCount} rooms
+        </div>
+        <div>
+          {bathroomCount} bathrooms
+        </div> */}
+      </div>
+      <ListingType />
+    </div>
+    {/* <hr />
       {activity && (
         <ListingActivity
           icon={activity.icon}
           label={activity?.label}
           description={activity?.description}
         />
-      )}
+      )} */}
       <hr />
-      <div className="text-lg font-light // text-neutral-500">
-        {description}
-      </div>
-      <hr />
+
       <div className="display: max-w-screen-lg mx-auto flex; justify-content: center; align-items: center; height: 100%;">
         <ListingDays days={dayInfo} day={day} setDay={setDay} />
         <ListingItinerary {...dayItinerary} />

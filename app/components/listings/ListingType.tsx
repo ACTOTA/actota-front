@@ -2,6 +2,7 @@ import React from 'react';
 import { activities } from "../Activities";
 import { IconType } from "react-icons";
 import { FaClock } from "react-icons/fa";
+import { MdOutlineNightsStay } from "react-icons/md";
 
 const types = [
   {
@@ -9,9 +10,22 @@ const types = [
     subtitle: 'Lightly active',
     icon: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
   },
+
+  {
+    category: 'Duration',
+    subtitle: 'Average day length',
+    icon: FaClock,
+    duration: '6-8 Hours'
+  },
+  {
+    category: 'Max Daily Drive Time',
+    subtitle: 'Most time spent in the car',
+    icon: FaClock,
+    duration: '2 Hours'
+  },
   {
     category: 'Activities',
-    subtitle: 'Included in itinerary',
+    subtitle: '$$$$$ out of $$$$$$',
     icons: {
       hiking: activities.find(a => a.label === 'Hiking')?.icon || FaClock, // Default to FaClock if not found
       fishing: activities.find(a => a.label === 'Fishing')?.icon || FaClock,
@@ -19,17 +33,24 @@ const types = [
     },
   },
   {
-    category: 'Duration',
-    subtitle: 'Included in itinerary',
-    icon: FaClock,
-    duration: '6-8 Hours'
+    category: 'Lodging',
+    subtitle: '$$ out of $$$$$',
+    icon: MdOutlineNightsStay,
+    duration: '4 Nights'
   },
-  // More types...
+  {
+    category: 'Transportation',
+    subtitle: '$$$$ out of $$$$$',
+    icon: MdOutlineNightsStay,
+    duration: '4 Nights'
+  },
+
 ];
 export default function ListingType() {
   return (
     <div className="p-4 rounded-lg shadow-lg bg-slate-100">
-      <h1 className="mb-4 text-xl font-bold text-center text-black">Itinerary Details</h1>
+      
+      <h1 className="mb-4 text-xl font-bold text-black">Details about your itinerary</h1>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-1">
         {types.map((type) => (
           <div

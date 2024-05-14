@@ -1,40 +1,50 @@
 import React, { useState } from 'react';
 import Counter from './inputs/Counter';
-interface LodgingDetailsCounterProps {
-  guestCount: number;
-  roomCount: number;
-  bathroomCount: number;
-  setGuestCount: (value: number) => void;
-  setRoomCount: (value: number) => void;
-  setBathroomCount: (value: number) => void;
-}
 
-const LodgingDetailsCounter: React.FC<LodgingDetailsCounterProps> = ({
-  guestCount,
-  roomCount,
-  bathroomCount,
-  setGuestCount,
-  setRoomCount,
-  setBathroomCount
-}) => {
+const LodgingDetailsCounter = () => {
+  // State hooks for managing counts
+  const [guestCount, setGuestCount] = useState(0);
+  const [roomCount, setRoomCount] = useState(0);
+  const [bathroomCount, setBathroomCount] = useState(0);
+
+  // Function to update state based on the type
+const setCustomValue = (type: string, value: number) => {
+    switch (type) {
+        case 'guestCount':
+            setGuestCount(value);
+            break;
+        case 'roomCount':
+            setRoomCount(value);
+            break;
+        case 'bathroomCount':
+            setBathroomCount(value);
+            break;
+        default:
+            console.warn('Invalid type for counter');
+    }
+};
+
   return (
-    <div className="flex flex-col w-1/2 gap-2">
+    <div className="flex flex-col gap-2 p-2">
       <Counter 
-        onChange={setGuestCount}
+        onChange={(value) => setCustomValue('guestCount', value)}
         value={guestCount}
         title="Guests" 
+        subtitle=""
       />
       <hr />
       <Counter 
-        onChange={setRoomCount}
+        onChange={(value) => setCustomValue('roomCount', value)}
         value={roomCount}
-        title="Rooms"
+        title="Rooms" 
+        subtitle=""
       />
       <hr />
       <Counter 
-        onChange={setBathroomCount}
+        onChange={(value) => setCustomValue('bathroomCount', value)}
         value={bathroomCount}
-        title="Bathrooms"
+        title="Bathrooms" 
+        subtitle=""
       />
     </div>
   );

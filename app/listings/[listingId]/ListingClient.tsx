@@ -139,7 +139,6 @@ const ListingClient: React.FC<ListingClientProps> = ({
             <div 
               className="order-first mb-10 md:order-last md:col-span-3"
             >
-              <ListingType />
               <ListingReservation
                 price={listing.price}
                 totalPrice={totalPrice}
@@ -149,6 +148,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
                 disabled={isLoading}
                 disabledDates={disabledDates}
               />
+             
             </div>
             
           </div>
