@@ -11,6 +11,7 @@ import ListingActivity from "./ListingActivity";
 import ListingDays from "./ListingDays";
 import ListingItinerary from "./ListingItinerary";
 import LodgingDetailsCounter from "../LodgingDetailsCounter";
+import ListingType from "./ListingType";
 interface ListingInfoProps {
   user: SafeUser,
   description: string;
@@ -79,8 +80,9 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
           <div>
             {bathroomCount} bathrooms
           </div>
-
+          
         </div>
+        
       </div>
       <hr />
       {activity && (
