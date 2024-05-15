@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { Range } from "react-date-range";
+import { Range, RangeKeyDict } from 'react-date-range';
 
 import Button from "../Button";
 import Calendar from "../inputs/Calendar";
 import LodgingDetailsCounter from '../LodgingDetailsCounter';
 import { BsCaretDownFill } from "react-icons/bs";
-
-
 
 interface ListingReservationProps {
   price: number;
@@ -29,23 +27,28 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
 }) => {
   const [calendarVisible, setCalendarVisible] = useState(false);
   const [detailsCounterVisible, setDetailsCounterVisible] = useState(false);
-  const [localDateRange, setLocalDateRange] = useState(dateRange); // Local state to handle date range
+  const [localDateRange, setLocalDateRange] = useState<Range>(dateRange);
 
   const handleDateClick = () => {
-    setCalendarVisible(!calendarVisible);
+    setCalendarVisible(true);
   };
 
   const handleToggleDetailsCounter = () => {
     setDetailsCounterVisible(!detailsCounterVisible);
   };
 
-  const handleDateChange = (value: Range) => {
-    setLocalDateRange(value); // Update local state with new date range
-    setCalendarVisible(false); // Hide the calendar after date selection
+  const handleDateChange = (ranges: RangeKeyDict) => {
+    const { selection } = ranges;
+    setLocalDateRange(selection);
+
+    if (selection.startDate && selection.endDate && selection.startDate !== selection.endDate) {
+      setCalendarVisible(false);
+      onChangeDate(selection);
+    }
   };
 
   const handleSubmit = () => {
-    onChangeDate(localDateRange); // Update the dateRange in the parent component when submitting
+    onChangeDate(localDateRange);
     onSubmit();
   };
 
@@ -53,24 +56,24 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
     <div className="bg-white rounded-xl border-[1px] border-neutral-200 overflow-hidden">
       <div className="flex flex-row items-center justify-between p-4">
         <div className="text-2xl font-semibold">${price} per person</div>
-        <div>${price}</div>
+        <div>${totalPrice}</div>
       </div>
       <div onClick={handleDateClick} className="cursor-pointer">
         <div className="border-[1px] border-neutral-300 rounded-lg p-3 m-4 flex justify-between">
-          <span>{dateRange.startDate?.toLocaleDateString()}</span>
-          <span className="border-l-[1px] border-neutral-300 px-2">{dateRange.endDate?.toLocaleDateString()}</span>
+          <span>{localDateRange.startDate?.toLocaleDateString()}</span>
+          <span className="border-l-[1px] border-neutral-300 px-2">{localDateRange.endDate?.toLocaleDateString()}</span>
         </div>
       </div>
       {calendarVisible && (
         <Calendar
-          value={dateRange}
+          value={localDateRange}
           disabledDates={disabledDates}
           onChange={handleDateChange}
         />
       )}
       <div onClick={handleToggleDetailsCounter} className="cursor-pointer">
         <div className="border-[1px] border-neutral-300 rounded-lg p-3 m-4 flex justify-between items-center">
-          Number of Guests = guestCount
+          Number of Guests
           <BsCaretDownFill />  
         </div>
       </div>
