@@ -24,6 +24,7 @@ export default async function Home() {
     );
   }
 
+  
   // Since NearbyData is now properly imported, use it directly
   return (
     <ClientOnly>

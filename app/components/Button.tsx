@@ -9,6 +9,7 @@ interface ButtonProps {
   outline?: boolean;
   small?: boolean;
   icon?: IconType;
+  className?: string; 
 }
 
 const Button: React.FC<ButtonProps> = ({ 
@@ -18,6 +19,7 @@ const Button: React.FC<ButtonProps> = ({
   outline,
   small,
   icon: Icon,
+  className, 
 }) => {
   return ( 
     <button
@@ -30,7 +32,11 @@ const Button: React.FC<ButtonProps> = ({
         rounded-lg
         hover:opacity-80
         transition
-        w-full
+        w-full 
+        bg-gradient-to-l 
+        from-logo-blue 
+        to-blue-800
+        
         ${outline ? 'bg-white' : 'bg-logo-blue'}
         ${outline ? 'border-black' : 'border-logo-blue'}
         ${outline ? 'text-black' : 'text-white'}
@@ -38,16 +44,14 @@ const Button: React.FC<ButtonProps> = ({
         ${small ? 'py-1' : 'py-3'}
         ${small ? 'font-light' : 'font-semibold'}
         ${small ? 'border-[1px]' : 'border-2'}
+        
       `}
+      
     >
       {Icon && (
         <Icon
           size={24}
-          className="
-            absolute
-            left-4
-            top-3
-          "
+          className="absolute left-4 top-3"
         />
       )}
       {label}

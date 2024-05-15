@@ -25,7 +25,7 @@ const setCustomValue = (type: string, value: number) => {
 };
 
   return (
-    <div className="flex flex-col gap-2 p-2">
+    <div className="flex flex-col gap-2 p-2 border rounded-md">
       <Counter 
         onChange={(value) => setCustomValue('guestCount', value)}
         value={guestCount}

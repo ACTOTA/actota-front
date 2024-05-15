@@ -41,9 +41,8 @@ export default async function RootLayout({
           <SearchModal />
           <Navbar currentUser={currentUser} />
         </ClientOnly>
-        <div className="pb-20 pt-28">
+        <div className="pt-20 pb-20">
           {children}
-          
         </div>
         <Filter />
       </body>
