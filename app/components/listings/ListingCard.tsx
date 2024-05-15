@@ -71,6 +71,17 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
     const location = parseLocation(data.location);
 
+    const handleCancel = useCallback(
+        (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+    
+        if (disabled) {
+          return;
+        }
+    
+        onAction?.(actionId)
+      }, [disabled, onAction, actionId]);
+
     const price = useMemo(() => reservation?.totalPrice || data.price, [reservation, data.price]);
 
     return (
