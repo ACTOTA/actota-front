@@ -27,12 +27,11 @@ export default async function Home() {
   return (
     <ClientOnly>
       <Banner />
-
       <Container>
         <main className="mx-auto max-w-7xl">
           <section className="pt-6 pb-8">
             <h2 className="text-4xl font-semibold">Explore Colorado</h2>
-            <SmallCards towns={NearbyData} className="grid grid-cols-1 gap-8 pt-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"/>
+            <SmallCards towns={NearbyData} />
           </section>
         </main>
         <div className="grid grid-cols-1 gap-8 pt-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
@@ -48,3 +47,4 @@ export default async function Home() {
     </ClientOnly>
   );
 }
+
