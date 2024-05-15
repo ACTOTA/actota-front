@@ -1,7 +1,4 @@
-// const chalk = require('chalk');
-// const blue = chalk.hex('#012869'); 
-// const red = chalk.hex('#C00A30');
-// const yellow = chalk.hex('#CFFD720');
+
 
 import type { Config } from "tailwindcss";
 

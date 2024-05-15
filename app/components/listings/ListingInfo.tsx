@@ -10,6 +10,10 @@ import Avatar from "../Avatar";
 import ListingActivity from "./ListingActivity";
 import ListingDays from "./ListingDays";
 import ListingItinerary from "./ListingItinerary";
+import LodgingDetailsCounter from "../LodgingDetailsCounter";
+import ListingType from "./ListingType";
+import ListingHead from "./ListingHead";
+import Heading from "../Heading";
 interface ListingInfoProps {
   user: SafeUser,
   description: string;
@@ -45,7 +49,12 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
     8: { title: 'Day 8', dayDescription: 'Day 8 Description', date: '12/12/12', startTime: '12:00', endTime: '12:00', driveTime: '12:00', dayActivities: 'A1,A2,A3', dayLodging: 'Lodging', dayActivityCount: 1 },
   }
 
+  const [guests, setGuests] = useState(guestCount);
+  const [rooms, setRooms] = useState(roomCount);
+  const [bathrooms, setBathrooms] = useState(bathroomCount);
+
   const { getByValue } = useTowns();
+  const location = getByValue(locationValue);
 
   const [day, setDay] = useState<number>(1); // This will be the current day
   const [dayItinerary, setDayItinerary] = useState<Object>(dayInfo[day]); // This will be the current day's itinerary
@@ -60,39 +69,40 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
   });
   return (
     <div className="flex flex-col col-span-4 gap-8">
-      <div className="flex flex-col gap-2">
-        <div
-          className="flex flex-row items-center gap-2 text-xl font-semibold //"
-        >
-          <div>Hosted by {user?.name}</div>
-          <Avatar src={user?.image} />
-        </div>
-        <div className="flex flex-row items-center gap-4 font-light // text-neutral-500"
-        >
-          <div>
-            {guestCount} guests
-          </div>
-          <div>
-            {roomCount} rooms
-          </div>
-          <div>
-            {bathroomCount} bathrooms
-          </div>
-        </div>
+    <div className="flex flex-col gap-2">
+      <Heading title="Dynamic Listing Heading Here" />
+      <h2>Dyanimic Locations Here</h2>
+      <div 
+        className="flex flex-row items-center gap-2 text-xl font-semibold "
+      >
+        <div>Hosted by {user?.name}</div>
+        <Avatar src={user?.image} />
       </div>
-      <hr />
+      <div className="flex flex-row items-center gap-4 font-light text-neutral-500"
+      >
+        
+        {/* <div>
+          {guestCount} guests
+        </div>
+        <div>
+          {roomCount} rooms
+        </div>
+        <div>
+          {bathroomCount} bathrooms
+        </div> */}
+      </div>
+      <ListingType />
+    </div>
+    {/* <hr />
       {activity && (
         <ListingActivity
           icon={activity.icon}
           label={activity?.label}
           description={activity?.description}
         />
-      )}
+      )} */}
       <hr />
-      <div className="text-lg font-light // text-neutral-500">
-        {description}
-      </div>
-      <hr />
+
       <div className="display: max-w-screen-lg mx-auto flex; justify-content: center; align-items: center; height: 100%;">
         <ListingDays days={dayInfo} day={day} setDay={setDay} />
         <ListingItinerary {...dayItinerary} />
@@ -107,13 +117,3 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
 }
 
 export default ListingInfo;
-
-
-
-
-
-
-
-
-
-//
