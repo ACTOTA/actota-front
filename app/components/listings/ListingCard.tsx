@@ -7,7 +7,7 @@ import { Listing as PrismaListing, Reservation } from '@prisma/client';
 import { SafeListing, SafeUser } from '@/app/types'; // Make sure this path is correct
 import useTowns from '@/app/hooks/useTowns';
 import React, { useCallback, useMemo } from 'react';
-// import { format } from 'date-fns';
+import { format } from 'date-fns';
 
 import Image from 'next/image';
 import StarButton from '../StarButton';
@@ -84,6 +84,18 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
     const price = useMemo(() => reservation?.totalPrice || data.price, [reservation, data.price]);
 
+
+  const reservationDate = useMemo(() => {
+    if (!reservation) {
+      return null;
+    }
+  
+    const start = new Date(reservation.startDate);
+    const end = new Date(reservation.endDate);
+
+    return `${format(start, 'PP')} - ${format(end, 'PP')}`;
+  }, [reservation]);
+  
     return (
         <div onClick={() => router.push(`/listings/${data.id}`)}
             className='col-span-1 cusrsor-pointer group'
@@ -103,30 +115,35 @@ const ListingCard: React.FC<ListingCardProps> = ({
                         />
                     </div>
                 </div>
+                
                 <div className="text-lg font-semibold">
                     {location?.label}, {location?.region}
                 </div>
+
                 <div className="font-light text-neutral-500">
-          {data.activity}
-        </div>
+                {reservationDate || data.activity}
+                </div>
+                
+                
                 <div className="flex flex-row items-center gap-1">
-          <div className="font-semibold">
-            $ {price}
-          </div>
-          {!reservation && (
-            <div className="font-light">night</div>
-          )}
-        </div>
-                {onAction && actionLabel && (
-          <Button
-            disabled={disabled}
-            small
-            label={actionLabel} 
-            onClick={handleCancel}
-          />
-        )}
-            </div>
-        </div>
+                <div className="font-semibold">
+                    $ {price}
+                </div>
+                {!reservation && (
+                    <div className="font-light">night</div>
+                )}
+                </div>
+                
+            {onAction && actionLabel && (
+                <Button
+                    disabled={disabled}
+                    small
+                    label={actionLabel} 
+                    onClick={handleCancel}
+                />
+                )}
+                    </div>
+                </div>
     );
 }
 

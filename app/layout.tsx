@@ -35,14 +35,15 @@ export default async function RootLayout({
       <body className={font.className}>
         <ClientOnly>
           <ToasterProvider />
-          <SearchModal />
           <RentModal />
           <LoginModal />
           <RegisterModal />
+          <SearchModal />
           <Navbar currentUser={currentUser} />
         </ClientOnly>
-        <div>
+        <div className="pb-20 pt-28">
           {children}
+          
         </div>
         <Filter />
       </body>

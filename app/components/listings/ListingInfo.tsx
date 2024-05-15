@@ -67,11 +67,10 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
   const Map = dynamic(() => import('../Map'), {
     ssr: false
   });
+  
   return (
     <div className="flex flex-col col-span-4 gap-8">
     <div className="flex flex-col gap-2">
-      <Heading title="Dynamic Listing Heading Here" />
-      <h2>Dyanimic Locations Here</h2>
       <div 
         className="flex flex-row items-center gap-2 text-xl font-semibold "
       >
