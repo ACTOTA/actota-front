@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Range, RangeKeyDict } from 'react-date-range';
 
 import Button from "../Button";
@@ -52,8 +52,32 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
     onSubmit();
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const parallaxElement = document.querySelector('.parallax');
+      if (parallaxElement) {
+        let scrollPosition = window.pageYOffset;
+
+        // Make the parallax effect a bit faster
+        let parallaxSpeed = 0.7;
+
+        // Limit the parallax effect to stop after 200px
+        if (scrollPosition > 150) {
+          scrollPosition = 150;
+        }
+
+        parallaxElement.style.transform = `translateY(${scrollPosition * parallaxSpeed}px)`;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   return (
-    <div className="bg-white rounded-xl border-[1px] border-neutral-200 overflow-hidden md:relative md:shadow-lg md:m-4 fixed bottom-0 left-0 right-0 z-50 p-4">
+    <div className="bg-white rounded-xl border-[1px] border-neutral-200 overflow-hidden md:relative md:shadow-lg md:m-4 fixed bottom-0 left-0 right-0 z-10 p-4 parallax md:transform-none">
       <div className="flex flex-row items-center justify-between p-4 md:flex md:flex-col md:items-start">
         <div className="text-left">
           <div className="text-2xl font-semibold">${price} <span className="text-base font-normal">per person</span></div>

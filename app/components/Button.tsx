@@ -33,9 +33,7 @@ const Button: React.FC<ButtonProps> = ({
         hover:opacity-80
         transition
         w-full 
-        bg-gradient-to-l 
-        from-logo-blue 
-        to-blue-800
+
         
         ${outline ? 'bg-white' : 'bg-logo-blue'}
         ${outline ? 'border-black' : 'border-logo-blue'}
