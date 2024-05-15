@@ -5,17 +5,17 @@ import { differenceInDays } from 'date-fns';
 
 import useSearchModal from '@/app/hooks/useSearchModal';
 import useTowns from '@/app/hooks/useTowns';
+import { STEPS } from '../../types/steps';
 import useActivitiesModal from '@/app/hooks/useActivitiesModal';
 
 // Assuming useSearchModal returns a function to close the modal
 const Search = () => {
   const searchModal = useSearchModal();
-  const [search, setSearch] = useState(false);
-  
+
   const params = useSearchParams();
   const { getByValue } = useTowns();
 
-  const locationValue = params?.get('locationValue'); 
+  const locationValue = params?.get('locationValue');
   const startDate = params?.get('startDate');
   const endDate = params?.get('endDate');
   const guestCount = params?.get('guestCount');
@@ -37,9 +37,8 @@ const Search = () => {
   const activitiesLabel = useMemo(() => selectedActivitiesCount > 0 ? `${selectedActivitiesCount} Activities` : 'Add Activities', [selectedActivitiesCount]);
 
 
-  return ( 
+  return (
     <div
-      onClick={searchModal.onOpen}
       className="
         border-[1px] 
         w-full 
@@ -52,15 +51,16 @@ const Search = () => {
         cursor-pointer
       "
     >
-      <div 
+      <div
         className="flex flex-row items-center justify-between "
       >
-        <div 
+        <div
           className="px-6 text-sm font-semibold "
+          onClick={() => searchModal.onOpen(STEPS.LOCATION)}
         >
           {locationLabel}
         </div>
-        <div 
+        <div
           className="
             hidden 
             sm:block 
@@ -71,16 +71,18 @@ const Search = () => {
             flex-1 
             text-center
           "
+          onClick={() => searchModal.onOpen(STEPS.DATE)}
         >
           {durationLabel}
         </div>
-        <div 
+        <div
           className="flex flex-row items-center gap-3 pl-6 pr-2 text-sm text-gray-600 "
+          onClick={() => searchModal.onOpen(STEPS.INFO)}
         >
           <div className="hidden sm:block">{guestLabel}
           </div>
-          <div 
-          className="
+          <div
+            className="
             hidden
             sm:block
             text-sm
@@ -91,11 +93,12 @@ const Search = () => {
             flex-1
             text-center
           "
-           >
-          {activitiesLabel}
-        </div>
-          <div 
-                className="
+            onClick={() => searchModal.onOpen(STEPS.ACTIVITIES)}
+          >
+            {activitiesLabel}
+          </div>
+          <div
+            className="
                     hidden
                     sm:block
                     text-sm
@@ -105,24 +108,24 @@ const Search = () => {
                     flex-1
                     text-center
                 "
-                >
-                Any Type
-                </div>         
-                  <div 
-                    className="p-2 text-white rounded-full bg-logo-blue"
-                  >
-                      <div className="icon-container">
-                    <BiSearch size={18} style={{ position: 'relative', zIndex: 1 }} />
-                    <div className="icon-gradient-outline">
-                      
-                    </div>
-                </div>
+          >
+            Any Type
+          </div>
+          <div
+            className="p-2 text-white rounded-full bg-logo-blue"
+          >
+            <div className="icon-container">
+              <BiSearch size={18} style={{ position: 'relative', zIndex: 1 }} />
+              <div className="icon-gradient-outline">
+
+              </div>
             </div>
+          </div>
         </div>
-       
+
       </div>
     </div>
   );
 }
- 
+
 export default Search;

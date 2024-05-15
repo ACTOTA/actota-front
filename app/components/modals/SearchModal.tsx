@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useMemo } from "react";
+import { useCallback, useState, useMemo, useEffect } from "react";
 import { Range } from 'react-date-range';
 import { formatISO } from 'date-fns';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -16,21 +16,14 @@ import ActivityBox, { ActivitySelectValue } from '../inputs/ActivityInput';
 import Heading from '../Heading';
 import Activities from '../Activities';
 import Types from '../Types';
-
-enum STEPS {
-  LOCATION = 0,
-  DATE = 1,
-  INFO = 2,
-  ACTIVITIES = 3,
-  TYPE = 4,
-}
+import { STEPS } from '../../types/steps';
 
 const SearchModal = () => {
   const router = useRouter();
   const searchModal = useSearchModal();
   const params = useSearchParams();
 
-  const [step, setStep] = useState(STEPS.LOCATION);
+  const [step, setStep] = useState(searchModal.step);
   const [location, setLocation] = useState();
   const [guestCount, setGuestCount] = useState(1);
   const [roomCount, setRoomCount] = useState(1);
@@ -42,8 +35,12 @@ const SearchModal = () => {
   });
   const [selectedActivities, setSelectedActivities] = useState<ActivitySelectValue[]>([]);
 
-  const Map = useMemo(() => dynamic(() => import('../Map'), { 
-    ssr: false 
+  useEffect(() => {
+    console.log(searchModal.step);
+  }, [searchModal]);
+
+  const Map = useMemo(() => dynamic(() => import('../Map'), {
+    ssr: false
   }), [location]);
 
   const onBack = useCallback(() => setStep(prev => prev - 1), []);
@@ -98,7 +95,7 @@ const SearchModal = () => {
       );
       break;
     case STEPS.ACTIVITIES:
-      
+
       bodyContent = <Activities value={selectedActivities} onChange={setSelectedActivities} />;
       break;
     case STEPS.TYPE:
