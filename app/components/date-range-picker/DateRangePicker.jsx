@@ -4,7 +4,7 @@ import {
   Paper,
   Stack,
   Dialog,
-  Button,
+  Button as MuiButton,
   TextField,
   DialogTitle,
   DialogActions,
@@ -32,20 +32,15 @@ DateRangePicker.propTypes = {
 export default function DateRangePicker({
   title = 'Select date range',
   variant = 'input',
-  //
   startDate,
   endDate,
-  //
   onChangeStartDate,
   onChangeEndDate,
-  //
   open,
   onClose,
-  //
   isError,
 }) {
   const isDesktop = useResponsive('up', 'md');
-
   const isCalendarView = variant === 'calendar';
 
   return (
@@ -128,13 +123,13 @@ export default function DateRangePicker({
       </DialogContent>
 
       <DialogActions>
-        <Button variant="outlined" color="inherit" onClick={onClose}>
+        <MuiButton variant="outlined" color="inherit" onClick={onClose}>
           Cancel
-        </Button>
+        </MuiButton>
 
-        <Button disabled={isError} variant="contained" onClick={onClose}>
+        <MuiButton disabled={isError} variant="contained" onClick={onClose}>
           Apply
-        </Button>
+        </MuiButton>
       </DialogActions>
     </Dialog>
   );
