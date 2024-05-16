@@ -18,6 +18,7 @@ const sortOptions = [
 //   { name: 'Featured', href: '#' },
 // ];
 
+
 const filters = [
   {
     id: 'price',
@@ -246,6 +247,7 @@ onClick={() => setMobileFiltersOpen(true)}
 Product Grid
 <div className="col-span-1">
 </div>
+
 </div>
 </section>
 </main>
