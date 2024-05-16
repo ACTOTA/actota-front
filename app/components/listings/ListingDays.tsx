@@ -17,7 +17,7 @@ export default function Example({ days, day, setDay }) {
 
   return (
     <nav aria-label="Progress">
-      <ol role="list" className="space-y-4 md:flex md:space-x-8 md:space-y-0">
+      <ol role="list" className="space-x-10 overflow-scroll md:space-x-14 md:flex">
         {Object.entries(days).map(([dayId, currDay]) => (
           <li key={dayId} className="md:flex-1" onClick={() => handleDayClick(dayId)}>
             {day.status === 'complete' ? (
