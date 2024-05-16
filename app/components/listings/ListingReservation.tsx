@@ -59,11 +59,11 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
         let scrollPosition = window.pageYOffset;
 
         // Make the parallax effect a bit faster
-        let parallaxSpeed = 0.7;
+        let parallaxSpeed = 0.95;
 
         // Limit the parallax effect to stop after 200px
-        if (scrollPosition > 150) {
-          scrollPosition = 150;
+        if (scrollPosition > 100) {
+          scrollPosition = 100;
         }
 
         parallaxElement.style.transform = `translateY(${scrollPosition * parallaxSpeed}px)`;
