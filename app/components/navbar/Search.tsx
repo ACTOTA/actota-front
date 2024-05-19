@@ -5,6 +5,7 @@ import { differenceInDays } from 'date-fns';
 
 import useSearchModal from '@/app/hooks/useSearchModal';
 import useTowns from '@/app/hooks/useTowns';
+import { STEPS } from '../../types/steps';
 import useActivitiesModal from '@/app/hooks/useActivitiesModal';
 
 const Search = () => {
@@ -38,7 +39,6 @@ const Search = () => {
 
   return (
     <div
-      onClick={searchModal.onOpen}
       className="
         border-[1px] 
         w-full 
@@ -54,12 +54,12 @@ const Search = () => {
       <div
         className="flex flex-row items-center justify-between "
       >
-        <div
+        <div onClick={() => searchModal.onOpen(STEPS.LOCATION)}
           className="px-6 text-sm font-semibold "
         >
           {locationLabel}
         </div>
-        <div
+        <div onClick={() => searchModal.onOpen(STEPS.DATE)}
           className="
             hidden 
             sm:block 
@@ -76,9 +76,10 @@ const Search = () => {
         <div
           className="flex flex-row items-center gap-3 pl-6 pr-2 text-sm text-gray-600 "
         >
-          <div className="hidden sm:block">{guestLabel}
+          <div onClick={() => searchModal.onOpen(STEPS.INFO)}
+            className="hidden sm:block">{guestLabel}
           </div>
-          <div
+          <div onClick={() => searchModal.onOpen(STEPS.ACTIVITIES)}
             className="
             hidden
             sm:block
@@ -120,7 +121,7 @@ const Search = () => {
         </div>
 
       </div>
-    </div>
+    </div >
   );
 }
 

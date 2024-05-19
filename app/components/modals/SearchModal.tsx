@@ -75,7 +75,7 @@ const SearchModal = () => {
   const secondaryActionLabel = useMemo(() => step === STEPS.LOCATION ? undefined : 'Back', [step]);
 
   let bodyContent;
-  switch (step) {
+  switch (searchModal.step) {
     case STEPS.DATE:
       bodyContent = (
         <div className="flex flex-col gap-8">
