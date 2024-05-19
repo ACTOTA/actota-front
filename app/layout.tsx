@@ -44,7 +44,6 @@ export default async function RootLayout({
         <div className="pt-20 pb-20">
           {children}
         </div>
-        <Filter />
       </body>
     </html>
   );

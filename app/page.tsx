@@ -25,7 +25,7 @@ export default async function Home() {
     );
   }
 
-  
+
   // Since NearbyData is now properly imported, use it directly
   return (
     <ClientOnly>
@@ -36,13 +36,14 @@ export default async function Home() {
             <h2 className="py-4 text-4xl font-semibold">Explore Colorado</h2>
             <SmallCards towns={NearbyData} />
           </section>
-          
+
           <section>
             <h2 className="py-8 text-4xl font-semibold">Activate Your Inner Nature</h2>
             <MediumCards towns={TravelModeData} />
           </section>
-          
+
         </main>
+        <Filter />
         <div className="grid grid-cols-1 gap-8 pt-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
           {listings.map((listing) => (
             <ListingCard
