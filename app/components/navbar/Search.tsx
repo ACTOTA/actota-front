@@ -10,32 +10,8 @@ import useActivitiesModal from '@/app/hooks/useActivitiesModal';
 
 const Search = () => {
   const searchModal = useSearchModal();
-  const [search, setSearch] = useState(false);
 
   const params = useSearchParams();
-  const { getByValue } = useTowns();
-
-  const location = params?.get('locationValue');
-  const startDate = params?.get('startDate');
-  const endDate = params?.get('endDate');
-  const guestCount = params?.get('guestCount');
-  const initialActivities = params?.get('activities');
-
-  const [selectedActivities, setSelectedActivities] = useState<string[]>(initialActivities ? initialActivities.split(',') : []);
-  const [selectedActivitiesCount, setSelectedActivitiesCount] = useState(selectedActivities.length);
-
-  useEffect(() => {
-    // This effect runs when `initialActivities` changes.
-    const activitiesArray = initialActivities ? initialActivities.split(',') : [];
-    setSelectedActivities(activitiesArray);
-    setSelectedActivitiesCount(activitiesArray.length);
-  }, [initialActivities]);
-
-  const locationLabel = useMemo(() => location ? getByValue(location as string)?.label : 'Denver, CO', [location, getByValue]);
-  const durationLabel = useMemo(() => startDate && endDate ? `${differenceInDays(new Date(endDate), new Date(startDate)) || 1} Days` : 'Any Week', [startDate, endDate]);
-  const guestLabel = useMemo(() => guestCount ? `${guestCount} Guests` : 'Add Guests', [guestCount]);
-  const activitiesLabel = useMemo(() => selectedActivitiesCount > 0 ? `${selectedActivitiesCount} Activities` : 'Add Activities', [selectedActivitiesCount]);
-
 
   return (
     <div
@@ -57,7 +33,7 @@ const Search = () => {
         <div onClick={() => searchModal.onOpen(STEPS.LOCATION)}
           className="px-6 text-sm font-semibold "
         >
-          {locationLabel}
+          {searchModal.locationLabel}
         </div>
         <div onClick={() => searchModal.onOpen(STEPS.DATE)}
           className="
@@ -71,13 +47,13 @@ const Search = () => {
             text-center
           "
         >
-          {durationLabel}
+          {searchModal.durationLabel}
         </div>
         <div
           className="flex flex-row items-center gap-3 pl-6 pr-2 text-sm text-gray-600 "
         >
           <div onClick={() => searchModal.onOpen(STEPS.INFO)}
-            className="hidden sm:block">{guestLabel}
+            className="hidden sm:block">{searchModal.guestLabel}
           </div>
           <div onClick={() => searchModal.onOpen(STEPS.ACTIVITIES)}
             className="
@@ -92,7 +68,7 @@ const Search = () => {
             text-center
           "
           >
-            {activitiesLabel}
+            {searchModal.activitiesLabel}
           </div>
           <div
             className="
@@ -106,7 +82,7 @@ const Search = () => {
                     text-center
                 "
           >
-            Any Type
+            {searchModal.typeLabel}
           </div>
           <div
             className="p-2 text-white rounded-full bg-logo-blue"
