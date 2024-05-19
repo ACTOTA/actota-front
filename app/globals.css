@@ -22,13 +22,6 @@ body,
       font-size: 16px !important;
       width: 100% !important;
     }
-
-    .rainbow-text {
-      background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: inline-block; /* Required for gradient to apply correctly */
-    }
     
 .gradient-underline {
   position: relative;
@@ -64,4 +57,16 @@ body,
       color: transparent;
       fill: currentColor;
     }
+    .parallax {
+      will-change: transform;
+    }
+    
+    @media (max-width: 768px) {
+      .parallax {
+        transform: none !important;
+      }
+    }
+
+
+    
     

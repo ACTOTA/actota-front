@@ -2,57 +2,20 @@ import React from 'react';
 
 function Banner() {
     return (
-        <div className="banner" style={{ width: '100%', height: '100vh', overflow: 'hidden', position: 'relative' }}>
-            {/* Text container with adjusted z-index */}
-            <div style={{
-                position: 'absolute',
-                top: '75%',  // Adjusted for visual positioning above the button
-                left: '50%', // Center horizontally
-                transform: 'translate(-50%, -100%)', // Center and move up based on its own height
-                width: '100%',
-                textAlign: 'center',
-                zIndex: 2, // Ensures it is above the video
-            }}>
-                <p className="text-lg text-white">Not sure where to go? Perfect.</p>
+        <div className="relative w-full h-[600px] overflow-hidden">
+            <div className="absolute top-[80%] shadow-white left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center z-10">
+                <p className="mb-2 text-sm leading-7 text-white rounded-full text-bold sm:text-lg">Not sure where to go? Perfect.</p>
+                <button className="px-4 py-2 text-lg transition duration-150 border rounded-full shadow-md cursor-pointer text-logo-blue border-logo-blue active:border-logo-yellow border-4px bg-slate-100 hover:shadow-black active:scale-90">
+                    Surprise me!
+                </button>
             </div>
-            <video autoPlay muted loop style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                zIndex: 1  // Explicit z-index lower than the text
-            }}>
+            <video autoPlay muted loop className="absolute top-0 left-0 z-0 object-cover w-full h-full">
                 <source src="/videos/DVbanner.mp4" type="video/mp4" />
                 <source src="/videos/DVbanner.webm" type="video/webm" />
                 Your browser does not support the video tag.
             </video>
-            <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                background: 'linear-gradient(to bottom, rgba(255,255,255,0) 80%, rgba(255,255,255,1) 100%)',
-                zIndex: 1  // Same z-index as video to ensure consistent layering
-            }}></div>
-            <button style={{
-                position: 'absolute',
-                top: '80%', // Align with the start of the gradient
-                left: '50%', // Center horizontally
-                transform: 'translate(-50%, -50%)', // Center the button
-                padding: '10px 20px',
-                fontSize: '16px',
-                color: '#fff',
-                backgroundColor: '#007BFF', // Example blue color
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                zIndex: 2  // Ensures it is above the video
-            }}>
-                Surprise Me!
-            </button>
+            <div className="absolute top-0 left-0 z-0 w-full h-full bg-gradient-to-b-from-50"></div>
+
         </div>
     );
 }

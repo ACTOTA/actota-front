@@ -52,10 +52,10 @@ const SearchModal = () => {
       return;
     }
 
-    const currentQuery = qs.parse(params.toString());
+    const currentQuery = qs.parse(params?.toString() || '');
     const updatedQuery = {
       ...currentQuery,
-      locationValue: (location && location.value) || undefined,
+      locationValue: (location && (location as { value: string }).value) || undefined,
       activitiesValue: selectedActivities.map(a => a.label).join(','),
       guestCount,
       roomCount,

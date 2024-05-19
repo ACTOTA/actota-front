@@ -13,6 +13,10 @@ module.exports = {
         "logo-yellow": "#CFFD72",
         cyan: "#79FFE1",
       },
+      backgroundImage: {
+        // Define a custom gradient
+        'gradient-to-b-from-50': 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, 1) 100%)',
+      }
     },
   },
   plugins: [
