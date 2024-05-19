@@ -23,7 +23,6 @@ const SearchModal = () => {
   const searchModal = useSearchModal();
   const params = useSearchParams();
 
-  const [step, setStep] = useState(searchModal.step);
   const [location, setLocation] = useState();
   const [guestCount, setGuestCount] = useState(1);
   const [roomCount, setRoomCount] = useState(1);
@@ -41,13 +40,13 @@ const SearchModal = () => {
 
   const Map = useMemo(() => dynamic(() => import('../Map'), {
     ssr: false
-  }), [location]);
+  }), []);
 
-  const onBack = useCallback(() => setStep(prev => prev - 1), []);
-  const onNext = useCallback(() => setStep(prev => prev + 1), []);
+  const onBack = useCallback(() => searchModal.onBack(), [searchModal]);
+  const onNext = useCallback(() => searchModal.onNext(), [searchModal]);
 
   const onSubmit = useCallback(() => {
-    if (step !== STEPS.TYPE) {
+    if (searchModal.step !== STEPS.TYPE) {
       onNext();
       return;
     }
@@ -67,12 +66,12 @@ const SearchModal = () => {
     const queryString = qs.stringify(updatedQuery, { skipNull: true });
     router.push(`/?${queryString}`);
 
-    setStep(STEPS.LOCATION);
+    searchModal.step = STEPS.LOCATION;
     searchModal.onClose();
-  }, [dateRange, guestCount, location, onNext, params, router, roomCount, searchModal, selectedActivities, step, bathroomCount]);
+  }, [dateRange, guestCount, location, onNext, params, router, roomCount, searchModal, selectedActivities, bathroomCount]);
 
-  const actionLabel = useMemo(() => step === STEPS.TYPE ? 'Search' : 'Next', [step]);
-  const secondaryActionLabel = useMemo(() => step === STEPS.LOCATION ? undefined : 'Back', [step]);
+  const actionLabel = useMemo(() => searchModal.step === STEPS.TYPE ? 'Search' : 'Next', [searchModal.step]);
+  const secondaryActionLabel = useMemo(() => searchModal.step === STEPS.LOCATION ? undefined : 'Back', [searchModal.step]);
 
   let bodyContent;
   switch (searchModal.step) {
