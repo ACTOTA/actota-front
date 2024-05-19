@@ -34,10 +34,6 @@ const SearchModal = () => {
   });
   const [selectedActivities, setSelectedActivities] = useState<ActivitySelectValue[]>([]);
 
-  useEffect(() => {
-    console.log(searchModal.step);
-  }, [searchModal]);
-
   const Map = useMemo(() => dynamic(() => import('../Map'), {
     ssr: false
   }), []);
@@ -73,13 +69,31 @@ const SearchModal = () => {
   const actionLabel = useMemo(() => searchModal.step === STEPS.TYPE ? 'Search' : 'Next', [searchModal.step]);
   const secondaryActionLabel = useMemo(() => searchModal.step === STEPS.LOCATION ? undefined : 'Back', [searchModal.step]);
 
+  const updateLocation = useCallback((val) => {
+    setLocation(val);
+    searchModal.locationLabel = val.value + ", " + val.region;
+  }, [searchModal]);
+  const updateDuration = useCallback((val) => {
+    setDateRange(val.selection);
+    console.log(val);
+    searchModal.durationLabel = `${val.selection.startDate?.toLocaleDateString()} - ${val.selection.endDate?.toLocaleDateString()}`;
+  }, [searchModal]);
+  const updateGuestCount = useCallback((val) => {
+    setGuestCount(val);
+    if (val === 1) {
+      searchModal.guestLabel = '1 guest';
+      return;
+    }
+    searchModal.guestLabel = val + ' guests';
+  }, [searchModal]);
+
   let bodyContent;
   switch (searchModal.step) {
     case STEPS.DATE:
       bodyContent = (
         <div className="flex flex-col gap-8">
           <Heading title="When do you plan to go?" subtitle="Select your dates" />
-          <Calendar onChange={(range) => setDateRange(range.selection)} value={dateRange} />
+          <Calendar value={dateRange} onChange={updateDuration} />
         </div>
       );
       break;
@@ -87,7 +101,7 @@ const SearchModal = () => {
       bodyContent = (
         <div className="flex flex-col gap-8">
           <Heading title="More information" subtitle="Specify details" />
-          <Counter onChange={setGuestCount} value={guestCount} title="Guests" subtitle="How many guests?" />
+          <Counter onChange={updateGuestCount} value={guestCount} title="Guests" subtitle="How many guests?" />
           <Counter onChange={setRoomCount} value={roomCount} title="Rooms" subtitle="Room requirements?" />
           <Counter onChange={setBathroomCount} value={bathroomCount} title="Bathrooms" subtitle="Bathroom needs?" />
         </div>
@@ -104,7 +118,7 @@ const SearchModal = () => {
       bodyContent = (
         <div className="flex flex-col gap-8">
           <Heading title="Where do you wanna go?" subtitle="Choose a location" />
-          <TownSelect value={location} onChange={(val) => setLocation(val)} />
+          <TownSelect value={location} onChange={updateLocation} />
           <hr />
           <Map />
         </div>
