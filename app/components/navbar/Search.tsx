@@ -5,17 +5,17 @@ import { differenceInDays } from 'date-fns';
 
 import useSearchModal from '@/app/hooks/useSearchModal';
 import useTowns from '@/app/hooks/useTowns';
+import { STEPS } from '../../types/steps';
 import useActivitiesModal from '@/app/hooks/useActivitiesModal';
 
-// Assuming useSearchModal returns a function to close the modal
 const Search = () => {
   const searchModal = useSearchModal();
   const [search, setSearch] = useState(false);
-  
+
   const params = useSearchParams();
   const { getByValue } = useTowns();
 
-  const locationValue = params?.get('locationValue'); 
+  const location = params?.get('locationValue');
   const startDate = params?.get('startDate');
   const endDate = params?.get('endDate');
   const guestCount = params?.get('guestCount');
@@ -31,15 +31,14 @@ const Search = () => {
     setSelectedActivitiesCount(activitiesArray.length);
   }, [initialActivities]);
 
-  const locationLabel = useMemo(() => locationValue ? getByValue(locationValue as string)?.label : 'Denver, CO', [locationValue, getByValue]);
+  const locationLabel = useMemo(() => location ? getByValue(location as string)?.label : 'Denver, CO', [location, getByValue]);
   const durationLabel = useMemo(() => startDate && endDate ? `${differenceInDays(new Date(endDate), new Date(startDate)) || 1} Days` : 'Any Week', [startDate, endDate]);
   const guestLabel = useMemo(() => guestCount ? `${guestCount} Guests` : 'Add Guests', [guestCount]);
   const activitiesLabel = useMemo(() => selectedActivitiesCount > 0 ? `${selectedActivitiesCount} Activities` : 'Add Activities', [selectedActivitiesCount]);
 
 
-  return ( 
+  return (
     <div
-      onClick={searchModal.onOpen}
       className="
         border-[1px] 
         w-full 
@@ -52,15 +51,15 @@ const Search = () => {
         cursor-pointer
       "
     >
-      <div 
+      <div
         className="flex flex-row items-center justify-between "
       >
-        <div 
+        <div onClick={() => searchModal.onOpen(STEPS.LOCATION)}
           className="px-6 text-sm font-semibold "
         >
           {locationLabel}
         </div>
-        <div 
+        <div onClick={() => searchModal.onOpen(STEPS.DATE)}
           className="
             hidden 
             sm:block 
@@ -74,13 +73,14 @@ const Search = () => {
         >
           {durationLabel}
         </div>
-        <div 
+        <div
           className="flex flex-row items-center gap-3 pl-6 pr-2 text-sm text-gray-600 "
         >
-          <div className="hidden sm:block">{guestLabel}
+          <div onClick={() => searchModal.onOpen(STEPS.INFO)}
+            className="hidden sm:block">{guestLabel}
           </div>
-          <div 
-          className="
+          <div onClick={() => searchModal.onOpen(STEPS.ACTIVITIES)}
+            className="
             hidden
             sm:block
             text-sm
@@ -91,11 +91,11 @@ const Search = () => {
             flex-1
             text-center
           "
-           >
-          {activitiesLabel}
-        </div>
-          <div 
-                className="
+          >
+            {activitiesLabel}
+          </div>
+          <div
+            className="
                     hidden
                     sm:block
                     text-sm
@@ -105,24 +105,24 @@ const Search = () => {
                     flex-1
                     text-center
                 "
-                >
-                Any Type
-                </div>         
-                  <div 
-                    className="p-2 text-white rounded-full bg-logo-blue"
-                  >
-                      <div className="icon-container">
-                    <BiSearch size={18} style={{ position: 'relative', zIndex: 1 }} />
-                    <div className="icon-gradient-outline">
-                      
-                    </div>
-                </div>
+          >
+            Any Type
+          </div>
+          <div
+            className="p-2 text-white rounded-full bg-logo-blue"
+          >
+            <div className="icon-container">
+              <BiSearch size={18} style={{ position: 'relative', zIndex: 1 }} />
+              <div className="icon-gradient-outline">
+
+              </div>
             </div>
+          </div>
         </div>
-       
+
       </div>
-    </div>
+    </div >
   );
 }
- 
+
 export default Search;

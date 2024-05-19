@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useMemo } from "react";
+import { useCallback, useState, useMemo, useEffect } from "react";
 import { Range } from 'react-date-range';
 import { formatISO } from 'date-fns';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -16,21 +16,13 @@ import ActivityBox, { ActivitySelectValue } from '../inputs/ActivityInput';
 import Heading from '../Heading';
 import Activities from '../Activities';
 import Types from '../Types';
-
-enum STEPS {
-  LOCATION = 0,
-  DATE = 1,
-  INFO = 2,
-  ACTIVITIES = 3,
-  TYPE = 4,
-}
+import { STEPS } from '../../types/steps';
 
 const SearchModal = () => {
   const router = useRouter();
   const searchModal = useSearchModal();
   const params = useSearchParams();
 
-  const [step, setStep] = useState(STEPS.LOCATION);
   const [location, setLocation] = useState();
   const [guestCount, setGuestCount] = useState(1);
   const [roomCount, setRoomCount] = useState(1);
@@ -42,23 +34,27 @@ const SearchModal = () => {
   });
   const [selectedActivities, setSelectedActivities] = useState<ActivitySelectValue[]>([]);
 
-  const Map = useMemo(() => dynamic(() => import('../Map'), { 
-    ssr: false 
-  }), [location]);
+  useEffect(() => {
+    console.log(searchModal.step);
+  }, [searchModal]);
 
-  const onBack = useCallback(() => setStep(prev => prev - 1), []);
-  const onNext = useCallback(() => setStep(prev => prev + 1), []);
+  const Map = useMemo(() => dynamic(() => import('../Map'), {
+    ssr: false
+  }), []);
+
+  const onBack = useCallback(() => searchModal.onBack(), [searchModal]);
+  const onNext = useCallback(() => searchModal.onNext(), [searchModal]);
 
   const onSubmit = useCallback(() => {
-    if (step !== STEPS.TYPE) {
+    if (searchModal.step !== STEPS.TYPE) {
       onNext();
       return;
     }
 
-    const currentQuery = qs.parse(params.toString());
+    const currentQuery = qs.parse(params?.toString() || '');
     const updatedQuery = {
       ...currentQuery,
-      locationValue: (location && location.value) || undefined,
+      locationValue: (location && (location as { value: string }).value) || undefined,
       activitiesValue: selectedActivities.map(a => a.label).join(','),
       guestCount,
       roomCount,
@@ -70,15 +66,15 @@ const SearchModal = () => {
     const queryString = qs.stringify(updatedQuery, { skipNull: true });
     router.push(`/?${queryString}`);
 
-    setStep(STEPS.LOCATION);
+    searchModal.step = STEPS.LOCATION;
     searchModal.onClose();
-  }, [dateRange, guestCount, location, onNext, params, router, roomCount, searchModal, selectedActivities, step, bathroomCount]);
+  }, [dateRange, guestCount, location, onNext, params, router, roomCount, searchModal, selectedActivities, bathroomCount]);
 
-  const actionLabel = useMemo(() => step === STEPS.TYPE ? 'Search' : 'Next', [step]);
-  const secondaryActionLabel = useMemo(() => step === STEPS.LOCATION ? undefined : 'Back', [step]);
+  const actionLabel = useMemo(() => searchModal.step === STEPS.TYPE ? 'Search' : 'Next', [searchModal.step]);
+  const secondaryActionLabel = useMemo(() => searchModal.step === STEPS.LOCATION ? undefined : 'Back', [searchModal.step]);
 
   let bodyContent;
-  switch (step) {
+  switch (searchModal.step) {
     case STEPS.DATE:
       bodyContent = (
         <div className="flex flex-col gap-8">
@@ -98,7 +94,7 @@ const SearchModal = () => {
       );
       break;
     case STEPS.ACTIVITIES:
-      
+
       bodyContent = <Activities value={selectedActivities} onChange={setSelectedActivities} />;
       break;
     case STEPS.TYPE:

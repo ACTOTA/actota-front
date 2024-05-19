@@ -7,6 +7,7 @@ import getCurrentUser from "./actions/getCurrentUser";
 import ListingCard from "./components/listings/ListingCard";
 import Banner from "./components/Banner";
 import SmallCards, { NearbyData } from "./components/SmallCards"; // Ensure NearbyData is exported
+import MediumCards, { TravelModeData } from "./components/MediumCards";
 import Filter from './components/Filter';
 
 export default async function Home() {
@@ -24,6 +25,7 @@ export default async function Home() {
     );
   }
 
+  
   // Since NearbyData is now properly imported, use it directly
   return (
     <ClientOnly>
@@ -34,10 +36,10 @@ export default async function Home() {
             <h2 className="py-4 text-4xl font-semibold">Explore Colorado</h2>
             <SmallCards towns={NearbyData} />
           </section>
-          <section>
           
-            <h2 className="py-8 text-4xl font-semibold">Featured Listings</h2>
-            
+          <section>
+            <h2 className="py-8 text-4xl font-semibold">Activate Your Inner Nature</h2>
+            <MediumCards towns={TravelModeData} />
           </section>
           
         </main>

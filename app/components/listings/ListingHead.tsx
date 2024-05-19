@@ -29,7 +29,7 @@ const ListingHead: React.FC<ListingHeadProps> = ({
   
     return ( 
     <>
-      <Heading
+      <Heading 
         title={title}
         subtitle={`${location?.region}, ${location?.label}`}
       />
