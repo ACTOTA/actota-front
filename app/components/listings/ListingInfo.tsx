@@ -69,7 +69,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
   });
   
   return (
-    <div className="flex flex-col col-span-4 gap-8">
+    <div className="flex flex-col col-span-4 gap-2">
     <div className="flex flex-col gap-2">
       <div 
         className="flex flex-row items-center gap-2 text-xl font-semibold "
@@ -77,7 +77,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
         <div>Hosted by {user?.name}</div>
         <Avatar src={user?.image} />
       </div>
-      <div className="flex flex-row items-center gap-4 font-light text-neutral-500"
+      <div className="flex flex-row items-center font-light text-neutral-500"
       >
         
         {/* <div>
@@ -91,6 +91,10 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
         </div> */}
       </div>
       <ListingType />
+      <hr />
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <ListingDays days={dayInfo} day={day} setDay={setDay} />
+      </div>
     </div>
     {/* <hr />
       {activity && (
@@ -102,9 +106,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
       )} */}
       <hr />
 
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-        <ListingDays days={dayInfo} day={day} setDay={setDay} />
-      </div>
+
       <ListingItinerary {...dayItinerary} />
       {/* <Map center={coordinates} /> */}
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Range, RangeKeyDict } from 'react-date-range';
-
 import Button from "../Button";
 import Calendar from "../inputs/Calendar";
 import LodgingDetailsCounter from '../inputs/LodgingDetailsCounter';
@@ -27,6 +26,7 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
 }) => {
   const [calendarVisible, setCalendarVisible] = useState(false);
   const [detailsCounterVisible, setDetailsCounterVisible] = useState(false);
+  const [activitiesVisible, setActivitiesVisible] = useState(false);
   const [localDateRange, setLocalDateRange] = useState<Range>(dateRange);
 
   const handleDateClick = () => {
@@ -35,6 +35,10 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
 
   const handleToggleDetailsCounter = () => {
     setDetailsCounterVisible(!detailsCounterVisible);
+  };
+
+  const handleToggleActivities = () => {
+    setActivitiesVisible(!activitiesVisible);
   };
 
   const handleDateChange = (ranges: RangeKeyDict) => {
@@ -54,7 +58,7 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
 
   useEffect(() => {
     const handleScroll = () => {
-      const parallaxElement = document.querySelector('.parallax');
+      const parallaxElement = document.querySelector('.parallax') as HTMLElement;
       if (parallaxElement) {
         let scrollPosition = window.pageYOffset;
 
@@ -112,8 +116,25 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
         {detailsCounterVisible && (
           <LodgingDetailsCounter />
         )}
+        <div onClick={handleToggleActivities} className="cursor-pointer">
+          <div className="border-[1px] border-neutral-300 rounded-lg p-3 m-4 flex justify-between items-center">
+            Activities
+            <BsCaretDownFill />
+          </div>
+        </div>
+        {activitiesVisible && (
+          <div className="m-4">
+            {/* Add your activities dropdown content here */}
+            <ul>
+              <li>Hiking</li>
+              <li>Rafting</li>
+              <li>Sightseeing</li>
+              <li>Fishing</li>
+            </ul>
+          </div>
+        )}
         <div className="mt-4 mb-4">
-        <Button disabled={disabled} label="Reserve" onClick={handleSubmit} className="w-full text-sm md:w-1/4" />
+          <Button disabled={disabled} label="Reserve" onClick={handleSubmit} className="w-full text-sm md:w-1/4" />
         </div>
         <hr />
         <div className="p-4">
@@ -130,7 +151,6 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
             <div>${totalPrice}</div>
           </div>
         </div>
-
       </div>
     </div>
   );
