@@ -39,6 +39,8 @@ const ListingClient: React.FC<ListingClientProps> = ({
   const loginModal = useLoginModal();
   const router = useRouter();
 
+  const [guestCount, setGuestCount] = useState(1); // Add state for guest count
+
   const disabledDates = useMemo(() => {
     let dates: Date[] = [];
 
@@ -73,7 +75,8 @@ const ListingClient: React.FC<ListingClientProps> = ({
         totalPrice,
         startDate: dateRange.startDate,
         endDate: dateRange.endDate,
-        listingId: listing?.id
+        listingId: listing?.id,
+        guestCount, // Include guest count in the reservation
       })
       .then(() => {
         toast.success('Listing reserved!');
@@ -93,7 +96,8 @@ const ListingClient: React.FC<ListingClientProps> = ({
     listing?.id,
     router,
     currentUser,
-    loginModal
+    loginModal,
+    guestCount
   ]);
 
   useEffect(() => {
@@ -147,15 +151,15 @@ const ListingClient: React.FC<ListingClientProps> = ({
                 onSubmit={onCreateReservation}
                 disabled={isLoading}
                 disabledDates={disabledDates}
+                currentUser={currentUser} // Pass the currentUser prop here
+                guestCount={guestCount} // Pass the guestCount prop here
               />
-             
             </div>
-            
           </div>
         </div>
       </div>
     </Container>
-   );
+  );
 }
  
 export default ListingClient;
