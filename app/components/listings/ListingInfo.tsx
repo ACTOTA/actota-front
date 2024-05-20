@@ -10,7 +10,7 @@ import Avatar from "../Avatar";
 import ListingActivity from "./ListingActivity";
 import ListingDays from "./ListingDays";
 import ListingItinerary from "./ListingItinerary";
-import LodgingDetailsCounter from "../LodgingDetailsCounter";
+import LodgingDetailsCounter from "../inputs/LodgingDetailsCounter";
 import ListingType from "./ListingType";
 import ListingHead from "./ListingHead";
 import Heading from "../Heading";
@@ -102,13 +102,11 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
       )} */}
       <hr />
 
-      <div className="display: max-w-screen-lg mx-auto flex; justify-content: center; align-items: center; height: 100%;">
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
         <ListingDays days={dayInfo} day={day} setDay={setDay} />
-        <ListingItinerary {...dayItinerary} />
-        {/* Using spread operator. This extracts the values from the object, being passed through.
-        Since the object keys names match the props that are meant to be passed in, it acts as if we passed them in separately. */}
       </div>
-      <Map center={coordinates} />
+      <ListingItinerary {...dayItinerary} />
+      {/* <Map center={coordinates} /> */}
 
     </div>
 

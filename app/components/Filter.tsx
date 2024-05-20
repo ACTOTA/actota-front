@@ -4,7 +4,7 @@ import { activities } from './Activities';
 import { Fragment, useState } from 'react';
 import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react';
 import { XMarkIcon, ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
-import LodgingDetailsCounter from './LodgingDetailsCounter';
+import LodgingDetailsCounter from './inputs/LodgingDetailsCounter';
 import ListingCard from '../components/listings/ListingCard';
 import EmptyState from "@/app/components/EmptyState";
 

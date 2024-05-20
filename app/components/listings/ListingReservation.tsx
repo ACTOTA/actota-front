@@ -3,7 +3,7 @@ import { Range, RangeKeyDict } from 'react-date-range';
 
 import Button from "../Button";
 import Calendar from "../inputs/Calendar";
-import LodgingDetailsCounter from '../LodgingDetailsCounter';
+import LodgingDetailsCounter from '../inputs/LodgingDetailsCounter';
 import { BsCaretDownFill } from "react-icons/bs";
 
 interface ListingReservationProps {
