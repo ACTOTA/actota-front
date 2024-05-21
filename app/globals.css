@@ -67,6 +67,24 @@ body,
       }
     }
 
+/* Custom thin scrollbar */
+.thin-scrollbar::-webkit-scrollbar {
+  width: 4px; /* Adjust the width as needed */
+  height: 4px; /* Adjust the height as needed for horizontal scrollbar */
+}
+
+.thin-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Customize the track color */
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background: #888; /* Customize the thumb color */
+  border-radius: 10px;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Customize the thumb hover color */
+}
 
     
     

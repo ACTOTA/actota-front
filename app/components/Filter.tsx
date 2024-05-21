@@ -4,7 +4,7 @@ import { activities } from './Activities';
 import { Fragment, useState } from 'react';
 import { Dialog, Disclosure, Menu, Transition } from '@headlessui/react';
 import { XMarkIcon, ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
-import LodgingDetailsCounter from './LodgingDetailsCounter';
+import LodgingDetailsCounter from './inputs/LodgingDetailsCounter';
 import ListingCard from '../components/listings/ListingCard';
 import EmptyState from "@/app/components/EmptyState";
 
@@ -15,9 +15,9 @@ const sortOptions = [
   { name: 'Price: Low to High', href: '#', current: false },
   { name: 'Price: High to Low', href: '#', current: false },
 ];
-// const subCategories = [
-//   { name: 'Featured', href: '#' },
-// ];
+const subCategories = [
+  { name: 'Featured', href: '#' },
+];
 
 
 const filters = [
@@ -35,7 +35,7 @@ const filters = [
   },
   {
     id: 'activity',
-    name: 'Activity',
+    name: 'Activities',
     options: activities.map(activity => ({
       value: activity.label.toLowerCase().replace(/\s+/g, '-'), // Convert label to a URL-friendly format
       label: activity.label,
@@ -117,15 +117,15 @@ export default function Filter() {
                 {/* Filters */}
                 <form className="mt-4 border-t border-gray-200">
                   <h3 className="sr-only">Categories</h3>
-                  {/* <ul role="list" className="px-2 py-3 font-medium text-gray-900">
-    {subCategories.map((category) => (
-      <li key={category.name}>
-        <a href={category.href} className="block px-2 py-3">
-          {category.name}
-        </a>
-      </li>
-    ))}
-  </ul> */}
+                  <ul role="list" className="px-2 py-3 font-medium text-gray-900">
+                    {subCategories.map((category) => (
+                      <li key={category.name}>
+                        <a href={category.href} className="block px-2 py-3">
+                          {category.name}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
 
                   {filters.map((section) => (
                     <Disclosure as="div" key={section.id} className="px-4 py-6 border-t border-gray-200">
@@ -227,7 +227,7 @@ export default function Filter() {
 
             <button
               type="button"
-              className="p-2 ml-5 m-2 text-gray-400 hover:text-gray-500 sm:ml-7"
+              className="p-2 m-2 ml-5 text-gray-400 hover:text-gray-500 sm:ml-7"
               onClick={() => setMobileFiltersOpen(true)}
             >
               <span className="sr-only">View filters</span>
@@ -241,7 +241,7 @@ export default function Filter() {
           </div>
         </div>
 
-        <section aria-labelledby="products-heading" className="py-4 border-gray-200 border-t">
+        <section aria-labelledby="products-heading" className="py-4 border-t border-gray-200">
           <h2 id="products-heading" className="sr-only">Products</h2>
 
           <div className="">

@@ -16,7 +16,7 @@ export const NearbyData = [
   { img: "/images/TownImages/Boulder/Boulder2.jpg", location: "Boulder", distance: "45-minute drive" },
   { img: "/images/TownImages/IdahoSprings/IdahoSprings1.jpg", location: "Idaho Springs", distance: "40-minute drive" },
   { img: "/images/TownImages/ColoradoSprings/ColoradoSprings2.jpg", location: "Colorado Springs", distance: "1-hour drive" },
-  { img: "/images/TownImages/FortCollins/FortCollins.jpg", location: "Fort Collins", distance: "1-hour drive" },
+  { img: "/images/TownImages/FortCollins/FortCollins1.jpg", location: "Fort Collins", distance: "1-hour drive" },
   { img: "/images/TownImages/EstesPark/EstesPark1.jpg", location: "Estes Park", distance: "1.5-hour drive" },
   { img: "/images/TownImages/Vail/Vail1.jpg", location: "Vail", distance: "1.5-hour drive" },
   { img: "/images/TownImages/GlenwoodSprings/GlenwoodSprings1.jpg", location: "Glenwood Springs", distance: "2.5-hour drive" },

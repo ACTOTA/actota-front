@@ -17,6 +17,7 @@ import Heading from '../Heading';
 import Activities from '../Activities';
 import Types from '../Types';
 import { STEPS } from '../../types/steps';
+import ListingType from "../listings/ListingType";
 
 const SearchModal = () => {
   const router = useRouter();
@@ -75,7 +76,6 @@ const SearchModal = () => {
   }, [searchModal]);
   const updateDuration = useCallback((val) => {
     setDateRange(val.selection);
-    console.log(val);
     searchModal.durationLabel = `${val.selection.startDate?.toLocaleDateString()} - ${val.selection.endDate?.toLocaleDateString()}`;
   }, [searchModal]);
   const updateGuestCount = useCallback((val) => {
@@ -108,11 +108,10 @@ const SearchModal = () => {
       );
       break;
     case STEPS.ACTIVITIES:
-
       bodyContent = <Activities value={selectedActivities} onChange={setSelectedActivities} />;
       break;
     case STEPS.TYPE:
-      bodyContent = <Types />;
+      bodyContent = <ListingType />;
       break;
     default:
       bodyContent = (

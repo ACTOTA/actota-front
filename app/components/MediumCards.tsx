@@ -11,32 +11,35 @@ interface TravelModeProps {
   towns: Town[];
 }
 export const TravelModeData = [
-
+    
+  { img: "/images/TravelModeImages/MostPopular/MostPopular2.jpg", 
+  label: "Most Popular", 
+  subtitle: "Experience the Most Popular Destinations in Colorado" 
+  },
   
-  { img: "/images/TravelModeImages/Mindfulness/Mindfulness4.jpg", 
-    label: "Mindfulness Focused", 
+  { img: "/images/TravelModeImages/Mindfulness/Mindfulness5.jpg", 
+    label: "Mindfulness", 
     subtitle: "Calm contemplation in the Rockies" 
     },
-    
-    
+
   {
-    img: "/images/TravelModeImages/NatureImerssion/NatureImerssion2.jpg",
-    label: "Nature Focused",
+    img: "/images/TravelModeImages/NatureImerssion/NatureImerssion3.jpg",
+    label: "Nature",
     subtitle: "Connect Deep with Nature's Beauty"
     },
    
     { img: "/images/TravelModeImages/CulturalImerssion/CulturalImerssion2.jpg", 
-  label: "Culture Focused", 
+  label: "Culture", 
   subtitle: "Engage with local history" 
     },
     
     { img: "/images/TravelModeImages/Intense/Intense1.jpg", 
-  label: "Challenge Focused", 
+  label: "Challenge", 
   subtitle: "Challenge yourself in the Rockies" 
     },
 
     { img: "/images/TravelModeImages/Exciting/Exciting.jpg", 
-    label: "Exciting Focused", 
+    label: "Exciting", 
     subtitle: "Enjoy the thrill of Colorado" 
       },
     

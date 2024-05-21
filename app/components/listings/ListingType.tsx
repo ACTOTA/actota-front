@@ -54,9 +54,9 @@ export default function ListingType() {
   };
 
   return (
-    <div className="p-4 border rounded-lg shadow-lghover:cursor-pointer hover:bg-slate-100 ">
-      <h1 className="mb-4 text-xl font-bold text-black cursor-pointer" onClick={handleToggleVisibility}>
-        Details about your itinerary
+    <div className="p-2 border rounded-lg shadow-lghover:cursor-pointer hover:bg-slate-100 ">
+      <h1 className="text-xl font-bold text-black cursor-pointer " onClick={handleToggleVisibility}>
+        Trip Metrics
       </h1>
       {visible && (
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-1">

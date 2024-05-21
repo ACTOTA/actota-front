@@ -25,13 +25,15 @@ const Search = () => {
         hover:shadow-md 
         transition 
         cursor-pointer
+
       "
     >
       <div
         className="flex flex-row items-center justify-between "
+        
       >
         <div onClick={() => searchModal.onOpen(STEPS.LOCATION)}
-          className="px-6 text-sm font-semibold "
+          className="w-full px-6 text-sm font-semibold rounded-full cursor-pointer md:w-auto hover:bg-slate-200"
         >
           {searchModal.locationLabel}
         </div>
@@ -80,6 +82,7 @@ const Search = () => {
                     border-r-[1px]
                     flex-1
                     text-center
+
                 "
           >
             {searchModal.typeLabel}

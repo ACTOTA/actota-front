@@ -10,7 +10,7 @@ import Avatar from "../Avatar";
 import ListingActivity from "./ListingActivity";
 import ListingDays from "./ListingDays";
 import ListingItinerary from "./ListingItinerary";
-import LodgingDetailsCounter from "../LodgingDetailsCounter";
+import LodgingDetailsCounter from "../inputs/LodgingDetailsCounter";
 import ListingType from "./ListingType";
 import ListingHead from "./ListingHead";
 import Heading from "../Heading";
@@ -69,7 +69,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
   });
   
   return (
-    <div className="flex flex-col col-span-4 gap-8">
+    <div className="flex flex-col col-span-4 gap-2">
     <div className="flex flex-col gap-2">
       <div 
         className="flex flex-row items-center gap-2 text-xl font-semibold "
@@ -77,7 +77,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
         <div>Hosted by {user?.name}</div>
         <Avatar src={user?.image} />
       </div>
-      <div className="flex flex-row items-center gap-4 font-light text-neutral-500"
+      <div className="flex flex-row items-center font-light text-neutral-500"
       >
         
         {/* <div>
@@ -91,6 +91,10 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
         </div> */}
       </div>
       <ListingType />
+      <hr />
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <ListingDays days={dayInfo} day={day} setDay={setDay} />
+      </div>
     </div>
     {/* <hr />
       {activity && (
@@ -102,13 +106,9 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
       )} */}
       <hr />
 
-      <div className="display: max-w-screen-lg mx-auto flex; justify-content: center; align-items: center; height: 100%;">
-        <ListingDays days={dayInfo} day={day} setDay={setDay} />
-        <ListingItinerary {...dayItinerary} />
-        {/* Using spread operator. This extracts the values from the object, being passed through.
-        Since the object keys names match the props that are meant to be passed in, it acts as if we passed them in separately. */}
-      </div>
-      <Map center={coordinates} />
+
+      <ListingItinerary {...dayItinerary} />
+      {/* <Map center={coordinates} /> */}
 
     </div>
 

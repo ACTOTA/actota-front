@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Counter from './inputs/Counter';
+import Counter from './Counter';
 
 const LodgingDetailsCounter = () => {
   // State hooks for managing counts
