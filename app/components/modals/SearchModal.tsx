@@ -76,9 +76,17 @@ const SearchModal = () => {
   }, [searchModal]);
   const updateDuration = useCallback((val) => {
     setDateRange(val.selection);
-    searchModal.durationLabel = `${val.selection.startDate?.toLocaleDateString()} - ${val.selection.endDate?.toLocaleDateString()}`;
-  }, [searchModal]);
-  const updateGuestCount = useCallback((val) => {
+
+    const getDaysBetweenDates = (date1: Date, date2: Date): number => {
+      const millisecondsPerDay = 24 * 60 * 60 * 1000;
+      const timeDifference = Math.abs(date2.getTime() - date1.getTime());
+      return Math.round(timeDifference / millisecondsPerDay);
+    };
+
+    const daysDifference = getDaysBetweenDates(val.selection.startDate!, val.selection.endDate!) + 1;
+
+    searchModal.durationLabel = `${daysDifference} ${daysDifference > 1 ? 'days' : 'day'}`;
+  }, [searchModal]); const updateGuestCount = useCallback((val) => {
     setGuestCount(val);
     if (val === 1) {
       searchModal.guestLabel = '1 guest';
