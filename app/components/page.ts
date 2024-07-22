@@ -14,6 +14,9 @@ const Components = () => {
 	}, []);
 
 	return (
+		Button({ children: "Button" }),
+		Field({ children: "Field" }),
+		FavButton(),
 		Checkbox({ children: "Checkbox" })
 	)
 

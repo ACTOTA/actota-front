@@ -1,4 +1,4 @@
-export default function Knob({ children}: { children: React.ReactNode}) {
+export default function Knob() {
     return (
         
         <button

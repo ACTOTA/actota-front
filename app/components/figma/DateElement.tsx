@@ -1,2 +1,4 @@
-export default function DateElement({ date }: { date: Date }) {
+export default function DateElement() {
+
+    
 }
