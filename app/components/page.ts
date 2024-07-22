@@ -14,7 +14,7 @@ const Components = () => {
 	}, []);
 
 	return (
-		FavButton()
+		Checkbox({ children: "Checkbox" })
 	)
 
 }
