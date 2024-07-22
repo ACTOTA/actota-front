@@ -101,3 +101,11 @@ body,
 .neutral-03 {
   border-color:  #9C9C9C;
 }
+
+.glass-corner {
+  background-color: radial-gradient(circle, #FFFFFF 25%, #B6B6B6 15%, #000000 20%);
+}
+
+.stroke-glass1 {
+  border-color: linear-gradient(360deg, #DEDEDE 50%, #666666 50%);
+}

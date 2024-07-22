@@ -5,8 +5,9 @@ export default function Field({children, className}: {children: React.ReactNode;
         <div>
         <button className="rounded-[16px] border-[1px] top-[1327px] left-[217px] w-[536px] h-[56px] translucent-black30 neutral-03 p-[
 0px, 16px, 0px, 16px] justify-between">
+        
           {children}
-          <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
+          <ChevronDownIcon aria-hidden="true" className="h-[24px] w-[24px] text-gray-400" />
         </button>
       </div>
     )

@@ -2,6 +2,8 @@
 import { useEffect } from "react";
 import Button from "./figma/Button";
 import Field from "./figma/Field";
+import Checkbox from "./figma/Checkbox";
+import FavButton from "./figma/FavButton";
 
 
 const Components = () => {
@@ -12,8 +14,7 @@ const Components = () => {
 	}, []);
 
 	return (
-		Button({ children: "Get Started", className: "neutral-01 text-bold text-white text-center text-small" }),
-		Field({ children: "Select a category"})
+		FavButton()
 	)
 
 }
