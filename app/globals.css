@@ -91,7 +91,13 @@ body,
 }
 
 .neutral-06 {
-  background-attachment: #FFFFFF;
+  background-color: #FFFFFF;
+}
+
+.translucent-black30 {
+  background-color: #000000;
 }
     
-    
+.neutral-03 {
+  border-color:  #9C9C9C;
+}
