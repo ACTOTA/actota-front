@@ -105,6 +105,10 @@ body,
 .translucent-black30 {
   background-color: #000000;
 }
+
+.translucent-white20 {
+  background-color: linear-gradient(180deg, #FFFFFF 20%)
+}
     
 .neutral-03 {
   border-color:  #9C9C9C;
