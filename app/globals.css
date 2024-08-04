@@ -111,7 +111,11 @@ body,
 }
 
 .translucent-black30 {
-  background-color: #000000;
+  background-color: linear-gradient(180deg, #000000 30%);
+}
+
+.translucent-black50 {
+  background-color: linear-gradient(180deg, #000000 50%);
 }
 
 .translucent-white20 {

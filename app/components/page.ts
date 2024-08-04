@@ -7,6 +7,8 @@ import FavButton from "./figma/FavButton";
 import React from "react";
 import Theme from "./figma/Theme";
 import Search from "./figma/Search";
+import Dropdownmenu from "./figma/DropdownMenu";
+import Chip from "./figma/Chip";
 
 
 const Components = () => {
@@ -22,7 +24,9 @@ const Components = () => {
 		FavButton(),
 		Checkbox({ children: "Checkbox", checked: true}),
 		Theme({ children: "Theme" }),
-		Search({ children: "Search" })])
+		Search({ children: "Search" }),
+		Dropdownmenu(),
+		Chip()])
 	)
 
 }
