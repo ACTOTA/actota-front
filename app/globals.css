@@ -102,6 +102,14 @@ body,
   color: #B3B3B3;
 }
 
+.text-neutral-05{
+  color: #F7F7F7;
+}
+
+.border-neutral-06 {
+  border-color: #FFFFFF;
+}
+
 .translucent-black30 {
   background-color: #000000;
 }
