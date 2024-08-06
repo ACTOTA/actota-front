@@ -106,6 +106,10 @@ body,
   color: #F7F7F7;
 }
 
+.border-neutral-03 {
+  border-color: #9C9C9C;
+}
+
 .border-neutral-06 {
   border-color: #FFFFFF;
 }
