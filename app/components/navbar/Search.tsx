@@ -15,22 +15,17 @@ const Search = () => {
 
   return (
     <div
-      className="
-        border-[1px] 
-        w-full 
-        md:w-auto 
+      className="glass-regular stroke-glass1 glass-corner flex flex-col jusify-center content-center
+        rounded-full
+        w-[720px] 
+        h-[82px]
         py-2 
-        rounded-full 
-        shadow-sm 
-        hover:shadow-md 
-        transition 
         cursor-pointer
-
       "
     >
       <div
         className="flex flex-row items-center justify-between "
-        
+
       >
         <div onClick={() => searchModal.onOpen(STEPS.LOCATION)}
           className="w-full px-6 text-sm font-semibold rounded-full cursor-pointer md:w-auto hover:bg-slate-200"
@@ -88,10 +83,10 @@ const Search = () => {
             {searchModal.typeLabel}
           </div>
           <div
-            className="p-2 text-white rounded-full bg-logo-blue"
+            className="p-2 text-white rounded-full bg-white"
           >
             <div className="icon-container">
-              <BiSearch size={18} style={{ position: 'relative', zIndex: 1 }} />
+              <BiSearch size={18} style={{ color: 'black', position: 'relative', zIndex: 1 }} />
               <div className="icon-gradient-outline">
 
               </div>
