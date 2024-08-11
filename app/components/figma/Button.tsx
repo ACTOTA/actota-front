@@ -1,12 +1,22 @@
-export default function Button({ children, className }: { children: React.ReactNode; className?: string }) {
-    return (
-      <>
-        <button
-          type="button"
-          className={`rounded-[200px] ${className}`}
-        >
-          {children}
-        </button>
-      </>
-    )
-  }
+import React from 'react';
+
+type ButtonProps = {
+  children: React.ReactNode;
+  className?: string;
+} & React.ButtonHTMLAttributes<HTMLButtonElement>;
+
+export default function Button({ children, className, ...rest }: ButtonProps) {
+
+
+  return (
+    <>
+      <button
+        type="button"
+        className={`rounded-[200px] bg-white py-3 px-6 ${className}`}
+        {...rest}
+      >
+        {children}
+      </button>
+    </>
+  )
+}

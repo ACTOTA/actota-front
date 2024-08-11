@@ -11,26 +11,26 @@ interface NavbarProps {
     currentUser?: SafeUser | null;
 }
 
-const Navbar: React.FC<NavbarProps>  = ({ 
-    currentUser 
+const Navbar: React.FC<NavbarProps> = ({
+    currentUser
 }) => {
     console.log("Navbar currentUser:    ", currentUser);
     return (
-        <div className="fixed z-10 w-full bg-white shadow-sm">
+        <div className="fixed z-10 w-full bg-none shadow-sm text-white">
             <div
-            className="py-3 "
-         >
-            <Container>
-                <div
-                className="flex flex-row items-center justify-between md:gap-0"
-                >
-                    <Logo />
-                    <Search />
-                    <UserMenu currentUser={currentUser}/>
-                </div>
-            </Container>
+                className="py-3 "
+            >
+                <Container>
+                    <div
+                        className="flex flex-row items-center justify-between md:gap-0"
+                    >
+                        <Logo />
+                        <Search />
+                        <UserMenu currentUser={currentUser} />
+                    </div>
+                </Container>
             </div>
-            
+
         </div>
     );
 }
