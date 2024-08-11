@@ -50,7 +50,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
   }, [isOpen]);
 
   return (
-    <div className="relative" ref={openMenu}>
+    <div className="flex gap-6" ref={openMenu}>
       <button>Log In</button>
       <Button className="text-black">Get Started</Button>
     </div>

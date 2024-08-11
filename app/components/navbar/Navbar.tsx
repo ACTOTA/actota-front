@@ -2,7 +2,7 @@
 
 import Container from "../Container";
 import Activities from "../Activities";
-import Logo from "./Logo";
+import Logo from "../Logo";
 import Search from "./Search";
 import UserMenu from "./UserMenu";
 import { SafeUser } from "@/app/types";
@@ -16,7 +16,7 @@ const Navbar: React.FC<NavbarProps> = ({
 }) => {
     console.log("Navbar currentUser:    ", currentUser);
     return (
-        <div className="fixed z-10 w-full bg-none shadow-sm text-white">
+        <div className="fixed h-28 z-10 w-full bg-none text-white">
             <div
                 className="py-3 "
             >
@@ -25,7 +25,7 @@ const Navbar: React.FC<NavbarProps> = ({
                         className="flex flex-row items-center justify-between md:gap-0"
                     >
                         <Logo />
-                        <Search />
+                        {currentUser && <Search />}
                         <UserMenu currentUser={currentUser} />
                     </div>
                 </Container>
