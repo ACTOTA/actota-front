@@ -5,7 +5,7 @@ import EmptyState from "@/app/components/EmptyState";
 import ClientOnly from "./components/ClientOnly";
 import getCurrentUser from "./actions/getCurrentUser";
 import ListingCard from "./components/listings/ListingCard";
-import Banner from "./components/Banner";
+import Hero from "./components/Hero";
 import SmallCards, { NearbyData } from "./components/SmallCards"; // Ensure NearbyData is exported
 import MediumCards, { TravelModeData } from "./components/MediumCards";
 import Filter from './components/Filter';
@@ -29,7 +29,7 @@ export default async function Home() {
   // Since NearbyData is now properly imported, use it directly
   return (
     <ClientOnly>
-      <Banner />
+      <Hero />
       <Container>
         <main className="mx-auto max-w-7xl">
           <section className="pt-6 pb-8">
