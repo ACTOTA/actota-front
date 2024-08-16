@@ -12,7 +12,7 @@ export default function Button({ children, className, ...rest }: ButtonProps) {
     <>
       <button
         type="button"
-        className={`rounded-[200px] bg-white py-3 px-6 ${className}`}
+        className={`rounded-[200px] bg-white text-black py-3 px-6 ${className}`}
         {...rest}
       >
         {children}

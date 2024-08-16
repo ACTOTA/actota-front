@@ -6,6 +6,7 @@ import ClientOnly from "./components/ClientOnly";
 import getCurrentUser from "./actions/getCurrentUser";
 import ListingCard from "./components/listings/ListingCard";
 import Hero from "./components/Hero";
+import WhyBook from "./components/WhyBook";
 import SmallCards, { NearbyData } from "./components/SmallCards"; // Ensure NearbyData is exported
 import MediumCards, { TravelModeData } from "./components/MediumCards";
 import Filter from './components/Filter';
@@ -40,6 +41,7 @@ export default async function Home() {
       </Head>
       <ClientOnly>
         <Hero />
+        <WhyBook />
         <Container>
           <main className="mx-auto max-w-7xl">
             <section className="pt-6 pb-8">

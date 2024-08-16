@@ -52,7 +52,7 @@ const UserMenu: React.FC<UserMenuProps> = ({
   return (
     <div className="flex gap-6" ref={openMenu}>
       <button>Log In</button>
-      <Button className="text-black">Get Started</Button>
+      <Button className="">Get Started</Button>
     </div>
   );
 }
