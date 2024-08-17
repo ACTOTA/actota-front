@@ -1,6 +1,11 @@
 import { MdCheckBox } from "react-icons/md"
 
-export default function Checkbox({ children, checked}: { children: React.ReactNode, checked: boolean}) {
+type checkboxProps = {
+    children: React.ReactNode;
+    checked: boolean;
+} & React.HTMLAttributes<HTMLDivElement>;
+
+export default function Checkbox({ children, checked, ...rest}: checkboxProps) {
     return (
         <div className="flex text-center gap-2 neutral-06">
             <MdCheckBox aria-checked={checked} className="justify-start"/>
