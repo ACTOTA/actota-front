@@ -41,7 +41,6 @@ export default async function Home() {
       </Head>
       <ClientOnly>
         <Hero />
-        <WhyBook />
         <Container>
           <main className="mx-auto max-w-7xl">
             <section className="pt-6 pb-8">
@@ -66,6 +65,7 @@ export default async function Home() {
             ))}
           </div>
         </Container>
+        <WhyBook />
       </ClientOnly>
     </>
   );
