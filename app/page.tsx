@@ -4,6 +4,7 @@ import Container from "@/app/components/Container";
 import EmptyState from "@/app/components/EmptyState";
 import ClientOnly from "./components/ClientOnly";
 import getCurrentUser from "./actions/getCurrentUser";
+import HomeListings from "./components/HomeListings";
 import ListingCard from "./components/listings/ListingCard";
 import Hero from "./components/Hero";
 import WhyBook from "./components/WhyBook";
@@ -41,7 +42,8 @@ export default async function Home() {
       </Head>
       <ClientOnly>
         <Hero />
-        <Container>
+
+        {/* <Container>
           <main className="mx-auto max-w-7xl">
             <section className="pt-6 pb-8">
               <h2 className="py-4 text-4xl font-semibold">Explore Colorado</h2>
@@ -55,16 +57,9 @@ export default async function Home() {
 
           </main>
           <Filter />
-          <div className="grid grid-cols-1 gap-8 pt-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-            {listings.map((listing) => (
-              <ListingCard
-                currentUser={currentUser}
-                key={listing.id}
-                data={listing}
-              />
-            ))}
-          </div>
-        </Container>
+        </Container> */}
+
+        <HomeListings />
         <WhyBook />
       </ClientOnly>
     </>

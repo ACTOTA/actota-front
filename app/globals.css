@@ -6,7 +6,9 @@ html,
 body,
     :root {
         height: 100%;
+        --Glass-Dark: radial-gradient(ellipse at center, rgba(207, 207, 207, 0.25), rgba(107, 107, 107, 0.15), rgba(0, 0, 0, 0.5));
         --Glass-Corner: radial-gradient(ellipse at top left, rgba(255, 255, 255, 0.25), rgba(182, 182, 182, 0.15), rgba(0, 0, 0, 0.2));
+        --Stroke-Glass-1: linear-gradient(to right, rgba(222, 222, 222, 0.5), rgba(102, 102, 102, 0.5));
         --Stroke-Red: linear-gradient(to top left, rgba(241, 14, 59, 0), rgba(241, 14, 59, 1)), linear-gradient(to bottom right, rgba(222, 222, 222, 0.5), rgba(102, 102, 102, 0.5)); 
         --Stroke-Blue: linear-gradient(to top left, rgba(5, 83, 206, 0), rgba(11, 103, 249, 1)), linear-gradient(to bottom right, rgba(222, 222, 222, 0.5), rgba(102, 102, 102, 0.5));
         --Stroke-Yellow: linear-gradient(to top left, rgba(254, 219, 37, 0), rgba(254, 219, 37, 1)), linear-gradient(to bottom right, rgba(222, 222, 222, 0.5), rgba(102, 102, 102, 0.5));
@@ -138,8 +140,8 @@ body,
   background-color: radial-gradient(circle, #FFFFFF 25%, #B6B6B6 15%, #000000 20%);
 }
 
-.stroke-glass1 {
-  border-color: linear-gradient(360deg, #DEDEDE 50%, #666666 50%);
+.stroke-glass-1 {
+  border: 1px solid rgba(222, 222, 222, 0.5);
 }
 .stroke-glass-blue {
   border-color: linear-gradient(360deg, #0553CE 0%, #0B67F9 100%);
@@ -156,6 +158,10 @@ Stroke-Blue {
   background-image: 
     linear-gradient(to right, #DEDEDE 50%, #666666 50%), /* Gray gradient */
     linear-gradient(to right, #0553CE 0%, #0B67F9 100%); /* Blue gradient on top */
+}
+
+.glass-dark {
+  background: var(--Glass-Dark, linear-gradient(0deg, rgba(0, 0, 0, 0.50) 0%, rgba(0, 0, 0, 0.50) 100%), radial-gradient(242.84% 121.1% at 4.26% 6.6%, rgba(207, 207, 207, 0.25) 0%, rgba(107, 107, 107, 0.15) 100%)); 
 }
 .glass-bg-blue {
   box-shadow: 4px 8px 16px 0px rgba(0, 0, 0, 0.25);
@@ -188,6 +194,11 @@ Stroke-Blue {
   background-clip: padding-box, border-box;
   background-origin: padding-box, border-box;
  
+}
+
+.glass-blur {
+  box-shadow: 4px 8px 16px 0px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(12px);
 }
 
 .red-04 {
