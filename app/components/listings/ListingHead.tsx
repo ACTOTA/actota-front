@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Heading from "../Heading";
-import StarButton from "../StarButton";
+import HeartButton from "../HeartButton";
 
 import { SafeUser } from "@/app/types";
 
@@ -50,7 +50,7 @@ const ListingHead: React.FC<ListingHeadProps> = ({
         <div
           className="absolute top-5 right-5"
         >
-          <StarButton
+          <HeartButton
             listingId={id}
             currentUser={currentUser}
           />

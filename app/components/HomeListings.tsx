@@ -10,6 +10,9 @@ export default async function HomeListings() {
 
   return (
     <section className="h-[100vh] px-8 py-4">
+      <div>
+        Popular
+      </div>
       <div className="grid grid-cols-4 gap-4">
         {listings.map((listing) => (
           <ListingCard

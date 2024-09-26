@@ -10,7 +10,7 @@ import React, { useCallback, useMemo, useEffect } from 'react';
 import { format } from 'date-fns';
 
 import Image from 'next/image';
-import StarButton from '../StarButton';
+import HeartButton from '../HeartButton';
 import Button from '../Button';
 
 type Location = {
@@ -114,9 +114,9 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
                 </div>
 
-                <section className='absolute h-full w-full p-2'>
-                    <div className='h-1/5'>
-                        <StarButton
+                <section className='h-full w-full p-2'>
+                    <div className='flex justify-end h-1/5'>
+                        <HeartButton
                             listingId={data.id}
                             currentUser={currentUser} />
                     </div>
