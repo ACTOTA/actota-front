@@ -9,8 +9,8 @@ export default async function HomeListings() {
   const currentUser = await getCurrentUser();
 
   return (
-    <section className="h-[100vh]">
-      <div className="grid grid-cols-1 gap-8 pt-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+    <section className="h-[100vh] px-8 py-4">
+      <div className="grid grid-cols-4 gap-4">
         {listings.map((listing) => (
           <ListingCard
             currentUser={currentUser}

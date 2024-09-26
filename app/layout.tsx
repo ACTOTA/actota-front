@@ -32,7 +32,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={font.className}>
+      <body className={`neutral-01 ${font.className}`}>
         <ClientOnly>
           <ToasterProvider />
           <RentModal />

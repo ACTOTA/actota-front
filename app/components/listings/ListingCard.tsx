@@ -6,7 +6,7 @@ import { Listing as PrismaListing, Reservation } from '@prisma/client';
 
 import { SafeListing, SafeUser } from '@/app/types'; // Make sure this path is correct
 import useTowns from '@/app/hooks/useTowns';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useEffect } from 'react';
 import { format } from 'date-fns';
 
 import Image from 'next/image';
@@ -66,8 +66,11 @@ const ListingCard: React.FC<ListingCardProps> = ({
     currentUser
 }) => {
     const router = useRouter();
-    const { getByValue } = useTowns();
+    // const { getByValue } = useTowns();
 
+    useEffect(() => {
+        console.log("DATA: ", data);
+    }, []);
 
     const location = parseLocation(data.location);
 
@@ -132,9 +135,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
 
                         <div className="flex flex-row items-center gap-1">
-                            <div className="font-semibold">
-                                $ {price}
-                            </div>
+                            <div className="font-semibold">From ${price}</div>
                             {!reservation && (
                                 <div className="font-light">night</div>
                             )}
