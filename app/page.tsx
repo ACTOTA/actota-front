@@ -8,6 +8,7 @@ import HomeListings from "./components/HomeListings";
 import ListingCard from "./components/listings/ListingCard";
 import Hero from "./components/Hero";
 import WhyBook from "./components/WhyBook";
+import Newsletter from "./components/Newsletter";
 import Footer from "./components/Footer";
 import SmallCards, { NearbyData } from "./components/SmallCards"; // Ensure NearbyData is exported
 import MediumCards, { TravelModeData } from "./components/MediumCards";
@@ -62,6 +63,7 @@ export default async function Home() {
 
         <HomeListings />
         <WhyBook />
+        <Newsletter />
         <Footer />
       </ClientOnly>
     </>
