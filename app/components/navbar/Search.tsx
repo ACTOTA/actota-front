@@ -14,41 +14,21 @@ const Search = () => {
   const params = useSearchParams();
 
   return (
-    <div
-      className="glass-regular stroke-glass1 glass-corner flex flex-col jusify-center content-center
-        rounded-full
-        w-[720px] 
-        h-[82px]
-        py-2 
-        cursor-pointer
-      "
-    >
-      <div
-        className="flex flex-row items-center justify-between "
 
-      >
-        <div onClick={() => searchModal.onOpen(STEPS.LOCATION)}
-          className="w-full px-6 text-sm font-semibold rounded-full cursor-pointer md:w-auto hover:bg-slate-200"
-        >
+      <div className="flex flex-row items-center justify-between w-[720px] h-[82px] rounded-full neutral-01
+          stroke-glass-01 glass-corner backdrop-filter backdrop-blur-md border-none text-sm text-white text-left">
+      <section onClick={() => searchModal.onOpen(STEPS.LOCATION)} className="hover:bg-slate-200 cursor-pointer px-10">
+        <p>Where</p>
+        <p className="">
           {searchModal.locationLabel}
-        </div>
-        <div onClick={() => searchModal.onOpen(STEPS.DATE)}
-          className="
-            hidden 
-            sm:block 
-            text-sm 
-            font-semibold 
-            px-6 
-            border-x-[1px] 
-            flex-1 
-            text-center
-          "
-        >
-          {searchModal.durationLabel}
-        </div>
+        </p>
+      </section>
+      <section onClick={() => searchModal.onOpen(STEPS.DATE)} className="">
+        <p>When</p>
+        <p>{searchModal.durationLabel}</p>
+      </section>
         <div
-          className="flex flex-row items-center gap-3 pl-6 pr-2 text-sm text-gray-600 "
-        >
+          className="flex flex-row items-center gap-3 pl-6 pr-2 text-sm text-gray-600">
           <div onClick={() => searchModal.onOpen(STEPS.INFO)}
             className="hidden sm:block">{searchModal.guestLabel}
           </div>
@@ -82,20 +62,13 @@ const Search = () => {
           >
             {searchModal.typeLabel}
           </div>
-          <div
-            className="p-2 text-white rounded-full bg-white"
-          >
-            <div className="icon-container">
-              <BiSearch size={18} style={{ color: 'black', position: 'relative', zIndex: 1 }} />
-              <div className="icon-gradient-outline">
-
-              </div>
-            </div>
+          
+          <div className="w-[64px] h-[64px] relative bg-white rounded-full">
+            <BiSearch size={24} className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2"/>
           </div>
         </div>
 
       </div>
-    </div >
   );
 }
 
