@@ -83,9 +83,9 @@ const SearchModal = () => {
       return Math.round(timeDifference / millisecondsPerDay);
     };
 
-    const daysDifference = getDaysBetweenDates(val.selection.startDate!, val.selection.endDate!) + 1;
+    const daysDifference = getDaysBetweenDates(val.selection.startDate!, val.selection.endDate!);
 
-    searchModal.durationLabel = `${daysDifference} ${daysDifference > 1 ? 'days' : 'day'}`;
+    searchModal.durationLabel = `${daysDifference} days`;
   }, [searchModal]); const updateGuestCount = useCallback((val) => {
     setGuestCount(val);
     if (val === 1) {
