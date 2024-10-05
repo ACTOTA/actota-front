@@ -16,14 +16,14 @@ const Search = () => {
   return (
 
     <div className="flex flex-row items-center justify-between w-[720px] h-[82px] grid grid-cols-9 rounded-full neutral-01
-          stroke-glass-01 glass-corner backdrop-filter backdrop-blur-md border-none text-sm text-left">
+          stroke-glass-01 glass-corner backdrop-filter backdrop-blur-md border-none text-sm text-white text-left">
       <section onClick={() => searchModal.onOpen(STEPS.LOCATION)} 
         className="cursor-pointer z-10 h-full w-full col-span-2 flex flex-col justify-center gap-1 pl-8 pr-6 relative 
         after:content-[''] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2">
         <p>Where</p>
         <p className="text-neutral-04">{searchModal.locationLabel}</p>
       </section>
-      
+
       <section onClick={() => searchModal.onOpen(STEPS.DATE)} className="cursor-pointer z-10 h-full w-full col-span-2
         flex flex-col justify-center gap-1 pl-8 pr-6 relative
         after:content-[''] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2">
@@ -43,7 +43,7 @@ const Search = () => {
         <p>What</p>
         <p className="text-neutral-04">Trip Details</p>
       </section>
-      
+
       <section className="px-2 col-span-1">
         <div className="w-[64px] h-[64px] relative rounded-full bg-white cursor-pointer">
           <BiSearch size={24} className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 text-black"/>
