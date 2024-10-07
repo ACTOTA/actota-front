@@ -35,7 +35,7 @@ const SearchModal = () => {
   });
   const [selectedActivities, setSelectedActivities] = useState<ActivitySelectValue[]>([]);
 
-  const Map = useMemo(() => dynamic(() => import('../Map'), {
+  const Map = useMemo(() => dynamic(() => import('../MapPage'), {
     ssr: false
   }), []);
 

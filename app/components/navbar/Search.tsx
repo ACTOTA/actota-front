@@ -8,17 +8,19 @@ import useTowns from '@/app/hooks/useTowns';
 import { STEPS } from '../../types/steps';
 import useActivitiesModal from '@/app/hooks/useActivitiesModal';
 import SearchBoxes from './SearchBoxes';
+import { LoadScript } from '@react-google-maps/api';
+
+const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
+const libs = ['places', 'drawing', 'visualization', 'marker'];
 
 const Search = () => {
   const searchModal = useSearchModal();
-  
+
   const [currStep, setCurrStep] = useState<STEPS | null>(null);
   const stepsEle = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClick(event: MouseEvent) {
-      console.log(stepsEle.current);
-      console.log(currStep);
       if (currStep != null && stepsEle.current && !stepsEle.current.contains(event.target as Node)) {
         console.log('click outside');
         setCurrStep(null);
@@ -26,15 +28,22 @@ const Search = () => {
     }
 
     document.addEventListener('click', handleClick);
-    
+
     return () => {
         document.removeEventListener('click', handleClick);
     };
   }, [currStep]);
 
+
+
   return (
-    <div>
-      <div className="flex flex-row items-center justify-between w-[720px] h-[82px] grid grid-cols-9 rounded-full neutral-01
+    <LoadScript 
+          googleMapsApiKey={API_KEY}
+          libraries={libs}
+          language="en"
+          region="EN"
+          version="weekly">
+      <div className="items-center justify-between w-[720px] h-[82px] grid grid-cols-9 rounded-full neutral-01
           stroke-glass-01 glass-corner backdrop-filter backdrop-blur-md border-none text-sm text-white text-left">
         <section onClick={() => currStep != null ? setCurrStep(null) : setCurrStep(STEPS.LOCATION)} 
         className="cursor-pointer z-10 h-full w-full col-span-2 flex flex-col justify-center gap-1 pl-8 pr-6 relative 
@@ -73,7 +82,8 @@ const Search = () => {
       {currStep != null && (
         <SearchBoxes step={currStep} reference={stepsEle}/>
       )}
-    </div>
+
+      </LoadScript> 
   );
 }
 

@@ -64,7 +64,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
   }, [day]) // This hook will run every time the day changes
 
   const coordinates = getByValue(locationValue)?.latlng
-  const Map = dynamic(() => import('../Map'), {
+  const Map = dynamic(() => import('../MapPage'), {
     ssr: false
   });
   

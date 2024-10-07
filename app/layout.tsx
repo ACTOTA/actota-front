@@ -1,6 +1,7 @@
 import React from "react";
 import { Nunito } from 'next/font/google';
 import "./globals.css";
+import { LoadScript } from '@react-google-maps/api';
 
 import Navbar from "./components/navbar/Navbar";
 import ClientOnly from './components/ClientOnly';
@@ -23,6 +24,9 @@ const font = Nunito({
   subsets: ['latin'],
 });
 
+const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
+const libs = ['places', 'drawing', 'visualization', 'marker'];
+
 export default async function RootLayout({
   children,
 }: {
@@ -39,7 +43,7 @@ export default async function RootLayout({
           <LoginModal />
           <RegisterModal />
           <SearchModal />
-          <Navbar currentUser={currentUser} />
+          <Navbar currentUser={currentUser} /> 
         </ClientOnly>
         <div>
           {children}
