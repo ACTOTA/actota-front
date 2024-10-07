@@ -27,20 +27,22 @@ export default function SearchBoxes({ step, reference, ...rest } : SearchBoxesPr
 
     return (
         <div className="w-[584px] h-[596px] m-auto mt-4 glass-dark glass-corner backdrop-filter backdrop-blur-md stroke-glass-01
-        before:rounded-3xl rounded-3xl px-6" ref={reference} {...rest}>
+        before:rounded-3xl rounded-3xl px-6 flex flex-col justify-center items-center box-content" ref={reference} {...rest}>
 
-            <div className='flex flex-col justify-between h-full'>
             {step === STEPS.LOCATION && ( // Conditionally render the Map component
-                <div>
-                    <ItineraryDropdown className="w-full m-auto">
+                <div className="w-full h-full flex flex-col justify-between py-6">
+                    <ItineraryDropdown className="w-full m-0">
                         <MapPinIcon className="h-6 w-6 text-white"/>
                         <p className="text-lg">Select Location</p>
                     </ItineraryDropdown>
-                    <MapPage visible={true} />
-                    <Button className="h-14 w-full text-lg">Confirm Location</Button>
+                    <div className="">
+                        <MapPage visible={true} />
+                    </div>
+                    <Button className="bg-white h-14 w-full">
+                        <p>Confirm Location</p>
+                    </Button>
                 </div>
             )}
-            </div>
         </div>
     )
 }

@@ -27,6 +27,7 @@ const Map: React.FC<MapProps> = ({ center = defaultCenter, zoom = 11 }) => {
       mapContainerStyle={containerStyle}
       center={safeCenter}
       zoom={zoom}
+      mapContainerClassName='rounded-lg'
     >
       <Marker position={safeCenter} />
     </GoogleMap>
