@@ -1,25 +1,18 @@
-# Use the official Node.js base image 
-FROM node:18-alpine
+FROM arm64v8/node:21
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json (or yarn.lock)
 COPY package*.json ./
 
-# Install dependencies
 RUN npm install
 
-# Copy the rest of the application code
 COPY . .
 
-# Build the Next.js app
-# RUN npm run build
+RUN npx prisma generate
 
-# Expose the port Next.js runs on
 EXPOSE 3000
 
-# Start the Next.js app
-CMD ["npm", "run", "dev"]
+ARG APP_ENV=dev
+ENV APP_ENV=${APP_ENV}
 
-
+CMD if [ "$APP_ENV" = "dev" ]; then npm run dev; else npm run build && npm run start; fi

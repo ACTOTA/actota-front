@@ -18,11 +18,18 @@ const Search = () => {
 
   const [currStep, setCurrStep] = useState<STEPS | null>(null);
   const stepsEle = useRef<HTMLDivElement>(null);
+  const selectedClasses = ['border-solid', 'border-[2px]',  'border-[#FFF]', 'rounded-full'];
 
   useEffect(() => {
     function handleClick(event: MouseEvent) {
-      if (currStep != null && stepsEle.current && !stepsEle.current.contains(event.target as Node)) {
+      if (currStep != null && stepsEle.current && !stepsEle.current.contains(event.target as Node) 
+        || !stepsEle.current) {
         console.log('click outside');
+
+        const ele = document.getElementById(currStep?.toString());
+        if (ele) {
+          ele.classList.remove(...selectedClasses, 'after:hidden');
+        }
         setCurrStep(null);
       } 
     }
@@ -32,41 +39,56 @@ const Search = () => {
     return () => {
         document.removeEventListener('click', handleClick);
     };
-  }, [currStep]);
+  }, [currStep, selectedClasses]);
 
+  const handleSelect = (step: STEPS) => {
+    currStep != null ? setCurrStep(null) : setCurrStep(step);
+
+    const ele = document.getElementById(step.toString());
+    if (ele) {
+      ele.classList.add(...selectedClasses, 'after:hidden');
+    }
+  }
 
 
   return (
     <LoadScript 
-          googleMapsApiKey={API_KEY}
-          libraries={libs}
-          language="en"
-          region="EN"
-          version="weekly">
+      googleMapsApiKey={API_KEY}
+      libraries={libs}
+      language="en"
+      region="EN"
+      version="weekly">
       <div className="items-center justify-between w-[720px] h-[82px] grid grid-cols-9 rounded-full neutral-01
-          stroke-glass-01 glass-corner backdrop-filter backdrop-blur-md border-none text-sm text-white text-left">
-        <section onClick={() => currStep != null ? setCurrStep(null) : setCurrStep(STEPS.LOCATION)} 
+          stroke-glass-01 glass-corner backdrop-filter backdrop-blur-md text-sm text-white text-left">
+        <section onClick={() => handleSelect(STEPS.LOCATION)}
+        id={STEPS.LOCATION.toString()}
         className="cursor-pointer z-10 h-full w-full col-span-2 flex flex-col justify-center gap-1 pl-8 pr-6 relative 
         after:content-[''] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2">
           <p>Where</p>
           <p className="text-neutral-04">{searchModal.locationLabel}</p>
         </section>
 
-        <section onClick={() => searchModal.onOpen(STEPS.DATE)} className="cursor-pointer z-10 h-full w-full col-span-2
+        <section onClick={() => handleSelect(STEPS.DATE)} 
+        id={STEPS.DATE.toString()}
+        className="cursor-pointer z-10 h-full w-full col-span-2
         flex flex-col justify-center gap-1 pl-8 pr-6 relative
         after:content-[''] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2">
           <p >When</p>
           <p className="text-neutral-04">{searchModal.durationLabel}</p>
         </section>
 
-        <section onClick={() => searchModal.onOpen(STEPS.INFO)} className="cursor-pointer z-10 h-full w-full col-span-2
+        <section onClick={() => searchModal.onOpen(STEPS.INFO)} 
+        id={STEPS.INFO.toString()}
+        className="cursor-pointer z-10 h-full w-full col-span-2
         flex flex-col justify-center gap-1 pl-8 pr-6 relative
         after:content-[''] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2">
           <p>Who</p>
           <p className="text-neutral-04">Add Guests</p>
         </section>
 
-        <section onClick={() => searchModal.onOpen(STEPS.ACTIVITIES)} className="cursor-pointer z-10 h-full w-full col-span-2
+        <section onClick={() => searchModal.onOpen(STEPS.ACTIVITIES)} 
+        id={STEPS.ACTIVITIES.toString()}
+        className="cursor-pointer z-10 h-full w-full col-span-2
         flex flex-col justify-center gap-1 pl-8 pr-6">
           <p>What</p>
           <p className="text-neutral-04">Trip Details</p>

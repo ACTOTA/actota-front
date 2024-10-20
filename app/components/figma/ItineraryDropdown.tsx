@@ -7,8 +7,8 @@ type ItineraryDropdownProps = {
 
 export default function ItineraryDropdown({ children, className, ...rest }: ItineraryDropdownProps) {
     return (
-        <button className={`rounded-[8px] h-[56px] translucent-black-30 glass-corner neutral-03 px-4 text-md
-            stroke-glass-01 before:rounded-[8px] border-none flex justify-between items-center ${className}`} {...rest}>
+        <button className={`rounded-[8px] h-[56px] glass-corner neutral-03 px-4 text-md
+            stroke-glass-01 translucent-black-30 before:rounded-[8px] border-none flex justify-between items-center ${className}`} {...rest}>
             <div className="flex gap-6 text-neutral-04">
                 {children}
             </div>
