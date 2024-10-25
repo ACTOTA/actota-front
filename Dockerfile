@@ -10,9 +10,8 @@ COPY . .
 
 RUN npx prisma generate
 
+RUN npm run build
+
 EXPOSE 3000
 
-ARG APP_ENV=dev
-ENV APP_ENV=${APP_ENV}
-
-CMD if [ "$APP_ENV" = "dev" ]; then npm run dev; else npm run build && npm run start; fi
+CMD ["npm", "run", "start"]
