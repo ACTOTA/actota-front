@@ -12,8 +12,41 @@ import Logo from '../components/Logo';
 
 export default function SignUp() {
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log(e.currentTarget);
+
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const firstName = formData.get('firstName') as string;
+    const lastName = formData.get('lastName') as string;
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    console.log(formData);
+    
+    try {
+      const response = await fetch('/api/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          password
+        })
+      });
+
+      if (response) {
+        console.log(response);
+      } else {
+        console.log("Failed to create account.");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
   }
 
   return (
@@ -37,26 +70,26 @@ export default function SignUp() {
         <form onSubmit={(e) => handleSubmit(e)} className="m-auto flex flex-col gap-4 w-full">
           <div className="w-full">
             <caption className="w-96 text-left text-neutral-05">First Name</caption>
-            <Input type="text" placeholder="First Name" className="rounded-lg" />
+            <Input type="text" name="firstName" placeholder="First Name" className="rounded-lg" />
           </div>
           <div>
             <caption className="w-96 text-left text-neutral-05">Last Name</caption>
-            <Input type="text" placeholder="Last Name" />
+            <Input type="text" name="lastName" placeholder="Last Name" />
           </div>
           <div>
             <caption className="w-96 text-left text-neutral-05">Email Address</caption>
-            <Input type="email" icon={<HiOutlineMail className="text-white"/>} placeholder="Your email address" />
+            <Input type="email" name="email" icon={<HiOutlineMail className="text-white"/>} placeholder="Your email address" />
           </div>
           <div>
             <caption className="w-96 text-left text-neutral-05">Password</caption>
-            <Input type="password" icon={<BiLock className="text-white"/>} placeholder="Password" />
+            <Input type="password" name="password" icon={<BiLock className="text-white"/>} placeholder="Password" />
             <div className="h-2"/>
             <Input type="password" icon={<BiLock className="text-white"/>} placeholder="Confirm Password" />
           </div>
 
-
           <Button type="submit" className="bg-white text-black w-full py-5">Create My Account</Button>
         </form>
+
         <div className="text-white flex justify-center">
           <p>or continue with</p>
         </div>
