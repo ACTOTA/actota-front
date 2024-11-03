@@ -28,16 +28,18 @@ const Search = () => {
       console.log("currStep", currStep);
       console.log("stepsEle", stepsEle.current);
 
+      const targetEle = event.target as HTMLElement;
+
       if ((stepsEle.current && !stepsEle.current.contains(event.target as Node) 
-        || !stepsEle.current)) {
+        || !stepsEle.current) || targetEle.id == currStep?.toString()) {
         console.log('click outside');
-        
-        if (currStep !== undefined && currStep !== null) {
-          const ele = document.getElementById(currStep.toString());
-          if (ele) {
-            ele.classList.remove(...selectedClasses, 'after:hidden');
-          }
-        }
+
+        // if (currStep !== undefined && currStep !== null) {
+        //   const ele = document.getElementById(currStep.toString());
+        //   if (ele) {
+        //     ele.classList.remove(...selectedClasses, 'after:hidden');
+        //   }
+        // }
         
         setCurrStep(null);
       } 
@@ -52,14 +54,13 @@ const Search = () => {
 
   const handleSelect = (step: STEPS) => {
     const ele = document.getElementById(step.toString());
-    if (ele) {
-      step == currStep ? ele.classList.remove(...selectedClasses, 'after:hidden') : ele.classList.add(...selectedClasses, 'after:hidden');
-    }
+    // if (ele) {
+    //   step == currStep ? ele.classList.remove(...selectedClasses, 'after:hidden') : ele.classList.add(...selectedClasses, 'after:hidden');
+    // }
 
     console.log("step", step);
     currStep != null ? setCurrStep(null) : setCurrStep(step);
 
-    
   }
 
 

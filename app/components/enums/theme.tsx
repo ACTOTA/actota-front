@@ -1,5 +1,7 @@
 export enum Theme {
   Activity,
   Transportation,
-  Lodging
+  Lodging,
+  Dark,
+  Light
 }

@@ -170,15 +170,22 @@ body,
   backdrop-filter: blur(8px);
 }
 
+.glass-bg-dark{
+  background: radial-gradient(88.82% 228.46% at 4.26% 6.6%, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.5) 100%) /* warning: gradient uses a rotation that is not supported by CSS and may not behave as expected */,
+  linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.15));
+  box-shadow: 4px 8px 16px 0px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(20px);
+}
+
 Stroke-Blue {
   background-image: 
     linear-gradient(to right, #DEDEDE 50%, #666666 50%), /* Gray gradient */
     linear-gradient(to right, #0553CE 0%, #0B67F9 100%); /* Blue gradient on top */
 }
 
-.glass-dark {
-  background: var(--Glass-Dark, linear-gradient(0deg, rgba(0, 0, 0, 0.50) 0%, rgba(0, 0, 0, 0.50) 100%), radial-gradient(242.84% 121.1% at 4.26% 6.6%, rgba(207, 207, 207, 0.25) 0%, rgba(107, 107, 107, 0.15) 100%)); 
-}
+/* .glass-dark { */
+/*   background: var(--Glass-Dark, linear-gradient(0deg, rgba(0, 0, 0, 0.50) 0%, rgba(0, 0, 0, 0.50) 100%), radial-gradient(242.84% 121.1% at 4.26% 6.6%, rgba(207, 207, 207, 0.25) 0%, rgba(107, 107, 107, 0.15) 100%));  */
+/* } */
 .glass-bg-blue {
   box-shadow: 4px 8px 16px 0px rgba(0, 0, 0, 0.25);
 
