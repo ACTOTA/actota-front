@@ -11,25 +11,34 @@ import SearchBoxes from './SearchBoxes';
 import { LoadScript } from '@react-google-maps/api';
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
-const libs = ['places', 'drawing', 'visualization', 'marker'];
+
 
 const Search = () => {
   const searchModal = useSearchModal();
 
   const [currStep, setCurrStep] = useState<STEPS | null>(null);
   const stepsEle = useRef<HTMLDivElement>(null);
-  const selectedClasses = ['border-solid', 'border-[2px]',  'border-[#FFF]', 'rounded-full'];
+
+  const selectedClasses = useMemo(() => {
+    return ['border-solid', 'border-[2px]',  'border-[#FFF]', 'rounded-full'];
+  }, []);
 
   useEffect(() => {
     function handleClick(event: MouseEvent) {
-      if (currStep != null && stepsEle.current && !stepsEle.current.contains(event.target as Node) 
-        || !stepsEle.current) {
-        console.log('click outside');
+      console.log("currStep", currStep);
+      console.log("stepsEle", stepsEle.current);
 
-        const ele = document.getElementById(currStep?.toString());
-        if (ele) {
-          ele.classList.remove(...selectedClasses, 'after:hidden');
+      if ((stepsEle.current && !stepsEle.current.contains(event.target as Node) 
+        || !stepsEle.current)) {
+        console.log('click outside');
+        
+        if (currStep !== undefined && currStep !== null) {
+          const ele = document.getElementById(currStep.toString());
+          if (ele) {
+            ele.classList.remove(...selectedClasses, 'after:hidden');
+          }
         }
+        
         setCurrStep(null);
       } 
     }
@@ -42,19 +51,22 @@ const Search = () => {
   }, [currStep, selectedClasses]);
 
   const handleSelect = (step: STEPS) => {
-    currStep != null ? setCurrStep(null) : setCurrStep(step);
-
     const ele = document.getElementById(step.toString());
     if (ele) {
-      ele.classList.add(...selectedClasses, 'after:hidden');
+      step == currStep ? ele.classList.remove(...selectedClasses, 'after:hidden') : ele.classList.add(...selectedClasses, 'after:hidden');
     }
+
+    console.log("step", step);
+    currStep != null ? setCurrStep(null) : setCurrStep(step);
+
+    
   }
 
 
   return (
     <LoadScript 
       googleMapsApiKey={API_KEY}
-      libraries={libs}
+      libraries={['places', 'drawing', 'visualization', 'marker']}
       language="en"
       region="EN"
       version="weekly">
