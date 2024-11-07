@@ -1,5 +1,6 @@
-import React from 'react';
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/20/solid';
+"use client";
+
+import React, {useState} from 'react';
 import { HiEye, HiEyeOff } from 'react-icons/hi';
 
 type InputProps = {
@@ -12,7 +13,7 @@ type InputProps = {
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export default function Input({id, name, type, placeholder, icon, classname}: InputProps) { 
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);

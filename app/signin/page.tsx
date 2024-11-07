@@ -11,29 +11,24 @@ import Button from '../components/figma/Button';
 import Logo from '../components/Logo';
 import Link from 'next/link';
 
-export default function SignUp() {
+export default function SignIn() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(e.currentTarget);
 
     const formData = new FormData(e.currentTarget as HTMLFormElement);
-    const firstName = formData.get('firstName') as string;
-    const lastName = formData.get('lastName') as string;
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
     console.log(formData);
     
     try {
-      const response = await fetch('/api/signup', {
+      const response = await fetch('/api/signin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          firstName,
-          lastName,
           email,
           password
         })
@@ -41,6 +36,7 @@ export default function SignUp() {
 
       if (response) {
         console.log(response);
+        
       } else {
         console.log("Failed to create account.");
       }
@@ -59,24 +55,16 @@ export default function SignUp() {
         objectFit="cover"
       />
 
-      <GlassPanel theme={Theme.Dark} className="h-[900px] min:w-[600px] flex flex-col justify-around relative text-white py-6 px-[2%]">
+      <GlassPanel theme={Theme.Dark} className="h-[900px] w-[600px] flex flex-col justify-around relative text-white py-6 px-[2%]">
         <div className="absolute top-8 right-8">
           <Logo /> 
         </div>
        
         <div className="text-white">
-          <h3 className="text-2xl font-bold">Let&apos;s Get Started!</h3>
-          <p>Create an account to continue.</p>
+          <h3 className="text-2xl font-bold">Welcome Back!</h3>
+          <p>Sign in to your account to continue.</p>
         </div>
         <form onSubmit={(e) => handleSubmit(e)} className="m-auto flex flex-col gap-4 w-full">
-          <div className="w-full">
-            <p className="w-96 text-left text-neutral-05">First Name</p>
-            <Input type="text" name="firstName" placeholder="First Name" className="rounded-lg" />
-          </div>
-          <div>
-            <p className="w-96 text-left text-neutral-05">Last Name</p>
-            <Input type="text" name="lastName" placeholder="Last Name" />
-          </div>
           <div>
             <p className="w-96 text-left text-neutral-05">Email Address</p>
             <Input type="email" name="email" icon={<HiOutlineMail className="text-white"/>} placeholder="Your email address" />
@@ -85,10 +73,17 @@ export default function SignUp() {
             <p className="w-96 text-left text-neutral-05">Password</p>
             <Input type="password" name="password" icon={<BiLock className="text-white"/>} placeholder="Password" />
             <div className="h-2"/>
-            <Input type="password" icon={<BiLock className="text-white"/>} placeholder="Confirm Password" />
           </div>
+          
+          <Link href="/forgot-password"> 
+            <p className="text-right"><b>Forgot your password?</b></p>
+          </Link>
 
-          <Button type="submit" className="bg-white text-black w-full py-5">Create My Account</Button>
+          <div className="flex items-center">
+            <input type="checkbox" name="remember" id="remember" className="mr-2"/>
+            <p>Remember me on this device</p>
+          </div>
+          <Button type="submit" className="bg-white text-black w-full py-5">Log In</Button>
         </form>
 
         <div className="text-white flex justify-center">
@@ -99,15 +94,10 @@ export default function SignUp() {
           <Button className="py-5">Apple</Button>
           <Button className="py-5">Facebook</Button>
         </div>
-        <div className="m-auto text-center">
-          <p>By create an account, I agree to ACTOTA&apos;s
-            <a href="#" className=""><b> <u>Terms of Service</u></b></a> and
-            <a href="#" className=""><b> <u>Privacy Policy</u></b></a>
-          </p>
-        </div>
-        
-        <p className="m-auto">Already have an account? <Link href="/signin" className=""><b><u>Log In here</u></b></Link></p>
+                
+        <p className="m-auto">Don&apos;t have an account? <Link href="/signup" className=""><b><u>Create an account here</u></b></Link></p>
       </GlassPanel>
     </div> 
   )
 }
+
