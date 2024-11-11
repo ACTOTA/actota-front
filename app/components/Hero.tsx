@@ -15,7 +15,7 @@ export default function Hero() {
 
             <div className="col-span-2 text-white text-7xl font-extrabold font-['Manrope'] leading-[88px]
                 absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">
-                <div className="">
+                <div className="flex flex-col justify-center items-center">
                     <span className="m-auto w-full flex justify-start gap-8">
                         <h2 className="">Book</h2>
                         <h2 className="">Your</h2>

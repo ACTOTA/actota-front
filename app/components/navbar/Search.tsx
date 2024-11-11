@@ -34,13 +34,6 @@ const Search = () => {
         || !stepsEle.current) || targetEle.id == currStep?.toString()) {
         console.log('click outside');
 
-        // if (currStep !== undefined && currStep !== null) {
-        //   const ele = document.getElementById(currStep.toString());
-        //   if (ele) {
-        //     ele.classList.remove(...selectedClasses, 'after:hidden');
-        //   }
-        // }
-        
         setCurrStep(null);
       } 
     }
@@ -90,8 +83,8 @@ const Search = () => {
           <p className="text-neutral-04">{searchModal.durationLabel}</p>
         </section>
 
-        <section onClick={() => searchModal.onOpen(STEPS.INFO)} 
-        id={STEPS.INFO.toString()}
+        <section onClick={() => handleSelect(STEPS.GUESTS)}
+        id={STEPS.GUESTS.toString()}
         className="cursor-pointer z-10 h-full w-full col-span-2
         flex flex-col justify-center gap-1 pl-8 pr-6 relative
         after:content-[''] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2">

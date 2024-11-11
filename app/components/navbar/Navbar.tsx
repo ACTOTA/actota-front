@@ -27,19 +27,14 @@ const Navbar: React.FC<NavbarProps> = ({
     console.log("Navbar currentUser: ", currentUser);
     return (
         <div className="fixed h-28 z-10 w-full bg-none text-white">
-            <div
-                className="py-3 "
-            >
+            <div className="py-3">
                 <Container>
-                    <div
-                        className="flex flex-row items-center justify-between md:gap-0"
-                    >
+                    <div className="flex flex-row items-center justify-between md:gap-0" >
                         <Logo onClick={handleClick} className="hover:cursor-pointer"/>
                         <UserMenu currentUser={currentUser} />
                     </div>
                 </Container>
             </div>
-
         </div>
     );
 }

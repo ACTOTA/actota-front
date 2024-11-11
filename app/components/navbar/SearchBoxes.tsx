@@ -5,7 +5,8 @@ import ItineraryDropdown from '../figma/ItineraryDropdown';
 import { MapPinIcon } from '@heroicons/react/20/solid';
 import Button from '../figma/Button';
 import MapPage from '../MapPage';
-import dynamic from 'next/dynamic';
+import PlusMinusButton, { ButtonType } from '../figma/PlusMinusButton';
+import GuestMenu from './GuestMenu';
 
 type SearchBoxesProps = {
     step: STEPS;
@@ -16,21 +17,38 @@ export default function SearchBoxes({ step, reference, ...rest } : SearchBoxesPr
 
     const [mapLoaded, setMapLoaded] = useState(false);
 
+    const dimensions = useMemo(() => {
+        console.log("step", step);
+    switch (step) {
+      case STEPS.LOCATION:
+        return { w: 584, h: 596 };
+      case STEPS.GUESTS:
+        return { w: 400, h: 290 };
+      case STEPS.ACTIVITIES:
+        return { w: 520, h: 304 };
+      case STEPS.DATE:
+        return { w: 680, h: 424 };
+      default:
+        return { w: 0, h: 0 }; 
+    }
+  }, [step]);
+
     useEffect(() => {
-        console.log(step);
         if (step === STEPS.LOCATION) {
             setMapLoaded(true);
         }
+        console.log("dimensions", dimensions);
+    
     }, [step]);
 
-   
+       
 
     return (
-        <div className="w-[584px] h-[596px] m-auto mt-4 glass-dark glass-corner backdrop-filter backdrop-blur-md stroke-glass-01
-        before:rounded-3xl rounded-3xl px-6 flex flex-col justify-center items-center box-content" ref={reference} {...rest}>
+        <div className={`w-[${dimensions.w}px] h-[${dimensions.h}px] m-auto mt-4 glass-dark glass-corner backdrop-filter backdrop-blur-md stroke-glass-01
+        before:rounded-3xl rounded-3xl px-6 flex flex-col justify-center items-center box-content`} ref={reference} {...rest}>
 
             {step === STEPS.LOCATION && ( // Conditionally render the Map component
-                <div className="w-full h-full flex flex-col justify-between py-6">
+                <section className={`flex flex-col justify-between gap-6 py-6 w-full`}>
                     <ItineraryDropdown className="w-full m-0">
                         <MapPinIcon className="h-6 w-6 text-white"/>
                         <p className="text-lg">Select Location</p>
@@ -38,11 +56,12 @@ export default function SearchBoxes({ step, reference, ...rest } : SearchBoxesPr
                     <div className="">
                         <MapPage visible={true} />
                     </div>
-                    <Button className="bg-white h-14 w-full">
+                    <Button className="bg-white text-black h-14 w-full">
                         <p>Confirm Location</p>
                     </Button>
-                </div>
+                </section>
             )}
+            {step == STEPS.GUESTS && <GuestMenu />}
         </div>
     )
 }

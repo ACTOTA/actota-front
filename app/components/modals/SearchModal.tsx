@@ -105,7 +105,7 @@ const SearchModal = () => {
         </div>
       );
       break;
-    case STEPS.INFO:
+    case STEPS.GUESTS:
       bodyContent = (
         <div className="flex flex-col gap-8">
           <Heading title="More information" subtitle="Specify details" />
