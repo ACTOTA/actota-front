@@ -35,7 +35,7 @@ export default function GuestMenu() {
     };
  
     return (
-        <section className="h-full w-full grid grid-rows-3 gap-3 text-lg z-30 py-4">
+        <section className="h-full w-full grid grid-rows-3 gap-3 text-lg z-20 py-4">
             <div className="flex justify-between">
                 <div>
                     <p>Adults</p>
