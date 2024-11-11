@@ -13,7 +13,7 @@ type InputProps = {
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export default function Input({id, name, type, placeholder, icon, classname}: InputProps) { 
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(type === 'password'); 
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);

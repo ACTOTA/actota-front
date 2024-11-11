@@ -101,8 +101,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
     return (
         <div onClick={() => router.push(`/listings/${data.id}`)}
-            className='col-span-1 cusrsor-pointer group w-full h-[400px]'
-        >
+            className='col-span-1 cusrsor-pointer group w-full h-[400px]'>
             <div className='flex flex-col w-full h-full gap-2 relative'>
                 <div className='absolute w-full h-full overflow-hidden aspect-square rounded-xl'>
                     <Image
@@ -114,8 +113,8 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
                 </div>
 
-                <section className='h-full w-full p-2'>
-                    <div className='flex justify-end h-1/5'>
+                <section className='absolute h-full w-full p-2'>
+                    <div className='h-1/5'>
                         <HeartButton
                             listingId={data.id}
                             currentUser={currentUser} />
