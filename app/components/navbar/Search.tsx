@@ -92,7 +92,7 @@ const Search = () => {
           <p className="text-neutral-04">Add Guests</p>
         </section>
 
-        <section onClick={() => searchModal.onOpen(STEPS.ACTIVITIES)} 
+        <section onClick={() => handleSelect(STEPS.ACTIVITIES)}
         id={STEPS.ACTIVITIES.toString()}
         className="cursor-pointer z-10 h-full w-full col-span-2
         flex flex-col justify-center gap-1 pl-8 pr-6">

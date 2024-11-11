@@ -1,11 +1,8 @@
 import React from 'react';
 import { STEPS } from '../../types/steps';
 import { useEffect, useMemo, useState } from 'react';
-import ItineraryDropdown from '../figma/ItineraryDropdown';
-import { MapPinIcon } from '@heroicons/react/20/solid';
-import Button from '../figma/Button';
-import MapPage from '../MapPage';
-import PlusMinusButton, { ButtonType } from '../figma/PlusMinusButton';
+import LocationMenu from './LocationMenu';
+import DateMenu from './DateMenu';
 import GuestMenu from './GuestMenu';
 
 type SearchBoxesProps = {
@@ -46,21 +43,8 @@ export default function SearchBoxes({ step, reference, ...rest } : SearchBoxesPr
     return (
         <div className={`w-[${dimensions.w}px] h-[${dimensions.h}px] m-auto mt-4 glass-dark glass-corner backdrop-filter backdrop-blur-md stroke-glass-01
         before:rounded-3xl rounded-3xl px-6 flex flex-col justify-center items-center box-content`} ref={reference} {...rest}>
-
-            {step === STEPS.LOCATION && ( // Conditionally render the Map component
-                <section className={`flex flex-col justify-between gap-6 py-6 w-full`}>
-                    <ItineraryDropdown className="w-full m-0">
-                        <MapPinIcon className="h-6 w-6 text-white"/>
-                        <p className="text-lg">Select Location</p>
-                    </ItineraryDropdown>
-                    <div className="">
-                        <MapPage visible={true} />
-                    </div>
-                    <Button className="bg-white text-black h-14 w-full">
-                        <p>Confirm Location</p>
-                    </Button>
-                </section>
-            )}
+            {step === STEPS.LOCATION && <LocationMenu />}
+            {step === STEPS.DATE && <DateMenu />}
             {step == STEPS.GUESTS && <GuestMenu />}
         </div>
     )
