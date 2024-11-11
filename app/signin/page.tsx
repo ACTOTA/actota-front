@@ -11,8 +11,9 @@ import Button from '../components/figma/Button';
 import Logo from '../components/Logo';
 import Link from 'next/link';
 import { jwtVerify } from 'jose/jwt/verify';
+import { setAuthCookie } from '../actions/setAuthCookie';
 
-interface Claims {
+export interface Claims {
   sub: string,
   exp: number,
   iat: number
@@ -66,9 +67,9 @@ export default function SignIn() {
         const authToken = data.auth_token;
 
         if (authToken) {
-          const claims = await verifyJwt(authToken);
+          const claims = await verifyJwt(authToken) as Claims;
+          setAuthCookie(authToken, claims);
 
-          console.log("claims : ", claims);
         }
 
       } else {
