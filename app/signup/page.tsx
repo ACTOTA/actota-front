@@ -10,6 +10,8 @@ import { BiLock } from 'react-icons/bi';
 import Button from '../components/figma/Button';
 import Logo from '../components/Logo';
 import Link from 'next/link';
+import { verifyJwt, Claims } from '../libs/auth';
+import { setAuthCookie } from '../actions/setAuthCookie';
 
 export default function SignUp() {
 
@@ -39,8 +41,15 @@ export default function SignUp() {
         })
       });
 
-      if (response) {
-        console.log(response);
+      if (response.ok) {
+        const data = await response.json();
+
+        const authToken = data.auth_token;
+
+        if (authToken) {
+          const claims = await verifyJwt(authToken);
+          setAuthCookie(authToken, claims);
+        }
       } else {
         console.log("Failed to create account.");
       }

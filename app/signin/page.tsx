@@ -10,33 +10,9 @@ import { BiLock } from 'react-icons/bi';
 import Button from '../components/figma/Button';
 import Logo from '../components/Logo';
 import Link from 'next/link';
-import { jwtVerify } from 'jose/jwt/verify';
 import { setAuthCookie } from '../actions/setAuthCookie';
+import { verifyJwt, Claims } from '../libs/auth';
 
-export interface Claims {
-  sub: string,
-  exp: number,
-  iat: number
-};
-
-const verifyJwt = async (token: string): Promise<Claims | null> => {
-  const secret = process.env.NEXT_PUBLIC_AUTH_SECRET || 'your-jwt-secret';
-
-  try {
-    // Convert the secret to a Uint8Array (required by `jose`)
-    const encoder = new TextEncoder();
-    const secretKey = encoder.encode(secret); 
-
-    // Verify the JWT and extract the payload
-    const { payload } = await jwtVerify(token, secretKey);
-
-    // Type-cast the payload to your Claims interface
-    return payload as Claims;
-  } catch (err) {
-    console.error('JWT verification failed:', err);
-    return null;
-  }
-};
 
 export default function SignIn() {
 
