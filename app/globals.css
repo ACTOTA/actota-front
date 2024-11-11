@@ -222,6 +222,7 @@ Stroke-Blue {
   background-clip: padding-box, border-box;
   background-origin: padding-box, border-box;
 }
+
 .glass-bg-yellow {
   box-shadow: 4px 8px 16px 0px rgba(0, 0, 0, 0.25);
 
@@ -239,6 +240,9 @@ Stroke-Blue {
   backdrop-filter: blur(12px);
 }
 
+.red-03 {
+  background-color: #C10B2F;
+}
 .red-04 {
   background-color: #F43E62;
 }
