@@ -1,12 +1,8 @@
 import React from "react";
-import getListings from "../actions/getListings";
 import ListingCard from "../components/listings/ListingCard";
-import getCurrentUser from "../actions/getCurrentUser";
 
 export default async function HomeListings() {
-
-  const listings = await getListings() ?? [];
-  const currentUser = await getCurrentUser();
+  const listings = [];
 
   return (
     <section className="h-[100vh] px-8 py-4">

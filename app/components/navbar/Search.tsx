@@ -3,10 +3,8 @@ import { useSearchParams } from 'next/navigation';
 import { BiSearch } from 'react-icons/bi';
 import { differenceInDays } from 'date-fns';
 
-import useSearchModal from '@/app/hooks/useSearchModal';
 import useTowns from '@/app/hooks/useTowns';
 import { STEPS } from '../../types/steps';
-import useActivitiesModal from '@/app/hooks/useActivitiesModal';
 import SearchBoxes from './SearchBoxes';
 import { LoadScript } from '@react-google-maps/api';
 
@@ -14,7 +12,6 @@ const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
 
 
 const Search = () => {
-  const searchModal = useSearchModal();
 
   const [currStep, setCurrStep] = useState<STEPS | null>(null);
   const stepsEle = useRef<HTMLDivElement>(null);
@@ -71,7 +68,6 @@ const Search = () => {
         className="cursor-pointer z-10 h-full w-full col-span-2 flex flex-col justify-center gap-1 pl-8 pr-6 relative 
         after:content-[''] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2">
           <p>Where</p>
-          <p className="text-neutral-04">{searchModal.locationLabel}</p>
         </section>
 
         <section onClick={() => handleSelect(STEPS.DATE)} 
@@ -80,7 +76,6 @@ const Search = () => {
         flex flex-col justify-center gap-1 pl-8 pr-6 relative
         after:content-[''] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2">
           <p >When</p>
-          <p className="text-neutral-04">{searchModal.durationLabel}</p>
         </section>
 
         <section onClick={() => handleSelect(STEPS.GUESTS)}
