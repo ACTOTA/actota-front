@@ -1,9 +1,7 @@
 import React from 'react';
-import getListings from "./actions/getListings";
 import Container from "@/app/components/Container";
 import EmptyState from "@/app/components/EmptyState";
 import ClientOnly from "./components/ClientOnly";
-import getCurrentUser from "./actions/getCurrentUser";
 import HomeListings from "./components/HomeListings";
 import ListingCard from "./components/listings/ListingCard";
 import Hero from "./components/Hero";
@@ -16,19 +14,6 @@ import Filter from './components/Filter';
 import Head from 'next/head';
 
 export default async function Home() {
-  const listings = await getListings() ?? [];
-  const currentUser = await getCurrentUser();
-
-  // Handle the case where no listings are available
-  if (listings.length === 0) {
-    return (
-      <ClientOnly>
-        <Container>
-          <EmptyState showReset />
-        </Container>
-      </ClientOnly>
-    );
-  }
 
 
   // Since NearbyData is now properly imported, use it directly
@@ -44,22 +29,6 @@ export default async function Home() {
       </Head>
       <ClientOnly>
         <Hero />
-
-        {/* <Container>
-          <main className="mx-auto max-w-7xl">
-            <section className="pt-6 pb-8">
-              <h2 className="py-4 text-4xl font-semibold">Explore Colorado</h2>
-              <SmallCards towns={NearbyData} />
-            </section>
-
-            <section>
-              <h2 className="py-8 text-4xl font-semibold">Activate Your Inner Nature</h2>
-              <MediumCards towns={TravelModeData} />
-            </section>
-
-          </main>
-          <Filter />
-        </Container> */}
 
         <HomeListings />
         <WhyBook />

@@ -4,7 +4,6 @@ import Container from "../Container";
 import Activities from "../Activities";
 import Logo from "../Logo";
 import Search from "./Search";
-import UserMenu from "./UserMenu";
 import { SafeUser } from "@/app/types";
 import { usePathname } from "next/navigation";
 
@@ -31,7 +30,6 @@ const Navbar: React.FC<NavbarProps> = ({
                 <Container>
                     <div className="flex flex-row items-center justify-between md:gap-0" >
                         <Logo onClick={handleClick} className="hover:cursor-pointer"/>
-                        <UserMenu currentUser={currentUser} />
                     </div>
                 </Container>
             </div>
