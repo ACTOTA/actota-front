@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import LocationMenu from './LocationMenu';
 import DateMenu from './DateMenu';
 import GuestMenu from './GuestMenu';
+import ActivitiesMenu from './ActivitiesMenu';
 
 type SearchBoxesProps = {
     step: STEPS;
@@ -26,7 +27,7 @@ export default function SearchBoxes({ step, reference, ...rest } : SearchBoxesPr
       case STEPS.DATE:
         return { w: 680, h: 424 };
       default:
-        return { w: 0, h: 0 }; 
+        return { w: 584, h: 596 }; 
     }
   }, [step]);
 
@@ -36,16 +37,17 @@ export default function SearchBoxes({ step, reference, ...rest } : SearchBoxesPr
         }
         console.log("dimensions", dimensions);
     
-    }, [step]);
+    }, [step, dimensions]);
 
        
 
     return (
-        <div className={`w-[${dimensions.w}px] h-[${dimensions.h}px] m-auto mt-4 glass-dark glass-corner backdrop-filter backdrop-blur-md stroke-glass-01
-        before:rounded-3xl rounded-3xl px-6 flex flex-col justify-center items-center box-content`} ref={reference} {...rest}>
+        <div className={`m-auto mt-4 glass-dark glass-corner backdrop-filter backdrop-blur-md stroke-glass-01
+        before:rounded-3xl rounded-3xl px-6 flex flex-col justify-center items-center box-content w-[${dimensions.w}px] h-[${dimensions.h}px]`} ref={reference} {...rest}>
             {step === STEPS.LOCATION && <LocationMenu />}
             {step === STEPS.DATE && <DateMenu />}
             {step == STEPS.GUESTS && <GuestMenu />}
+            {step === STEPS.ACTIVITIES && <ActivitiesMenu />}
         </div>
     )
 }
