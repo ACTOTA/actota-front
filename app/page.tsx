@@ -2,8 +2,6 @@ import React from 'react';
 import Container from "@/app/components/Container";
 import EmptyState from "@/app/components/EmptyState";
 import ClientOnly from "./components/ClientOnly";
-import HomeListings from "./components/HomeListings";
-import ListingCard from "./components/listings/ListingCard";
 import Hero from "./components/Hero";
 import WhyBook from "./components/WhyBook";
 import Newsletter from "./components/Newsletter";
@@ -30,7 +28,6 @@ export default async function Home() {
       <ClientOnly>
         <Hero />
 
-        <HomeListings />
         <WhyBook />
         <Newsletter />
         <Footer />
