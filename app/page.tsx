@@ -1,15 +1,11 @@
 import React from 'react';
-import Container from "@/app/components/Container";
-import EmptyState from "@/app/components/EmptyState";
 import ClientOnly from "./components/ClientOnly";
 import Hero from "./components/Hero";
 import WhyBook from "./components/WhyBook";
 import Newsletter from "./components/Newsletter";
 import Footer from "./components/Footer";
-import SmallCards, { NearbyData } from "./components/SmallCards"; // Ensure NearbyData is exported
-import MediumCards, { TravelModeData } from "./components/MediumCards";
-import Filter from './components/Filter';
 import Head from 'next/head';
+import FeaturedItineraries from './components/FeaturedItineraries';
 
 export default async function Home() {
 
@@ -27,7 +23,7 @@ export default async function Home() {
       </Head>
       <ClientOnly>
         <Hero />
-
+        <FeaturedItineraries />
         <WhyBook />
         <Newsletter />
         <Footer />
