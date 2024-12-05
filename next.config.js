@@ -9,6 +9,7 @@ module.exports = {
       'res.cloudinary.com',
       'upload-widget.cloudinary.com',
       'links.papareact.com',
+      'storage.googleapis.com'
     ]
   },
   async rewrites() {
@@ -20,4 +21,4 @@ module.exports = {
     ]
   }
 }
- 
+

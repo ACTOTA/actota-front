@@ -15,6 +15,7 @@ type ItineraryDropdownProps = {
   className?: string;
   isLoading?: boolean;
   onSelect?: (value: string | number) => void; // Callback when an option is selected
+  selected: string;
 } & React.HTMLAttributes<HTMLButtonElement>;
 
 export default function ItineraryDropdown({
@@ -23,6 +24,7 @@ export default function ItineraryDropdown({
   className,
   isLoading = false,
   onSelect,
+  selected,
   ...rest
 }: ItineraryDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,6 +39,8 @@ export default function ItineraryDropdown({
     if (onSelect) {
       onSelect(value);
     }
+
+    console.log(value);
     setIsOpen(false);
   };
 
@@ -49,17 +53,17 @@ export default function ItineraryDropdown({
         {...rest}
       >
         <div className="flex gap-6 text-neutral-04">
-          {isLoading ? "Loading activities..." : children}
+          {selected}
         </div>
         <ChevronDownIcon aria-hidden="true" className="h-[24px] w-[24px]" />
       </button>
 
       {isOpen && !isLoading && (
-        <ul className="absolute mt-2 translucent-black-30 shadow-lg rounded-[8px] w-full z-10 text-white">
+        <ul className="absolute bg-black shadow-lg rounded-[8px] w-full z-10 text-white text-center">
           {options.map((option, i) => (
             <li
               key={i}
-              className="h-4 px-4 py-2 cursor-pointer hover:bg-opacity-20 hover:bg-white"
+              className="h-6 px-2 py-2 cursor-pointer text-sm hover:bg-opacity-20 hover:bg-white"
               onClick={() => handleOptionClick(option.label)}
             >
               {option.label}
