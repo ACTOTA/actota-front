@@ -26,9 +26,9 @@ export default function SignUp() {
     const password = formData.get('password') as string;
 
     console.log(formData);
-    
+
     try {
-      const response = await fetch('/api/signup', {
+      const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -48,7 +48,7 @@ export default function SignUp() {
 
         if (authToken) {
           const claims = await verifyJwt(authToken);
-          setAuthCookie(authToken, claims);
+          setAuthCookie(authToken, claims as Claims);
         }
       } else {
         console.log("Failed to create account.");
@@ -70,9 +70,9 @@ export default function SignUp() {
 
       <GlassPanel theme={Theme.Dark} className="h-[900px] min:w-[600px] flex flex-col justify-around relative text-white py-6 px-[2%]">
         <div className="absolute top-8 right-8">
-          <Logo /> 
+          <Logo />
         </div>
-       
+
         <div className="text-white">
           <h3 className="text-2xl font-bold">Let&apos;s Get Started!</h3>
           <p>Create an account to continue.</p>
@@ -88,13 +88,13 @@ export default function SignUp() {
           </div>
           <div>
             <p className="w-96 text-left text-neutral-05">Email Address</p>
-            <Input type="email" name="email" icon={<HiOutlineMail className="text-white"/>} placeholder="Your email address" />
+            <Input type="email" name="email" icon={<HiOutlineMail className="text-white" />} placeholder="Your email address" />
           </div>
           <div>
             <p className="w-96 text-left text-neutral-05">Password</p>
-            <Input type="password" name="password" icon={<BiLock className="text-white"/>} placeholder="Password" />
-            <div className="h-2"/>
-            <Input type="password" icon={<BiLock className="text-white"/>} placeholder="Confirm Password" />
+            <Input type="password" name="password" icon={<BiLock className="text-white" />} placeholder="Password" />
+            <div className="h-2" />
+            <Input type="password" icon={<BiLock className="text-white" />} placeholder="Confirm Password" />
           </div>
 
           <Button type="submit" className="bg-white text-black w-full py-5">Create My Account</Button>
@@ -114,9 +114,9 @@ export default function SignUp() {
             <a href="#" className=""><b> <u>Privacy Policy</u></b></a>
           </p>
         </div>
-        
+
         <p className="m-auto">Already have an account? <Link href="/signin" className=""><b><u>Log In here</u></b></Link></p>
       </GlassPanel>
-    </div> 
+    </div>
   )
 }
