@@ -43,8 +43,8 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
 
     return (
-        <div onClick={() => router.push(`/listings/${data._id}`)}
-            className='grid gap- 2 col-span-1 cusrsor-pointer group w-[308px] h-[400px] bg-white rounded-lg text-white'>
+        <div onClick={() => router.push(`/listings/${(data._id as { $oid: string }).$oid}`)}
+            className='grid gap- 2 col-span-1 hover:cursor-pointer group w-[308px] h-[400px] bg-white rounded-lg text-white'>
 
             <div className='relative h-full'>
                 <Image src={data.images[0] || ""} alt="Vacation Picture" layout='fill' objectFit='cover' className='rounded-lg' />

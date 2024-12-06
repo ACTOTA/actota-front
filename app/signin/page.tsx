@@ -24,9 +24,9 @@ export default function SignIn() {
     const password = formData.get('password') as string;
 
     console.log(formData);
-    
+
     try {
-      const response = await fetch('/api/signin', {
+      const response = await fetch('/api/auth/signin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -68,9 +68,9 @@ export default function SignIn() {
 
       <GlassPanel theme={Theme.Dark} className="h-[900px] w-[600px] flex flex-col justify-around relative text-white py-6 px-[2%]">
         <div className="absolute top-8 right-8">
-          <Logo /> 
+          <Logo />
         </div>
-       
+
         <div className="text-white">
           <h3 className="text-2xl font-bold">Welcome Back!</h3>
           <p>Sign in to your account to continue.</p>
@@ -78,20 +78,20 @@ export default function SignIn() {
         <form onSubmit={(e) => handleSubmit(e)} className="m-auto flex flex-col gap-4 w-full">
           <div>
             <p className="w-96 text-left text-neutral-05">Email Address</p>
-            <Input type="email" name="email" icon={<HiOutlineMail className="text-white"/>} placeholder="Your email address" />
+            <Input type="email" name="email" icon={<HiOutlineMail className="text-white" />} placeholder="Your email address" />
           </div>
           <div>
             <p className="w-96 text-left text-neutral-05">Password</p>
-            <Input type="password" name="password" icon={<BiLock className="text-white"/>} placeholder="Password" />
-            <div className="h-2"/>
+            <Input type="password" name="password" icon={<BiLock className="text-white" />} placeholder="Password" />
+            <div className="h-2" />
           </div>
-          
-          <Link href="/forgot-password"> 
+
+          <Link href="/forgot-password">
             <p className="text-right"><b>Forgot your password?</b></p>
           </Link>
 
           <div className="flex items-center">
-            <input type="checkbox" name="remember" id="remember" className="mr-2"/>
+            <input type="checkbox" name="remember" id="remember" className="mr-2" />
             <p>Remember me on this device</p>
           </div>
           <Button type="submit" className="bg-white text-black w-full py-5">Log In</Button>
@@ -105,10 +105,10 @@ export default function SignIn() {
           <Button className="py-5">Apple</Button>
           <Button className="py-5">Facebook</Button>
         </div>
-                
+
         <p className="m-auto">Don&apos;t have an account? <Link href="/signup" className=""><b><u>Create an account here</u></b></Link></p>
       </GlassPanel>
-    </div> 
+    </div>
   )
 }
 
