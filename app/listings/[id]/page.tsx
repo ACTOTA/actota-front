@@ -11,24 +11,31 @@ export default function Itinerary() {
   const pathname = usePathname() as string
   const objectId = pathname.substring(pathname.lastIndexOf('/') + 1)
 
-  const [listing, setListing] = React.useState<FeaturedVacation>();
+  const [listings, setListings] = React.useState<FeaturedVacation[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   useEffect(() => {
     async function fetchListings() {
       try {
+        setIsLoading(true);
         const fetchedListing = await get_itinerary_by_id(objectId);
-        setListing(fetchedListing);
+        setListings(fetchedListing);
 
-        console.log('Fetched listings:', fetchedListing);
+        console.log('Fetched listings:', listings);
       } catch (error) {
         console.error('Failed to fetch activities:', error);
+      } finally {
+        setIsLoading(false);
       }
     }
 
     fetchListings();
+  }, []); // Empty dependency array means run once on mount
 
-    console.log('objectId:', listing);
-  }, []);
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
 
   return (
     <div>
