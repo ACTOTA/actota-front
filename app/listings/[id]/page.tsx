@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import { get_itinerary_by_id } from '@/services/api/itinerary';
 import React, { useEffect } from 'react';
 import { FeaturedVacation } from '@/db/models/itinerary';
+import { ArrowLeftIcon } from '@heroicons/react/20/solid';
 
 
 export default function Itinerary() {
@@ -38,8 +39,13 @@ export default function Itinerary() {
 
 
   return (
-    <div>
-      <h1>Itinerary</h1>
-    </div>
+    <section className='w-full h-full bg-cyan'>
+      <div>
+        <ArrowLeftIcon className="h-6 w-6 text-white" />
+      </div>
+
+
+    </section>
   );
 }
+

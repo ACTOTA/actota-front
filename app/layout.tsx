@@ -25,7 +25,7 @@ export default async function RootLayout({
     <html lang="en">
       <body className={`neutral-01 ${font.className}`}>
         <ClientOnly>
-          <Navbar /> 
+          <Navbar />
         </ClientOnly>
         <div>
           {children}

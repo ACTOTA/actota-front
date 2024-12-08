@@ -1,21 +1,32 @@
 'use client';
 
 import Container from "../Container";
-import Activities from "../Activities";
 import Logo from "../Logo";
-import Search from "./Search";
-import { SafeUser } from "@/app/types";
+import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/app/actions/auth";
+import { SessionUser } from "@/app/types/session";
 import { usePathname } from "next/navigation";
 
-interface NavbarProps {
-    currentUser?: SafeUser | null;
-}
+const Navbar = () => {
 
-const Navbar: React.FC<NavbarProps> = ({
-    currentUser
-}) => {
-
+    const [currentUser, setCurrentUser] = useState<SessionUser | null>(null)
+    const [loading, setLoading] = useState(true)
     const path = usePathname();
+
+    useEffect(() => {
+        async function loadUser() {
+            try {
+                const user = await getCurrentUser()
+                setCurrentUser(user)
+            } catch (error) {
+                console.error('Failed to load user:', error)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        loadUser()
+    }, [])
 
     const handleClick = () => {
         if (path !== "/") {
@@ -23,13 +34,16 @@ const Navbar: React.FC<NavbarProps> = ({
         }
     }
 
+
+    if (loading) return null
+
     console.log("Navbar currentUser: ", currentUser);
     return (
         <div className="fixed h-28 z-10 w-full bg-none text-white">
             <div className="py-3">
                 <Container>
                     <div className="flex flex-row items-center justify-between md:gap-0" >
-                        <Logo onClick={handleClick} className="hover:cursor-pointer"/>
+                        <Logo onClick={handleClick} className="hover:cursor-pointer" />
                     </div>
                 </Container>
             </div>
@@ -38,3 +52,5 @@ const Navbar: React.FC<NavbarProps> = ({
 }
 
 export default Navbar;
+
+
