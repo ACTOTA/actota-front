@@ -1,19 +1,38 @@
+import { getAuthCookie } from "@/app/actions/getAuthCookie";
+
 export async function get_featured() {
 	try {
-		const response = await fetch('/api/itineraries/featured');
+		const token = getAuthCookie();
+
+		const response = await fetch('/api/itineraries/featured', {
+			headers: {
+				'Authorization': `Bearer ${token}`
+			},
+			cache: 'no-store'
+		});
 		const result = await response.json();
-		return result;
+
+		console.log('Featured itineraries:', result);
+		return JSON.parse(JSON.stringify(result));
 	} catch (error) {
-		return error;
+		return { error: 'Failed to fetch featured itineraries' };
 	}
 }
 
 export async function get_itinerary_by_id(id: string) {
 	try {
-		const response = await fetch(`/api/itineraries/${id}`);
+		const token = getAuthCookie();
+
+		const response = await fetch(`/api/itineraries/${id}`, {
+			headers: {
+				'Authorization': `Bearer ${token}`
+			},
+			cache: 'no-store'
+		});
+
 		const result = await response.json();
-		return result;
+		return JSON.parse(JSON.stringify(result));
 	} catch (error) {
-		return error;
+		return { error: 'Failed to fetch itinerary' };
 	}
 }

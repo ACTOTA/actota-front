@@ -16,7 +16,7 @@ export default function FeaturedItineraries() {
         const fetchedListing = await get_featured();
         setListings(fetchedListing);
 
-        console.log('Fetched listings:', fetchedListing);
+        console.log('Fetched listings:', listings);
       } catch (error) {
         console.error('Failed to fetch activities:', error);
       } finally {
