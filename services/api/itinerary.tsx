@@ -2,7 +2,7 @@ import { getAuthCookie } from "@/app/actions/getAuthCookie";
 
 export async function get_featured() {
 	try {
-		const token = getAuthCookie();
+		const token = await getAuthCookie();
 
 		const response = await fetch('/api/itineraries/featured', {
 			headers: {
@@ -21,7 +21,7 @@ export async function get_featured() {
 
 export async function get_itinerary_by_id(id: string) {
 	try {
-		const token = getAuthCookie();
+		const token = await getAuthCookie();
 
 		const response = await fetch(`/api/itineraries/${id}`, {
 			headers: {
