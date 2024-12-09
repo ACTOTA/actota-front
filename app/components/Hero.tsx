@@ -23,7 +23,7 @@ export default function Hero() {
                         <h2 className="">Trip</h2>
                     </span>
                     <h2 className="m-auto text-center">with a Few Clicks</h2>
-                    <div className="h-8"/>
+                    <div className="h-8" />
                     <Search />
                 </div>
             </div>
