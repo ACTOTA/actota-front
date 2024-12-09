@@ -39,7 +39,7 @@ const Navbar = () => {
 
     console.log("Navbar currentUser: ", currentUser);
     return (
-        <div className="fixed h-28 z-10 w-full bg-none text-white">
+        <div className="fixed h-16 z-50 w-full text-white flex items-center">
             <div className="py-3">
                 <Container>
                     <div className="flex flex-row items-center justify-between md:gap-0" >
