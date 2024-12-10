@@ -17,27 +17,23 @@ export default function Itinerary() {
   const [listing, setListings] = useState<FeaturedVacation>();
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchListings = async () => {
-    try {
-      const fetchedListing = await get_itinerary_by_id(objectId);
-      setListings(fetchedListing);
-    } catch (error) {
-      console.error('Failed to fetch activities:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-
   useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        const fetchedListing = await get_itinerary_by_id(objectId);
+        setListings(fetchedListing);
+      } catch (error) {
+        console.error('Failed to fetch activities:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
     fetchListings();
-    console.log('First render');
   }, []);
 
-  useEffect(() => {
-    const name = listing;
-    console.log('Fetched listings:', name);
-  }, [listing]);
+  // useEffect(() => {
+  //   const name = listing;
+  // }, [listing]);
 
   if (isLoading) {
     return <div className='text-white'>Loading...</div>;
@@ -85,7 +81,7 @@ export default function Itinerary() {
             ))}
           </div>
 
-          <div className='w-full h-full text-white'>
+          <div className='w-full h-full text-white my-8'>
             <h2><b>Overview</b></h2>
             <div className='grid grid-cols-2'>
               <div>
@@ -100,7 +96,12 @@ export default function Itinerary() {
                 <p>Activities</p>
               </div>
             </div>
+            <div className='my-8'>
+              <h2><b>About</b></h2>
+              <p className='text-neutral-04'>{listing.description}</p>
+            </div>
           </div>
+
         </div>
         <div className='col-span-2'>
           <div className='neutral-02 rounded-lg p-4 flex flex-col justify-around gap-1 text-neutral-04'>
@@ -111,7 +112,10 @@ export default function Itinerary() {
             <div><p>Service fee</p></div>
             <br />
 
-            <div className='font-bold'><p>Total amount</p></div>
+            <div className='text-white font-bold flex justify-between'>
+              <p>Total amount</p>
+              <p>${listing.person_cost}</p>
+            </div>
             <Button className='bg-white rounded-full p-2 text-black text-sm font-bold'>
               <p>Proceed to Payment</p>
               <ArrowRightIcon className='h-6 w-6' />

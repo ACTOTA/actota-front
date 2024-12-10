@@ -7,7 +7,6 @@ type GlassPanelProps = {
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export default function GlassPanel({ children, className, theme, ...rest }: GlassPanelProps) {
-    console.log("theme: ", theme);
 
     const style = theme === Theme.Activity ? "glass-bg-blue stroke-glass-blue" :
         theme === Theme.Transportation ? "glass-bg-red stroke-glass-red" :
