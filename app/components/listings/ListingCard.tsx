@@ -25,10 +25,6 @@ const ListingCard: React.FC<ListingCardProps> = ({
 }) => {
     const router = useRouter();
 
-    useEffect(() => {
-        console.log('ListingCard rendered:', data);
-    }, [data]);
-
     const handleCancel = useCallback(
         (e: React.MouseEvent<HTMLButtonElement>) => {
             e.stopPropagation();

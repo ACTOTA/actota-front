@@ -12,7 +12,6 @@ export async function get_featured() {
 		});
 		const result = await response.json();
 
-		console.log('Featured itineraries:', result);
 		return JSON.parse(JSON.stringify(result));
 	} catch (error) {
 		return { error: 'Failed to fetch featured itineraries' };
