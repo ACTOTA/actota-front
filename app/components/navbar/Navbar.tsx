@@ -10,6 +10,7 @@ import Button from "../figma/Button";
 import Link from "next/link";
 import { Menu } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import { signOut } from "@/app/actions/signout";
 
 const Navbar = () => {
 
@@ -42,6 +43,10 @@ const Navbar = () => {
         }
     }
 
+    async function handleSignout() {
+        await signOut();
+        window.location.href = "/";
+    }
 
     if (loading) return null
 
@@ -106,17 +111,17 @@ const Navbar = () => {
                                                 </Link>
                                             </Menu.Item>
                                             <Menu.Item>
-                                                <Link href="/account" className="block px-4 py-2 pb-3 text-sm data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none 
-                                                    hover:bg-red-500/20 hover:rounded-b-md">
+                                                <div className="block px-4 py-2 pb-3 text-sm data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none 
+                                                    hover:bg-red-500/20 hover:rounded-b-md" onClick={handleSignout}>
                                                     Sign Out
-                                                </Link>
+                                                </div>
                                             </Menu.Item>
                                         </div>
                                     </Menu.Items>
                                 </Menu>
                             </div>
                         ) : (
-                            <div>
+                            <div className="flex gap-2">
                                 <Link href='/signin'><Button className="hover:cursor-pointer text-white">Sign In</Button></Link>
                                 <Link href='/signup'><Button className="hover:cursor-pointer bg-white text-black">Get Started</Button></Link>
                             </div>
