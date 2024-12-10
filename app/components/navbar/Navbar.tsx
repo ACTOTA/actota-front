@@ -53,79 +53,63 @@ const Navbar = () => {
                         <Logo onClick={handleClick} className="hover:cursor-pointer" />
                         {currentUser ? (
                             <div>
-                                <Menu as="div" className="relative inline-block text-left">
+                                <Menu as="div" className="relative inline-block text-left text-white">
                                     <div>
                                         <Menu.Button className="inline-flex w-full justify-center gap-x-1.5 rounded-full trans neutral-01 px-3 py-2 text-sm font-semibold text-white shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-800">
-                                            Options
+                                            <p>{(currentUser.first_name && currentUser.last_name) ? (currentUser.first_name + " " + currentUser.last_name) : currentUser.email}</p>
                                             <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-gray-400" />
                                         </Menu.Button>
                                     </div>
 
                                     <Menu.Items
-                                        className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                                        className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md glass-bg-dark shadow-lg ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
                                     >
-                                        <div className="py-1">
+                                        <div className="">
                                             <Menu.Item>
-                                                <a
-                                                    href="#"
-                                                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
-                                                >
-                                                    My Account
-                                                </a>
+                                                <Link href="/account" className="block px-4 py-2 pt-3 text-sm data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none 
+                                                    hover:bg-red-500/20 hover:rounded-t-md">
+                                                    Account
+                                                </Link>
                                             </Menu.Item>
                                             <Menu.Item>
-                                                <a
-                                                    href="#"
-                                                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
-                                                >
-                                                    Duplicate
-                                                </a>
+
+                                                <Link href="/account" className="block px-4 py-2 text-sm data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none 
+                                                    hover:bg-red-500/20">
+                                                    Favorites
+                                                </Link>
                                             </Menu.Item>
+                                            <Menu.Item>
+                                                <Link href="/account" className="block px-4 py-2 text-sm data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none 
+                                                    hover:bg-red-500/20">
+                                                    My Bookings
+                                                </Link>
+                                            </Menu.Item>
+                                            <Menu.Item>
+                                                <Link href="/account" className="block px-4 py-2 pb-3 text-sm data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none 
+                                                    hover:bg-red-500/20">
+                                                    Payments
+                                                </Link>
+                                            </Menu.Item>
+
                                         </div>
-                                        <div className="py-1">
+                                        <div className="">
                                             <Menu.Item>
-                                                <a
-                                                    href="#"
-                                                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
-                                                >
-                                                    Archive
-                                                </a>
+                                                <Link href="/account" className="block px-4 py-2 pt-3 text-sm data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none 
+                                                    hover:bg-red-500/20">
+                                                    Help Center
+                                                </Link>
                                             </Menu.Item>
                                             <Menu.Item>
-                                                <a
-                                                    href="#"
-                                                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
-                                                >
-                                                    Move
-                                                </a>
-                                            </Menu.Item>
-                                        </div>
-                                        <div className="py-1">
-                                            <Menu.Item>
-                                                <a
-                                                    href="#"
-                                                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
-                                                >
-                                                    Share
-                                                </a>
+                                                <Link href="/account" className="block px-4 py-2 text-sm data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none 
+                                                    hover:bg-red-500/20">
+                                                    Preferences
+                                                </Link>
                                             </Menu.Item>
                                             <Menu.Item>
-                                                <a
-                                                    href="#"
-                                                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
-                                                >
-                                                    Add to favorites
-                                                </a>
-                                            </Menu.Item>
-                                        </div>
-                                        <div className="py-1">
-                                            <Menu.Item>
-                                                <a
-                                                    href="#"
-                                                    className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none"
-                                                >
-                                                    Delete
-                                                </a>
+                                                <Link href="/account" className="block px-4 py-2 pb-3 text-sm data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none 
+                                                    hover:bg-red-500/20 hover:rounded-b-md">
+                                                    Sign Out
+                                                </Link>
                                             </Menu.Item>
                                         </div>
                                     </Menu.Items>
