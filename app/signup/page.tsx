@@ -50,8 +50,13 @@ export default function SignUp() {
           const claims = await verifyJwt(authToken);
           setAuthCookie(authToken, claims as Claims);
         }
+
+        window.location.href = '/';
+
       } else {
+
         console.log("Failed to create account.");
+
       }
     } catch (error) {
       console.error(error);

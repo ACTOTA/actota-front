@@ -48,6 +48,8 @@ export default function SignIn() {
 
         }
 
+        window.location.href = '/';
+
       } else {
         console.log("Failed to create account.");
       }

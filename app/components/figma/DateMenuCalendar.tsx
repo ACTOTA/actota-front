@@ -1,19 +1,18 @@
 import generateCalendarData from '@/app/libs/calendarData';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 
 
-function classNames(...classes) {
+function classNames(...classes: (string | boolean | undefined)[]) {
   return classes.filter(Boolean).join(' ')
 }
 
 
 export default function DateMenuCalendar() {
-  
-  const [currentMonth, setCurrentMonth] = React.useState(11);
-  const [currentYear, setCurrentYear] = React.useState(2024);
 
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
   const goBack = () => {
     if (currentMonth === 0) {
@@ -33,13 +32,20 @@ export default function DateMenuCalendar() {
     }
   }
 
+
   const months = React.useMemo(() => {
     const calendarData = generateCalendarData(currentYear, currentMonth);
     console.log(calendarData);
     return calendarData;
-  }, [goBack, goForward]);
+  }, [currentMonth, currentYear]);
 
 
+
+  useEffect(() => {
+    const now = new Date();
+    setCurrentMonth(now.getMonth());
+    setCurrentYear(now.getFullYear());
+  }, []);
 
   return (
     <div className="w-full">
@@ -49,14 +55,14 @@ export default function DateMenuCalendar() {
           className="absolute -left-1.5 -top-1 flex items-center justify-center p-1.5 text-gray-400 hover:text-gray-500"
         >
           <span className="sr-only">Previous month</span>
-          <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" onClick={goBack}/>
+          <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" onClick={goBack} />
         </button>
         <button
           type="button"
           className="absolute -right-1.5 -top-1 flex items-center justify-center p-1.5 text-gray-400 hover:text-gray-500"
         >
           <span className="sr-only">Next month</span>
-          <ChevronRightIcon className="h-5 w-5" aria-hidden="true" onClick={goForward}/>
+          <ChevronRightIcon className="h-5 w-5" aria-hidden="true" onClick={goForward} />
         </button>
         {months.map((month, monthIdx) => (
           <section
@@ -87,15 +93,15 @@ export default function DateMenuCalendar() {
                     'relative py-1.5 hover:bg-red-500 hover:bg-opacity-15 hover:rounded-lg focus:z-10',
                   )}
                 >
-                  <time 
-                    dateTime={day.date} 
+                  <time
+                    dateTime={day.date}
                     className={classNames(
-                      day.isToday && 'relative', 
-                      'mx-auto flex h-7 w-7 items-center justify-center rounded-full' 
+                      day.isToday && 'relative',
+                      'mx-auto flex h-7 w-7 items-center justify-center rounded-full'
                     )}
-                  > 
+                  >
                     {day.isToday && (
-                      <span className="absolute bottom-[-2px] left-1/2 -translate-x-1/2 w-2 h-2 rounded-full red-04"></span>  
+                      <span className="absolute bottom-[-2px] left-1/2 -translate-x-1/2 w-2 h-2 rounded-full red-04"></span>
                     )}{day.date.split('-').pop().replace(/^0/, '')}
                   </time>
                 </button>
