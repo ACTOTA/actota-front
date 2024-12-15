@@ -4,15 +4,7 @@ import "./globals.css";
 
 import Navbar from "./components/navbar/Navbar";
 import ClientOnly from './components/ClientOnly';
-import RegisterModal from './components/modals/RegisterModal';
-import LoginModal from "./components/modals/LoginModal";
-import RentModal from "./components/modals/RentModal";
-import Filter from "./components/Filter"; // Make sure this path is correct
-import SearchModal from "./components/modals/SearchModal";
 
-import ToasterProvider from './providers/ToasterProvider';
-import getCurrentUser from "./actions/getCurrentUser";
-import Home from "./page";
 
 export const metadata = {
   title: "ACTOTA!",
@@ -28,20 +20,14 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const currentUser = await getCurrentUser();
 
   return (
     <html lang="en">
-      <body className={font.className}>
+      <body className={`neutral-01 ${font.className}`}>
         <ClientOnly>
-          <ToasterProvider />
-          <RentModal />
-          <LoginModal />
-          <RegisterModal />
-          <SearchModal />
-          <Navbar currentUser={currentUser} />
+          <Navbar />
         </ClientOnly>
-        <div className="pt-20 pb-20">
+        <div>
           {children}
         </div>
       </body>

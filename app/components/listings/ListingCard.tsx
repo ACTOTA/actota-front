@@ -1,149 +1,76 @@
-'use client';
-
 import { useRouter } from 'next/navigation';
-import { Listing as PrismaListing, Reservation } from '@prisma/client';
 
-
-import { SafeListing, SafeUser } from '@/app/types'; // Make sure this path is correct
-import useTowns from '@/app/hooks/useTowns';
-import React, { useCallback, useMemo } from 'react';
-import { format } from 'date-fns';
-
-import Image from 'next/image';
-import StarButton from '../StarButton';
+import React, { useCallback, useEffect } from 'react';
+import HeartButton from '../HeartButton';
 import Button from '../Button';
+import { FeaturedVacation } from '@/db/models/itinerary';
+import Image from 'next/image';
+import GlassPanel from '../figma/GlassPanel';
+import { Theme } from '../enums/theme';
 
-type Location = {
-    value: string;
-    label: string;
-    flag: string;
-    latlng: [number, number];
-    region: string;
-};
-interface Listing {
-    id: string;
-    title: string;
-    description: string;
-    imageSrc: string;
-    createdAt: Date;
-    activity: string;
-    roomCount: number;
-    bathroomCount: number;
-    guestCount: number;
-    location: Location;
-    userId: string;
-    price: number;
-}
-
-function parseLocation(locationJson: any): Location | null {
-    try {
-        if (typeof locationJson === 'string') {
-            return JSON.parse(locationJson);
-        }
-        return locationJson as Location;
-    } catch (error) {
-        console.error('Failed to parse location JSON', error);
-        return null;
-    }
-}
 interface ListingCardProps {
-    data: SafeListing;
-    reservation?: Reservation;
+    data: FeaturedVacation;
     onAction?: (id: string) => void;
     disabled?: boolean;
     actionLabel?: string;
     actionId?: string;
-    currentUser?: SafeUser | null;
 }
 
 const ListingCard: React.FC<ListingCardProps> = ({
     data,
-    reservation,
     onAction,
     disabled = false,
     actionLabel,
     actionId = "",
-    currentUser
 }) => {
     const router = useRouter();
-    const { getByValue } = useTowns();
-
-
-    const location = parseLocation(data.location);
 
     const handleCancel = useCallback(
         (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.stopPropagation();
-    
-        if (disabled) {
-          return;
-        }
-    
-        onAction?.(actionId)
-      }, [disabled, onAction, actionId]);
+            e.stopPropagation();
 
-    const price = useMemo(() => reservation?.totalPrice || data.price, [reservation, data.price]);
+            if (disabled) {
+                return;
+            }
+
+            onAction?.(actionId)
+        }, [disabled, onAction, actionId]);
 
 
-  const reservationDate = useMemo(() => {
-    if (!reservation) {
-      return null;
-    }
-  
-    const start = new Date(reservation.startDate);
-    const end = new Date(reservation.endDate);
 
-    return `${format(start, 'PP')} - ${format(end, 'PP')}`;
-  }, [reservation]);
-  
     return (
-        <div onClick={() => router.push(`/listings/${data.id}`)}
-            className='col-span-1 cusrsor-pointer group'
-        >
-            <div className='flex flex-col w-full gap-2'>
-                <div className='relative w-full overflow-hidden aspect-square rounded-xl'>
-                    <Image
-                        fill
-                        alt="Listing"
-                        src={data.imageSrc}
-                        className='object-cover w-full h-full transition-transform duration-200 ease-in-out group-hover:scale-110'
-                    />
-                    <div className='absolute top-3 right-3'>
-                        <StarButton
-                            listingId={data.id}
-                            currentUser={currentUser}
-                        />
-                    </div>
-                </div>
-                
-                <div className="text-lg font-semibold">
-                    {location?.label}, {location?.region}
-                </div>
+        <div onClick={() => router.push(`/listings/${(data._id as { $oid: string }).$oid}`)}
+            className='grid gap- 2 col-span-1 hover:cursor-pointer group w-[308px] h-[400px] bg-white rounded-lg text-white'>
 
-                <div className="font-light text-neutral-500">
-                {reservationDate || data.activity}
+            <div className='relative h-full'>
+                <Image src={data.images[0] || ""} alt="Vacation Picture" layout='fill' objectFit='cover' className='rounded-lg' />
+
+                <div className="flex flex-col w-full p-2">
+                    <GlassPanel className='absolute bottom-0 left-0 h-1/3 rounded-lg m-2'
+                        theme={Theme.Dark}>
+                        <div className='p-4'>
+                            <h3 className='font-bold'>{data.trip_name}</h3>
+                            <h4 className='text-sm text-neutral-04'>{data.start_location.name}, {data.end_location.name}</h4>
+                            <div className='flex gap-4 text-xs text-neutral-03'>
+                                <p>{data.length_days} {data.length_days > 1 ? "Days" : "Day"}</p>
+                                <p>{data.activities.length} {data.activities.length > 1 ? "Activities" : "Activity"}</p>
+                            </div>
+
+
+                        </div>
+                    </GlassPanel>
                 </div>
-                
-                
-                <div className="flex flex-row items-center gap-1">
-                <div className="font-semibold">
-                    $ {price}
-                </div>
-                {!reservation && (
-                    <div className="font-light">night</div>
-                )}
-                </div>
-                
+            </div>
+
             {onAction && actionLabel && (
                 <Button
                     disabled={disabled}
                     small
-                    label={actionLabel} 
+                    label={actionLabel}
                     onClick={handleCancel}
                 />
-                )}
-                    </div>
-                </div>
+            )}
+        </div>
     );
 }
 
