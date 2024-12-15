@@ -133,7 +133,7 @@ body,
 }
 
 .translucent-white20 {
-  background-color: linear-gradient(180deg, #FFFFFF 20%)
+  background-color: rgba(255, 255, 255, 0.2);
 }
     
 .neutral-03 {

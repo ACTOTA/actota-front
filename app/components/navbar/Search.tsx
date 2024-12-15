@@ -1,9 +1,6 @@
-import { useCallback, useEffect, useState, useMemo, useRef } from "react";
-import { useSearchParams } from 'next/navigation';
+import { useEffect, useState, useMemo, useRef, Dispatch, SetStateAction } from "react";
 import { BiSearch } from 'react-icons/bi';
-import { differenceInDays } from 'date-fns';
 
-import useTowns from '@/app/hooks/useTowns';
 import { STEPS } from '../../types/steps';
 import SearchBoxes from './SearchBoxes';
 import { LoadScript } from '@react-google-maps/api';
@@ -11,9 +8,11 @@ import { LoadScript } from '@react-google-maps/api';
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
 
 
-const Search = () => {
+export default function Search({ setClasses }: { setClasses?: Dispatch<SetStateAction<string>> }) {
 
   const [currStep, setCurrStep] = useState<STEPS | null>(null);
+  const [className, setClassName] = useState<string>('');
+  const searchRef = useRef<HTMLDivElement>(null);
   const stepsEle = useRef<HTMLDivElement>(null);
 
   const selectedClasses = useMemo(() => {
@@ -54,6 +53,33 @@ const Search = () => {
   }
 
 
+  useEffect(() => {
+    setTimeout(() => {
+      const searchElement = searchRef.current;
+      if (!searchElement) return;
+
+      const initialPosition = searchElement.getBoundingClientRect().top + window.scrollY;
+
+      const handleScroll = () => {
+        console.log('scrolling');
+        if (window.scrollY >= initialPosition) {
+          setClasses('fixed top-0 left-1/2 -translate-x-1/2');
+          setClassName('w-[580px] md:w-[640px] xl:w-[700px] 2xl:w-[720px]');
+        } else {
+          setClasses('');
+          setClassName('');
+        }
+      };
+
+      document.addEventListener('scroll', handleScroll, { passive: true });
+      return () => document.removeEventListener('scroll', handleScroll);
+    }, 100);
+  }, [searchRef, setClasses]);
+
+
+
+
+
   return (
     <LoadScript
       googleMapsApiKey={API_KEY}
@@ -61,8 +87,9 @@ const Search = () => {
       language="en"
       region="EN"
       version="weekly">
-      <div className="items-center justify-between w-[720px] h-[82px] grid grid-cols-9 rounded-full neutral-01
-          stroke-glass-01 glass-corner backdrop-filter backdrop-blur-md text-sm text-white text-left">
+      <div className={`items-center justify-between w-[720px] h-[82px] grid grid-cols-9 rounded-full neutral-01
+          stroke-glass-01 glass-corner backdrop-filter backdrop-blur-md text-sm text-white text-left m-auto z-50
+          transition-all duration-300 ease-in-out ${className}`} ref={searchRef}>
         <section onClick={() => handleSelect(STEPS.LOCATION)}
           id={STEPS.LOCATION.toString()}
           className="cursor-pointer z-10 h-full w-full col-span-2 flex flex-col justify-center gap-1 pl-8 pr-6 relative 
@@ -97,8 +124,9 @@ const Search = () => {
           <p className="text-neutral-04">Trip Details</p>
         </section>
 
-        <section className="px-2 col-span-1">
-          <div className="w-[64px] h-[64px] relative rounded-full bg-white cursor-pointer">
+        <section className="px-2 col-span-1 h-full w-full flex justify-center items-center">
+          <div className="w-full aspect-square relative rounded-full bg-white cursor-pointer
+            transition-all duration-300 ease-in-out">
             <BiSearch size={24} className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 text-black" />
           </div>
         </section>
@@ -111,5 +139,3 @@ const Search = () => {
     </LoadScript>
   );
 }
-
-export default Search;

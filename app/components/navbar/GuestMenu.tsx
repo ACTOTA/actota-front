@@ -33,43 +33,43 @@ export default function GuestMenu() {
             setChildren(children === 0 ? 0 : children - 1);
         }
     };
- 
+
     return (
-        <section className="h-full w-full grid grid-rows-3 gap-3 text-lg z-20 py-4">
+        <section className="h-full w-full grid grid-rows-3 gap-3 text-lg z-20 p-4">
             <div className="flex justify-between">
                 <div>
                     <p>Adults</p>
                     <p className="text-sm text-neutral-04">Ages 13 and above</p>
                 </div>
                 <div className="flex justify-around items-center gap-4">
-                    <PlusMinusButton buttonType={ButtonType.minus} onClick={updateAdults(ButtonType.minus)}/>
+                    <PlusMinusButton buttonType={ButtonType.minus} onClick={updateAdults(ButtonType.minus)} />
                     <p className="w-4 text-center">{adults}</p>
-                    <PlusMinusButton buttonType={ButtonType.plus} onClick={updateAdults(ButtonType.plus)}/>
+                    <PlusMinusButton buttonType={ButtonType.plus} onClick={updateAdults(ButtonType.plus)} />
                 </div>
             </div>
-                    
+
             <div className="flex justify-between">
                 <div>
                     <p>Children</p>
                     <p className="text-sm text-neutral-04">Ages 2-12</p>
                 </div>
                 <div className="flex justify-around items-center gap-4">
-                    <PlusMinusButton buttonType={ButtonType.minus} onClick={updateChildren(ButtonType.minus)}/>
+                    <PlusMinusButton buttonType={ButtonType.minus} onClick={updateChildren(ButtonType.minus)} />
                     <p className="w-4 text-center">{children}</p>
-                    <PlusMinusButton buttonType={ButtonType.plus} onClick={updateChildren(ButtonType.plus)}/>
+                    <PlusMinusButton buttonType={ButtonType.plus} onClick={updateChildren(ButtonType.plus)} />
                 </div>
             </div>
-                 
+
             <div className="flex justify-between">
                 <div>
                     <p>Infants</p>
                     <p className="text-sm text-neutral-04">Ages 2 and below</p>
                 </div>
-                
+
                 <div className="flex justify-around items-center gap-4">
-                    <PlusMinusButton buttonType={ButtonType.minus} onClick={updateInfant(ButtonType.minus)}/>
+                    <PlusMinusButton buttonType={ButtonType.minus} onClick={updateInfant(ButtonType.minus)} />
                     <p className="w-4 text-center">{infants}</p>
-                    <PlusMinusButton buttonType={ButtonType.plus} onClick={updateInfant(ButtonType.plus)}/>
+                    <PlusMinusButton buttonType={ButtonType.plus} onClick={updateInfant(ButtonType.plus)} />
                 </div>
             </div>
         </section>

@@ -37,9 +37,8 @@ export default function LocationMenu() {
     };
 
     return (
-        <section className={`flex flex-col justify-between gap-6 py-6 h-full w-[584px] z-20`}>
+        <section className={`flex flex-col justify-between gap-6 py-6 h-full w-[584px] z-20 p-4`}>
             <div>
-                <h3 className="text-2xl font-bold">Destination</h3>
                 <div className="h-2" />
                 <div className="relative">
                     <div className="grid w-full grid-cols-1 translucent-black-30">
