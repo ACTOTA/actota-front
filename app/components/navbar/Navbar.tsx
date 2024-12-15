@@ -19,7 +19,6 @@ const Navbar = () => {
     const path = usePathname();
 
     useEffect(() => {
-
         console.log("Navbar path: ", path);
 
         async function loadUser() {
@@ -51,11 +50,12 @@ const Navbar = () => {
     if (loading) return null
 
     return (
-        <div className="fixed h-16 z-50 w-full text-white flex items-center">
+        <div className="fixed h-[82px] z-30 w-full text-white flex items-center">
             <div className="py-3 w-full h-full">
                 <Container>
                     <div className="flex flex-row items-center justify-between w-full h-full" >
-                        <Logo onClick={handleClick} className="hover:cursor-pointer" />
+                        <Logo onClick={handleClick} className="hover:cursor-pointer z-50" />
+
                         {currentUser ? (
                             <div>
                                 <Menu as="div" className="relative inline-block text-left text-white">
@@ -121,7 +121,7 @@ const Navbar = () => {
                                 </Menu>
                             </div>
                         ) : (
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 z-50">
                                 <Link href='/signin'><Button className="hover:cursor-pointer text-white">Sign In</Button></Link>
                                 <Link href='/signup'><Button className="hover:cursor-pointer bg-white text-black">Get Started</Button></Link>
                             </div>
