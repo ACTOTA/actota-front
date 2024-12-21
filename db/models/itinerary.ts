@@ -1,5 +1,5 @@
 export interface FeaturedVacation {
-  _id: Object  // MongoDB ObjectId as string
+  _id?: Object;
   trip_name: string;
   person_cost: number;
   length_days: number;
@@ -7,19 +7,30 @@ export interface FeaturedVacation {
   start_location: Location;
   end_location: Location;
   description: string;
-  activities: Activity[];
-  images: string[];
+  days: Days;
+  activities?: Activity[];
+  images?: string[];
   created_at?: Date;
   updated_at?: Date;
 }
 
 interface Location {
   name: string;
-  coordinates: [number, number];  // Tuple of two numbers
+  coordinates: [number, number];
+}
+
+interface Day {
+  time: string; // Using string for time in format "HH:mm:ss"
+  location: Location;
+  name: string;
+}
+
+interface Days {
+  [key: string]: Day[];
 }
 
 interface Activity {
-  time: string;  // Time in format "HH:mm"
-  location: Location;
-  name: string;
+  label: string;
+  description: string;
+  tags: string[];
 }

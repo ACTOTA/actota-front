@@ -9,6 +9,7 @@ import Image from 'next/image';
 import GlassPanel from '@/app/components/figma/GlassPanel';
 import { Theme } from '@/app/components/enums/theme';
 import Button from '@/app/components/figma/Button';
+import DayView from './DayView';
 
 export default function Itinerary() {
   const pathname = usePathname() as string;
@@ -30,10 +31,6 @@ export default function Itinerary() {
     };
     fetchListings();
   }, []);
-
-  // useEffect(() => {
-  //   const name = listing;
-  // }, [listing]);
 
   if (isLoading) {
     return <div className='text-white'>Loading...</div>;
@@ -102,6 +99,10 @@ export default function Itinerary() {
             </div>
           </div>
 
+          <div className='h-full w-full bg-white'>
+            <DayView listing={listing} />
+          </div>
+
         </div>
         <div className='col-span-2'>
           <div className='neutral-02 rounded-lg p-4 flex flex-col justify-around gap-1 text-neutral-04'>
@@ -122,6 +123,8 @@ export default function Itinerary() {
             </Button>
           </div>
         </div>
+
+
       </div>
     </section>
   );

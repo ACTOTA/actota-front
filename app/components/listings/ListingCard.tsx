@@ -53,7 +53,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
                             <h4 className='text-sm text-neutral-04'>{data.start_location.name}, {data.end_location.name}</h4>
                             <div className='flex gap-4 text-xs text-neutral-03'>
                                 <p>{data.length_days} {data.length_days > 1 ? "Days" : "Day"}</p>
-                                <p>{data.activities.length} {data.activities.length > 1 ? "Activities" : "Activity"}</p>
+                                <p>{data.days.length} {data.days.length > 1 ? "Activities" : "Activity"}</p>
                             </div>
 
 
