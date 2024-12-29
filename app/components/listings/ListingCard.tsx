@@ -55,6 +55,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
                                 <p>{data.length_days} {data.length_days > 1 ? "Days" : "Day"}</p>
                                 <p>{data.days.length} {data.days.length > 1 ? "Activities" : "Activity"}</p>
                             </div>
+                            <h3>From ${data.person_cost}</h3>
                         </div>
                     </GlassPanel>
                 </div>

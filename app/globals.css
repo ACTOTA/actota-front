@@ -259,3 +259,92 @@ Stroke-Blue {
   }
 }
 
+
+.rmsc {
+    --rmsc-main: #1F2937;
+    --rmsc-hover: #374151;
+    --rmsc-selected: #4B5563;
+    --rmsc-border: #374151;
+    --rmsc-gray: #D1D5DB;
+    --rmsc-bg: #1F2937;
+}
+
+.multi-select-container {
+    width: 100%;
+    background: #1F2937;
+    border-radius: 8px;
+}
+
+.rmsc .dropdown-heading {
+    outline: none;
+    border: 1px solid #374151;
+    box-shadow: none;
+    padding: 8px 12px;
+    background: #1F2937;
+}
+
+.rmsc .dropdown-content {
+    /* background: #1F2937; */
+    background: none;
+    border: 1px solid #374151;
+    border-radius: 8px;
+    margin-top: 4px;
+}
+
+.rmsc .item-renderer {
+    color: #D1D5DB;
+    font-size: 14px;
+    padding: 8px 12px;
+}
+
+.rmsc .item-renderer:hover {
+    background: #374151;
+}
+
+.rmsc .dropdown-heading:focus {
+    border: 1px solid #4B5563;
+}
+
+.rmsc .search input {
+    background: #1F2937;
+    color: #D1D5DB;
+    border: 1px solid #374151;
+}
+
+.dropdown-container {
+    background: transparent;
+    border: 1px solid #374151;
+    border-radius: 8px;
+}
+
+.rmsc .dropdown-content {
+    /* background: #1F2937; */
+    background: none;
+    border: 1px solid #374151;
+    margin-top: 4px;
+}
+
+.rmsc .search {
+    padding: 8px;
+    background: #1F2937;
+}
+
+.rmsc .search input {
+    background: #1F2937;
+    color: #D1D5DB;
+    border: 1px solid #374151;
+    padding: 6px 8px;
+}
+
+.rmsc .item-renderer {
+    background: #1F2937;
+    color: #D1D5DB;
+    display: flex;
+    align-items: center;
+    padding: 8px;
+}
+
+.rmsc .item-renderer:hover {
+    background: #374151;
+}
+
