@@ -99,7 +99,7 @@ export default function Itinerary() {
             </div>
           </div>
 
-          <div className='h-full w-full bg-white'>
+          <div className='h-full w-full'>
             <DayView listing={listing} />
           </div>
 
