@@ -43,6 +43,9 @@ export default function Search({ setClasses }: { setClasses?: Dispatch<SetStateA
   const [currStep, setCurrStep] = useState<STEPS | null>(null);
   const [className, setClassName] = useState<string>('');
   const [mapLoaded, setMapLoaded] = useState(false);
+  // When
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
   // Who
   const [selectedGuests, setSelectedGuests] = useState<Guests>({ adults: 1, children: 0, infants: 0 });
   // What
@@ -126,6 +129,19 @@ export default function Search({ setClasses }: { setClasses?: Dispatch<SetStateA
     ));
   }, [selectedGuests]);
 
+  useEffect(() => {
+    setSearchSections(prev => prev.map(section =>
+      section.step === STEPS.DATE
+        ? {
+          ...section,
+          subtitle: startDate && endDate
+            ? `${Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))} days`
+            : 'Duration'
+        }
+        : section
+    ));
+  }, [startDate, endDate]);
+
   const handleSelect = (selectedStep: STEPS) => {
     setCurrStep(prevStep => prevStep === selectedStep ? null : selectedStep);
     setSearchSections(prevSections =>
@@ -182,7 +198,12 @@ export default function Search({ setClasses }: { setClasses?: Dispatch<SetStateA
             before:rounded-3xl rounded-3xl flex flex-col justify-center items-center box-content w-[${dimensions.w}px]`}
           ref={stepsEle}>
           {currStep === STEPS.LOCATION && <LocationMenu />}
-          {currStep === STEPS.DATE && <DateMenu />}
+          {currStep === STEPS.DATE && <DateMenu
+            startDate={startDate}
+            setStartDate={setStartDate}
+            endDate={endDate}
+            setEndDate={setEndDate}
+          />}
           {currStep === STEPS.GUESTS && <GuestMenu
             selectedGuests={selectedGuests}
             setSelectedGuests={setSelectedGuests}

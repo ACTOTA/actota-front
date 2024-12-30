@@ -2,8 +2,14 @@ import React, { useState } from 'react';
 import DateMenuCalendar from '../figma/DateMenuCalendar';
 
 
+interface DateMenuProps {
+    startDate: Date | null;
+    setStartDate: React.Dispatch<React.SetStateAction<Date | null>>;
+    endDate: Date | null;
+    setEndDate: React.Dispatch<React.SetStateAction<Date | null>>;
+}
 
-export default function DateMenu() {
+export default function DateMenu({ startDate, setStartDate, endDate, setEndDate }: DateMenuProps) {
     const [startTime, setStartTime] = useState('09:00');
     const [endTime, setEndTime] = useState('17:00');
 
@@ -16,15 +22,39 @@ export default function DateMenu() {
     ]);
 
     const handleDateRangeChange = (startDate: string | null, endDate: string | null) => {
-        console.log('Date range changed:', startDate, endDate);
-    }
+        if (startDate) {
+            const [hours, minutes] = startTime.split(':');
+            const startDateTime = new Date(startDate);
+            startDateTime.setHours(parseInt(hours), parseInt(minutes));
+            setStartDate(startDateTime);
+        }
+
+        if (endDate) {
+            const [hours, minutes] = endTime.split(':');
+            const endDateTime = new Date(endDate);
+            endDateTime.setHours(parseInt(hours), parseInt(minutes));
+            setEndDate(endDateTime);
+        }
+    };
 
     const handleStartTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setStartTime(e.target.value);
+        if (startDate) {
+            const [hours, minutes] = e.target.value.split(':');
+            const newDate = new Date(startDate);
+            newDate.setHours(parseInt(hours), parseInt(minutes));
+            setStartDate(newDate);
+        }
     }
 
     const handleEndTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setEndTime(e.target.value);
+        if (endDate) {
+            const [hours, minutes] = e.target.value.split(':');
+            const newDate = new Date(endDate);
+            newDate.setHours(parseInt(hours), parseInt(minutes));
+            setEndDate(newDate);
+        }
     }
 
     // Generate time options from 00:00 to 23:45 in 15-minute increments
@@ -45,7 +75,9 @@ export default function DateMenu() {
 
     return (
         <section className="w-full flex-col justify-center items-center gap-2 p-6">
-            <DateMenuCalendar onDateRangeChange={handleDateRangeChange} />
+            <DateMenuCalendar
+                onDateRangeChange={handleDateRangeChange}
+            />
             <div className='w-full grid grid-cols-2 gap-4'>
                 <div className="justify-start items-center gap-4 inline-flex">
                     <div className="text-white text-base font-bold font-['Manrope'] leading-normal">Start</div>

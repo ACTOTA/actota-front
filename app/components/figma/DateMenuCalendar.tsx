@@ -16,6 +16,13 @@ export default function DateMenuCalendar({ onDateRangeChange }: DateMenuCalendar
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
 
+  const isPastOrToday = (date: string) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const compareDate = new Date(date);
+    return compareDate <= today;
+  };
+
   const goBack = () => {
     if (currentMonth === 0) {
       setCurrentYear(currentYear - 1);
@@ -47,6 +54,8 @@ export default function DateMenuCalendar({ onDateRangeChange }: DateMenuCalendar
 
 
   const handleDateSelect = (date: string) => {
+    if (isPastOrToday(date)) return; // Prevent selection of past dates
+
     let newStartDate = startDate;
     let newEndDate = endDate;
 
@@ -120,8 +129,10 @@ export default function DateMenuCalendar({ onDateRangeChange }: DateMenuCalendar
                   key={day.date}
                   type="button"
                   onClick={() => handleDateSelect(day.date)}
+                  disabled={isPastOrToday(day.date)}
                   className={classNames(
                     day.isCurrentMonth ? 'text-neural-06' : 'text-gray-700',
+                    isPastOrToday(day.date) && 'cursor-not-allowed',
                     dayIdx === 0 && 'rounded-tl-lg',
                     dayIdx === 6 && 'rounded-tr-lg',
                     dayIdx === month.days.length - 7 && 'rounded-bl-lg',
@@ -131,7 +142,6 @@ export default function DateMenuCalendar({ onDateRangeChange }: DateMenuCalendar
                     isEnd(day.date) && 'bg-white text-black rounded-r-lg',
                     isInRange(day.date) && 'translucent-white20 text-white'
                   )}
-
                 >
                   <time
                     dateTime={day.date}
