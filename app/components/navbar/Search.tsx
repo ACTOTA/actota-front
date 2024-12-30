@@ -21,6 +21,12 @@ export interface Lodging {
   label: string;
 }
 
+export interface Guests {
+  adults: number;
+  children: number;
+  infants: number;
+}
+
 type SearchSection = {
   step: STEPS;
   title: string;
@@ -29,12 +35,17 @@ type SearchSection = {
   isSelected: boolean;
 }
 
+
+
 export default function Search({ setClasses }: { setClasses?: Dispatch<SetStateAction<string>> }) {
 
 
   const [currStep, setCurrStep] = useState<STEPS | null>(null);
   const [className, setClassName] = useState<string>('');
   const [mapLoaded, setMapLoaded] = useState(false);
+  // Who
+  const [selectedGuests, setSelectedGuests] = useState<Guests>({ adults: 1, children: 0, infants: 0 });
+  // What
   const [selectedActivities, setSelectedActivities] = useState<Activity[]>([]);
   const [lodging, setLodging] = useState<Lodging[]>([]);
 
@@ -103,6 +114,18 @@ export default function Search({ setClasses }: { setClasses?: Dispatch<SetStateA
     ));
   }, [selectedActivities]);
 
+  useEffect(() => {
+    const total = selectedGuests.adults + selectedGuests.children + selectedGuests.infants;
+    setSearchSections(prev => prev.map(section =>
+      section.step === STEPS.GUESTS
+        ? {
+          ...section,
+          subtitle: total <= 1 ? '1 Guest' : `${total} Guests`
+        }
+        : section
+    ));
+  }, [selectedGuests]);
+
   const handleSelect = (selectedStep: STEPS) => {
     setCurrStep(prevStep => prevStep === selectedStep ? null : selectedStep);
     setSearchSections(prevSections =>
@@ -160,7 +183,10 @@ export default function Search({ setClasses }: { setClasses?: Dispatch<SetStateA
           ref={stepsEle}>
           {currStep === STEPS.LOCATION && <LocationMenu />}
           {currStep === STEPS.DATE && <DateMenu />}
-          {currStep === STEPS.GUESTS && <GuestMenu />}
+          {currStep === STEPS.GUESTS && <GuestMenu
+            selectedGuests={selectedGuests}
+            setSelectedGuests={setSelectedGuests}
+          />}
           {currStep === STEPS.ACTIVITIES &&
             <ActivitiesMenu
               selectedActivities={selectedActivities}
