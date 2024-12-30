@@ -1,28 +1,28 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import ItineraryDropdown from '../figma/ItineraryDropdown';
 import get_activities from '@/services/api/activities';
 import get_lodging from '@/services/api/lodging';
 import Toggle from '../figma/Toggle';
 import { MultiSelect } from "react-multi-select-component";
 import { BiCar, BiHome, BiWalk } from 'react-icons/bi';
-import { HomeIcon } from '@heroicons/react/20/solid';
+import { Activity, Lodging } from './Search';
 
-interface Activity {
-    _id: string;
-    label: string;
-}
-interface Lodging {
-    _id: string;
-    label: string;
+interface ActivitiesMenuProps {
+    selectedActivities: Activity[];
+    setSelectedActivities: React.Dispatch<React.SetStateAction<Activity[]>>;
+    lodging: Lodging[];
+    setLodging: React.Dispatch<React.SetStateAction<Lodging[]>>;
 }
 
-export default function ActivitiesMenu() {
-    const [activities, setActivities] = useState([]); // Add this state
-    const [selectedActivities, setSelectedActivities] = useState([]);
-    const [lodging, setLodging] = useState([]);
-    const [selectedLodging, setSelectedLodging] = useState([]);
+interface Option {
+    label: string;
+    value: string;
+}
+
+export default function ActivitiesMenu({ selectedActivities, setSelectedActivities, lodging, setLodging }: ActivitiesMenuProps) {
+    const [activities, setActivities] = useState<Activity[]>([]);
+    const [selectedLodging, setSelectedLodging] = useState<Lodging[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [trans, setTrans] = useState(false);
 
@@ -50,15 +50,10 @@ export default function ActivitiesMenu() {
         fetchLodging();
     }, []);
 
-    const toggle = () => {
-        setTrans(!trans);
-        console.log('Transportation: ', trans);
-    }
 
     return (
         <section className="flex flex-col gap-4 h-full w-[520px] z-20 text-lg p-4">
             <div>
-
                 <div className='flex gap-3'>
                     <BiWalk className='h-6 w-6' />
                     <p>Activities</p>
@@ -69,12 +64,23 @@ export default function ActivitiesMenu() {
                         label: act.label,
                         value: act._id
                     }))}
-                    value={selectedActivities}
-                    onChange={setSelectedActivities}
+                    value={selectedActivities.map((act: Activity) => ({
+                        label: act.label,
+                        value: act._id
+                    }))}
+                    onChange={(selected: Option[]) => {
+                        const uniqueSelected = Array.from(
+                            new Set(selected.map((s: Option) => s.value))
+                        ).map(value =>
+                            activities.find(act => act._id === value)
+                        ).filter((item): item is Activity => !!item);
+
+                        setSelectedActivities(uniqueSelected);
+                    }}
                     labelledBy="Select activities"
-                    isLoading={isLoading}
                     className="multi-select-container"
                 />
+
             </div>
 
             <div>
@@ -88,8 +94,19 @@ export default function ActivitiesMenu() {
                         label: lodge.label,
                         value: lodge._id
                     }))}
-                    value={selectedLodging}
-                    onChange={setSelectedLodging}
+                    value={selectedLodging.map((lodge: Lodging) => ({
+                        label: lodge.label,
+                        value: lodge._id
+                    }))}
+                    onChange={(selected: Option[]) => {
+                        const uniqueSelected = Array.from(
+                            new Set(selected.map((s: Option) => s.value))
+                        ).map(value =>
+                            lodging.find(act => act._id === value)
+                        ).filter((item): item is Lodging => !!item);
+
+                        setSelectedLodging(uniqueSelected);
+                    }}
                     labelledBy="Select lodging"
                     isLoading={isLoading}
                     className="multi-select-container"
