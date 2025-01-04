@@ -14,7 +14,7 @@ export interface FeaturedVacation {
   updated_at?: Date;
 }
 
-interface Location {
+export interface Location {
   name: string;
   coordinates: [number, number];
 }

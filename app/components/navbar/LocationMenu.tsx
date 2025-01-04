@@ -1,15 +1,18 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import Button from '../figma/Button';
 import MapPage from '../MapPage';
 import get_locations from '@/services/api/locations';
 
-interface Location {
-    city: string;
-    state: string;
+// const DEFAULT_COORDINATES = [-104.9903, 39.7392]; // Denver, CO
+
+
+interface LocationMenuProps {
+    mapLocation: Location;
+    setMapLocation: React.Dispatch<React.SetStateAction<Location>>;
 }
 
-export default function LocationMenu() {
+export default function LocationMenu({ mapLocation, setMapLocation }: LocationMenuProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [results, setResults] = useState<Location[]>([]);
     const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
@@ -30,11 +33,20 @@ export default function LocationMenu() {
         }, 500);
     };
 
+
     const handleLocationSelect = (location: Location) => {
+        const newMapLocation: Location = {
+            name: `${location.city}, ${location.state}`,
+            coordinates: location.coordinates
+        };
+
         setSelectedLocation(location);
         setSearchTerm(`${location.city}, ${location.state}`);
+        // Use function updater pattern
+        setMapLocation(() => newMapLocation);
         setResults([]);
     };
+
 
     return (
         <section className={`flex flex-col justify-between gap-6 py-6 h-full w-[584px] z-20 p-4`}>
@@ -73,7 +85,10 @@ export default function LocationMenu() {
                 </div>
             </div>
             <div className="w-full">
-                <MapPage visible={true} />
+                <MapPage
+                    visible={true}
+                    location={mapLocation}
+                />
             </div>
             <Button className="bg-white text-black h-14 w-full" disabled={!selectedLocation}>
                 <p>Confirm Location</p>

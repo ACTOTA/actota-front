@@ -8,6 +8,7 @@ import DateMenu from './DateMenu';
 import GuestMenu from './GuestMenu';
 import ActivitiesMenu from './ActivitiesMenu';
 import { STEPS } from '../../types/steps';
+import { Location } from "@/db/models/itinerary";
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
 
@@ -43,6 +44,8 @@ export default function Search({ setClasses }: { setClasses?: Dispatch<SetStateA
   const [currStep, setCurrStep] = useState<STEPS | null>(null);
   const [className, setClassName] = useState<string>('');
   const [mapLoaded, setMapLoaded] = useState(false);
+  // Where
+  const [mapLocation, setMapLocation] = useState<Location>({ name: 'Denver, CO', coordinates: [-104.9903, 39.7392] });
   // When
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
@@ -197,7 +200,9 @@ export default function Search({ setClasses }: { setClasses?: Dispatch<SetStateA
         <div className={`m-auto mt-4 glass-dark glass-corner backdrop-filter backdrop-blur-md stroke-glass-01
             before:rounded-3xl rounded-3xl flex flex-col justify-center items-center box-content w-[${dimensions.w}px]`}
           ref={stepsEle}>
-          {currStep === STEPS.LOCATION && <LocationMenu />}
+          {currStep === STEPS.LOCATION && <LocationMenu
+            mapLocation={mapLocation}
+            setMapLocation={setMapLocation} />}
           {currStep === STEPS.DATE && <DateMenu
             startDate={startDate}
             setStartDate={setStartDate}
