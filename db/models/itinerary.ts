@@ -15,7 +15,8 @@ export interface FeaturedVacation {
 }
 
 export interface Location {
-  name: string;
+  city: string;
+  state: string;
   coordinates: [number, number];
 }
 

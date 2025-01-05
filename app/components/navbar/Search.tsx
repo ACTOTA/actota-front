@@ -45,7 +45,7 @@ export default function Search({ setClasses }: { setClasses?: Dispatch<SetStateA
   const [className, setClassName] = useState<string>('');
   const [mapLoaded, setMapLoaded] = useState(false);
   // Where
-  const [mapLocation, setMapLocation] = useState<Location>({ name: 'Denver, CO', coordinates: [-104.9903, 39.7392] });
+  const [mapLocation, setMapLocation] = useState<Location>();
   // When
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
@@ -106,6 +106,17 @@ export default function Search({ setClasses }: { setClasses?: Dispatch<SetStateA
       return () => document.removeEventListener('scroll', handleScroll);
     }, 100);
   }, [searchRef, setClasses]);
+
+  useEffect(() => {
+    setSearchSections(prev => prev.map(section =>
+      section.step === STEPS.LOCATION
+        ? {
+          ...section,
+          subtitle: mapLocation ? `${mapLocation.city}, ${mapLocation.state}` : "Trip Details"
+        }
+        : section
+    ));
+  }, [mapLocation]);
 
   useEffect(() => {
     setSearchSections(prev => prev.map(section =>

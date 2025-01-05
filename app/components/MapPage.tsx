@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api';
+import { GoogleMap, Marker } from '@react-google-maps/api';
+import { Location } from '@/db/models/itinerary';
 
 const containerStyle = {
   width: '100%',
@@ -8,13 +9,9 @@ const containerStyle = {
 
 const defaultCenter = { lat: 39.7392, lng: -104.9903 }; // Denver, CO
 
-interface Location {
-  name: string;
-  coordinates: [number, number]; // [longitude, latitude]
-}
-
 interface MapProps {
-  location?: Location;
+  mapLocation?: Location;
+  setMapLocation?: React.Dispatch<React.SetStateAction<Location>>;
   center?: {
     lat: number;
     lng: number;
@@ -22,37 +19,34 @@ interface MapProps {
   zoom?: number;
 }
 
-const Map: React.FC<MapProps> = ({ location, center = defaultCenter, zoom = 11 }) => {
+const Map: React.FC<MapProps> = ({ mapLocation, setMapLocation, zoom = 11 }) => {
   const [map, setMap] = useState<google.maps.Map | null>(null);
 
-
-  const safeCenter = location ? {
-    lat: location.coordinates[1],
-    lng: location.coordinates[0]
-  } : {
-    lat: center.lat ?? defaultCenter.lat,
-    lng: center.lng ?? defaultCenter.lng
-  };
+  useEffect(() => {
+    if (map && mapLocation) {
+      const newCenter = {
+        lat: mapLocation.coordinates[1],
+        lng: mapLocation.coordinates[0]
+      };
+      map.panTo(newCenter);
+    }
+  }, [mapLocation, map]);
 
   useEffect(() => {
-    if (map && location) {
-      map.panTo(safeCenter);
-      map.setZoom(zoom);
-    }
-  }, [location, map, safeCenter, zoom]);
-
+    console.log('Map loaded', mapLocation);
+  }, [mapLocation]);
 
   return (
     <GoogleMap
       mapContainerStyle={containerStyle}
-      center={safeCenter}
+      center={mapLocation ? { lat: mapLocation.coordinates[1], lng: mapLocation.coordinates[0] } : defaultCenter}
       zoom={zoom}
       mapContainerClassName='rounded-lg'
       onLoad={(map) => setMap(map)}
     >
       <Marker
-        position={safeCenter}
-        title={location?.name || "Denver"}
+        position={mapLocation ? { lat: mapLocation.coordinates[1], lng: mapLocation.coordinates[0] } : defaultCenter}
+        title={mapLocation ? `${mapLocation.city}, ${mapLocation.state}` : 'Denver, CO'}
       />
     </GoogleMap>
   );
@@ -60,16 +54,17 @@ const Map: React.FC<MapProps> = ({ location, center = defaultCenter, zoom = 11 }
 
 interface MapPageProps {
   visible: boolean;
-  location?: Location;
+  mapLocation?: Location;
+  setMapLocation?: React.Dispatch<React.SetStateAction<Location>>;
 }
 
-function MapPage({ visible, location }: MapPageProps) {
+function MapPage({ visible, mapLocation, setMapLocation }: MapPageProps) {
   return (
     <div>
       {visible && (
         <Map
-          key={location ? `${location.coordinates[0]}-${location.coordinates[1]}` : 'default'}
-          location={location}
+          mapLocation={mapLocation}
+          setMapLocation={setMapLocation}
         />
       )}
     </div>
@@ -77,4 +72,3 @@ function MapPage({ visible, location }: MapPageProps) {
 }
 
 export default MapPage;
-

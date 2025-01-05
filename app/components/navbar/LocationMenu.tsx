@@ -3,6 +3,7 @@ import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import Button from '../figma/Button';
 import MapPage from '../MapPage';
 import get_locations from '@/services/api/locations';
+import { Location } from '@/db/models/itinerary';
 
 // const DEFAULT_COORDINATES = [-104.9903, 39.7392]; // Denver, CO
 
@@ -36,7 +37,8 @@ export default function LocationMenu({ mapLocation, setMapLocation }: LocationMe
 
     const handleLocationSelect = (location: Location) => {
         const newMapLocation: Location = {
-            name: `${location.city}, ${location.state}`,
+            city: location.city,
+            state: location.state,
             coordinates: location.coordinates
         };
 
@@ -87,7 +89,8 @@ export default function LocationMenu({ mapLocation, setMapLocation }: LocationMe
             <div className="w-full">
                 <MapPage
                     visible={true}
-                    location={mapLocation}
+                    mapLocation={mapLocation}
+                    setMapLocation={setMapLocation}
                 />
             </div>
             <Button className="bg-white text-black h-14 w-full" disabled={!selectedLocation}>
