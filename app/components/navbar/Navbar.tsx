@@ -14,6 +14,7 @@ import { signOut } from "@/app/actions/signout";
 
 const Navbar = () => {
 
+    const [scrolled, setScrolled] = useState(false);
     const [currentUser, setCurrentUser] = useState<SessionUser | null>(null)
     const [loading, setLoading] = useState(true)
     const path = usePathname();
@@ -36,6 +37,20 @@ const Navbar = () => {
         loadUser()
     }, [])
 
+    useEffect(() => {
+        const handleScroll = () => {
+            const viewportHeight = window.innerHeight;
+            if (window.scrollY >= viewportHeight) {
+                setScrolled(true);
+            } else {
+                setScrolled(false);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [scrolled]);
+
     const handleClick = () => {
         if (path !== "/") {
             window.location.href = "/";
@@ -50,7 +65,8 @@ const Navbar = () => {
     if (loading) return null
 
     return (
-        <div className="fixed h-24 z-30 w-full text-white flex items-center">
+        <div className={`fixed h-24 z-30 w-full text-white flex items-center transition-all duration-300 ease-in-out
+            ${scrolled ? 'backdrop-blur-lg bg-black/20' : ''}`}>
             <div className="py-3 w-full h-full">
                 <div className="flex flex-row items-center justify-between w-full h-full p-3" >
                     <Logo onClick={handleClick} className="hover:cursor-pointer z-50" />

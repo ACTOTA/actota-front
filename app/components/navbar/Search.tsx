@@ -125,7 +125,7 @@ export default function Search({ setClasses }: { setClasses?: Dispatch<SetStateA
           ...section,
           subtitle: selectedActivities.length
             ? `${selectedActivities.length} ${selectedActivities.length === 1 ? 'activity' : 'activities'} selected`
-            : "Trip Details"
+            : "Location"
         }
         : section
     ));
@@ -168,7 +168,16 @@ export default function Search({ setClasses }: { setClasses?: Dispatch<SetStateA
 
   const handleSubmit = () => {
     console.log('Search submitted');
-    console.log(selectedActivities);
+    const form = {
+      location: mapLocation,
+      startDate,
+      endDate,
+      guests: selectedGuests,
+      activities: selectedActivities,
+      lodging
+    }
+
+    console.log(form);
   }
 
   return (
