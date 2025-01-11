@@ -14,15 +14,16 @@ import DayView from './DayView';
 export default function Itinerary() {
   const pathname = usePathname() as string;
   const objectId = pathname.substring(pathname.lastIndexOf('/') + 1);
-
   const [listing, setListings] = useState<FeaturedVacation>();
   const [isLoading, setIsLoading] = useState(true);
+  const [mainPhoto, setMainPhoto] = useState<string>("");
 
   useEffect(() => {
     const fetchListings = async () => {
       try {
         const fetchedListing = await get_itinerary_by_id(objectId);
         setListings(fetchedListing);
+        setMainPhoto(fetchedListing.images[0]);
       } catch (error) {
         console.error('Failed to fetch activities:', error);
       } finally {
@@ -40,6 +41,17 @@ export default function Itinerary() {
     return <div className='text-white'>No data available</div>;
   }
 
+  const handleBooking = () => {
+    console.log("start_date", listing.start_date);
+    if (!listing?.start_date) return;
+    const timestamp = listing.start_date.getTime() / 1000;
+    window.location.href = `https://fareharbor.com/embeds/book/adventurecoloradotours/items/${listing.fareharbor_id}/availability/${timestamp}/book/?full-items=yes&flow=345668`;
+  };
+
+  const clickImage = (image: string) => {
+    setMainPhoto(image);
+  }
+
   return (
     <section className='w-full h-full text-white px-9'>
       <div className='h-16' />
@@ -55,18 +67,21 @@ export default function Itinerary() {
 
       </div>
       <div className='grid grid-cols-7 gap-6 my-4'>
-        <div className='col-span-5 flex flex-col gap-4 relative w-full h-[600px]'>
-          <Image
-            src={listing.images[0]}
-            alt='Image of tour'
-            width={928}
-            height={640}
-            sizes='100vw'
-            className='w-full h-auto rounded-lg'
-          />
+        <div className='col-span-5 flex flex-col gap-4 w-full h-[600px]'>
+          <div className='w-full aspect-[926/640] relative'>
+            <Image
+              src={mainPhoto}
+              alt='Image of tour'
+              fill
+              priority
+              className='rounded-lg object-cover'
+              sizes='(max-width: 1536px) 71vw'
+            />
+          </div>
+
           <div className='flex gap-4'>
             {listing.images.map((image, i) => (
-              <div key={i}>
+              <div key={i} className='cursor-pointer' onClick={() => clickImage(image)}>
                 <Image
                   src={image}
                   alt='Image of tour'
@@ -117,14 +132,12 @@ export default function Itinerary() {
               <p>Total amount</p>
               <p>${listing.person_cost}</p>
             </div>
-            <Button className='bg-white rounded-full p-2 text-black text-sm font-bold'>
+            <Button className='bg-white rounded-full p-2 text-black text-sm font-bold' onClick={handleBooking}>
               <p>Proceed to Payment</p>
               <ArrowRightIcon className='h-6 w-6' />
             </Button>
           </div>
         </div>
-
-
       </div>
     </section>
   );

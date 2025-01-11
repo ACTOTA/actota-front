@@ -26,7 +26,7 @@ export default function Hero() {
                         </span>
                         <h2 className="m-auto text-center">with a Few Clicks</h2>
                         <div className="h-8" />
-                        <div className={`h-full z-50 ${classes}`}>
+                        <div className={`z-50 ${classes}`}>
                             <Search setClasses={setClasses} />
                         </div>
                     </div>

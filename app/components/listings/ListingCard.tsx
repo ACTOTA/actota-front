@@ -40,9 +40,10 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
     return (
         <div onClick={() => router.push(`/listings/${(data._id as { $oid: string }).$oid}`)}
-            className='grid gap- 2 col-span-1 hover:cursor-pointer group w-[308px] h-[400px] bg-white rounded-lg text-white'>
+            className='hover:cursor-pointer group min-w-[308px] h-[400px] bg-white rounded-2xl text-white
+            border border-[#ececec] flex-col justify-between items-end inline-flex overflow-hidden'>
 
-            <div className='relative h-full'>
+            <div className='relative h-full w-full'>
                 <Image src={data.images[0] || ""} alt="Vacation Picture" layout='fill' objectFit='cover' className='rounded-lg' />
 
                 <div className="flex flex-col w-full p-2">
@@ -50,7 +51,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
                         theme={Theme.Dark}>
                         <div className='p-4'>
                             <h3 className='font-bold'>{data.trip_name}</h3>
-                            <h4 className='text-sm text-neutral-04'>{data.start_location.name}, {data.end_location.name}</h4>
+                            <h4 className='text-sm text-neutral-04'>{data.start_location.city}</h4>
                             <div className='flex gap-4 text-xs text-neutral-03'>
                                 <p>{data.length_days} {data.length_days > 1 ? "Days" : "Day"}</p>
                                 <p>{data.days.length} {data.days.length > 1 ? "Activities" : "Activity"}</p>
