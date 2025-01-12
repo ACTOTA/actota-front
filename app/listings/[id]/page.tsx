@@ -10,20 +10,21 @@ import GlassPanel from '@/app/components/figma/GlassPanel';
 import { Theme } from '@/app/components/enums/theme';
 import Button from '@/app/components/figma/Button';
 import DayView from './DayView';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/16/solid';
 
 export default function Itinerary() {
   const pathname = usePathname() as string;
   const objectId = pathname.substring(pathname.lastIndexOf('/') + 1);
   const [listing, setListings] = useState<FeaturedVacation>();
   const [isLoading, setIsLoading] = useState(true);
-  const [mainPhoto, setMainPhoto] = useState<string>("");
+  const [mainPhoto, setMainPhoto] = useState<{}>();
 
   useEffect(() => {
     const fetchListings = async () => {
       try {
         const fetchedListing = await get_itinerary_by_id(objectId);
         setListings(fetchedListing);
-        setMainPhoto(fetchedListing.images[0]);
+        setMainPhoto({ 0: fetchedListing.images[0] });
       } catch (error) {
         console.error('Failed to fetch activities:', error);
       } finally {
@@ -48,8 +49,26 @@ export default function Itinerary() {
     window.location.href = `https://fareharbor.com/embeds/book/adventurecoloradotours/items/${listing.fareharbor_id}/availability/${timestamp}/book/?full-items=yes&flow=345668`;
   };
 
-  const clickImage = (image: string) => {
-    setMainPhoto(image);
+  const clickImage = (i: number, image: string) => {
+    setMainPhoto({ [i]: image });
+  }
+  const prevImage = () => {
+    let key = Object.keys(mainPhoto)[0];
+    if (parseInt(key) + 1 < listing.images.length) {
+      setMainPhoto({ [parseInt(key) + 1]: listing.images[parseInt(key) + 1] });
+    } else {
+      setMainPhoto({ 0: listing.images[0] });
+    }
+  }
+
+
+  const nextImage = () => {
+    let key = Object.keys(mainPhoto)[0];
+    if (parseInt(key) - 1 >= 0) {
+      setMainPhoto({ [parseInt(key) - 1]: listing.images[parseInt(key) - 1] });
+    } else {
+      setMainPhoto({ [listing.images.length - 1]: listing.images[listing.images.length - 1] });
+    }
   }
 
   return (
@@ -70,18 +89,23 @@ export default function Itinerary() {
         <div className='col-span-5 flex flex-col gap-4 w-full h-[600px]'>
           <div className='w-full aspect-[926/640] relative'>
             <Image
-              src={mainPhoto}
+              src={Object.values(mainPhoto)[0]}
               alt='Image of tour'
               fill
               priority
               className='rounded-lg object-cover'
               sizes='(max-width: 1536px) 71vw'
             />
+            <GlassPanel className='absolute bottom-0 left-1/2 -translate-x-1/2 h-12 rounded-full m-2 flex items-center px-2' theme={Theme.Light}>
+              <ChevronLeftIcon className='h-6 w-6 cursor-pointer' onClick={nextImage} />
+              <div>{Number(Object.keys(mainPhoto)[0]) + 1} of {listing.images.length}</div>
+              <ChevronRightIcon className='h-6 w-6 cursor-pointer' onClick={prevImage} />
+            </GlassPanel>
           </div>
 
           <div className='flex gap-4'>
             {listing.images.map((image, i) => (
-              <div key={i} className='cursor-pointer' onClick={() => clickImage(image)}>
+              <div key={i} className={`${image == Object.values(mainPhoto)[0] ? 'border-blue-800 border-solid border-2 rounded-[10px]' : ''} cursor-pointer`} onClick={() => clickImage(i, image)}>
                 <Image
                   src={image}
                   alt='Image of tour'
