@@ -11,9 +11,11 @@ import Link from "next/link";
 import { Menu } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import { signOut } from "@/app/actions/signout";
+import Search from "./Search";
 
 const Navbar = () => {
 
+    const [classes, setClasses] = useState<string>('');
     const [scrolled, setScrolled] = useState(false);
     const [currentUser, setCurrentUser] = useState<SessionUser | null>(null)
     const [loading, setLoading] = useState(true)
@@ -70,6 +72,11 @@ const Navbar = () => {
             <div className="py-3 w-full h-full">
                 <div className="flex flex-row items-center justify-between w-full h-full p-3" >
                     <Logo onClick={handleClick} className="hover:cursor-pointer z-50" />
+
+                    {path !== "/" && <div className={`z-50 ${classes}`}>
+                        <Search setClasses={setClasses} />
+                    </div>}
+
 
                     {currentUser ? (
                         <div>
