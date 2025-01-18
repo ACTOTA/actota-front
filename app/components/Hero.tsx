@@ -2,11 +2,8 @@
 
 import React from 'react';
 import Image from 'next/image';
-import Search from './navbar/Search';
 
 export default function Hero() {
-
-    const [classes, setClasses] = React.useState<string>('');
 
     return (
         <div className="w-full h-[100vh] relative">
@@ -26,9 +23,6 @@ export default function Hero() {
                         </span>
                         <h2 className="m-auto text-center">with a Few Clicks</h2>
                         <div className="h-8" />
-                        <div className={`z-50 ${classes}`}>
-                            <Search setClasses={setClasses} />
-                        </div>
                     </div>
                 </div>
             </div>
