@@ -1,0 +1,53 @@
+'use client';
+
+import React, { useState } from 'react';
+import Image from 'next/image';
+import Search from '@/src/components/navbar/Search';
+import { Alex_Brush } from 'next/font/google';
+import { STEPS } from '../types/steps';
+
+const alexBrush = Alex_Brush({
+    weight: ['400'],
+    subsets: ['latin'],
+});
+
+export default function Hero() {
+    const [currStep, setCurrStep] = useState<STEPS | null>(null);
+    const [classes, setClasses] = React.useState<string>('');
+
+    return (
+        <div className="w-full h-[100vh] relative flex items-center justify-center">
+            <Image
+                width={10}
+                height={10}
+                src="/hero-bg.svg"
+                alt="hero background"
+                className="absolute inset-0 w-full h-screen object-cover"
+                priority
+            />
+
+            <div className={`relative w-full transition-all duration-700 ease-in-out  flex flex-col items-center justify-center
+                ${currStep != null ? 'h-full' : 'h-0'}`}>
+                <div className={` py-[50px] flex flex-col justify-center items-center bg-[url('/hero-bg-airoplane.svg')] bg-cover bg-center 
+                     duration-700 ease-in-out
+                     ${currStep != null ? 'opacity-0  pointer-events-none h-0' : 'opacity-100 h-[400px] translate-y-0'}
+                     `}>
+                    <p className='text-white text-7xl font-extrabold leading-[88px] text-center'>
+                        Book Your
+                        <span className={alexBrush.className}> Dream </span>
+                        Trip
+                    </p>
+                    
+                    <p className='text-white text-7xl font-extrabold leading-[88px] text-center flex items-center gap-2'>
+                        with a Few Clicks <img src="/svg-icons/mingcute-cursor.svg" alt="hero background" className="mt-6" />
+                    </p>
+                </div>
+                <div className={` h-full z-50 
+                    ${classes}`}>
+                    <Search setClasses={setClasses} currStep={currStep} setCurrStep={setCurrStep} />
+                </div>
+            </div>
+        </div>
+    );
+}
+
