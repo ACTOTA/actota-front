@@ -1,5 +1,6 @@
 'use client';
 
+import Container from "../Container";
 import Logo from "../Logo";
 import { useEffect, useState } from "react";
 import { SessionUser } from "@/app/types/session";
@@ -72,9 +73,9 @@ const Navbar = () => {
                 <div className="flex flex-row items-center justify-between w-full h-full p-3" >
                     <Logo onClick={handleClick} className="hover:cursor-pointer z-50" />
 
-                    <div className={`z-50 ${classes}`}>
-                        <Search setClasses={setClasses} path={path} />
-                    </div>
+                    {path !== "/" && <div className={`z-50 ${classes}`}>
+                        <Search setClasses={setClasses} />
+                    </div>}
 
 
                     {currentUser ? (
