@@ -6,6 +6,7 @@ import Newsletter from "@/src/components/Newsletter";
 import Footer from "@/src/components/Footer";
 import Head from 'next/head';
 import FeaturedItineraries from "@/src/components/FeaturedItineraries";
+import FAQs from '@/src/components/FAQs';
 
 export default async function Home() {
 
@@ -26,6 +27,7 @@ export default async function Home() {
       <ClientOnly>
         <FeaturedItineraries />
         <WhyBook />
+        <FAQs />
         <Newsletter />
         <Footer />
       </ClientOnly>

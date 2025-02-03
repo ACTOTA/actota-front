@@ -7,52 +7,57 @@ export default function WhyBook() {
   const info = [
     {
       theme: Theme.Activity,
-      image: <Image src="/images/route-icon.svg" alt="route icon" width={32} height={32}
-        className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2" />,
-      title: "Flexibility",
+      image: "/svg-icons/why-book-img1.svg",
+      title: "Customize your Itineraries",
       description: "Free cancellation and payment to satisfy your budget and plans."
     },
     {
       theme: Theme.Transportation,
-      image: <Image src="/images/route-icon.svg" alt="route icon" width={32} height={32}
-        className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2" />,
-      title: "Flexibility",
+      image: "/svg-icons/why-book-img2.svg",
+      title: "Allocate your Budget",
       description: "Free cancellation and payment to satisfy your budget and plans."
+
     },
     {
       theme: Theme.Lodging,
-      image: <Image src="/images/route-icon.svg" alt="route icon" width={32} height={32}
-        className="absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2" />,
-      title: "Flexibility",
+      image: "/svg-icons/why-book-img3.svg",
+      title: "Guide Experience",
       description: "Free cancellation and payment to satisfy your budget and plans."
     },
   ]
   return (
-    <section className="h-[100vh] w-full neutral-01 relative flex">
-      <div className="w-full h-96 absolute">
-        <Image src="/images/actota-backdrop.png" alt="actota backdrop" layout="fill" objectFit="contain" />
-      </div>
-      <div className="z-10 w-full h-full">
-        <div className="h-3/4 w-full flex flex-col justify-center">
 
-          <h1 className="text-white text-5xl m-auto text-center w-full">Why Book with Us?</h1>
-          <div className="flex justify-center items-center gap-8 self-stretch">
+    <div className='bg-[#00122D] w-full h-full'>
+      <section className="  p-[80px]  w-full  relative flex bg-gradient-to-b from-[rgba(9,14,21,0.50)] to-[#090E15]">
+
+        <div className=" max-w-[1440px] flex flex-col justify-center mx-auto">
+
+          <h2 className=" font-bold leading-[80px] sm:text-[64px] text-center text-white">
+            Why Book with Us?
+          </h2>
+          <p className='text-primary-gray mt-[16px] text-center'>With innovative features like itineraries customizing and budget allocation, we offer a seamless booking experience for your dream trip. </p>
+          <div className="flex justify-center items-center flex-wrap gap-8 self-stretch mt-[80px]">
             {info.map((item, i) => (
-              <GlassPanel key={i} theme={item.theme} className="h-[400px] w-[400px] text-white
-                flex flex-col p-8 relative">
-                <GlassPanel className="w-16 h-16 rounded-2xl relative">
-                  {item.image}
-                </GlassPanel>
-                <span className="text-left absolute bottom-8">
-                  <h2 className="text-xl font-bold">{item.title}</h2>
-                  <p>{item.description}</p>
-                </span>
-              </GlassPanel>
+              <div className='flex-1 max-w-[400px]  bg-gradient-to-br  from-[#CFCFCF]/50 to-[#6B6B6B]/30   rounded-lg'>
+
+                <div key={i} className="h-[380px] w-[400px] text-white 
+                flex flex-col p-2   bg-black/60   rounded-lg">
+                  <div className=" flex justify-center   items-center rounded-2xl">
+                    <Image src={item.image} alt="route icon" objectFit="cover" height={240} width={390}
+                    />
+                  </div>
+                  <div className=" mt-5 ">
+                    <h2 className="text-xl font-bold">{item.title}</h2>
+                    <p className='text-primary-gray mt-2'>{item.description}</p>
+                  </div>
+                </div>
+              </div>
+
             ))}
 
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   )
 }

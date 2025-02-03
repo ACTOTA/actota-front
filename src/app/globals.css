@@ -5,17 +5,6 @@
 body {
   background-color: black;
 }
-.border-gradient {
-  border: 5px solid;
-  border-image-source: linear-gradient(to left, #666666, #DEDEDE);
-  border-image-slice: 1;
-  /* border-radius: 40px; */
-  border-radius: 200px !important;
-  overflow: hidden !important;
-  /* Ensures the border follows the rounded corners */
-  -webkit-mask-image: radial-gradient(circle, white 100%, transparent 100%);
-  mask-image: radial-gradient(circle, white 100%, transparent 100%);
-}
 
 /* 
 html,
