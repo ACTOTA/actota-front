@@ -32,7 +32,7 @@ const FAQs = () => {
                         Frequently asked questions
                     </h2>
                     <p className='text-primary-gray my-10'>Can’t find what you’re looking for?</p>
-                    <Button className="bg-white text-black">Contact us</Button>
+                    <Button variant="primary" className="bg-white text-black">Contact us</Button>
                 </div>
 
                 <dl className=" flex-1  divide-gray-900/10 -mt-4">

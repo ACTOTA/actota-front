@@ -140,7 +140,7 @@ export default function LocationMenu() {
       <div className="w-full">
         <MapPage visible={true} location={selectedLocation} /> 
       </div>
-      <Button className="bg-white text-black h-14 w-full" disabled={!selectedLocation}>
+      <Button variant="primary" className="bg-white text-black h-14 w-full" disabled={!selectedLocation}>
         <p>Confirm Location</p>
       </Button>
     </section>

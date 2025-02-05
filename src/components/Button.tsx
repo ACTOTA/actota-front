@@ -9,19 +9,19 @@ interface ButtonProps {
   outline?: boolean;
   small?: boolean;
   icon?: IconType;
-  className?: string; 
+  className?: string;
 }
 
-const Button: React.FC<ButtonProps> = ({ 
-  label, 
-  onClick, 
-  disabled, 
+const Button: React.FC<ButtonProps> = ({
+  label,
+  onClick,
+  disabled,
   outline,
   small,
   icon: Icon,
-  className, 
+  className,
 }) => {
-  return ( 
+  return (
     <button
       disabled={disabled}
       onClick={onClick}
@@ -44,17 +44,21 @@ const Button: React.FC<ButtonProps> = ({
         ${small ? 'border-[1px]' : 'border-2'}
         
       `}
-      
+
     >
-      {Icon && (
-        <Icon
-          size={24}
-          className="absolute left-4 top-3"
-        />
-      )}
-      {label}
+      
+        <>
+          {Icon && (
+            <Icon
+              size={24}
+              className="absolute left-4 top-3"
+            />
+          )}
+          {label}
+        </>
+      
     </button>
-   );
+  );
 }
- 
+
 export default Button;

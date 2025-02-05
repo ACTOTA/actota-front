@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import ListingCard from "@/src/components/ListingCard";
 import { FeaturedVacation } from "@/db/models/itinerary";
 import axios from "axios";
+import Button from "@/src/components/figma/Button";
 export default function FeaturedItineraries() {
   const [listings, setListings] = React.useState<FeaturedVacation[]>([{
     trip_name: "Lahore",
@@ -44,7 +45,7 @@ export default function FeaturedItineraries() {
     end_date: new Date(),
     created_at: new Date(),
     updated_at: new Date()
-  },{
+  }, {
     trip_name: "Lahore",
     fareharbor_id: 1,
     person_cost: 100,
@@ -63,7 +64,7 @@ export default function FeaturedItineraries() {
     end_date: new Date(),
     created_at: new Date(),
     updated_at: new Date()
-  },{
+  }, {
     trip_name: "Lahore",
     fareharbor_id: 1,
     person_cost: 100,
@@ -82,7 +83,7 @@ export default function FeaturedItineraries() {
     end_date: new Date(),
     created_at: new Date(),
     updated_at: new Date()
-  },{
+  }, {
     trip_name: "Lahore",
     fareharbor_id: 1,
     person_cost: 100,
@@ -101,7 +102,7 @@ export default function FeaturedItineraries() {
     end_date: new Date(),
     created_at: new Date(),
     updated_at: new Date()
-  },{
+  }, {
     trip_name: "Lahore",
     fareharbor_id: 1,
     person_cost: 100,
@@ -120,7 +121,7 @@ export default function FeaturedItineraries() {
     end_date: new Date(),
     created_at: new Date(),
     updated_at: new Date()
-  },{
+  }, {
     trip_name: "Lahore",
     fareharbor_id: 1,
     person_cost: 100,
@@ -139,7 +140,7 @@ export default function FeaturedItineraries() {
     end_date: new Date(),
     created_at: new Date(),
     updated_at: new Date()
-  },{
+  }, {
     trip_name: "Lahore",
     fareharbor_id: 1,
     person_cost: 100,
@@ -158,7 +159,7 @@ export default function FeaturedItineraries() {
     end_date: new Date(),
     created_at: new Date(),
     updated_at: new Date()
-  },{
+  }, {
     trip_name: "Lahore",
     fareharbor_id: 1,
     person_cost: 100,
@@ -177,7 +178,7 @@ export default function FeaturedItineraries() {
     end_date: new Date(),
     created_at: new Date(),
     updated_at: new Date()
-  },{
+  }, {
     trip_name: "Lahore",
     fareharbor_id: 1,
     person_cost: 100,
@@ -196,7 +197,7 @@ export default function FeaturedItineraries() {
     end_date: new Date(),
     created_at: new Date(),
     updated_at: new Date()
-  },{
+  }, {
     trip_name: "Lahore",
     fareharbor_id: 1,
     person_cost: 100,
@@ -255,10 +256,9 @@ export default function FeaturedItineraries() {
             />
           ))}
         </div>
-        <div className="flex justify-center flex-col items-center pt-6">  
+        <div className="flex justify-center flex-col items-center pt-6">
           <p className="text-white text-xl font-bold">See More Itineraries</p>
-          <button className="bg-white text-black mt-4  px-4 py-2 rounded-full">Load More</button>
-
+          <Button variant="primary" className="bg-white text-black mt-4 ">Load More</Button>
         </div>
       </div>
 
