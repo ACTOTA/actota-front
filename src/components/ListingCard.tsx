@@ -14,7 +14,7 @@ import { CgSoftwareUpload } from "react-icons/cg";
 import { FaRegHeart } from "react-icons/fa";
 import { IoLeafOutline } from "react-icons/io5";
 interface ListingCardProps {
-     data: FeaturedVacation ;
+    data: FeaturedVacation;
     onAction?: (id: string) => void;
     disabled?: boolean;
     actionLabel?: string;
@@ -52,30 +52,30 @@ const ListingCard: React.FC<ListingCardProps> = ({
                 <Image src={data.images[0] || ""} alt="Vacation Picture" layout='fill' objectFit='cover' className='rounded-lg' />
 
                 < div className="flex flex-col w-full p-2 bg-red-500">
-                <div className='flex justify-between items-start absolute top-0 right-0 w-full m-2'>
-                <div className=' bg-[#05080D]  rounded-full px-3 py-1  ml-4 flex items-center justify-center gap-1'> <IoLeafOutline className='h-5 w-5 text-white' />Mindfulness</div>
+                    <div className='flex justify-between items-start absolute top-0 right-0 w-full m-2'>
+                        <div className=' bg-[#05080D]  rounded-full px-3 py-1  ml-4 flex items-center justify-center gap-1'> <IoLeafOutline className='h-5 w-5 text-white' />Mindfulness</div>
 
-                    <div className='flex gap-2'>
-                    <div className=' bg-[#05080D]  rounded-full h-10 w-10 flex items-center justify-center'> <CgSoftwareUpload className='h-5 w-5 text-white' /></div>
-                    <div className=' bg-[#05080D]  rounded-full h-10 w-10 flex items-center justify-center'> <FaRegHeart className='h-5 w-5 text-white' /></div>
+                        <div className='flex gap-2'>
+                            <div className=' bg-[#05080D]  rounded-full h-10 w-10 flex items-center justify-center'> <CgSoftwareUpload className='h-5 w-5 text-white' /></div>
+                            <div className=' bg-[#05080D]  rounded-full h-10 w-10 flex items-center justify-center'> <FaRegHeart className='h-5 w-5 text-white' /></div>
+                        </div>
                     </div>
-                </div>
                     <div className=' bottom-0 left-0 w-[292px] absolute border border-border-primary bg-black/50 backdrop-blur-[4px]  rounded-lg m-2'>
                         <div className='px-3 py-2'>
                             <p className='font-bold'>{data?.trip_name}</p>
                             <p className='text-sm text-primary-gray'>{data?.start_location.city}</p>
                             <div className='flex justify-start items-center gap-3' >
 
-                            <div className='flex gap-1 text-xs'>
-                            <GoClock className='h-[13px] w-[13px] text-white' />
-                                <p>{data?.length_days} {data?.length_days > 1 ? "Days" : "Day"}</p>
-                            </div>
-                            <div className='flex gap-1 text-xs '>
-                            <LuUsers className='h-[13px] w-[13px] text-white' />
-                                <p> {data?.min_guests > 1 ? data?.min_guests + "-" + data.max_guests : 0}</p>
-                            </div>
+                                <div className='flex gap-1 text-xs'>
+                                    <GoClock className='h-[13px] w-[13px] text-white' />
+                                    <p>{data?.length_days} {data?.length_days > 1 ? "Days" : "Day"}</p>
+                                </div>
+                                <div className='flex gap-1 text-xs '>
+                                    <LuUsers className='h-[13px] w-[13px] text-white' />
+                                    <p> {data?.min_guests > 1 ? data?.min_guests + "-" + data.max_guests : 0}</p>
+                                </div>
                                 <div className='flex gap-1 text-xs  my-2'>
-                                <FaPersonWalking className='h-3 w-2 text-white' />
+                                    <FaPersonWalking className='h-3 w-2 text-white' />
                                     <p> {data?.activities?.length > 1 ? data?.activities?.length + " Activities" : data?.activities?.length + " Activity"}</p>
                                 </div>
                             </div>

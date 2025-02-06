@@ -4,12 +4,12 @@ import { BiSearch } from 'react-icons/bi';
 import { STEPS } from '@/src/types/steps';
 import SearchBoxes from './SearchBoxes';
 import { LoadScript } from '@react-google-maps/api';
+import { useRouter } from "next/navigation";
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
 
-
 export default function Search({ setClasses, currStep, setCurrStep }: { setClasses?: Dispatch<SetStateAction<string>>, currStep?: STEPS, setCurrStep?: Dispatch<SetStateAction<STEPS | null>> }) {
-
+  const router = useRouter();
   const [className, setClassName] = useState<string>('');
   const searchRef = useRef<HTMLDivElement>(null);
   const stepsEle = useRef<HTMLDivElement>(null);
@@ -129,7 +129,7 @@ export default function Search({ setClasses, currStep, setCurrStep }: { setClass
           </section>
 
           <section  className="px-2 col-span-1 h-full w-full flex justify-center items-center">
-            <div className="w-full aspect-square relative rounded-full bg-white cursor-pointer
+            <div onClick={() => router.push('/itineraries')} className="w-full aspect-square relative rounded-full bg-white cursor-pointer
             transition-all duration-300 ease-in-out">
               <BiSearch size={24} className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 text-black" />
             </div>

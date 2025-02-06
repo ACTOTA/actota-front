@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import GlassPanel from '../components/figma/GlassPanel';
 import { Theme } from '../components/enums/theme';
+import SimpleCard from './SimpleCard';
 
 export default function WhyBook() {
 
@@ -38,20 +39,7 @@ export default function WhyBook() {
           <p className='text-primary-gray mt-[16px] text-center'>With innovative features like itineraries customizing and budget allocation, we offer a seamless booking experience for your dream trip. </p>
           <div className="flex justify-center items-center flex-wrap gap-8 self-stretch mt-[80px]">
             {info.map((item, i) => (
-              <div className='flex-1 max-w-[400px]  bg-gradient-to-br  from-[#CFCFCF]/50 to-[#6B6B6B]/30   rounded-lg'>
-
-                <div key={i} className="h-[380px] w-[400px] text-white 
-                flex flex-col p-2   bg-black/60   rounded-lg">
-                  <div className=" flex justify-center   items-center rounded-2xl">
-                    <Image src={item.image} alt="route icon" objectFit="cover" height={240} width={390}
-                    />
-                  </div>
-                  <div className=" mt-5 ">
-                    <h2 className="text-xl font-bold">{item.title}</h2>
-                    <p className='text-primary-gray mt-2'>{item.description}</p>
-                  </div>
-                </div>
-              </div>
+              <SimpleCard showButton={false} image={item.image} title={item.title} description={item.description} />
 
             ))}
 
