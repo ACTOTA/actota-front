@@ -87,7 +87,7 @@ export default function SignIn() {
           <input type="checkbox" name="remember" id="remember" className="mr-2" />
           <p className=' text-[14px] leading-[20px]'>Remember me on this device</p>
         </div>
-        <Button type="submit" className="bg-white text-black w-full my-[10px]">Log In</Button>
+        <Button type="submit" variant="primary" className="bg-white text-black w-full my-[10px]">Log In</Button>
       </form>
 
       <div className="text-white flex justify-center items-center gap-[16px]">

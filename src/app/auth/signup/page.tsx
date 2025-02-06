@@ -86,7 +86,7 @@ export default function SignUp() {
         </div>
 
 
-        <Button type="submit" className="bg-white text-black w-full my-[10px]">Create My Account</Button>
+        <Button type="submit" variant="primary" className="bg-white text-black w-full my-[10px]">Create My Account</Button>
       </form>
 
       <div className="text-white flex justify-center items-center gap-[16px]">

@@ -70,7 +70,7 @@ export default function ForgotPassword() {
 
 
 
-          <Button onClick={() => setStep(2)} className="bg-white text-black w-full my-[10px] mt-[24px]">Confirm Email</Button>
+          <Button onClick={() => setStep(2)} variant="primary" className="bg-white text-black w-full my-[10px] mt-[24px]">Confirm Email</Button>
           <Link href="/auth/signin" className="m-auto my-[16px] text-white text-[16px] leading-[20px] flex items-center gap-2"><ArrowLeftIcon className="w-4 h-4" /> Back to Login</Link>
         </GlassPanel>
       )}
@@ -113,6 +113,7 @@ export default function ForgotPassword() {
             onClick={() => setStep(3)}
             className="bg-white text-black w-full my-[10px] mt-[24px]"
             disabled={otp.some(digit => digit === '')}
+            variant="primary"
           >
             Continue
           </Button>
@@ -151,9 +152,8 @@ export default function ForgotPassword() {
 
 
 
-            <Button type="submit" className="bg-white text-black w-full my-[10px]">Reset Password</Button>
+            <Button variant="primary" type="submit" className="bg-white text-black w-full my-[10px]">Reset Password</Button>
           </form>
-
 
           <Link href="/auth/signin" className="m-auto my-[16px] text-white text-[16px] leading-[20px] flex items-center gap-2"><ArrowLeftIcon className="w-4 h-4" /> Back to Login</Link>
         </GlassPanel>
