@@ -5,6 +5,12 @@
 body {
   background-color: black;
 }
+.gradient-bg {
+  background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
+ 
+  backdrop-filter: blur(10px); /* Glass effect */
+}
+
 
 /* 
 html,

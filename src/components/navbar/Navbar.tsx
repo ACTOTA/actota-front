@@ -51,7 +51,7 @@ const Navbar = () => {
     if (loading) return null
 
     return (
-        <div className={`fixed h-[82px] z-30 w-full text-white flex items-center ${isAuthRoute ? 'hidden' : ''}`}>
+        <div className={`fixed h-[82px] z-30 w-full bg-black/70 backdrop-blur-sm text-white flex items-center ${isAuthRoute ? 'hidden' : ''}`}>
             <div className="py-3 w-full h-full">
                 <Container>
                     <div className="flex flex-row items-center justify-between w-full h-full" >
