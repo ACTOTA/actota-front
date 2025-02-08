@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react';
 import { FeaturedVacation } from '@/db/models/itinerary';
 import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon, ClockIcon, HeartIcon } from '@heroicons/react/20/solid';
@@ -22,6 +22,8 @@ import ActivityTag from '@/src/components/figma/ActivityTag';
 
 export default function Itinerary() {
   const pathname = usePathname() as string;
+  const router = useRouter();
+
   const objectId = pathname.substring(pathname.lastIndexOf('/') + 1);
   const [listing, setListings] = useState<FeaturedVacation>({
     trip_name: "Yellowstone Adventure",
@@ -174,14 +176,14 @@ export default function Itinerary() {
   }
 
   return (
-    <section className='w-full !h-full text-white px-[64px] pt-[64px]  gap-4 '>
+    <section className='w-full !h-full text-white p-[64px] max-sm:px-6 max-lg:px-10 gap-4'>
       <div className='flex items-center gap-2 my-6'>
-        <ArrowLeftIcon className="h-6 w-6 hover:cursor-pointer" />
+        <ArrowLeftIcon className="h-6 w-6 hover:cursor-pointer" onClick={() => router.push("/")} />
         <p className='text-primary-gray text-sm'>Itineraries / <span className='text-white'>Denver Tour</span></p>
       </div>
-      <div className='flex items-center justify-between'>
-        <h1 className='text-4xl font-bold'>{listing.trip_name}</h1>
-        <div className='flex items-center gap-2'>
+      <div className='flex gap-4 flex-col md:flex-row md:items-center '>
+        <h1 className='text-4xl font-bold me-auto'>{listing.trip_name}</h1>
+        <div className='flex items-center md:flex-nowrap flex-wrap gap-2'>
           <Button variant="outline" size='none' className='p-4' onClick={() => { }}>
             <FaRegHeart className='h-6 w-6 text-white' />
           </Button>
@@ -193,12 +195,12 @@ export default function Itinerary() {
 
           <Button variant="outline" size='md' className='gap-1' onClick={() => { }}>
             <LuUsers className='h-5 w-5 text-white' />
-            <p>Manage Members</p>
+            <p className='text-nowrap'>Manage Members</p>
           </Button>
         </div>
       </div>
-      <div className='grid grid-cols-7 gap-6 mt-4'>
-        <div className='col-span-5 flex flex-col gap-4 w-full '>
+      <div className='grid md:grid-cols-12 lg:grid-cols-7 gap-6 mt-4'>
+        <div className='md:col-span-8 lg:col-span-5 flex flex-col gap-4 w-full '>
           <div className='w-full aspect-[926/640] relative'>
             <Image
               src={"/images/hero-bg.jpg"}
@@ -209,7 +211,7 @@ export default function Itinerary() {
               className='rounded-lg object-cover'
               sizes='(max-width: 1536px) 71vw'
             />
-            <GlassPanel className='absolute bottom-0 left-1/2 -translate-x-1/2 h-12 rounded-full m-2 flex justify-between gap-4 p-0 items-center px-2' theme={Theme.Light}>
+            <GlassPanel className='absolute bottom-2 left-0 right-0 w-fit m-auto rounded-full flex items-center gap-4 !p-3' theme={Theme.Light}>
               <ChevronLeftIcon className='h-6 w-6 cursor-pointer' onClick={nextImage} />
               {/* <div>{Number(Object.keys(mainPhoto)[0]) + 1} of {listing.images.length}</div> */}
               <div className='text-white'>1 of 3</div>
@@ -219,12 +221,12 @@ export default function Itinerary() {
 
           <div className='flex gap-4'>
             {listing.images.map((image, i) => (
-              <div key={i} className={`${true ? 'border-blue-800 border-solid border-2 rounded-[10px]' : ''} cursor-pointer`} onClick={() => clickImage(i, image)}>
+              <div key={i} className={`rounded-[10px] cursor-pointer`} onClick={() => clickImage(i, image)}>
                 <Image
                   src={image}
                   alt='Image of tour'
-                  height={120}
-                  width={120}
+                  height={100}
+                  width={100}
                   className='rounded-lg aspect-square object-cover'
                 />
               </div>
@@ -233,7 +235,7 @@ export default function Itinerary() {
 
           <div className='w-full h-full text-white mt-8 relative'>
             <h2 className='text-white text-xl'><b>Overview</b></h2>
-            <div className='grid grid-cols-2 mt-4'>
+            <div className='grid sm:grid-cols-2 mt-4'>
               <div>
                 <p className='flex items-center gap-2 text-sm mb-3'><CalendarIcon className='h-5 w-5' /> 22 June 2024 - 24 June 2024</p>
                 <p className='flex items-center gap-2 text-sm mb-3'><LuUsers className='h-5 w-5' />3 Adults</p>
@@ -242,21 +244,13 @@ export default function Itinerary() {
                 <div className='flex items-center flex-wrap gap-2 text-sm mb-3'>
                   <button
                     type="button"
-                    className={`
-        inline-flex items-center  px-2 py-1 rounded-lg
-        text-sm font-medium bg-[#262626]
-       
-      `}
+                    className="inline-flex items-center px-2 py-1 rounded-lg text-sm font-medium bg-[#262626]"
                   >
                     Faisalabad, pakistan
                   </button>
                   <button
                     type="button"
-                    className={`
-        inline-flex items-center  px-2 py-1 rounded-lg
-        text-sm font-medium bg-[#262626]
-       
-      `}
+                    className="inline-flex items-center px-2 py-1 rounded-lg text-sm font-medium bg-[#262626]"
                   >
                     Faisalabad, pakistan
                   </button>
@@ -284,23 +278,25 @@ export default function Itinerary() {
 
 
         </div>
-        <div className='col-span-2 bg-[#141414] rounded-2xl max-h-[340px]'>
-          <div className=' rounded-lg p-4 flex flex-col  gap-1 '>
-            <b className='text-white text-lg mb-4'>Reservation Details</b>
-            <div className='flex justify-between  mb-2'><p className='text-primary-gray'> Activitiy costs</p><p>${listing.person_cost}</p></div>
-            <div className='flex justify-between mb-2'><p className='text-primary-gray'>Lodging costs</p><p>${listing.person_cost}</p></div>
-            <div className='flex justify-between mb-2'><p className='text-primary-gray'>Transport costs</p><p>${listing.person_cost}</p></div>
-            <div className='flex justify-between'><p className='text-primary-gray'>Service fee</p><p>${listing.person_cost}</p></div>
-            <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent my-2"></div>
+        <div className='md:col-span-4 lg:col-span-2'>
+          <div className=' bg-[#141414] rounded-2xl'>
+            <div className=' rounded-lg p-4 flex flex-col  gap-1 '>
+              <b className='text-white text-lg mb-4'>Reservation Details</b>
+              <div className='flex justify-between  mb-2'><p className='text-primary-gray'> Activitiy costs</p><p>${listing.person_cost}</p></div>
+              <div className='flex justify-between mb-2'><p className='text-primary-gray'>Lodging costs</p><p>${listing.person_cost}</p></div>
+              <div className='flex justify-between mb-2'><p className='text-primary-gray'>Transport costs</p><p>${listing.person_cost}</p></div>
+              <div className='flex justify-between'><p className='text-primary-gray'>Service fee</p><p>${listing.person_cost}</p></div>
+              <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent my-2"></div>
 
-            <div className='text-white font-bold flex justify-between mb-4'>
-              <p>Total amount</p>
-              <p>${listing.person_cost}</p>
+              <div className='text-white font-bold flex justify-between mb-4'>
+                <p>Total amount</p>
+                <p>${listing.person_cost}</p>
+              </div>
+              <Button variant='primary' className=' text-black text-sm font-bold' onClick={handleBooking}>
+                <p>Proceed to Payment</p>
+                <ArrowRightIcon className='h-6 w-6' />
+              </Button>
             </div>
-            <Button variant='primary' className=' text-black text-sm font-bold' onClick={handleBooking}>
-              <p>Proceed to Payment</p>
-              <ArrowRightIcon className='h-6 w-6' />
-            </Button>
           </div>
         </div>
       </div>

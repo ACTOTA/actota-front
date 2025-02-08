@@ -247,7 +247,7 @@ export default function FeaturedItineraries() {
         <div className=" flex items-center py-5">
           <h2 className="text-2xl font-bold">Itineraries for You</h2>
         </div>
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap justify-center gap-4">
           {listings?.map((listing) => (
             <ListingCard
               // key={(listing._id as { $oid: string }).$oid}

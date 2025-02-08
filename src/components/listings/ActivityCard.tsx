@@ -24,16 +24,14 @@ interface ActivityCardProps {
 
 const ActivityCard = ({ activity, formatTime, getActivityIcon }: ActivityCardProps) => {
     return (
-        <div className="flex gap-4">
+        <div className="flex flex-col gap-4 border-border-primary">
             {/* Time Column */}
-            <div className="w-20 -mr-10 flex flex-col items-center ">
+            <div className="w-fit -ml-16 text-sm bg-gray-900 rounded-full px-2 py-1">
                 <span className="text-white">{formatTime(activity.time)}</span>
-                <div className="h-full w-px border-l border-dashed border-white/30 my-2"></div>
             </div>
 
             {/* Activity Card */}
-
-            <div className="flex-1 bg-gradient-to-br from-[#FEDB25] via-border-primary to-border-primary rounded-xl mt-9 p-[2px]">
+            <div className="flex-1 bg-gradient-to-br from-[#FEDB25] via-border-primary to-border-primary rounded-xl p-[2px]">
                 <div className="flex-1 bg-black rounded-xl">
 
                     <div className="flex-1 bg-gradient-to-br from-white/20 to-white/5 rounded-xl p-4">

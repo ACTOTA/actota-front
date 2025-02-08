@@ -242,7 +242,7 @@ export default function DayView({ listing }: DayViewProps) {
 					</div>
 				</div>
 			) : (
-				<div className="space-y-4">
+				<div className="space-y-4 border-l-2 border-dashed border-border-primary ps-6 ms-6">
 					{listing.days[`day${selectedDay}`]?.map((activity, index) => (
 						<ActivityCard
 							key={index}
