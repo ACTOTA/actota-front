@@ -1,9 +1,7 @@
-import React from 'react'
+import Booking from "@/src/components/profileComponents/bookings/Booking";
 
 const Bookings = () => {
-  return (
-    <div>Bookings</div>
-  )
-}
+  return <Booking />;
+};
 
 export default Bookings;
