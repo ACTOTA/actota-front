@@ -1,10 +1,9 @@
 import React from "react";
-import { Nunito ,Manrope} from 'next/font/google';
+import { Nunito, Manrope } from "next/font/google";
 import "./globals.css";
 
 import Navbar from "@/src/components/navbar/Navbar";
-import ClientOnly from '@/src/components/ClientOnly';
-
+import ClientOnly from "@/src/components/ClientOnly";
 
 export const metadata = {
   title: "ACTOTA!",
@@ -17,32 +16,26 @@ export const metadata = {
       rel: "apple-touch-icon-precomposed",
       url: "/images/logo.png",
     },
-    
   },
 };
 
 const font = Manrope({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export default async function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-
   return (
     <html lang="en">
       <body className={`${font.className}`}>
         <ClientOnly>
           <Navbar />
         </ClientOnly>
-        <div>
-          {children}
-        </div>
-
+        <div>{children}</div>
       </body>
     </html>
   );

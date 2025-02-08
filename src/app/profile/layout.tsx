@@ -1,7 +1,7 @@
 import React from "react";
 import { Manrope } from "next/font/google";
 import "../globals.css";
-import Sidebar from "@/src/components/sidebar/Sidebar";
+import Sidebar from "@/src/components/profileComponents/sidebar/Sidebar";
 
 // export const metadata = {
 //   title: "ACTOTA!",
@@ -31,7 +31,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${font.className}`}>
-        <div className="flex">
+        <div className="flex max-w-[1280px] mx-auto">
           <Sidebar />
           <div className="flex-1 text-white p-8">{children}</div>
         </div>

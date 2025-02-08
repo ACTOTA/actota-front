@@ -1,11 +1,11 @@
-import React from 'react'
+import Account from "@/src/components/profileComponents/account/Account";
 
 const page = () => {
   return (
-    <div className=''>
-        <h1>Profile</h1>
-    </div>
-  )
-}
+    <>
+      <Account />
+    </>
+  );
+};
 
-export default page 
+export default page;
