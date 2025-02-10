@@ -75,7 +75,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="h-screen w-[376px] min-w-[376px] py-8 px-8 flex flex-col relative before:absolute before:right-0 before:top-0 before:h-full before:w-[1px] before:bg-gradient-to-b before:from-transparent before:via-primary-gray before:to-transparent">
+    <div className="h-screen w-[376px] min-w-[376px] pb-8  px-8 flex flex-col relative before:absolute before:right-0 before:top-0 before:h-full before:w-[1px] before:bg-gradient-to-b before:from-transparent before:via-primary-gray before:to-transparent">
       {/* Profile Section */}
       <div className="flex flex-col gap-4 mb-12">
         <div className="flex items-center gap-4">

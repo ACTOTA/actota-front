@@ -1,6 +1,4 @@
 import React from "react";
-import { Manrope } from "next/font/google";
-import "../globals.css";
 import Sidebar from "@/src/components/profileComponents/sidebar/Sidebar";
 
 // export const metadata = {
@@ -18,24 +16,16 @@ import Sidebar from "@/src/components/profileComponents/sidebar/Sidebar";
 //   },
 // };
 
-const font = Manrope({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-});
 
-export default async function RootLayout({
+export default async function ProfileLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${font.className}`}>
-        <div className="flex max-w-[1280px] mx-auto">
+        <div className="flex max-w-[1280px] mx-auto pt-20">
           <Sidebar />
           <div className="flex-1 text-white p-8">{children}</div>
         </div>
-      </body>
-    </html>
   );
 }
