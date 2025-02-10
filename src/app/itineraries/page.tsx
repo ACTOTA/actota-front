@@ -1,10 +1,13 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
 import { FeaturedVacation } from "@/db/models/itinerary";
 import ItineraryCard from '@/src/components/ItineraryCard';
 import Button from '@/src/components/figma/Button';
 import Newsletter from '@/src/components/Newsletter';
 import Footer from '@/src/components/Footer';
+import Filter from '@/src/components/Filter';
+import ItineraryPageFilter from '@/src/components/ItineraryPageFilter';
+import ItineraryPageAdvanceFilter from '@/src/components/ItineraryPageAdvanceFilter';
 const Itineraries = () => {
     const [listings, setListings] = React.useState<FeaturedVacation[]>([{
         trip_name: "Lahore",
@@ -217,6 +220,8 @@ const Itineraries = () => {
         created_at: new Date(),
         updated_at: new Date()
     }]);
+    const [advanceFilter, setAdvanceFilter] = useState(false)
+
     return (
         <div className="max-w-[1440px] mx-auto ">
 
@@ -232,8 +237,12 @@ const Itineraries = () => {
                         <Button variant="primary" className="bg-white text-black mt-4 ">Load More</Button>
                     </div>
                 </div>
-                <div className="col-span-1">
-                    <p className=' sticky top-20  mt-4 bg-red-500'>hello</p>
+                <div className="col-span-1 pt-12">
+                    {advanceFilter ?
+                        <ItineraryPageAdvanceFilter advanceFilter={advanceFilter} setAdvanceFilter={setAdvanceFilter} />
+                        :
+                        <ItineraryPageFilter advanceFilter={advanceFilter} setAdvanceFilter={setAdvanceFilter} />
+                    }
                 </div>
             </div>
             <Newsletter />

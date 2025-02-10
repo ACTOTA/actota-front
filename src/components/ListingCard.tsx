@@ -44,7 +44,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
 
     return (
-        <div onClick={() => router.push(`/listings/${(data._id as { $oid: string }).$oid}`)}
+        <div onClick={() => router.push(`/itineraries`)}
             className='hover:cursor-pointer group min-w-[308px] h-[400px] bg-white rounded-2xl text-white
              border border-border-primary flex-col justify-between items-end inline-flex overflow-hidden'>
 

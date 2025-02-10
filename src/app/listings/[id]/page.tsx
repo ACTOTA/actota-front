@@ -292,7 +292,7 @@ export default function Itinerary() {
                 <p>Total amount</p>
                 <p>${listing.person_cost}</p>
               </div>
-              <Button variant='primary' className=' text-black text-sm font-bold' onClick={handleBooking}>
+              <Button onClick={() => router.push("/payment")} variant='primary' className=' text-black text-sm font-bold' >
                 <p>Proceed to Payment</p>
                 <ArrowRightIcon className='h-6 w-6' />
               </Button>

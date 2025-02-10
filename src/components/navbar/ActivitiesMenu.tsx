@@ -6,6 +6,7 @@ import Toggle from '../figma/Toggle';
 import { GoHome } from "react-icons/go";
 import { MdOutlineDirectionsCarFilled } from "react-icons/md";
 import { FaPersonWalking } from "react-icons/fa6";
+import Dropdown from '../figma/Dropdown';
 export default function ActivitiesMenu() {
     const [activities, setActivities] = useState([{label: 'Activities', description: 'Select preferred activities', tags: ['Activities']}]);
     const [selectedActivity, setSelectedActivity] = useState('Select preferred activities');
@@ -27,11 +28,9 @@ export default function ActivitiesMenu() {
                 <p className='flex items-center gap-2'><FaPersonWalking className='h-6 w-6' /> Activities</p>
 
                 <div className="h-2" />
-                <ItineraryDropdown
-                    className="w-full m-0 "
-                    options={activities}
-                    isLoading={isLoading}
-                    selected={selectedActivity}
+                <Dropdown
+                    label='Select preferred activities'
+                    options={["Activities", "Food", "Shopping", "Entertainment", "Other"]}
                     onSelect={(value) => setSelectedActivity(value.toString())}
                 />
             </div>
@@ -40,7 +39,7 @@ export default function ActivitiesMenu() {
                 <div className='flex items-center justify-between gap-2'>
 
                     <p className='flex items-center gap-2'><GoHome className='h-6 w-6' /> Lodging</p>
-                    <Toggle enabled={trans} setEnabled={setTrans} onClick={toggle} />
+                    <Toggle enabled={true} setEnabled={() => { }} onClick={() => { }} />
 
                 </div>
 
@@ -57,7 +56,7 @@ export default function ActivitiesMenu() {
             <div className='flex items-center justify-between '>
 
                 <p className='flex items-center gap-2'><MdOutlineDirectionsCarFilled className='h-6 w-6' /> Transportation</p>
-                <Toggle enabled={trans} setEnabled={setTrans} onClick={toggle} />
+                <Toggle enabled={true} setEnabled={() => { }} />
             </div>
         </section>
     );

@@ -11,7 +11,6 @@ import FAQs from '@/src/components/FAQs';
 export default async function Home() {
 
 
-  // Since NearbyData is now properly imported, use it directly
   return (
     <>
       <Head>

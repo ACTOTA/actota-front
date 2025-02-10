@@ -8,8 +8,8 @@ import { PiInstagramLogoFill } from "react-icons/pi";
 export default function Footer() {
   const navigation = [
     {
-      title: "Product & Service",
-      links: ["Products", "Products", "Products", "Products", "Products"]
+      title: "Explore",
+      links: ["Explore", "Activities", "Destinations", "Travelers", "Travelers"]
     },
     {
       title: "Product & Service",
@@ -64,7 +64,7 @@ export default function Footer() {
               <ul className="space-y-4">
                 {column.links.map((link, linkIndex) => (
                   <li key={linkIndex}>
-                    <Link href="#" className="text-gray-400 hover:text-white">
+                    <Link href={link === "Explore" ? "/location" : "#"} className="text-gray-400 hover:text-white">
                       {link}
                     </Link>
                   </li>

@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ListingCard from "@/src/components/ListingCard";
 import { FeaturedVacation } from "@/db/models/itinerary";
 import axios from "axios";
 import Button from "@/src/components/figma/Button";
+import  Dropdown  from "./figma/Dropdown";
+import ItineraryDropdown from "./figma/ItineraryDropdown";
 export default function FeaturedItineraries() {
   const [listings, setListings] = React.useState<FeaturedVacation[]>([{
     trip_name: "Lahore",
@@ -218,7 +220,7 @@ export default function FeaturedItineraries() {
     updated_at: new Date()
   }]);
   const [isLoading, setIsLoading] = React.useState(true);
-
+  const [selectedActivity, setSelectedActivity] = useState([]);
   // useEffect(() => {
   //   async function fetchListings() {
   //     try {
@@ -244,8 +246,10 @@ export default function FeaturedItineraries() {
     <section className=" w-full text-white">
       <div className="max-w-[1440px] mx-auto p-[80px]">
 
-        <div className=" flex items-center py-5">
+        <div className=" flex justify-between items-center py-5">
           <h2 className="text-2xl font-bold">Itineraries for You</h2>
+         
+
         </div>
         <div className="flex flex-wrap justify-center gap-4">
           {listings?.map((listing) => (

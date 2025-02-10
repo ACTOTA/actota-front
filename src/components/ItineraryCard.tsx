@@ -47,10 +47,10 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
 
 
     return (
-        <GlassPanel onClick={() => router.push(`/listings/${(data._id as { $oid: string }).$oid}`)} className='!p-4 !rounded-[24px] max-w-[864px] hover:cursor-pointer flex justify-between items-end mt-4'>
+        <GlassPanel  className='!p-4 !rounded-[22px] max-w-[864px] hover:cursor-pointer flex justify-between items-end mt-4 bg-gradient-to-br from-[#6B6B6B]/30 to-[black]'>
 
 
-            <div className='flex justify-between relative gap-4 h-full w-full'>
+            <div onClick={() => router.push(`/listings/1`)} className='flex justify-between relative gap-4 h-full w-full'>
                 <div>
                     <div className='flex justify-between items-center text-white'>
                         <p className='text-2xl font-bold'>{data?.trip_name}</p>

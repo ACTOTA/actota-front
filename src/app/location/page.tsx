@@ -123,7 +123,7 @@ const Location = () => {
 
           <div className=' flex items-center gap-2 my-6  pt-[80px]'>
             <ArrowLeftIcon className="h-6 w-6 hover:cursor-pointer" />
-            <p className='text-primary-gray text-sm'>Itineraries / <span className='text-white'>Denver Tour</span></p>
+            <p className='text-primary-gray text-sm'>Explore / <span className='text-white'> St. Mary’s Glacier</span></p>
           </div>
           <div className="w-full h-[588px] relative flex items-center justify-center">
             <Image
