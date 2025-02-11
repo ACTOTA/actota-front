@@ -46,7 +46,7 @@ export default function Dropdown({
     <div className={`relative inline-block w-full `}>
       <button
         type="button"
-        className={`w-full px-4 py-3 text-left bg-black/20 text-white rounded-lg  hover:bg-[#262626] focus:outline-none border border-primary-gray ${className}`}
+        className={`w-full px-4 py-3 text-left bg-black/20 text-white rounded-lg  hover:bg-[#262626] focus:outline-none border border-primary-gray whitespace-nowrap flex items-center justify-between ${className}`}
         onClick={toggleDropdown}
       >
         {multiSelect
