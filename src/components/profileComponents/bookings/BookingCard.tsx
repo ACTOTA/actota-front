@@ -47,7 +47,7 @@ const BookingCard: React.FC<ListingCardProps> = ({
 
 
     return (
-        <GlassPanel className='!p-4 !rounded-[22px] max-w-[864px] hover:cursor-pointer flex flex-col gap-2 mt-4 bg-gradient-to-br from-[#6B6B6B]/30 to-[black]'>
+        <GlassPanel className='!p-4 !rounded-[22px]  hover:cursor-pointer flex flex-col gap-2 mt-4 bg-gradient-to-br from-[#6B6B6B]/30 to-[black]'>
 
             <div className='flex justify-between items-center'>
                 <Button variant='primary' size='sm' className='!bg-[#215CBA] text-white flex items-center gap-1'> {data.status === "upcoming" ? <CiCalendar className='text-white size-5' /> : data.status === "ongoing" ? <Image src="/svg-icons/ongoing-icon.svg" alt="clock" width={16} height={16} /> : <FaCheck className='text-white size-5' />} {data?.status.charAt(0).toUpperCase() + data?.status.slice(1)}</Button>
@@ -55,7 +55,7 @@ const BookingCard: React.FC<ListingCardProps> = ({
             </div>
             <div className="h-[1px] my-2 w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
 
-            <div onClick={() => router.push(`/listings/1`)} className='flex justify-between relative gap-4 h-full w-full'>
+            <div  className='flex justify-between relative gap-4 h-full w-full'>
                 <div className='w-full'>
                     <div className='flex justify-between items-center text-white'>
                         <p className='text-2xl font-bold'>{data?.trip_name}</p>
@@ -131,7 +131,7 @@ const BookingCard: React.FC<ListingCardProps> = ({
                 </div>
                 <div className='flex gap-2'>
                     {data?.status !== "upcoming" && <Button variant='primary' className='!bg-[#C10B2F] text-white'>Cancel Trip</Button>}
-                    <Button variant='outline' className=' text-white gap-2'> View {data?.status === "upcoming" ? "Details" : ""} <CgArrowTopRight className='size-6' /></Button>
+                    <Button onClick={() => router.push(`/my-bookings`)} variant='outline' className=' text-white gap-2'> View {data?.status === "upcoming" ? "Details" : ""} <CgArrowTopRight className='size-6' /></Button>
 
                 </div>
             </div>

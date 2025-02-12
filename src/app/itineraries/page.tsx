@@ -225,7 +225,7 @@ const Itineraries = () => {
     return (
         <div className="max-w-[1440px] mx-auto ">
 
-            <div className="grid grid-cols-3 gap-8 p-[80px]">
+            <div className="grid grid-cols-3 gap-8 p-[80px] ">
                 <div className="col-span-2 ">
                     <h2 className="text-[40px] font-bold text-white">Itineraries for You</h2>
                     <p className="text-white">Itineraries found.</p>
@@ -237,7 +237,7 @@ const Itineraries = () => {
                         <Button variant="primary" className="bg-white text-black mt-4 ">Load More</Button>
                     </div>
                 </div>
-                <div className="col-span-1 pt-12">
+                <div className="col-span-1 pt-12 ">
                     {advanceFilter ?
                         <ItineraryPageAdvanceFilter advanceFilter={advanceFilter} setAdvanceFilter={setAdvanceFilter} />
                         :
