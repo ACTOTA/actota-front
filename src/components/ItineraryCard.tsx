@@ -87,8 +87,24 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
                 <div>
                     <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={300} objectFit='cover' className='rounded-lg' />
                     <div className='flex gap-2 absolute top-2 right-2'>
-                        <div className=' bg-[#05080D]  rounded-full h-10 w-10 flex items-center justify-center'> <CgSoftwareUpload className='h-5 w-5 text-white' /></div>
-                        <div className=' bg-[#05080D]  rounded-full h-10 w-10 flex items-center justify-center'> <FaRegHeart className='h-5 w-5 text-white' /></div>
+                        <button 
+                            onClick={(e) => {
+                                e.stopPropagation();  // Stop the event from bubbling up
+                                router.push("?modal=shareModal");
+                            }} 
+                            className='bg-[#05080D] rounded-full h-10 w-10 flex items-center justify-center'
+                        > 
+                            <CgSoftwareUpload className='h-5 w-5 text-white' />
+                        </button>
+                        <button 
+                            onClick={(e) => {
+                                e.stopPropagation();  // Stop the event from bubbling up
+                                router.push("?modal=shareModal");
+                            }} 
+                            className='bg-[#05080D] rounded-full h-10 w-10 flex items-center justify-center'
+                        > 
+                            <FaRegHeart className='h-5 w-5 text-white' />
+                        </button>
                     </div>
                 </div>
             </div>

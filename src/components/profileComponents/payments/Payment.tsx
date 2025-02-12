@@ -10,7 +10,9 @@ import { RxCross1 } from "react-icons/rx";
 import TrashIcon from "@/public/svg-icons/trash.svg";
 import { RiVisaLine } from "react-icons/ri";
 import Dropdown from "../../figma/Dropdown";
+import { useRouter } from "next/navigation";
 const Payment = () => {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("bookingsHistory");
   const [search, setSearch] = useState("");
   const [savedCards, setSavedCards] = useState([
@@ -194,7 +196,8 @@ const Payment = () => {
                   <div className="flex items-center gap-2">
                     {item.isDefault ? <Button variant="primary" size="sm" className={`mx-auto !bg-[#215CBA] !text-white`}> Default</Button> :
                       <Button variant="simple" size="sm" className={`px-0 py-0  !text-[#BBD4FB] border-b border-[#BBD4FB] !rounded-none`}> Set as default</Button>}
-                    <TrashIcon className="text-white " />
+                    <button onClick={() => router.push("?modal=deletePaymentCard")}>   <TrashIcon className="text-white " /></button>
+
                   </div>
                 </div>
               </div>

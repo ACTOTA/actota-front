@@ -10,9 +10,17 @@ import Button from '@/src/components/figma/Button';
 import Link from 'next/link';
 import { setAuthCookie } from '@/src/helpers/auth';
 import { verifyJwt, Claims } from '@/src/helpers/auth';
-
+import { useRouter } from "next/navigation";
 
 export default function SignIn() {
+  const router = useRouter();
+
+  const signIn = () => {
+    router.push("?modal=signinLoading")
+    setTimeout(() => {
+      router.push(window.location.pathname);
+    }, 3000)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,7 +95,7 @@ export default function SignIn() {
           <input type="checkbox" name="remember" id="remember" className="mr-2" />
           <p className=' text-[14px] leading-[20px]'>Remember me on this device</p>
         </div>
-        <Button type="submit" variant="primary" className="bg-white text-black w-full my-[10px]">Log In</Button>
+        <Button onClick={signIn} variant="primary" className="bg-white text-black w-full my-[10px]">Log In</Button>
       </form>
 
       <div className="text-white flex justify-center items-center gap-[16px]">
@@ -96,7 +104,7 @@ export default function SignIn() {
         <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
       </div>
       <div className="flex justify-center items-center gap-[8px] my-[16px] pb-[16px]">
-        <button className='bg-[#262626] rounded-[8px] py-[16px] px-[70px] flex justify-center items-center  hover:cursor-pointer'>
+        <button  className='bg-[#262626] rounded-[8px] py-[16px] px-[70px] flex justify-center items-center  hover:cursor-pointer'>
           <Image src="/svg-icons/google.svg" alt="google" width={20} height={20} />
         </button>
         <button className='bg-[#262626] rounded-[8px] py-[14px] px-[70px] flex justify-center items-center hover:cursor-pointer'>

@@ -11,10 +11,12 @@ import Link from 'next/link'
 import React from 'react'
 import { CgArrowTopRight } from 'react-icons/cg'
 import { FaStar } from 'react-icons/fa6'
+import { GoArrowRight } from 'react-icons/go'
 import { HiOutlineMail } from 'react-icons/hi'
 import { LuRoute, LuUser } from 'react-icons/lu'
-
+import { useRouter } from 'next/navigation';
 const Payment = () => {
+    const router = useRouter();
     return (
         <section className='w-full !h-full text-white pl-[80px]  gap-4 bg-[url("/images/payment-page-bg.png")] bg-cover bg-center bg-repeat'>
             <div className='grid grid-cols-6 gap-6 pt-[82px]'>
@@ -226,8 +228,14 @@ const Payment = () => {
                         <p className=' font-bold text-white'>Total Amount</p>
                         <p className='text-xl font-bold text-white'> $1000</p>
                     </div>
-                    <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
-                    <p className='text-xl  mt-8'>Sign in or Create an Account</p>
+
+                    <Button onClick={() => router.push("?modal=guestCheckout")} variant="outline" className="gap-2">Checkout as a Guest  <GoArrowRight className='size-5'/></Button>
+                    <div className="text-white flex justify-center items-center gap-[16px] mt-4">
+                        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
+                        <p className='text-primary-gray text-[14px] leading-[20px] whitespace-nowrap'>or </p>
+                        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
+                    </div>
+                    <p className='text-xl  mt-4'>Sign in or Create an Account</p>
                     <div className='flex relative items-start gap-3 p-4 border border-[#BBD4FB] rounded-xl mt-6 '>
 
                         <Image src={"/images/payment-page-card-blur-bg.png"} alt="user" layout='fill' className='absolute top-0 left-[-30px] ' />
@@ -241,7 +249,7 @@ const Payment = () => {
                         <p className="text-primary-gray w-96 text-left mb-1 mt-[16px]">Email Address</p>
                         <Input type="email" name="email" icon={<HiOutlineMail className="text-white h-[20px] w-[20px]" />} placeholder="Your email address" />
                     </div>
-                    <Button type="submit" variant="primary" className="bg-white text-black w-full my-[24px]">Continue</Button>
+                    <Button onClick={() => router.push("?modal=signin")} variant="primary" className="bg-white text-black w-full my-[24px]">Continue</Button>
 
                     <div className="text-white flex justify-center items-center gap-[16px]">
                         <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
@@ -249,7 +257,7 @@ const Payment = () => {
                         <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
                     </div>
                     <div className="flex justify-center items-center gap-[8px] my-[16px] pb-[16px]">
-                        <button className='bg-gradient-to-r from-[#1A1A1A] to-[#0D0D0D]/70 rounded-[8px] py-[16px] w-[120px] flex justify-center items-center  hover:cursor-pointer'>
+                        <button onClick={() => router.push("?modal=bookingConfirmed")} className='bg-gradient-to-r from-[#1A1A1A] to-[#0D0D0D]/70 rounded-[8px] py-[16px] w-[120px] flex justify-center items-center  hover:cursor-pointer'>
                             <Image src="/svg-icons/google.svg" alt="google" width={24} height={24} />
                         </button>
                         <button className='bg-gradient-to-r from-[#1A1A1A] to-[#0D0D0D]/70 rounded-[8px] py-[14px] w-[120px] flex justify-center items-center hover:cursor-pointer'>

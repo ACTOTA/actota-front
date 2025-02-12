@@ -9,9 +9,17 @@ import { verifyJwt, Claims } from '@/src/helpers/auth';
 import { setAuthCookie } from '@/src/helpers/auth';
 import GlassPanel from '@/src/components/figma/GlassPanel';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export default function SignUp() {
+  const router = useRouter();
 
+  const signUp = () => {
+    router.push("?modal=signupLoading")
+    setTimeout(() => {
+      router.push(window.location.pathname);
+    }, 3000)
+  }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log(e.currentTarget);
@@ -86,7 +94,7 @@ export default function SignUp() {
         </div>
 
 
-        <Button type="submit" variant="primary" className="bg-white text-black w-full my-[10px]">Create My Account</Button>
+        <Button onClick={signUp} variant="primary" className="bg-white text-black w-full my-[10px]">Create My Account</Button>
       </form>
 
       <div className="text-white flex justify-center items-center gap-[16px]">

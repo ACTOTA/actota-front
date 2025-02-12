@@ -5,16 +5,23 @@ import Image from 'next/image';
 import Search from '@/src/components/navbar/Search';
 import { Alex_Brush } from 'next/font/google';
 import { STEPS } from '../types/steps';
-
+import { useRouter } from 'next/navigation';
 const alexBrush = Alex_Brush({
     weight: ['400'],
     subsets: ['latin'],
 });
 
 export default function Hero() {
+    const router = useRouter();
     const [currStep, setCurrStep] = useState<STEPS | null>(null);
     const [classes, setClasses] = React.useState<string>('');
-
+    const [showCookieBanner, setShowCookieBanner] = React.useState<boolean>(false);
+    setTimeout(() => {
+        if ( !showCookieBanner) {
+            router.push("?modal=cookieBanner");
+            setShowCookieBanner(true);
+        }
+    }, 5000);
     return (
         <div className="w-full h-[100vh] relative flex items-center justify-center">
             <Image
@@ -37,7 +44,7 @@ export default function Hero() {
                         <span className={alexBrush.className}> Dream </span>
                         Trip
                     </p>
-                    
+
                     <p className='text-white text-7xl font-extrabold leading-[88px] text-center flex items-center gap-2'>
                         with a Few Clicks <img src="/svg-icons/mingcute-cursor.svg" alt="hero background" className="mt-6" />
                     </p>

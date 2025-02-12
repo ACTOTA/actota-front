@@ -22,6 +22,7 @@ interface ListingCardProps {
     disabled?: boolean;
     actionLabel?: string;
     actionId?: string;
+    bookingConfirmedModal?: boolean;
 }
 
 const BookingCard: React.FC<ListingCardProps> = ({
@@ -30,6 +31,7 @@ const BookingCard: React.FC<ListingCardProps> = ({
     disabled = false,
     actionLabel,
     actionId = "",
+    bookingConfirmedModal = false,
 }) => {
     const router = useRouter();
 
@@ -50,17 +52,21 @@ const BookingCard: React.FC<ListingCardProps> = ({
         <GlassPanel className='!p-4 !rounded-[22px]  hover:cursor-pointer flex flex-col gap-2 mt-4 bg-gradient-to-br from-[#6B6B6B]/30 to-[black]'>
 
             <div className='flex justify-between items-center'>
-                <Button variant='primary' size='sm' className='!bg-[#215CBA] text-white flex items-center gap-1'> {data.status === "upcoming" ? <CiCalendar className='text-white size-5' /> : data.status === "ongoing" ? <Image src="/svg-icons/ongoing-icon.svg" alt="clock" width={16} height={16} /> : <FaCheck className='text-white size-5' />} {data?.status.charAt(0).toUpperCase() + data?.status.slice(1)}</Button>
+                <div className='flex items-center gap-2'>
+
+                    <Button variant='primary' size='sm' className='!bg-[#215CBA] text-white flex items-center gap-1'> {data.status === "upcoming" ? <CiCalendar className='text-white size-5' /> : data.status === "ongoing" ? <Image src="/svg-icons/ongoing-icon.svg" alt="clock" width={16} height={16} /> : <FaCheck className='text-white size-5' />} {data?.status.charAt(0).toUpperCase() + data?.status.slice(1)}</Button>
+                    {bookingConfirmedModal && <p className='text-sm text-primary-gray flex items-center gap-1'><Image src="/svg-icons/airplane.svg" alt="points" width={20} height={20} /> Booking no. <span className='text-white'>{data?.id}</span></p>}
+                </div>
                 <p className='text-sm text-primary-gray'>Booked  <span className='text-white'> {moment(data?.created_at).format("DD MMM YYYY")}</span> </p>
             </div>
             <div className="h-[1px] my-2 w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
 
-            <div  className='flex justify-between relative gap-4 h-full w-full'>
+            <div className='flex justify-between relative gap-4 h-full w-full'>
                 <div className='w-full'>
                     <div className='flex justify-between items-center text-white'>
                         <p className='text-2xl font-bold'>{data?.trip_name}</p>
 
-                        <p className='text-2xl font-bold'>${data.person_cost}</p>
+                        {!bookingConfirmedModal && <p className='text-2xl font-bold'>${data.person_cost}</p>}
                     </div>
                     <div className='flex  items-center gap-3 my-3 text-white' >
 
@@ -94,13 +100,17 @@ const BookingCard: React.FC<ListingCardProps> = ({
 
                 </div>
 
-                <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={204} className='rounded-lg object-cover' />
+                {!bookingConfirmedModal && <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={204} className='rounded-lg object-cover' />}
 
             </div>
 
             {data?.delay_insurance ?
+                bookingConfirmedModal ?
+                    <div className='mt-2'></div> :
 
-                <div className="h-[1px] my-2 w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
+
+
+                    <div className="h-[1px] my-2 w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
 
                 :
 
@@ -131,7 +141,7 @@ const BookingCard: React.FC<ListingCardProps> = ({
                 </div>
                 <div className='flex gap-2'>
                     {data?.status !== "upcoming" && <Button variant='primary' className='!bg-[#C10B2F] text-white'>Cancel Trip</Button>}
-                    <Button onClick={() => router.push(`/my-bookings`)} variant='outline' className=' text-white gap-2'> View {data?.status === "upcoming" ? "Details" : ""} <CgArrowTopRight className='size-6' /></Button>
+                    <Button onClick={() => router.push(`/my-bookings`)} variant='outline' className=' text-white gap-2'> View {data?.status === "upcoming" && !bookingConfirmedModal ? "Details" : ""} <CgArrowTopRight className='size-6' /></Button>
 
                 </div>
             </div>

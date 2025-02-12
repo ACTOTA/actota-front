@@ -56,8 +56,25 @@ const ListingCard: React.FC<ListingCardProps> = ({
                         <div className=' bg-[#05080D]  rounded-full px-3 py-1  ml-4 flex items-center justify-center gap-1'> <IoLeafOutline className='h-5 w-5 text-white' />Mindfulness</div>
 
                         <div className='flex gap-2'>
-                            <div className=' bg-[#05080D]  rounded-full h-10 w-10 flex items-center justify-center'> <CgSoftwareUpload className='h-5 w-5 text-white' /></div>
-                            <div className=' bg-[#05080D]  rounded-full h-10 w-10 flex items-center justify-center'> <FaRegHeart className='h-5 w-5 text-white' /></div>
+                        <button 
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();  // Stop the event from bubbling up
+                                router.push("?modal=shareModal");
+                            }} 
+                            className='bg-[#05080D] rounded-full h-10 w-10 flex items-center justify-center'
+                        > 
+                            <CgSoftwareUpload className='h-5 w-5 text-white' />
+                        </button>
+                        <button 
+                            onClick={(e) => {
+                                e.stopPropagation();  // Stop the event from bubbling up
+                                router.push("?modal=shareModal");
+                            }} 
+                            className='bg-[#05080D] rounded-full h-10 w-10 flex items-center justify-center'
+                        > 
+                            <FaRegHeart className='h-5 w-5 text-white' />
+                        </button>
                         </div>
                     </div>
                     <div className=' bottom-0 left-0 w-[292px] absolute border border-border-primary bg-black/50 backdrop-blur-[4px]  rounded-lg m-2'>

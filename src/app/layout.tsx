@@ -4,6 +4,7 @@ import "./globals.css";
 
 import Navbar from "@/src/components/navbar/Navbar";
 import ClientOnly from "@/src/components/ClientOnly";
+import ModalContainer from "../components/ModalContainer";
 
 export const metadata = {
   title: "ACTOTA!",
@@ -33,6 +34,7 @@ export default async function RootLayout({
     <html lang="en">
       <body className={`${font.className}`}>
         <ClientOnly>
+          <ModalContainer />
           <Navbar />
         </ClientOnly>
         <div>{children}</div>
