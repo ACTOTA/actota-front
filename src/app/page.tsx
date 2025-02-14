@@ -7,6 +7,7 @@ import Footer from "@/src/components/Footer";
 import Head from 'next/head';
 import FeaturedItineraries from "@/src/components/FeaturedItineraries";
 import FAQs from '@/src/components/FAQs';
+import Filter from '../components/DrawerModal';
 
 export default async function Home() {
 

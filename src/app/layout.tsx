@@ -5,6 +5,7 @@ import "./globals.css";
 import Navbar from "@/src/components/navbar/Navbar";
 import ClientOnly from "@/src/components/ClientOnly";
 import ModalContainer from "../components/ModalContainer";
+import DrawerModal from "../components/DrawerModal";
 
 export const metadata = {
   title: "ACTOTA!",

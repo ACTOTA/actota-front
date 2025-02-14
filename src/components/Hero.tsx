@@ -16,12 +16,12 @@ export default function Hero() {
     const [currStep, setCurrStep] = useState<STEPS | null>(null);
     const [classes, setClasses] = React.useState<string>('');
     const [showCookieBanner, setShowCookieBanner] = React.useState<boolean>(false);
-    setTimeout(() => {
-        if ( !showCookieBanner) {
-            router.push("?modal=cookieBanner");
-            setShowCookieBanner(true);
-        }
-    }, 5000);
+    // setTimeout(() => {
+    //     if ( !showCookieBanner) {
+    //         router.push("?modal=cookieBanner");
+    //         setShowCookieBanner(true);
+    //     }
+    // }, 5000);
     return (
         <div className="w-full h-[100vh] relative flex items-center justify-center">
             <Image
@@ -54,6 +54,7 @@ export default function Hero() {
                     <Search setClasses={setClasses} currStep={currStep} setCurrStep={setCurrStep} />
                 </div>
             </div>
+
         </div>
     );
 }

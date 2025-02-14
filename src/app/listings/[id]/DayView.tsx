@@ -13,6 +13,8 @@ import { GiKnifeFork } from 'react-icons/gi';
 import { MdOutlineExplore } from 'react-icons/md';
 import Button from '@/src/components/figma/Button';
 import ActivityCard from '@/src/components/listings/ActivityCard';
+import FeedbackDrawer from '@/src/components/FeedbackDrawer';
+import DrawerModal from '@/src/components/DrawerModal';
 
 // Add this constant for the API key
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
@@ -53,6 +55,7 @@ const mapOptions = {
 export default function DayView({ listing }: DayViewProps) {
 	const [selectedView, setSelectedView] = useState<'map' | 'day'>('map');
 	const [selectedDay, setSelectedDay] = useState(1);
+	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const [map, setMap] = useState<google.maps.Map | null>(null);
 
 	const onLoad = useCallback((map: google.maps.Map) => {
@@ -249,10 +252,18 @@ export default function DayView({ listing }: DayViewProps) {
 							activity={activity}
 							formatTime={formatTime}
 							getActivityIcon={getActivityIcon}
+							setIsFeedbackDrawerOpen={setIsDrawerOpen}
 						/>
 					))}
 				</div>
 			)}
+
+			<DrawerModal
+				isDrawerOpen={isDrawerOpen}
+				setIsDrawerOpen={setIsDrawerOpen}
+			>
+				<FeedbackDrawer setIsDrawerOpen={setIsDrawerOpen} />
+			</DrawerModal>
 		</div>
 	);
 }

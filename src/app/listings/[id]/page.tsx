@@ -8,7 +8,6 @@ import Image from 'next/image';
 import GlassPanel from '@/src/components/figma/GlassPanel';
 import { Theme } from '@/src/components/enums/theme';
 import Button from '@/src/components/figma/Button';
-import { default as ButtonWithIcon } from '@/src/components/Button';
 import DayView from './DayView';
 import { getAuthCookie } from '@/src/helpers/auth';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/16/solid';

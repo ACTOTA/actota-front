@@ -3,17 +3,16 @@
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react';
 import { FeaturedVacation } from '@/db/models/itinerary';
-import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon, ClockIcon, HeartIcon } from '@heroicons/react/20/solid';
+import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon, ClockIcon, HeartIcon, XMarkIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
 import GlassPanel from '@/src/components/figma/GlassPanel';
 import { Theme } from '@/src/components/enums/theme';
 import Button from '@/src/components/figma/Button';
-import { default as ButtonWithIcon } from '@/src/components/Button';
 import { getAuthCookie } from '@/src/helpers/auth';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/16/solid';
 import { FaRegHeart, FaStar } from 'react-icons/fa6';
 import { CgSoftwareUpload } from 'react-icons/cg';
-import { LuUser, LuUsers } from 'react-icons/lu';
+import { LuArrowRight, LuUser, LuUsers } from 'react-icons/lu';
 import { PiClockDuotone } from 'react-icons/pi';
 import { GoHome } from 'react-icons/go';
 import { MdOutlineDirectionsCarFilled } from 'react-icons/md';
@@ -25,10 +24,13 @@ import { FiEdit3 } from 'react-icons/fi';
 import { CiMail } from 'react-icons/ci';
 import { GrLocation } from 'react-icons/gr';
 import { RxArrowTopRight } from 'react-icons/rx';
+import DrawerModal from '@/src/components/DrawerModal';
+import Input from '@/src/components/figma/Input';
 
 export default function MyBookings() {
   const pathname = usePathname() as string;
   const router = useRouter();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [bookings, setBookings] = React.useState<any>({
     id: 1,
     status: "upcoming",
@@ -101,6 +103,93 @@ export default function MyBookings() {
               </div>
             </div>
           </div>
+          <div className='mt-8'>
+            <div className='inline-flex justify-between items-center gap-4 mt-3'>
+              <Image src="/svg-icons/waivers-icon.svg" alt="waivers" height={48} width={48} />
+              <div>
+                <p className='text-white text-2xl font-bold'>Waivers</p>
+                <p className='text-primary-gray  mt-1'>You’re required to sign all the waivers before the trip.</p>
+              </div>
+
+            </div>
+
+
+
+            <div className='flex gap-4 mt-4'>
+
+              <div className="flex-1 bg-gradient-to-br from-[#FEDB25] via-border-primary to-border-primary rounded-xl p-[2px]">
+                <div className=" bg-black bg-opacity-80 rounded-xl">
+
+                  <div className="flex justify-between items-center rounded-xl p-3">
+                    <div className='inline-flex justify-between items-start gap-2'>
+                      <Image src="/svg-icons/alert-icon.svg" alt="waivers" className='mt-1' height={20} width={20} />
+                      <div>
+                        <p className='text-white  font-bold'>Waiver Title</p>
+                        <p className='text-primary-gray text-xs mt-1'>Short description about this waiver</p>
+                      </div>
+
+                    </div>
+                    <Button variant='simple' onClick={() => setIsDrawerOpen(true)} className=' !text-[#BBD4FB] text-sm font-bold flex items-center gap-1'>Sign Now <LuArrowRight className='text-[#BBD4FB] size-5 mt-1' /></Button>
+                  </div>
+                </div>
+              </div>
+              <div className="flex-1 bg-gradient-to-br from-[#FEDB25] via-border-primary to-border-primary rounded-xl p-[2px]">
+                <div className=" bg-black bg-opacity-80 rounded-xl">
+
+                  <div className="flex justify-between items-center rounded-xl p-3">
+                    <div className='inline-flex justify-between items-start gap-2'>
+                      <Image src="/svg-icons/alert-icon.svg" alt="waivers" className='mt-1' height={20} width={20} />
+                      <div>
+                        <p className='text-white  font-bold'>Waiver Title</p>
+                        <p className='text-primary-gray text-xs mt-1'>Short description about this waiver</p>
+                      </div>
+
+                    </div>
+                    <Button variant='simple' onClick={() => setIsDrawerOpen(true)} className=' !text-[#BBD4FB] text-sm font-bold flex items-center gap-1'>Sign Now <LuArrowRight className='text-[#BBD4FB] size-5 mt-1' /></Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <div className='flex gap-4 mt-4'>
+
+              <div className="flex-1 bg-gradient-to-br from-[#FEDB25] via-border-primary to-border-primary rounded-xl p-[2px]">
+                <div className=" bg-black bg-opacity-80 rounded-xl">
+
+                  <div className="flex justify-between items-center rounded-xl p-3">
+                    <div className='inline-flex justify-between items-start gap-2'>
+                      <Image src="/svg-icons/alert-icon.svg" alt="waivers" className='mt-1' height={20} width={20} />
+                      <div>
+                        <p className='text-white  font-bold'>Waiver Title</p>
+                        <p className='text-primary-gray text-xs mt-1'>Short description about this waiver</p>
+                      </div>
+
+                    </div>
+                    <Button variant='simple' onClick={() => setIsDrawerOpen(true)} className=' !text-[#BBD4FB] text-sm font-bold flex items-center gap-1'>Sign Now <LuArrowRight className='text-[#BBD4FB] size-5 mt-1' /></Button>
+                  </div>
+                </div>
+              </div>
+              <div className="flex-1 bg-gradient-to-br from-[#FEDB25] via-border-primary to-border-primary rounded-xl p-[2px]">
+                <div className=" bg-black bg-opacity-80 rounded-xl">
+
+                  <div className="flex justify-between items-center rounded-xl p-3">
+                    <div className='inline-flex justify-between items-start gap-2'>
+                      <Image src="/svg-icons/alert-icon.svg" alt="waivers" className='mt-1' height={20} width={20} />
+                      <div>
+                        <p className='text-white  font-bold'>Waiver Title</p>
+                        <p className='text-primary-gray text-xs mt-1'>Short description about this waiver</p>
+                      </div>
+
+                    </div>
+                    <Button variant='simple' onClick={() => setIsDrawerOpen(true)} className=' !text-[#BBD4FB] text-sm font-bold flex items-center gap-1'>Sign Now <LuArrowRight className='text-[#BBD4FB] size-5 mt-1' /></Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+          </div>
 
 
           <div className='mt-8'>
@@ -164,14 +253,14 @@ export default function MyBookings() {
 
 
 
-        
+
       </div>
 
 
       <div className='mt-8 px-[80px] max-sm:px-6 max-lg:px-10'>
         <p className='text-white text-2xl font-bold'>Guide’s Message</p>
 
-        <video src="/videos/DVbanner.mp4" controls loop  className='w-full h-full object-cover rounded-lg mt-4 border border-primary-gray' />
+        <video src="/videos/DVbanner.mp4" controls loop className='w-full h-full object-cover rounded-lg mt-4 border border-primary-gray' />
       </div>
 
       <div className='mt-8 px-[80px] max-sm:px-6 max-lg:px-10'>
@@ -202,7 +291,64 @@ export default function MyBookings() {
 
       <Newsletter />
       <Footer />
+      <DrawerModal isDrawerOpen={isDrawerOpen} setIsDrawerOpen={setIsDrawerOpen}>
+        <div className='flex flex-1 flex-col gap-4 p-8'>
+          <div className="flex items-center  justify-between">
+            <h1></h1>
 
+            <h2 className="text-lg font-bold text-center text-white">Waiver Title</h2>
+
+            <button
+              type="button"
+              onClick={() => setIsDrawerOpen(false)}
+            >
+              <span className="sr-only text-white">Close menu</span>
+              <XMarkIcon className="w-6 h-6 text-white" aria-hidden="true" />
+            </button>
+          </div>
+
+          <div className=''>
+            <p className='text-white '>
+              I, Johnny John, hereby declare the following:
+
+              I am fully and personally responsible for my own safety and actions while and during my participation
+              and I recognize that I may be in any case be at risk of [text here].
+              <br />
+              <br />
+              With full knowledge of the risks involved, I hereby release, waive, discharge ACTOTA, from
+              any and all liabilities, claims, demands, actions, and causes of action whatsoever, directly or indirectly
+              arising out of or related to any loss, damage, injury, or death, that may be sustained by me related to
+              COVID-19 while participating in any activity while in, on, or around the premises or while participating in activities that may lead to unintentional exposure or harm due to the risks involved.
+              <br />
+              <br />
+              I understand that ACTOTA will be taking extensive precautions to protect the guests and to limit the likelihood of unfortunate events and that I am aware of the risks involved from receiving service
+              from the company.
+              <br />
+              <br />
+              I agree to indemnify, defend, and hold harmless the company from and against any and all costs, expenses, damages, lawsuits, and/or liabilities or claims arising whether directly or indirectly from or related to any
+              and all claims made by or against any of the released party due to injury, loss, or death.
+              <br />
+              <br />
+              By signing below I acknowledge that I have read the [Waiver Title] and understand its contents; and fully competent to give my consent; That I have been sufficiently informed of the risks
+              involved and give my voluntary consent in signing it as my own free act and deed; with full intention to be
+              bound by the same, and free from any inducement or representation.
+              <br />
+              <br />
+              In signing this waiver, I agree to cooperate in a safe and orderly manner throughout the trip duration.
+            </p>
+          </div>
+          <div className='flex justify-between items-center gap-2'>
+            <div className='flex-1'>
+
+              <Input placeholder='Your Full Name' />
+            </div>
+            <Button variant='primary' className='px-10' >
+              <p>Sign</p>
+            </Button>
+          </div>
+          <p className='text-primary-gray '>Signature</p>
+        </div>
+      </DrawerModal>
     </section>
   );
 }

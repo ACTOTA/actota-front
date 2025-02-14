@@ -5,7 +5,7 @@ import ItineraryCard from '@/src/components/ItineraryCard';
 import Button from '@/src/components/figma/Button';
 import Newsletter from '@/src/components/Newsletter';
 import Footer from '@/src/components/Footer';
-import Filter from '@/src/components/Filter';
+import Filter from '@/src/components/DrawerModal';
 import ItineraryPageFilter from '@/src/components/ItineraryPageFilter';
 import ItineraryPageAdvanceFilter from '@/src/components/ItineraryPageAdvanceFilter';
 const Itineraries = () => {

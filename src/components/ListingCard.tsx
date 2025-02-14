@@ -2,7 +2,7 @@ import { useRouter } from 'next/navigation';
 
 import React, { useCallback, useEffect } from 'react';
 import HeartButton from '@/src/components/HeartButton';
-import Button from '@/src/components/Button';
+import Button from '@/src/components/figma/Button';
 import { FeaturedVacation } from '@/db/models/itinerary';
 import Image from 'next/image';
 import GlassPanel from '@/src/components/figma/GlassPanel';
