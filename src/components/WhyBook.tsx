@@ -1,26 +1,20 @@
-import Image from 'next/image'
-import GlassPanel from '../components/figma/GlassPanel';
-import { Theme } from '../components/enums/theme';
 import SimpleCard from './SimpleCard';
 
 export default function WhyBook() {
 
   const info = [
     {
-      theme: Theme.Activity,
       image: "/svg-icons/why-book-img1.svg",
       title: "Customize your Itineraries",
       description: "Free cancellation and payment to satisfy your budget and plans."
     },
     {
-      theme: Theme.Transportation,
       image: "/svg-icons/why-book-img2.svg",
       title: "Allocate your Budget",
       description: "Free cancellation and payment to satisfy your budget and plans."
 
     },
     {
-      theme: Theme.Lodging,
       image: "/svg-icons/why-book-img3.svg",
       title: "Guide Experience",
       description: "Free cancellation and payment to satisfy your budget and plans."

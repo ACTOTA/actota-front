@@ -6,6 +6,7 @@ import Search from '@/src/components/navbar/Search';
 import { Alex_Brush } from 'next/font/google';
 import { STEPS } from '../types/steps';
 import { useRouter } from 'next/navigation';
+import { FaHiking } from 'react-icons/fa';
 const alexBrush = Alex_Brush({
     weight: ['400'],
     subsets: ['latin'],
@@ -54,7 +55,6 @@ export default function Hero() {
                     <Search setClasses={setClasses} currStep={currStep} setCurrStep={setCurrStep} />
                 </div>
             </div>
-
         </div>
     );
 }

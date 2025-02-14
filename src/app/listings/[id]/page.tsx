@@ -6,7 +6,6 @@ import { FeaturedVacation } from '@/db/models/itinerary';
 import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon, ClockIcon, HeartIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
 import GlassPanel from '@/src/components/figma/GlassPanel';
-import { Theme } from '@/src/components/enums/theme';
 import Button from '@/src/components/figma/Button';
 import DayView from './DayView';
 import { getAuthCookie } from '@/src/helpers/auth';
@@ -210,7 +209,7 @@ export default function Itinerary() {
               className='rounded-lg object-cover'
               sizes='(max-width: 1536px) 71vw'
             />
-            <GlassPanel className='absolute bottom-2 left-0 right-0 w-fit m-auto rounded-full flex items-center gap-4 !p-3' theme={Theme.Light}>
+            <GlassPanel className='absolute bottom-2 left-0 right-0 w-fit m-auto rounded-full flex items-center gap-4 !p-3' >
               <ChevronLeftIcon className='h-6 w-6 cursor-pointer' onClick={nextImage} />
               {/* <div>{Number(Object.keys(mainPhoto)[0]) + 1} of {listing.images.length}</div> */}
               <div className='text-white'>1 of 3</div>

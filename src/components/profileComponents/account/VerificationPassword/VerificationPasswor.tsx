@@ -6,7 +6,7 @@ import { CiMail } from "react-icons/ci";
 import { FaFacebook } from "react-icons/fa";
 import { IoCheckmark } from "react-icons/io5";
 import Input from "@/src/components/figma/Input";
-import LockIcon from "@/src/assets/svg/lock-icon.svg";
+import LockIcon from "@/public/sidebar-icons/lock-icon.svg";
 import { IoEyeSharp } from "react-icons/io5";
 import { FaRegEyeSlash } from "react-icons/fa";
 

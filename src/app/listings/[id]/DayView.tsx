@@ -1,18 +1,12 @@
 'use client';
 import { FeaturedVacation } from '@/db/models/itinerary';
 import React, { useState, useCallback } from 'react';
-import { MdOutlineRestaurantMenu, MdOutlineDirections } from 'react-icons/md';
-import { IoAirplaneOutline } from 'react-icons/io5';
-import { FaRegClock } from 'react-icons/fa';
 import { BiSolidMap } from 'react-icons/bi';
 import { GoogleMap, Polyline, Marker, LoadScript } from '@react-google-maps/api';
 import { BsCalendar4 } from 'react-icons/bs';
-import { IoCarOutline } from 'react-icons/io5';
-// import { PiHotelLight } from 'react-icons/pi';
-import { GiKnifeFork } from 'react-icons/gi';
 import { MdOutlineExplore } from 'react-icons/md';
 import Button from '@/src/components/figma/Button';
-import ActivityCard from '@/src/components/listings/ActivityCard';
+import ActivityCard from '@/src/components/ActivityCard';
 import FeedbackDrawer from '@/src/components/FeedbackDrawer';
 import DrawerModal from '@/src/components/DrawerModal';
 
@@ -23,11 +17,7 @@ interface DayViewProps {
 	listing: FeaturedVacation;
 }
 
-const mapContainerStyle = {
-	width: '100%',
-	height: '600px',
-	borderRadius: '12px'
-};
+
 
 const defaultCenter = {
 	lat: 39.7392,

@@ -4,7 +4,7 @@ import Button from './figma/Button'
 import { XMarkIcon } from '@heroicons/react/20/solid'
 import Image from 'next/image'
 import Input from './figma/Input'
-import ActivityCard from '@/src/components/listings/ActivityCard';
+import ActivityCard from '@/src/components/ActivityCard';
 import { BiSolidMap } from 'react-icons/bi'
 import { MdOutlineExplore } from 'react-icons/md'
 import FeedbackCard from './FeedbackCard'
