@@ -262,7 +262,7 @@ export default function DayView({ listing }: DayViewProps) {
 				isDrawerOpen={isDrawerOpen}
 				setIsDrawerOpen={setIsDrawerOpen}
 			>
-				<FeedbackDrawer setIsDrawerOpen={setIsDrawerOpen} />
+				<FeedbackDrawer setIsDrawerOpen={setIsDrawerOpen}/>
 			</DrawerModal>
 		</div>
 	);
