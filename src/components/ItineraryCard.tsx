@@ -2,20 +2,18 @@
 import { useRouter } from 'next/navigation';
 
 import React, { useCallback, useEffect } from 'react';
-import HeartButton from '@/src/components/HeartButton';
-import Button from '@/src/components/Button';
 import { FeaturedVacation } from '@/db/models/itinerary';
 import Image from 'next/image';
 import GlassPanel from '@/src/components/figma/GlassPanel';
-import { Theme } from '@/src/components/enums/theme';
-import { FaCar, FaPersonWalking } from 'react-icons/fa6';
-import { GoClock, GoHome } from "react-icons/go";
+import { FaPersonWalking } from 'react-icons/fa6';
+import { GoHome } from "react-icons/go";
 import { LuUsers } from "react-icons/lu";
 import { CgSoftwareUpload } from "react-icons/cg";
 import { FaRegHeart } from "react-icons/fa";
 import { IoLeafOutline } from "react-icons/io5";
 import { CiCalendar } from 'react-icons/ci';
 import { MdOutlineDirectionsCarFilled } from 'react-icons/md';
+import LikeDislike from './LikeDislike';
 interface ListingCardProps {
     data: FeaturedVacation;
     onAction?: (id: string) => void;
@@ -51,7 +49,7 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
 
 
             <div onClick={() => router.push(`/listings/1`)} className='flex justify-between relative gap-4 h-full w-full'>
-                <div>
+                <div className=' w-full'>
                     <div className='flex justify-between items-center text-white'>
                         <p className='text-2xl font-bold'>{data?.trip_name}</p>
                         <div>
@@ -60,8 +58,8 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
                             <p className='text-2xl font-bold'>${data.person_cost}</p>
                         </div>
                     </div>
-                    <p className='py-3 text-sm text-primary-gray'>Denver, Idaho Springs, Glenwood Springs, 2 More.</p>
-                    <div className='flex justify-start items-center gap-3 mt-2 mb-2 text-white' >
+                    <p className='py-6 text-sm text-primary-gray'>Denver, Idaho Springs, Glenwood Springs, 2 More.</p>
+                    <div className='flex justify-start items-center gap-3 mt-2 mb-3 text-white' >
 
                         <div className='flex gap-1 text-xs'>
                             <FaPersonWalking className='h-[17px] w-[17px] text-white' />
@@ -84,8 +82,7 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
                     </div>
                 </div>
 
-                <div>
-                    <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={300} objectFit='cover' className='rounded-lg' />
+                    <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={300}  className='rounded-lg' />
                     <div className='flex gap-2 absolute top-2 right-2'>
                         <button 
                             onClick={(e) => {
@@ -94,19 +91,10 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
                             }} 
                             className='bg-[#05080D] rounded-full h-10 w-10 flex items-center justify-center'
                         > 
-                            <CgSoftwareUpload className='h-5 w-5 text-white' />
+                           <Image src="/svg-icons/share.svg" alt="share" height={20} width={20} />
                         </button>
-                        <button 
-                            onClick={(e) => {
-                                e.stopPropagation();  // Stop the event from bubbling up
-                                router.push("?modal=shareModal");
-                            }} 
-                            className='bg-[#05080D] rounded-full h-10 w-10 flex items-center justify-center'
-                        > 
-                            <FaRegHeart className='h-5 w-5 text-white' />
-                        </button>
+                       <LikeDislike />
                     </div>
-                </div>
             </div>
 
 

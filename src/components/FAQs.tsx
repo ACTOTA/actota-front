@@ -29,7 +29,7 @@ const FAQs = () => {
             <div className="mx-auto   divide-gray-900/10 flex justify-between items-start gap-10">
                 <div className='flex-1'>
                     <h2 className="text-4xl font-bold leading-[80px]  sm:text-[64px]">
-                        Frequently asked questions
+                        Frequently Asked Questions
                     </h2>
                     <p className='text-primary-gray my-10'>Can’t find what you’re looking for?</p>
                     <Button variant="primary" className="bg-white text-black">Contact us</Button>

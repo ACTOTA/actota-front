@@ -6,6 +6,7 @@ import Input from "@/src/components/figma/Input";
 import { FiSearch } from "react-icons/fi";
 import FavoritesCard from "./FavoritesCard";
 import Dropdown from "../../figma/Dropdown";
+import Image from "next/image";
 
 const Favorites = () => {
   const [activeTab, setActiveTab] = useState("all");
@@ -142,14 +143,14 @@ const Favorites = () => {
               className="px-3 py-2.5 "
             />
           </div>
-          <div className="inline-flex">
+          <div className="inline-flex ">
 
-            <Dropdown
-              options={["Recently Favorited", "Oldest"]}
-              onSelect={() => { }}
-              className="border-none !bg-[#141414]"
-              placeholder="Recently Favorited"
-            />
+            <Dropdown label={<div className="flex items-center gap-1">
+              <div className=" h-5 w-5">
+
+                <Image src="/svg-icons/chevron-selector.svg" alt="dropdown-arrow" width={24} height={24} />
+              </div>
+            </div>} options={["Lowest Price", "Highest Price", "Any Duration"]} onSelect={() => { }} className="border-none !bg-[#141414] rounded-lg" />
           </div>
         </div>
         {renderContent()}

@@ -12,7 +12,7 @@ const Booking = () => {
   const [bookings, setBookings] = React.useState<any[]>([{
     id: 1,
     status: "upcoming",
-    delay_insurance: true,
+    delay_insurance: false,
     trip_name: "Lahore",
     fareharbor_id: 1,
     person_cost: 100,
@@ -35,7 +35,7 @@ const Booking = () => {
   {
     id: 2,
     status: "ongoing",
-    delay_insurance: false,
+    delay_insurance: true,
     trip_name: "Lahore",
     fareharbor_id: 1,
     person_cost: 100,

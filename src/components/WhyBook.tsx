@@ -22,8 +22,8 @@ export default function WhyBook() {
   ]
   return (
 
-    <div className='bg-[#00122D] w-full h-full'>
-      <section className="  p-[80px]  w-full  relative flex bg-gradient-to-b from-[rgba(9,14,21,0.50)] to-[#090E15]">
+    <div className='bg-[url("/images/why-book-us-bg.png")] bg-cover bg-center w-full h-full'>
+      <section className="  p-[80px]  w-full  relative flex ">
 
         <div className=" max-w-[1440px] flex flex-col justify-center mx-auto">
 

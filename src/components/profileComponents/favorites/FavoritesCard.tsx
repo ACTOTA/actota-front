@@ -2,20 +2,14 @@
 import { useRouter } from 'next/navigation';
 
 import React, { useCallback, useEffect } from 'react';
-import HeartButton from '@/src/components/HeartButton';
 import Button from '@/src/components/figma/Button';
-import { FeaturedVacation } from '@/db/models/itinerary';
 import Image from 'next/image';
 import GlassPanel from '@/src/components/figma/GlassPanel';
-import { Theme } from '@/src/components/enums/theme';
-import { FaCar, FaPersonWalking } from 'react-icons/fa6';
-import { GoClock, GoHome } from "react-icons/go";
+import { FaPersonWalking } from 'react-icons/fa6';
 import { LuUsers } from "react-icons/lu";
-import { CgSoftwareUpload } from "react-icons/cg";
-import { FaRegHeart } from "react-icons/fa";
 import { IoLeafOutline } from "react-icons/io5";
-import { CiCalendar } from 'react-icons/ci';
-import { MdAccessTime, MdOutlineDirectionsCarFilled } from 'react-icons/md';
+import { MdAccessTime } from 'react-icons/md';
+import LikeDislike from '../../LikeDislike';
 interface ListingCardProps {
     data: any;
     onAction?: (id: string) => void;
@@ -84,8 +78,11 @@ const FavoritesCard: React.FC<ListingCardProps> = ({
 
                 <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={300} objectFit='cover' className='rounded-lg' />
                 <div className='flex gap-2 absolute top-2 right-2'>
-                    <div className=' bg-[#05080D]  rounded-full h-10 w-10 flex items-center justify-center'> <CgSoftwareUpload className='h-5 w-5 text-white' /></div>
-                    <div className=' bg-[#05080D]  rounded-full h-10 w-10 flex items-center justify-center'> <FaRegHeart className='h-5 w-5 text-white' /></div>
+                    <div onClick={(e) => {
+                        e.stopPropagation();
+                        router.push("?modal=shareModal");
+                     }} className=' bg-[#05080D]  rounded-full h-10 w-10 flex items-center justify-center'><Image src="/svg-icons/share.svg" alt="edit" height={20} width={20} /></div>
+                    <LikeDislike liked={true} />
                 </div>
             </div>
 

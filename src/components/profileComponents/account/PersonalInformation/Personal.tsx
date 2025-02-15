@@ -105,7 +105,7 @@ const Personal = () => {
 
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <div className="font-bold text-xl">Personal Information</div>
+          <div className="font-bold text-xl mt-2">Linked Accounts</div>
           <div className="font-normal text-base text-primary-gray">
             By linking a third party site, you’ll be able to directly sign in
             using your third party account information.

@@ -225,7 +225,13 @@ const FeedbackDrawer = ({ setIsDrawerOpen, activityCompleted = false }: { setIsD
           }
         </>
       )}
-      <Button variant='primary' className='w-full mt-4' onClick={() => setFeedbackSent(true)}>{feedbackSent ? "Close" : "Submit Feedback"}</Button>
+      <Button variant='primary' className='w-full mt-4' onClick={() => {
+        if (feedbackSent) {
+          setIsDrawerOpen(false);
+        } else {
+          setFeedbackSent(true);
+        }
+      }}>{feedbackSent ? "Close" : "Submit Feedback"}</Button>
     </div>
   );
 };

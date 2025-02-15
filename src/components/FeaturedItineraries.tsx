@@ -5,8 +5,8 @@ import ListingCard from "@/src/components/ListingCard";
 import { FeaturedVacation } from "@/db/models/itinerary";
 import axios from "axios";
 import Button from "@/src/components/figma/Button";
-import  Dropdown  from "./figma/Dropdown";
-import ItineraryDropdown from "./figma/ItineraryDropdown";
+import Dropdown from "./figma/Dropdown";
+import Image from "next/image";
 export default function FeaturedItineraries() {
   const [listings, setListings] = React.useState<FeaturedVacation[]>([{
     trip_name: "Lahore",
@@ -248,7 +248,48 @@ export default function FeaturedItineraries() {
 
         <div className=" flex justify-between items-center py-5">
           <h2 className="text-2xl font-bold">Itineraries for You</h2>
-         
+          <div className="flex items-center gap-4">
+            <div>
+
+              <Dropdown label={<div className="flex items-center gap-1">
+                <Image src="/svg-icons/leaf.svg" alt="dropdown-arrow" width={24} height={24} />
+                <p className="text-primary-gray text-sm  mr-5">Theme</p>
+              </div>} options={["popular", "new", "old"]} onSelect={() => { }} className="border-none !bg-[#141414] rounded-lg" />
+            </div>
+            <div>
+
+              <Dropdown label={<div className="flex items-center gap-1">
+                <div>
+
+                  <Image src="/svg-icons/doller-coin.svg" alt="dropdown-arrow" width={24} height={24} />
+                </div>
+              </div>} options={["$50-$10,000", "$50-$10,000", "$50-$10,000"]} onSelect={() => { }} className="border-none !bg-[#141414] rounded-lg" />
+
+            </div>
+            <div>
+
+              <Dropdown label={<div className="flex items-center gap-1">
+                <div>
+
+                  <Image src="/svg-icons/clock.svg" alt="dropdown-arrow" width={24} height={24} />
+                </div>
+              </div>} options={["Any Duration", "Any Duration", "Any Duration"]} onSelect={() => { }} className="border-none !bg-[#141414] rounded-lg" />
+
+            </div>
+
+            <div>
+
+              <Dropdown label={<div className="flex items-center gap-1">
+                <div>
+
+                  <Image src="/svg-icons/chevron-selector.svg" alt="dropdown-arrow" width={24} height={24} />
+                </div>
+              </div>} options={["Lowest Price", "Highest Price", "Any Duration"]} onSelect={() => { }} className="border-none !bg-[#141414] rounded-lg" />
+
+            </div>
+
+
+          </div>
 
         </div>
         <div className="flex flex-wrap justify-center gap-4">

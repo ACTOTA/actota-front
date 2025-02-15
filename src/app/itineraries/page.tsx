@@ -8,6 +8,8 @@ import Footer from '@/src/components/Footer';
 import Filter from '@/src/components/DrawerModal';
 import ItineraryPageFilter from '@/src/components/ItineraryPageFilter';
 import ItineraryPageAdvanceFilter from '@/src/components/ItineraryPageAdvanceFilter';
+import Dropdown from '@/src/components/figma/Dropdown';
+import Image from 'next/image';
 const Itineraries = () => {
     const [listings, setListings] = React.useState<FeaturedVacation[]>([{
         trip_name: "Lahore",
@@ -225,10 +227,40 @@ const Itineraries = () => {
     return (
         <div className="max-w-[1440px] mx-auto ">
 
-            <div className="grid grid-cols-3 gap-8 p-[80px] ">
+            <div className="grid grid-cols-3 gap-8 p-[80px] bg-gradient-to-b from-transparent via-[#080E14] to-[#080E14] ">
                 <div className="col-span-2 ">
                     <h2 className="text-[40px] font-bold text-white">Itineraries for You</h2>
-                    <p className="text-white">Itineraries found.</p>
+                    <div className="flex items-center justify-between gap-2">
+
+                        <p className="text-white"> <b>{listings.length}</b> Itineraries found.</p>
+
+
+                        <div className="flex items-center gap-4">
+                            <div>
+
+                                <Dropdown label={<div className="flex items-center gap-1">
+                                    <Image src="/svg-icons/leaf.svg" alt="dropdown-arrow" width={24} height={24} />
+                                    <p className="text-primary-gray text-sm  mr-5">Theme</p>
+                                </div>} options={["popular", "new", "old"]} onSelect={() => { }} className="border-none !bg-[#141414] rounded-lg" />
+                            </div>
+                            <div>
+
+                                <Dropdown label={<div className="flex items-center gap-1">
+                                    <div>
+
+                                        <Image src="/svg-icons/chevron-selector.svg" alt="dropdown-arrow" width={24} height={24} />
+                                    </div>
+                                </div>} options={["Lowest Price", "Highest Price", "Any Duration"]} onSelect={() => { }} className="border-none !bg-[#141414] rounded-lg" />
+
+                            </div>
+
+
+                        </div>
+
+
+
+
+                    </div>
                     {listings.map((listing) => (
                         <ItineraryCard data={listing} />
                     ))}
@@ -237,7 +269,7 @@ const Itineraries = () => {
                         <Button variant="primary" className="bg-white text-black mt-4 ">Load More</Button>
                     </div>
                 </div>
-                <div className="col-span-1 pt-12 ">
+                <div className="col-span-1 pt-14 ">
                     {advanceFilter ?
                         <ItineraryPageAdvanceFilter advanceFilter={advanceFilter} setAdvanceFilter={setAdvanceFilter} />
                         :

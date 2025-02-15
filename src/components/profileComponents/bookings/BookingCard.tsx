@@ -3,16 +3,12 @@ import { useRouter } from 'next/navigation';
 
 import React, { useCallback, useEffect } from 'react';
 import Button from '@/src/components/figma/Button';
-import { FeaturedVacation } from '@/db/models/itinerary';
 import Image from 'next/image';
 import GlassPanel from '@/src/components/figma/GlassPanel';
-import { Theme } from '@/src/components/enums/theme';
-import { FaCar, FaCheck, FaPersonWalking } from 'react-icons/fa6';
-import { GoClock, GoHome } from "react-icons/go";
+import { FaCheck, FaPersonWalking } from 'react-icons/fa6';
+import { GoHome } from "react-icons/go";
 import { LuUsers } from "react-icons/lu";
-import { CgArrowTopRight, CgSoftwareUpload } from "react-icons/cg";
-import { FaRegHeart } from "react-icons/fa";
-import { IoLeafOutline } from "react-icons/io5";
+import { CgArrowTopRight } from "react-icons/cg";
 import { CiCalendar } from 'react-icons/ci';
 import { MdOutlineDirectionsCarFilled } from 'react-icons/md';
 import moment from 'moment';
@@ -54,7 +50,7 @@ const BookingCard: React.FC<ListingCardProps> = ({
             <div className='flex justify-between items-center'>
                 <div className='flex items-center gap-2'>
 
-                    <Button variant='primary' size='sm' className='!bg-[#215CBA] text-white flex items-center gap-1'> {data.status === "upcoming" ? <CiCalendar className='text-white size-5' /> : data.status === "ongoing" ? <Image src="/svg-icons/ongoing-icon.svg" alt="clock" width={16} height={16} /> : <FaCheck className='text-white size-5' />} {data?.status.charAt(0).toUpperCase() + data?.status.slice(1)}</Button>
+                    <Button variant='primary' size='sm' className='!bg-[#215CBA] text-white flex items-center gap-1'> {data.status === "upcoming" ? <CiCalendar className='text-white size-5' /> : data.status === "ongoing" ? <Image src="/svg-icons/ongoing-icon.svg" alt="clock" width={16} height={16} /> : <FaCheck className='text-white size-5' />} {data?.status === "upcoming" ? "in 98 days" : data?.status.charAt(0).toUpperCase() + data?.status.slice(1)}</Button>
                     {bookingConfirmedModal && <p className='text-sm text-primary-gray flex items-center gap-1'><Image src="/svg-icons/airplane.svg" alt="points" width={20} height={20} /> Booking no. <span className='text-white'>{data?.id}</span></p>}
                 </div>
                 <p className='text-sm text-primary-gray'>Booked  <span className='text-white'> {moment(data?.created_at).format("DD MMM YYYY")}</span> </p>
@@ -140,8 +136,8 @@ const BookingCard: React.FC<ListingCardProps> = ({
                     <p className='text-sm text-primary-gray ml-7'>You’ll earn the points once you complete the trip.</p>
                 </div>
                 <div className='flex gap-2'>
-                    {data?.status !== "upcoming" && <Button variant='primary' className='!bg-[#C10B2F] text-white'>Cancel Trip</Button>}
-                    <Button onClick={() => router.push(`/my-bookings`)} variant='outline' className=' text-white gap-2'> View {data?.status === "upcoming" && !bookingConfirmedModal ? "Details" : ""} <CgArrowTopRight className='size-6' /></Button>
+                    {data?.status !== "completed" && <Button variant='primary' className='!bg-[#C10B2F] text-white'>Cancel Trip</Button>}
+                    <Button onClick={() => router.push(`/my-bookings`)} variant='outline' className=' text-white gap-2'> View {data?.status === "completed" && !bookingConfirmedModal ? "Details" : ""} <CgArrowTopRight className='size-6' /></Button>
 
                 </div>
             </div>
