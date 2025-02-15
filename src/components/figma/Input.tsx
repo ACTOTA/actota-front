@@ -37,7 +37,7 @@ export default function Input({ id, name, type, placeholder, value, icon, classn
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className={`block w-full bg-transparent placeholder:text-primary-gray py-4
+        className={`block w-full bg-transparent placeholder:text-primary-gray py-4 !font-manrope
           focus:ring-0 focus:outline-none sm:text-sm sm:leading-6 h-full border-none
           ${icon && 'pl-12'} ${type === 'password' && 'pr-10 bg-transparent'}
         `}

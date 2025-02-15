@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import GlassPanel from '@/src/components/figma/GlassPanel';
 import Input from '@/src/components/figma/Input';
@@ -14,8 +14,49 @@ import { useRouter } from "next/navigation";
 
 export default function SignIn() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({
+    email: '',
+    password: ''
+  });
+  const [rememberMe, setRememberMe] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const validateForm = () => {
+    let tempErrors = {
+      email: '',
+      password: ''
+    };
+    let isValid = true;
+
+    // Email validation
+    if (!email) {
+      tempErrors.email = 'Please provide your email.';
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      tempErrors.email = 'Please enter a valid email address.';
+      isValid = false;
+    }
+
+    // Password validation
+    if (!password) {
+      tempErrors.password = 'Please enter your password.';
+      isValid = false;
+    } else if (password.length < 6) {
+      tempErrors.password = 'Password must be at least 6 characters.';
+      isValid = false;
+    }
+
+    setErrors(tempErrors);
+    return isValid;
+  };
 
   const signIn = () => {
+
+    if (!validateForm()) {
+      return;
+    }
     router.push("?modal=signinLoading")
     setTimeout(() => {
       router.push(window.location.pathname);
@@ -24,6 +65,10 @@ export default function SignIn() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
 
     const formData = new FormData(e.currentTarget as HTMLFormElement);
     const email = formData.get('email') as string;
@@ -79,12 +124,37 @@ export default function SignIn() {
       <form onSubmit={(e) => handleSubmit(e)} className="m-auto flex flex-col gap-4 w-full mt-[16px]">
         <div>
           <p className="text-primary-gray w-96 text-left mb-1 mt-[16px]">Email Address</p>
-          <Input type="email" name="email" icon={<HiOutlineMail className="text-white h-[20px] w-[20px]" />} placeholder="Your email address" />
+          <Input
+            type="email"
+            name="email"
+            value={email}
+            onChange={(e: any) => setEmail(e.target.value)}
+            icon={<Image src="/svg-icons/mail.svg" alt="google" width={20} height={20} />}
+            placeholder="Your email address"
+            classname={errors.email ? 'border-[#79071D] ring-1 ring-[#79071D]' : ''}
+          />
+          {errors.email && (
+            <div className="mt-1 px-2 py-1 text-sm text-white bg-[#79071D] rounded">
+              {errors.email}
+            </div>
+          )}
         </div>
         <div>
           <p className="text-primary-gray w-96 text-left mb-1 mt-[10px]">Password</p>
-          <Input type="password" name="password" icon={<BiLock className="text-white h-[20px] w-[20px]" />} placeholder="Your Password" />
-          <div className="h-2" />
+          <Input
+            type="password"
+            name="password"
+            value={password}
+            onChange={(e: any) => setPassword(e.target.value)}
+            icon={<Image src="/svg-icons/lock.svg" alt="google" width={20} height={20} />}
+            placeholder="Your Password"
+            classname={errors.password ? '!border-[#79071D] !ring-1 !ring-[#79071D]' : ''}
+          />
+          {errors.password && (
+            <div className="mt-1 px-2 py-1 text-sm text-white bg-[#79071D] rounded">
+              {errors.password}
+            </div>
+          )}
         </div>
 
         <Link href="/auth/forgot-password">
@@ -92,7 +162,7 @@ export default function SignIn() {
         </Link>
 
         <div className="flex items-center">
-          <input type="checkbox" name="remember" id="remember" className="mr-2" />
+          <input value={1} onChange={(e) => setRememberMe(e.target.checked)} type="checkbox" name="remember" id="remember" className="mr-2 rounded ring-0 border-none focus:ring-0 focus:outline-none" />
           <p className=' text-[14px] leading-[20px]'>Remember me on this device</p>
         </div>
         <Button onClick={signIn} variant="primary" className="bg-white text-black w-full my-[10px]">Log In</Button>
@@ -104,7 +174,7 @@ export default function SignIn() {
         <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
       </div>
       <div className="flex justify-center items-center gap-[8px] my-[16px] pb-[16px]">
-        <button  className='bg-[#262626] rounded-[8px] py-[16px] px-[70px] flex justify-center items-center  hover:cursor-pointer'>
+        <button className='bg-[#262626] rounded-[8px] py-[16px] px-[70px] flex justify-center items-center  hover:cursor-pointer'>
           <Image src="/svg-icons/google.svg" alt="google" width={20} height={20} />
         </button>
         <button className='bg-[#262626] rounded-[8px] py-[14px] px-[70px] flex justify-center items-center hover:cursor-pointer'>
