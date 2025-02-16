@@ -6,9 +6,12 @@ import FAQs from './FAQs';
 import Newsletter from "./Newsletter";
 import Footer from "./Footer";
 import { useActivities } from '@/src/hooks/queries/activity/useActivityQuery';
+import { useLodging } from '../hooks/queries/lodging/useLodgingQuery';
 const Landing = () => {
-    const { data: activities, isLoading, error } = useActivities();
-    console.log(activities);
+  const { data: lodging } = useLodging();
+  const { data: activities, isLoading, error } = useActivities();
+  console.log(activities);
+  console.log(lodging);
   return (
     <>
       <FeaturedItineraries />

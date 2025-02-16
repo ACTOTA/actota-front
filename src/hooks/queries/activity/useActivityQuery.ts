@@ -12,11 +12,11 @@ async function fetchActivities(): Promise<Activity[]> {
       'Content-Type': 'application/json',
     },
   });
-  
+
   if (!response.ok) {
     throw new Error('Failed to fetch activities');
   }
-  
+
   return response.json();
 }
 
