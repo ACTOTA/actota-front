@@ -43,8 +43,9 @@
     "react-spinners": "^0.13.8",
     "recharts": "^2.15.1",
     "sharp": "^0.33.3",
-    "world-countries": "^5.0.0",
     "slick-carousel": "^1.8.1",
+    "sonner": "^1.7.4",
+    "world-countries": "^5.0.0",
     "zustand": "^4.5.2"
   },
   "devDependencies": {
