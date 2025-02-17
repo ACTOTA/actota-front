@@ -27,7 +27,7 @@ const config: Config = {
         "primary-gray": "#B3B3B3",
         "border-primary": "#6D6D6D",
         cyan: "#79FFE1",
-      },
+      },   
     },
   },
   plugins: [

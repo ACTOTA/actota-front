@@ -31,5 +31,6 @@ export const sessionOptions: SessionOptions = {
     },
   };
 export const getSession = () => {
-    return getIronSession<SessionDataType>(cookies(), sessionOptions);
+    // return getIronSession<SessionDataType>(cookies(), sessionOptions);
+    return defaultSession;
   };  

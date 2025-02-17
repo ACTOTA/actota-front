@@ -91,7 +91,7 @@ export default function Itinerary() {
     ],
     images: [
       "/images/hero-bg.jpg",
-      "/images/hero-bg.jpg",
+      "/images/maroon-bells.jpg",
       "/images/hero-bg.jpg"
     ],
     start_date: new Date("2024-06-15"),
@@ -100,7 +100,8 @@ export default function Itinerary() {
     updated_at: new Date()
   });
   const [isLoading, setIsLoading] = useState(true);
-  const [mainPhoto, setMainPhoto] = useState<{}>();
+  
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   async function get_itinerary_by_id(id: string) {
     try {
@@ -152,27 +153,12 @@ export default function Itinerary() {
     window.location.href = `https://fareharbor.com/embeds/book/adventurecoloradotours/items/${listing.fareharbor_id}/availability/${timestamp}/book/?full-items=yes&flow=345668`;
   };
 
-  const clickImage = (i: number, image: string) => {
-    setMainPhoto({ [i]: image });
-  }
-  const prevImage = () => {
-    let key = Object?.keys(mainPhoto)[0];
-    if (parseInt(key) + 1 < listing.images.length) {
-      setMainPhoto({ [parseInt(key) + 1]: listing.images[parseInt(key) + 1] });
-    } else {
-      setMainPhoto({ 0: listing.images[0] });
-    }
-  }
+ 
 
 
-  const nextImage = () => {
-    let key = Object?.keys(mainPhoto)[0];
-    if (parseInt(key) - 1 >= 0) {
-      setMainPhoto({ [parseInt(key) - 1]: listing.images[parseInt(key) - 1] });
-    } else {
-      setMainPhoto({ [listing.images.length - 1]: listing.images[listing.images.length - 1] });
-    }
-  }
+  const handleSlideClick = (index: number) => {
+    setCurrentIndex(index);
+  };
 
   return (
     <section className='w-full !h-full text-white p-[64px] max-sm:px-6 max-lg:px-10 gap-4'>
@@ -200,41 +186,16 @@ export default function Itinerary() {
       </div>
       <div className='grid md:grid-cols-12 lg:grid-cols-7 gap-6 mt-4'>
 
-        <div>
-          <ListingsSlider />
-        </div>
-        <div className='md:col-span-8 lg:col-span-5 flex flex-col gap-4 w-full '>
-          <div className='w-full aspect-[926/640] relative'>
-            <Image
-              src={"/images/hero-bg.jpg"}
-              // src={Object?.values(mainPhoto)[0]}
-              alt='Image of tour'
-              fill
-              priority
-              className='rounded-lg object-cover'
-              sizes='(max-width: 1536px) 71vw'
-            />
-            <GlassPanel className='absolute bottom-2 left-0 right-0 w-fit m-auto rounded-full flex items-center gap-4 !p-3' >
-              <ChevronLeftIcon className='h-6 w-6 cursor-pointer' onClick={nextImage} />
-              {/* <div>{Number(Object.keys(mainPhoto)[0]) + 1} of {listing.images.length}</div> */}
-              <div className='text-white'>1 of 3</div>
-              <ChevronRightIcon className='h-6 w-6 cursor-pointer' onClick={prevImage} />
-            </GlassPanel>
-          </div>
+        
+        <div className='md:col-span-8 lg:col-span-5 flex flex-col gap-4 w-full'>
+          <ListingsSlider 
+            images={listing.images}
+            currentIndex={currentIndex}
+           
+            onSlideClick={handleSlideClick}
+          />
 
-          <div className='flex gap-4'>
-            {listing.images.map((image, i) => (
-              <div key={i} className={`rounded-[10px] cursor-pointer`} onClick={() => clickImage(i, image)}>
-                <Image
-                  src={image}
-                  alt='Image of tour'
-                  height={100}
-                  width={100}
-                  className='rounded-lg aspect-square object-cover'
-                />
-              </div>
-            ))}
-          </div>
+          
 
           <div className='w-full h-full text-white mt-8 relative'>
             <h2 className='text-white text-xl'><b>Overview</b></h2>
