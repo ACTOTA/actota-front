@@ -117,7 +117,7 @@ const Location = () => {
   ]
   return (
     <div className='w-full h-full '>
-      <section className='flex justify-center  max-w-[1440px] px-[120px] 2xl:mx-auto '>
+      <section className='flex justify-center  max-w-[1440px] px-[100px] 2xl:mx-auto '>
 
         <div className=' text-white   '>
 
@@ -188,18 +188,12 @@ const Location = () => {
                 <p className='rounded-full h-[24px] w-[24px] bg-white mr-6'></p>
               </div>
             </div>
-            <div className='w-[288px] h-[352px] rounded-2xl border border-primary-gray relative overflow-hidden'>
-              <Image
-                width={10}
-                height={10}
-                src="/hero-bg.svg"
-                alt="hero background"
-                className=" w-full h-[352px] object-cover "
-                priority
-              />
-              <div className='absolute bottom-4 left-4 w-full h-[40px]  flex items-center justify-between rounded-lg'>
-                <p className='text-white text-xl'>St. Mary’s Glacier</p>
-                <p className='rounded-full h-[24px] w-[24px] bg-white mr-6'></p>
+            <div className='w-[288px] h-[352px] rounded-2xl border border-primary-gray relative overflow-hidden p-6'>
+
+              <div className=' w-full h-[40px]   rounded-lg'>
+                <p className='text-primary-gray '>About</p>
+                <p className='text-white text-2xl'>St. Mary’s Glacier</p>
+                <p className='text-primary-gray text-sm mt-10'>Explore this 2.6-km out-and-back trail near Idaho Springs, Colorado. Generally considered a moderately challenging route. This is a very popular area for cross-country skiing, fishing, and hiking, so you'll likely encounter other people while exploring. The best times to visit this trail are April through October. Dogs are welcome, but must be on a leash.</p>
               </div>
             </div>
             <div className='w-[288px] h-[352px] rounded-2xl border border-primary-gray relative overflow-hidden'>
@@ -298,7 +292,7 @@ const Location = () => {
             <h2 className="text-[56px] font-bold">Itineraries for You</h2>
             <Button variant="primary" size="md">Find More Itineraries</Button>
           </div>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap justify-center gap-4">
             {listings?.map((listing) => (
               <ListingCard
                 // key={(listing._id as { $oid: string }).$oid}
