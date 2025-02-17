@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, {  useState } from "react";
 import Button from "../../../figma/Button";
 import { FiEdit3 } from "react-icons/fi";
 import Image from "next/image";
@@ -8,14 +8,17 @@ import { GoDotFill } from "react-icons/go";
 import { PlusIcon } from "@heroicons/react/20/solid";
 import Input from "@/src/components/figma/Input";
 import { FaApple, FaArrowRight, FaCheck, FaFacebook } from "react-icons/fa";
-import { CheckBadgeIcon } from "@heroicons/react/24/outline";
 import { BsApple, BsArrowRight } from "react-icons/bs";
 import { IoCheckmark } from "react-icons/io5";
 import { FcGoogle } from "react-icons/fc";
+import PhoneInput from 'react-phone-number-input'
+import { E164Number } from 'libphonenumber-js'
+import 'react-phone-number-input/style.css'
 
 const Personal = () => {
   const [firstName, setFirstName] = useState("");
-  console.log(firstName, "firstName");
+  const [phoneNumber, setPhoneNumber] = useState<E164Number | undefined>();
+  console.log(phoneNumber, 'phoneNumber')
   return (
     <div className="gap-4 flex flex-col">
       <div className="flex justify-between items-center">
@@ -75,12 +78,26 @@ const Personal = () => {
         </div>
         <div className="flex flex-col gap-2">
           <div className="text-sm font-bold">Phone Number</div>
-          <Input
-            placeholder="Phone Number"
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setFirstName(e.target.value)
-            }
-          />
+          <div className="relative">
+            <PhoneInput
+
+              placeholder="Enter phone number"
+              value={phoneNumber}
+              onChange={setPhoneNumber}
+              maxLength={15}
+              international
+              defaultCountry="US"
+              className="focus-within:border-white px-4 border border-primary-gray rounded-lg"
+              class="!bg-transparent text-white w-full border-0 border-l ms-2 outline-none focus:outline-none focus:border-white focus:ring-0"
+              style={{
+                '--PhoneInputCountrySelectArrow-opacity': '1',
+                '--PhoneInputCountrySelectArrow-color': 'white',
+                '--PhoneInputCountrySelectArrow-marginLeft': '1rem',
+                '--PhoneInputCountrySelectArrow-height': '7px',
+                '--PhoneInputCountrySelectArrow-width': '7px',
+              }}
+            />
+          </div>
         </div>
         <div className="flex flex-col gap-2">
           <div className="text-sm font-bold">Date of Birth</div>
@@ -107,7 +124,7 @@ const Personal = () => {
         <div className="flex flex-col gap-2">
           <div className="font-bold text-xl mt-2">Linked Accounts</div>
           <div className="font-normal text-base text-primary-gray">
-            By linking a third party site, you’ll be able to directly sign in
+            By linking a third party site, you'll be able to directly sign in
             using your third party account information.
           </div>
         </div>

@@ -52,7 +52,7 @@ const Payment = () => {
       isDefault: false,
     },
   ]);
-  const [addNewCard, setAddNewCard] = useState(true);
+  const [addNewCard, setAddNewCard] = useState(false);
   const [cardFormData, setCardFormData] = useState<CardFormData>({
     cardHolderName: '',
     cardNumber: '',
@@ -408,7 +408,6 @@ const Payment = () => {
                       value={cardFormData.cardNumber}
                       onChange={handleCardNumberChange}
                       placeholder="Card Number"
-                      maxLength={19}
                       className={cardErrors.cardNumber ? 'border-[#79071D] ring-1 ring-[#79071D]' : ''}
                     />
                     {cardErrors.cardNumber && (
@@ -426,7 +425,6 @@ const Payment = () => {
                         value={cardFormData.expiryDate}
                         onChange={handleCardInputChange}
                         placeholder="MM/YY"
-                        maxLength={5}
                         className={cardErrors.expiryDate ? 'border-[#79071D] ring-1 ring-[#79071D]' : ''}
                       />
                       {cardErrors.expiryDate && (
@@ -443,7 +441,6 @@ const Payment = () => {
                         value={cardFormData.cvv}
                         onChange={handleCardInputChange}
                         placeholder="***"
-                        maxLength={4}
                         className={cardErrors.cvv ? 'border-[#79071D] ring-1 ring-[#79071D]' : ''}
                       />
                       {cardErrors.cvv && (

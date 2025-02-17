@@ -1,13 +1,11 @@
 "use client";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Button from "../../figma/Button";
 import Personal from "./PersonalInformation/Personal";
 import VerificationPasswor from "./VerificationPassword/VerificationPasswor";
 import EmailNotification from "./EmailNotification/EmailNotification";
-
 const Account = () => {
   const [activeTab, setActiveTab] = useState("personal");
-
   const tabs = [
     {
       id: "personal",
