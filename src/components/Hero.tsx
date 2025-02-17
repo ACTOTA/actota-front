@@ -52,7 +52,7 @@ export default function Hero() {
                 </div>
                 <div className={` h-full z-50 
                     ${classes}`}>
-                    <Search setClasses={setClasses} currStep={currStep} setCurrStep={setCurrStep} />
+                    <Search setClasses={setClasses} currStep={currStep} setCurrStep={setCurrStep} navbar={false} />
                 </div>
             </div>
         </div>

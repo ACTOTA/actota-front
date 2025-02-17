@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
 
-export default function Search({ setClasses, currStep, setCurrStep }: { setClasses?: Dispatch<SetStateAction<string>>, currStep?: STEPS, setCurrStep?: Dispatch<SetStateAction<STEPS | null>> }) {
+export default function Search({ setClasses, currStep, setCurrStep, navbar }: { setClasses?: Dispatch<SetStateAction<string>>, currStep?: STEPS | null, setCurrStep?: Dispatch<SetStateAction<STEPS | null>>, navbar?: boolean }) {
   const router = useRouter();
   const [className, setClassName] = useState<string>('');
   const searchRef = useRef<HTMLDivElement>(null);
@@ -48,7 +48,8 @@ export default function Search({ setClasses, currStep, setCurrStep }: { setClass
     // }
 
     console.log("step", step);
-    currStep != null ? setCurrStep?.(null) : setCurrStep?.(step);
+    // currStep != null ? setCurrStep?.(null) : setCurrStep?.(step);
+    setCurrStep?.(step);
 
   }
 
@@ -62,9 +63,11 @@ export default function Search({ setClasses, currStep, setCurrStep }: { setClass
 
       const handleScroll = () => {
         console.log('scrolling');
-        if (window.scrollY >= initialPosition) {
-          setClasses?.('fixed top-[8px] left-1/2 -translate-x-1/2');
-          setClassName('w-[580px] md:w-[640px] xl:w-[700px] 2xl:w-[720px]');
+        if (window.scrollY >= initialPosition && !navbar) {
+          console.log('reached initial position');
+          setClasses?.('fixed top-[8px]  left-1/2 -translate-x-1/2');
+
+          setClassName('w-[580px] md:w-[640px] xl:w-[700px] 2xl:w-[720px] ');
         } else {
           setClasses?.('');
           setClassName('');
@@ -89,47 +92,47 @@ export default function Search({ setClasses, currStep, setCurrStep }: { setClass
         region="EN"
         version="weekly">
 
-        <div className={`items-center   justify-between w-[720px] h-[82px] grid grid-cols-9 rounded-full border-2 border-border-primary
-      bg-black/40 backdrop-filter  backdrop-blur-md text-sm text-white text-left m-auto z-50
+        <div className={`items-center   justify-between ${navbar ? 'w-[420px]   h-[60px] text-primary-gray' : 'w-[720px] h-[82px] text-white'}  grid grid-cols-9 rounded-full border-2 border-border-primary
+      bg-black/40 backdrop-filter  backdrop-blur-sm text-sm  text-left m-auto z-50
           transition-all duration-300 ease-in-out ${className}`} ref={searchRef}>
 
           <section onClick={() => handleSelect(STEPS.LOCATION)}
             id={STEPS.LOCATION.toString()}
             className={`
-            ${currStep == STEPS.LOCATION ? 'border-2 border-white bg-black/50' : 'after:content-[""] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2'}
+            ${currStep == STEPS.LOCATION  ? 'border-2 border-white bg-black/50' : currStep !== STEPS.DATE && 'after:content-[""] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2'}
             rounded-full cursor-pointer z-10 h-full w-full col-span-2
-            flex flex-col justify-center gap-1 pl-8 pr-6 relative
+            flex flex-col justify-center gap-1 text-center relative
           `}>
             <p>Where</p>
-            <p className="text-primary-gray">Location</p>
+            {!navbar && <p className="text-primary-gray">Location</p>}
           </section>
 
           <section onClick={() => handleSelect(STEPS.DATE)}
             id={STEPS.DATE.toString()}
-            className={`${currStep == STEPS.DATE ? 'border-2 border-white bg-black/50' : 'after:content-[""] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
-        flex flex-col justify-center gap-1 pl-8 pr-6 relative`}>
+            className={`${currStep == STEPS.DATE ? 'border-2 border-white bg-black/50' : currStep !== STEPS.GUESTS &&  'after:content-[""] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
+        flex flex-col justify-center gap-1 text-center relative`}>
             <p >When</p>
-            <p className="text-primary-gray">Duration</p>
+            {!navbar && <p className="text-primary-gray">Duration</p>}
           </section>
 
           <section onClick={() => handleSelect(STEPS.GUESTS)}
             id={STEPS.GUESTS.toString()}
-            className={`${currStep == STEPS.GUESTS ? 'border-2 border-white bg-black/50' : 'after:content-[""] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
-        flex flex-col justify-center gap-1 pl-8 pr-6 relative
+            className={`${currStep == STEPS.GUESTS ? 'border-2 border-white bg-black/50' : currStep !== STEPS.ACTIVITIES &&  'after:content-[""] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
+        flex flex-col justify-center gap-1 text-center relative
        `}>
             <p>Who</p>
-            <p className="text-primary-gray">Add Guests</p>
+            {!navbar && <p className="text-primary-gray">Add Guests</p>}
           </section>
 
           <section onClick={() => handleSelect(STEPS.ACTIVITIES)}
             id={STEPS.ACTIVITIES.toString()}
             className={`${currStep == STEPS.ACTIVITIES ? 'border-2 border-white bg-black/50' : ' border-transparent'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
-        flex flex-col justify-center gap-1 pl-8 pr-6 `}>
+        flex flex-col justify-center gap-1 text-center `}>
             <p>What</p>
-            <p className="text-primary-gray">Trip Details</p>
+            {!navbar && <p className="text-primary-gray">Trip Details</p>}
           </section>
 
-          <section className="px-2 col-span-1 h-full w-full flex justify-center items-center">
+          <section className={`${navbar ? ' h-[55px] w-[55px] pr-1  -ml-2' : ' h-full w-full px-2'} col-span-1 flex justify-center items-center`}>
             <div onClick={() => router.push('/itineraries')} className="w-full aspect-square relative rounded-full bg-white cursor-pointer
             transition-all duration-300 ease-in-out">
               <BiSearch size={24} className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 text-black" />

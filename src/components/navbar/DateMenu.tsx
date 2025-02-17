@@ -44,7 +44,7 @@ export default function DateMenu() {
     };
 
     return (
-        <section className="w-full text-white border-2 border-border-primary rounded-3xl flex-col justify-center items-center gap-2 pl-4 pr-4 pt-6">
+        <section className="w-full text-white backdrop-blur-md border-2 border-border-primary rounded-3xl flex-col justify-center items-center gap-2 pl-4 pr-4 pt-6">
             <DateMenuCalendar onDateRangeChange={handleDateRangeChange} />
             <div className='w-full grid grid-cols-2 gap-4'>
                 <div className="justify-center items-center gap-4 inline-flex">

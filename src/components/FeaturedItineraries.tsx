@@ -292,7 +292,7 @@ export default function FeaturedItineraries() {
           </div>
 
         </div>
-        <div className="flex flex-wrap justify-center gap-4">
+        <div className="flex flex-wrap justify-start gap-4">
           {listings?.map((listing) => (
             <ListingCard
               // key={(listing._id as { $oid: string }).$oid}
