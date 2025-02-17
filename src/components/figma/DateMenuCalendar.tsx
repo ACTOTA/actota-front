@@ -46,7 +46,9 @@ export default function DateMenuCalendar({ onDateRangeChange }: DateMenuCalendar
   }, []);
 
 
-  const handleDateSelect = (date: string) => {
+  const handleDateSelect = (date: string, isCurrentMonth: boolean) => {
+    if (!isCurrentMonth) return; // Prevent selection of non-current month days
+    
     let newStartDate = startDate;
     let newEndDate = endDate;
 
@@ -68,15 +70,18 @@ export default function DateMenuCalendar({ onDateRangeChange }: DateMenuCalendar
   }
 
 
-  const isInRange = (date: string) => {
+  const isInRange = (date: string, isCurrentMonth: boolean) => {
+    if (!isCurrentMonth) return false;
     if (!startDate || !endDate) return false;
     const currentDate = new Date(date);
     return currentDate > new Date(startDate) && currentDate < new Date(endDate);
   }
-  const isStart = (date: string) => {
+  const isStart = (date: string, isCurrentMonth: boolean) => {
+    if (!isCurrentMonth) return false;
     return date === startDate;
   }
-  const isEnd = (date: string) => {
+  const isEnd = (date: string, isCurrentMonth: boolean) => {
+    if (!isCurrentMonth) return false;
     return date === endDate;
   }
 
@@ -119,19 +124,20 @@ export default function DateMenuCalendar({ onDateRangeChange }: DateMenuCalendar
                 <button
                   key={day.date}
                   type="button"
-                  onClick={() => handleDateSelect(day.date)}
+                  onClick={() => handleDateSelect(day.date, day.isCurrentMonth)}
+                  disabled={!day.isCurrentMonth}
                   className={classNames(
-                    day.isCurrentMonth ? 'text-neural-06' : 'text-gray-700',
+                    day.isCurrentMonth ? 'text-neutral-06' : 'text-gray-400 cursor-default hover:bg-transparent',
                     dayIdx === 0 && 'rounded-tl-lg',
                     dayIdx === 6 && 'rounded-tr-lg',
                     dayIdx === month.days.length - 7 && 'rounded-bl-lg',
                     dayIdx === month.days.length - 1 && 'rounded-br-lg',
-                    'relative py-1.5 hover:bg-red-500 hover:bg-opacity-15 hover:rounded-lg focus:z-10',
-                    isStart(day.date) && 'bg-white text-black rounded-l-lg',
-                    isEnd(day.date) && 'bg-white text-black rounded-r-lg',
-                    isInRange(day.date) && 'translucent-white20 text-white'
+                    'relative py-1.5',
+                    day.isCurrentMonth && 'hover:bg-red-500 hover:bg-opacity-15 hover:rounded-lg focus:z-10',
+                    isStart(day.date, day.isCurrentMonth) && 'bg-white text-black rounded-l-lg',
+                    isEnd(day.date, day.isCurrentMonth) && 'bg-white text-black rounded-r-lg',
+                    isInRange(day.date, day.isCurrentMonth) && 'translucent-white20 text-white'
                   )}
-
                 >
                   <time
                     dateTime={day.date}
@@ -142,7 +148,7 @@ export default function DateMenuCalendar({ onDateRangeChange }: DateMenuCalendar
                   >
                     {day.isToday && (
                       <span className="absolute bottom-[-2px] left-1/2 -translate-x-1/2 w-2 h-2 rounded-full red-04"></span>
-                    )}{day.date.split('-').pop().replace(/^0/, '')}
+                    )}{day.date?.split('-').pop()?.replace(/^0/, '') || ''}
                   </time>
                 </button>
               ))}
