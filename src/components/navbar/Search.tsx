@@ -12,35 +12,30 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
   const router = useRouter();
   const [className, setClassName] = useState<string>('');
   const searchRef = useRef<HTMLDivElement>(null);
-  const stepsEle = useRef<HTMLDivElement>(null);
 
 
-  const selectedClasses = useMemo(() => {
-    return ['border-solid', 'border-[2px]', 'border-[#FFF]', 'rounded-full'];
-  }, []);
-
+  
   useEffect(() => {
-    function handleClick(event: MouseEvent) {
-      console.log("currStep", currStep);
-      console.log("stepsEle", stepsEle.current);
-
-      const targetEle = event.target as HTMLElement;
-
-      if ((stepsEle.current && !stepsEle.current.contains(event.target as Node)
-        || !stepsEle.current) || targetEle.id == currStep?.toString()) {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      const searchBar = document.getElementById('search-bar');
+      const searchBox = document.getElementById('search-box');
+      
+      // Only close if click is outside both search-bar and search-box
+      if (!searchBar?.contains(target) && !searchBox?.contains(target)) {
         console.log('click outside');
-
         setCurrStep?.(null);
       }
+    };
+
+    if (currStep !== null) {
+      document.addEventListener('mousedown', handleClickOutside);
     }
 
-    document.addEventListener('click', handleClick);
-
     return () => {
-      document.removeEventListener('click', handleClick);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [currStep, selectedClasses]);
-
+  }, [currStep]);
   const handleSelect = (step: STEPS) => {
     const ele = document.getElementById(step.toString());
     // if (ele) {
@@ -84,7 +79,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
 
 
   return (
-    <>
+    <div className="w-full  relative"  id="search-bar">
       <LoadScript
         googleMapsApiKey={API_KEY}
         libraries={['places', 'drawing', 'visualization', 'marker']}
@@ -92,7 +87,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
         region="EN"
         version="weekly">
 
-        <div className={`items-center   justify-between ${navbar ? 'w-[420px]   h-[60px] text-primary-gray' : 'w-[720px] h-[82px] text-white'}  grid grid-cols-9 rounded-full border-2 border-border-primary
+        <div className={`items-center    justify-between ${navbar ? 'w-[420px]   h-[60px] text-primary-gray' : 'w-[720px] h-[82px] text-white'}  grid grid-cols-9 rounded-full border-2 border-border-primary
       bg-black/40 backdrop-filter  backdrop-blur-sm text-sm  text-left m-auto z-50
           transition-all duration-300 ease-in-out ${className}`} ref={searchRef}>
 
@@ -142,12 +137,13 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
 
         {currStep != null && (
 
-
-          <SearchBoxes step={currStep} reference={stepsEle} />
+          <div id='search-box' className="w-full">
+            <SearchBoxes step={currStep}  />
+          </div>
         )}
 
       </LoadScript >
-    </>
+    </div>
 
   );
 }

@@ -11,6 +11,7 @@ interface Location {
   state: string;
   lat: number;
   lng: number;
+  country: string;
 }
 
 export default function LocationMenu() {
@@ -46,20 +47,16 @@ export default function LocationMenu() {
   const searchLocations = (query: string) => {
     if (!window.google) return;
 
-    // Create AutocompleteService instance for suggestions
     const autoCompleteService = new google.maps.places.AutocompleteService();
     const geocoder = new google.maps.Geocoder();
 
-    // Get predictions first
+    // Removed restrictions to allow all types of places worldwide
     autoCompleteService.getPlacePredictions(
       {
         input: query,
-        // types: ['(cities)'], // Restrict to cities only
-        // componentRestrictions: { country: 'US' } // Restrict to US locations
       },
       (predictions, status) => {
         if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
-          // Get detailed information for each prediction
           Promise.all(
             predictions.map((prediction) => {
               return new Promise<Location>((resolve) => {
@@ -73,25 +70,39 @@ export default function LocationMenu() {
                       let lat = result.geometry.location.lat();
                       let lng = result.geometry.location.lng();
 
+                      // Updated component mapping to handle different location types
                       addressComponents.forEach((component) => {
-                        if (component.types.includes("locality")) {
+                        if (component.types.includes("locality") || 
+                            component.types.includes("postal_town") ||
+                            component.types.includes("administrative_area_level_3")) {
                           city = component.long_name;
                         }
                         if (component.types.includes("administrative_area_level_1")) {
-                          state = component.short_name; // Using short_name for state abbreviation
+                          state = component.long_name; // Changed to long_name for full state/province names
+                        }
+                        // If no city found, use the most specific component
+                        if (!city && component.types.includes("political")) {
+                          city = component.long_name;
                         }
                       });
 
-                      resolve({ city, state, lat, lng });
+                      // If still no city, use formatted address
+                      if (!city) {
+                        const parts = result.formatted_address.split(',');
+                        city = parts[0].trim();
+                      }
+
+                      resolve({ city, state, lat, lng, country: result.formatted_address.split(',').pop()?.trim() || "" });
                     } else {
-                      resolve({ city: "", state: "", lat: 0, lng: 0 }); // Fallback
+                      resolve({ city: "", state: "", lat: 0, lng: 0, country: "" });
                     }
                   }
                 );
               });
             })
           ).then((locations) => {
-            setResults(locations.filter((loc) => loc.city && loc.state));
+            // Filter only locations that have at least a city name
+            setResults(locations.filter((loc) => loc.city));
           });
         } else {
           setResults([]);
@@ -131,7 +142,7 @@ export default function LocationMenu() {
                       <GrLocation className="size-4" />
                       <div>
                         <div className="font-medium">{location.city}</div>
-                        <div className="text-sm text-gray-300">{location.state}, USA</div>
+                        <div className="text-sm text-gray-300">{location.state } {location.country} </div>
                       </div>
                     </div>
                   </li>
