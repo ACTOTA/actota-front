@@ -14,6 +14,7 @@ export default function Search({ setClasses, currStep, setCurrStep }: { setClass
   const searchRef = useRef<HTMLDivElement>(null);
   const stepsEle = useRef<HTMLDivElement>(null);
 
+
   const selectedClasses = useMemo(() => {
     return ['border-solid', 'border-[2px]', 'border-[#FFF]', 'rounded-full'];
   }, []);
@@ -92,7 +93,7 @@ export default function Search({ setClasses, currStep, setCurrStep }: { setClass
       bg-black/40 backdrop-filter  backdrop-blur-md text-sm text-white text-left m-auto z-50
           transition-all duration-300 ease-in-out ${className}`} ref={searchRef}>
 
-          <section  onClick={() => handleSelect(STEPS.LOCATION)}
+          <section onClick={() => handleSelect(STEPS.LOCATION)}
             id={STEPS.LOCATION.toString()}
             className={`
             ${currStep == STEPS.LOCATION ? 'border-2 border-white bg-black/50' : 'after:content-[""] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2'}
@@ -103,7 +104,7 @@ export default function Search({ setClasses, currStep, setCurrStep }: { setClass
             <p className="text-primary-gray">Location</p>
           </section>
 
-          <section  onClick={() => handleSelect(STEPS.DATE)}
+          <section onClick={() => handleSelect(STEPS.DATE)}
             id={STEPS.DATE.toString()}
             className={`${currStep == STEPS.DATE ? 'border-2 border-white bg-black/50' : 'after:content-[""] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
         flex flex-col justify-center gap-1 pl-8 pr-6 relative`}>
@@ -111,7 +112,7 @@ export default function Search({ setClasses, currStep, setCurrStep }: { setClass
             <p className="text-primary-gray">Duration</p>
           </section>
 
-          <section  onClick={() => handleSelect(STEPS.GUESTS)}
+          <section onClick={() => handleSelect(STEPS.GUESTS)}
             id={STEPS.GUESTS.toString()}
             className={`${currStep == STEPS.GUESTS ? 'border-2 border-white bg-black/50' : 'after:content-[""] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
         flex flex-col justify-center gap-1 pl-8 pr-6 relative
@@ -120,7 +121,7 @@ export default function Search({ setClasses, currStep, setCurrStep }: { setClass
             <p className="text-primary-gray">Add Guests</p>
           </section>
 
-          <section  onClick={() => handleSelect(STEPS.ACTIVITIES)}
+          <section onClick={() => handleSelect(STEPS.ACTIVITIES)}
             id={STEPS.ACTIVITIES.toString()}
             className={`${currStep == STEPS.ACTIVITIES ? 'border-2 border-white bg-black/50' : ' border-transparent'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
         flex flex-col justify-center gap-1 pl-8 pr-6 `}>
@@ -128,7 +129,7 @@ export default function Search({ setClasses, currStep, setCurrStep }: { setClass
             <p className="text-primary-gray">Trip Details</p>
           </section>
 
-          <section  className="px-2 col-span-1 h-full w-full flex justify-center items-center">
+          <section className="px-2 col-span-1 h-full w-full flex justify-center items-center">
             <div onClick={() => router.push('/itineraries')} className="w-full aspect-square relative rounded-full bg-white cursor-pointer
             transition-all duration-300 ease-in-out">
               <BiSearch size={24} className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 text-black" />

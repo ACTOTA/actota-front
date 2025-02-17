@@ -1,6 +1,11 @@
 import SimpleCard from './SimpleCard';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function WhyBook() {
+
+  const queryClient = useQueryClient();
+  const data = queryClient.getQueryData(['lodging']);
+  console.log(data);
 
   const info = [
     {
