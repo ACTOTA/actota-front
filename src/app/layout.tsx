@@ -1,7 +1,8 @@
 import React from "react";
 import { Nunito, Manrope } from "next/font/google";
 import "./globals.css";
-
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import Navbar from "@/src/components/navbar/Navbar";
 import ClientOnly from "@/src/components/ClientOnly";
 import ModalContainer from "../components/ModalContainer";

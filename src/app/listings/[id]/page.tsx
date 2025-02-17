@@ -17,6 +17,7 @@ import { PiClockDuotone } from 'react-icons/pi';
 import { GoHome } from 'react-icons/go';
 import { MdOutlineDirectionsCarFilled } from 'react-icons/md';
 import ActivityTag from '@/src/components/figma/ActivityTag';
+import ListingsSlider from '@/src/components/ListingsSlider';
 
 export default function Itinerary() {
   const pathname = usePathname() as string;
@@ -198,6 +199,10 @@ export default function Itinerary() {
         </div>
       </div>
       <div className='grid md:grid-cols-12 lg:grid-cols-7 gap-6 mt-4'>
+
+        <div>
+          <ListingsSlider />
+        </div>
         <div className='md:col-span-8 lg:col-span-5 flex flex-col gap-4 w-full '>
           <div className='w-full aspect-[926/640] relative'>
             <Image
