@@ -1,4 +1,4 @@
-export interface FeaturedVacation {
+export interface Itinerary {
   _id?: Object;
   trip_name: string;
   fareharbor_id: number;

@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react';
-import { FeaturedVacation } from '@/db/models/itinerary';
+import { Itinerary } from '@/db/models/itinerary';
 import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon, ClockIcon, HeartIcon, XMarkIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
 import GlassPanel from '@/src/components/figma/GlassPanel';

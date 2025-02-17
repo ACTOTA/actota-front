@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react';
-import { FeaturedVacation } from '@/db/models/itinerary';
+import { Itinerary } from '@/db/models/itinerary';
 import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon, ClockIcon, HeartIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
 import GlassPanel from '@/src/components/figma/GlassPanel';
@@ -23,7 +23,7 @@ export default function Itinerary() {
   const router = useRouter();
 
   const objectId = pathname.substring(pathname.lastIndexOf('/') + 1);
-  const [listing, setListings] = useState<FeaturedVacation>({
+  const [listing, setListings] = useState<Itinerary>({
     trip_name: "Yellowstone Adventure",
     fareharbor_id: 12345,
     person_cost: 599.99,

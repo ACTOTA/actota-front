@@ -7,11 +7,14 @@ import Newsletter from "./Newsletter";
 import Footer from "./Footer";
 import { useActivities } from '@/src/hooks/queries/activity/useActivityQuery';
 import { useLodging } from '../hooks/queries/lodging/useLodgingQuery';
+import { useItineraries } from '../hooks/queries/itinerary/useItineraryQuery';
 const Landing = () => {
   const { data: lodging } = useLodging();
   const { data: activities, isLoading, error } = useActivities();
+  const { data: itineraries } = useItineraries();
   console.log(activities);
   console.log(lodging);
+  console.log(itineraries);
   return (
     <>
       <FeaturedItineraries />

@@ -1,6 +1,6 @@
 'use client'
-import React, { useState } from 'react'
-import { FeaturedVacation } from "@/db/models/itinerary";
+import React, { useEffect, useState } from 'react'
+import { Itinerary } from "@/db/models/itinerary";
 import ItineraryCard from '@/src/components/ItineraryCard';
 import Button from '@/src/components/figma/Button';
 import Newsletter from '@/src/components/Newsletter';
@@ -10,8 +10,11 @@ import ItineraryPageFilter from '@/src/components/ItineraryPageFilter';
 import ItineraryPageAdvanceFilter from '@/src/components/ItineraryPageAdvanceFilter';
 import Dropdown from '@/src/components/figma/Dropdown';
 import Image from 'next/image';
+import { useQueryClient } from '@tanstack/react-query';
+
 const Itineraries = () => {
-    const [listings, setListings] = React.useState<FeaturedVacation[]>([{
+
+    const [listings, setListings] = React.useState<Itinerary[]>([{
         trip_name: "Lahore",
         fareharbor_id: 1,
         person_cost: 100,

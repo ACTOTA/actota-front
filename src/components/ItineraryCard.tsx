@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation';
 
 import React, { useCallback, useEffect } from 'react';
-import { FeaturedVacation } from '@/db/models/itinerary';
+import { Itinerary } from '@/db/models/itinerary';
 import Image from 'next/image';
 import GlassPanel from '@/src/components/figma/GlassPanel';
 import { FaPersonWalking } from 'react-icons/fa6';
@@ -15,7 +15,7 @@ import { CiCalendar } from 'react-icons/ci';
 import { MdOutlineDirectionsCarFilled } from 'react-icons/md';
 import LikeDislike from './LikeDislike';
 interface ListingCardProps {
-    data: FeaturedVacation;
+    data: Itinerary;
     onAction?: (id: string) => void;
     disabled?: boolean;
     actionLabel?: string;
@@ -45,7 +45,7 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
 
 
     return (
-        <GlassPanel  className='!p-4 !rounded-[22px] max-w-[864px] hover:cursor-pointer flex justify-between items-end mt-4 bg-gradient-to-br from-[#6B6B6B]/30 to-[black]'>
+        <GlassPanel className='!p-4 !rounded-[22px] max-w-[864px] hover:cursor-pointer flex justify-between items-end mt-4 bg-gradient-to-br from-[#6B6B6B]/30 to-[black]'>
 
 
             <div onClick={() => router.push(`/listings/1`)} className='flex justify-between relative gap-4 h-full w-full'>
@@ -82,19 +82,19 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
                     </div>
                 </div>
 
-                    <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={300}  className='rounded-lg' />
-                    <div className='flex gap-2 absolute top-2 right-2'>
-                        <button 
-                            onClick={(e) => {
-                                e.stopPropagation();  // Stop the event from bubbling up
-                                router.push("?modal=shareModal");
-                            }} 
-                            className='bg-[#05080D] rounded-full h-10 w-10 flex items-center justify-center'
-                        > 
-                           <Image src="/svg-icons/share.svg" alt="share" height={20} width={20} />
-                        </button>
-                       <LikeDislike />
-                    </div>
+                <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={300} className='rounded-lg' />
+                <div className='flex gap-2 absolute top-2 right-2'>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();  // Stop the event from bubbling up
+                            router.push("?modal=shareModal");
+                        }}
+                        className='bg-[#05080D] rounded-full h-10 w-10 flex items-center justify-center'
+                    >
+                        <Image src="/svg-icons/share.svg" alt="share" height={20} width={20} />
+                    </button>
+                    <LikeDislike />
+                </div>
             </div>
 
 

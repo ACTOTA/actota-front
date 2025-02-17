@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect } from 'react';
 import HeartButton from '@/src/components/HeartButton';
 import Button from '@/src/components/figma/Button';
-import { FeaturedVacation } from '@/db/models/itinerary';
+import { Itinerary } from '@/db/models/itinerary';
 import Image from 'next/image';
 import GlassPanel from '@/src/components/figma/GlassPanel';
 import { Theme } from '@/src/components/enums/theme';
@@ -14,7 +14,7 @@ import { CgSoftwareUpload } from "react-icons/cg";
 import { FaRegHeart } from "react-icons/fa";
 import { IoLeafOutline } from "react-icons/io5";
 interface ListingCardProps {
-    data: FeaturedVacation;
+    data: Itinerary;
     onAction?: (id: string) => void;
     disabled?: boolean;
     actionLabel?: string;
@@ -56,25 +56,25 @@ const ListingCard: React.FC<ListingCardProps> = ({
                         <div className=' bg-[#05080D]  rounded-full px-3 py-1  ml-4 flex items-center justify-center gap-1'> <IoLeafOutline className='h-5 w-5 text-white' />Mindfulness</div>
 
                         <div className='flex gap-2'>
-                        <button 
-                            onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();  // Stop the event from bubbling up
-                                router.push("?modal=shareModal");
-                            }} 
-                            className='bg-[#05080D] rounded-full h-10 w-10 flex items-center justify-center'
-                        > 
-                            <CgSoftwareUpload className='h-5 w-5 text-white' />
-                        </button>
-                        <button 
-                            onClick={(e) => {
-                                e.stopPropagation();  // Stop the event from bubbling up
-                                router.push("?modal=shareModal");
-                            }} 
-                            className='bg-[#05080D] rounded-full h-10 w-10 flex items-center justify-center'
-                        > 
-                            <FaRegHeart className='h-5 w-5 text-white' />
-                        </button>
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();  // Stop the event from bubbling up
+                                    router.push("?modal=shareModal");
+                                }}
+                                className='bg-[#05080D] rounded-full h-10 w-10 flex items-center justify-center'
+                            >
+                                <CgSoftwareUpload className='h-5 w-5 text-white' />
+                            </button>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();  // Stop the event from bubbling up
+                                    router.push("?modal=shareModal");
+                                }}
+                                className='bg-[#05080D] rounded-full h-10 w-10 flex items-center justify-center'
+                            >
+                                <FaRegHeart className='h-5 w-5 text-white' />
+                            </button>
                         </div>
                     </div>
                     <div className=' bottom-0 left-0 w-[292px] absolute border border-border-primary bg-black/50 backdrop-blur-[4px]  rounded-lg m-2'>

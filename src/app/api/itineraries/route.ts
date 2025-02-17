@@ -4,14 +4,9 @@ import { NextResponse } from 'next/server';
 export async function GET() {
 	try {
 
-		// TODO: Replace with Actota API
-		// TODO: replace env public api url to use local host
-
-		const response = await actotaApi.get('/api/lodging', {
+		const response = await actotaApi.get('/api/itineraries', {
 			headers: {
-				'Content-Type': 'application/json',
-				// TODO: put hardcoded token as for now
-				// "Authorization": `Bearer ${session.token}`
+				'Content-Type': 'application/json'
 			},
 		});
 
@@ -22,8 +17,9 @@ export async function GET() {
 	} catch (error) {
 		console.error('Fetch error:', error);
 		return NextResponse.json(
-			{ error: 'Failed to fetch lodging' },
+			{ error: 'Failed to fetch itineraries' },
 			{ status: 500 }
 		);
 	}
 }
+

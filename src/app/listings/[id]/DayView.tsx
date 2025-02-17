@@ -1,5 +1,5 @@
 'use client';
-import { FeaturedVacation } from '@/db/models/itinerary';
+import { Itinerary } from '@/db/models/itinerary';
 import React, { useState, useCallback } from 'react';
 import { BiSolidMap } from 'react-icons/bi';
 import { GoogleMap, Polyline, Marker, LoadScript } from '@react-google-maps/api';
@@ -14,7 +14,7 @@ import DrawerModal from '@/src/components/DrawerModal';
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
 
 interface DayViewProps {
-	listing: FeaturedVacation;
+	listing: Itinerary;
 }
 
 
@@ -252,7 +252,7 @@ export default function DayView({ listing }: DayViewProps) {
 				isDrawerOpen={isDrawerOpen}
 				setIsDrawerOpen={setIsDrawerOpen}
 			>
-				<FeedbackDrawer setIsDrawerOpen={setIsDrawerOpen}/>
+				<FeedbackDrawer setIsDrawerOpen={setIsDrawerOpen} />
 			</DrawerModal>
 		</div>
 	);

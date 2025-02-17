@@ -3,7 +3,6 @@ import { useRouter } from 'next/navigation';
 
 import React, { useCallback, useEffect } from 'react';
 import Button from '@/src/components/figma/Button';
-import { FeaturedVacation } from '@/db/models/itinerary';
 import Image from 'next/image';
 import GlassPanel from '@/src/components/figma/GlassPanel';
 import { Theme } from '@/src/components/enums/theme';
@@ -55,7 +54,7 @@ const MyItineraryCard: React.FC<ListingCardProps> = ({
 
                 </div>
                 <div className='flex gap-2'>
-                   <Button variant='primary' size='sm' className='!bg-[#C10B2F] text-white'>Delete</Button>
+                    <Button variant='primary' size='sm' className='!bg-[#C10B2F] text-white'>Delete</Button>
                     <Button variant='outline' size='sm' className=' text-white gap-2'> View <CgArrowRight className='size-6' /></Button>
                 </div>
             </div>
