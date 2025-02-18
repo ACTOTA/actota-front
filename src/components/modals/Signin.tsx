@@ -17,7 +17,7 @@ const Signin = () => {
         }, 3000)
     }
     return (
-        <div>
+        <div className='w-full'>
 
             <p className='text-white text-xl font-bold'>Sign In</p>
             <p className="m-auto mt-1 text-primary-gray text-[16px] leading-[20px]">Don’t have an account? <button onClick={() => router.push("?modal=signup")} className="text-white"><b><u>Sign up here</u></b></button></p>

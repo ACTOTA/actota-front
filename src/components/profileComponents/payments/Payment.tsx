@@ -220,17 +220,18 @@ const Payment = () => {
 
   // Delete card
   const handleDeleteCard = (cardId: number) => {
-    setSavedCards(prev => {
-      const deletedCard = prev.find(card => card.id === cardId);
-      const remainingCards = prev.filter(card => card.id !== cardId);
+    router.push("?modal=deletePaymentCard");
+    // setSavedCards(prev => {
+    //   const deletedCard = prev.find(card => card.id === cardId);
+    //   const remainingCards = prev.filter(card => card.id !== cardId);
 
-      // If deleted card was default, set first remaining card as default
-      if (deletedCard?.isDefault && remainingCards.length > 0) {
-        remainingCards[0].isDefault = true;
-      }
+    //   // If deleted card was default, set first remaining card as default
+    //   if (deletedCard?.isDefault && remainingCards.length > 0) {
+    //     remainingCards[0].isDefault = true;
+    //   }
 
-      return remainingCards;
-    });
+    //   return remainingCards;
+    // });
   };
 
   // Set card as default

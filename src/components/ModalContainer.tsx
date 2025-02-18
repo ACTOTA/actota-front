@@ -45,7 +45,7 @@ export default function ModalContainer() {
          router.push(window.location.pathname);
     };
     return (
-        <Modal onClose={handleClose} isLoading={openModal === "loading" || openModal === "signinLoading" || openModal === "signupLoading"}>
+        <Modal onClose={handleClose} isLoading={openModal === "loading" || openModal === "signinLoading" || openModal === "signupLoading" || openModal === "guestCheckoutLoading"} >
             {ModalComponent}
         </Modal>
     );

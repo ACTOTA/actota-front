@@ -4,7 +4,7 @@ import Button from '../figma/Button'
 
 const CookieBanner = () => {
     return (
-        <div>
+        <div className='w-full'>
             <div className='-m-2'>
                 <Cookie />
             </div>

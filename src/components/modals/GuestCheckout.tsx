@@ -17,7 +17,7 @@ const GuestCheckout = () => {
         }, 3000)
     }
     return (
-        <div>
+        <div className='w-full'>
             <p className='text-white text-xl font-bold'>Guest Checkout</p>
             <p className="m-auto mt-1 text-primary-gray text-[16px] leading-[20px]">Already have an account? <Link href="/auth/signin" className="text-white"><b><u>Sign in here</u></b></Link></p>
 

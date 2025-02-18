@@ -18,7 +18,7 @@ const ShareModal = () => {
 
     ]);
     return (
-        <div>
+        <div className='w-full'>
 
             <p className='text-white text-2xl font-bold'>Share Itinerary</p>
             <div className='flex gap-2 mt-4'>
@@ -31,7 +31,7 @@ const ShareModal = () => {
 
             </div>
             <p className='text-primary-gray text-sm mt-4 mb-2'>or copy link</p>
-            <div className='w-[430px]'>
+            <div className='w-full'>
                 <Input rightIcon={<button className='flex items-center gap-1'>Copy <PiCopyLight className='h-5 w-5 text-white' /> </button>} type="text" className='w-full bg-black/50 rounded-full border border-border-primary' placeholder='https://www.actota.com/itinerary/123' />
             </div>
             <div className='mt-4'>
