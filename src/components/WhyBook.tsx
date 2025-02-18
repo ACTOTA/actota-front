@@ -28,15 +28,15 @@ export default function WhyBook() {
   return (
 
     <div className='bg-[url("/images/why-book-us-bg.png")] bg-cover bg-center w-full h-full'>
-      <section className="  p-[80px]  w-full  relative flex ">
+      <section className="p-4   sm:p-[80px]   w-full  relative flex ">
 
         <div className=" max-w-[1440px] flex flex-col justify-center mx-auto">
 
-          <h2 className=" font-bold leading-[80px] sm:text-[64px] text-center text-white">
+          <h2 className=" font-bold sm:leading-[80px] text-2xl sm:text-[64px] max-sm:mt-4 sm:text-center  text-white">
             Why Book with Us?
           </h2>
-          <p className='text-primary-gray mt-[16px] text-center'>With innovative features like itineraries customizing and budget allocation, we offer a seamless booking experience for your dream trip. </p>
-          <div className="flex justify-center items-center flex-wrap gap-8 self-stretch mt-[80px]">
+          <p className='text-white sm:text-primary-gray mt-[16px] sm:text-center'>With innovative features like itineraries customizing and budget allocation, we offer a seamless booking experience for your dream trip. </p>
+          <div className="flex justify-center items-center flex-wrap gap-8 self-stretch mt-8 sm:mt-[80px]">
             {info.map((item, i) => (
               <SimpleCard showButton={false} image={item.image} title={item.title} description={item.description} />
 

@@ -244,11 +244,11 @@ export default function FeaturedItineraries() {
 
   return (
     <section className=" w-full text-white">
-      <div className="max-w-[1440px] mx-auto p-[80px]">
+      <div className="max-w-[1440px] mx-auto p-[80px] max-lg:px-8 max-sm:px-4 ">
 
-        <div className=" flex justify-between items-center py-5">
+        <div className=" flex justify-between items-center flex-wrap py-5">
           <h2 className="text-2xl font-bold">Itineraries for You</h2>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center flex-wrap max-sm:justify-between gap-4">
             <div>
 
               <Dropdown label={<div className="flex items-center gap-1">
@@ -292,7 +292,7 @@ export default function FeaturedItineraries() {
           </div>
 
         </div>
-        <div className="flex flex-wrap justify-start gap-4">
+        <div className="flex flex-wrap justify-start max-sm:justify-center gap-4">
           {listings?.map((listing) => (
             <ListingCard
               // key={(listing._id as { $oid: string }).$oid}

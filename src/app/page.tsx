@@ -19,7 +19,7 @@ export default async function Home() {
         <link rel="preconnect" href="https://fonts.gstatic.com" />
         <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap" rel="stylesheet" />
       </Head>
-      <Hero />
+      {/* <Hero /> */}
 
       <ClientOnly>
         <Providers>
