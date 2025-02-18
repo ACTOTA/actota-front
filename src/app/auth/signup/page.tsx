@@ -83,7 +83,7 @@ export default function SignUp() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -116,18 +116,18 @@ export default function SignUp() {
   }
 
   return (
-    <GlassPanel className="w-[584px] flex flex-col justify-around relative text-white">
+    <GlassPanel className="w-[584px] max-md:w-full max-md:!rounded-b-none max-md:!border-0 max-md:!border-t-[0.5px] flex flex-col justify-around relative text-white">
       <div className="text-white flex justify-between items-center">
         <h3 className="text-2xl font-semibold">Let&apos;s Get Started!</h3>
         <Image src="/images/actota-logo.png" alt="logo" width={110} height={20} />
       </div>
       <p className='text-light-gray text-[16px] leading-[24px] mt-1'>Create an account to continue.</p>
-      
+
       <form onSubmit={handleSubmit} className="m-auto flex flex-col gap-4 w-full mt-[16px]">
         <div>
-          <p className="text-primary-gray w-96 text-left mb-1 mt-[16px]">Full Name</p>
-          <Input 
-            type="text" 
+          <p className="text-primary-gray  text-left mb-1 mt-[16px]">Full Name</p>
+          <Input
+            type="text"
             name="fullName"
             value={formData.fullName}
             onChange={handleInputChange}
@@ -142,9 +142,9 @@ export default function SignUp() {
         </div>
 
         <div>
-          <p className="text-primary-gray w-96 text-left mb-1 mt-[10px]">Email Address</p>
-          <Input 
-            type="email" 
+          <p className="text-primary-gray  text-left mb-1 mt-[10px]">Email Address</p>
+          <Input
+            type="email"
             name="email"
             value={formData.email}
             onChange={handleInputChange}
@@ -160,9 +160,9 @@ export default function SignUp() {
         </div>
 
         <div>
-          <p className="text-primary-gray w-96 text-left mb-1 mt-[10px]">Password</p>
-          <Input 
-            type="password" 
+          <p className="text-primary-gray  text-left mb-1 mt-[10px]">Password</p>
+          <Input
+            type="password"
             name="password"
             value={formData.password}
             onChange={handleInputChange}
@@ -187,14 +187,15 @@ export default function SignUp() {
         <p className='text-primary-gray text-[14px] leading-[20px] whitespace-nowrap'>or continue with</p>
         <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
       </div>
-      <div className="flex justify-center items-center gap-[8px] my-[16px]">
-        <button className='bg-[#262626] rounded-[8px] py-[16px] px-[70px] flex justify-center items-center  hover:cursor-pointer'>
+      <div className="flex justify-center items-center gap-[8px] my-[16px] pb-[16px]">
+        <button className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer'>
+
           <Image src="/svg-icons/google.svg" alt="google" width={20} height={20} />
         </button>
-        <button className='bg-[#262626] rounded-[8px] py-[14px] px-[70px] flex justify-center items-center hover:cursor-pointer'>
+        <button className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer'>
           <Image src="/svg-icons/apple.svg" alt="apple" width={20} height={20} />
         </button>
-        <button className='bg-[#262626] rounded-[8px] py-[16px] px-[70px] flex justify-center items-center hover:cursor-pointer'>
+        <button className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer'>
           <Image src="/svg-icons/facebook.svg" alt="facebook" width={20} height={20} />
         </button>
       </div>

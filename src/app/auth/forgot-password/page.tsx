@@ -139,7 +139,7 @@ export default function ForgotPassword() {
   return (
     <>
       {step === 1 && (
-        <GlassPanel className=" w-[584px] flex flex-col justify-around relative text-white">
+        <GlassPanel className=" w-[584px] max-md:w-full max-md:!rounded-b-none max-md:!border-0 max-md:!border-t-[0.5px] flex flex-col justify-around relative text-white">
 
           <div className='flex w-full justify-center items-center gap-[16px] mb-[16px]'>
             <div className={`h-[4px] rounded-full w-full ${isActiveStep(1) ? 'bg-white' : 'bg-primary-gray'}`}></div>
@@ -152,7 +152,7 @@ export default function ForgotPassword() {
           <p className='text-light-gray text-[16px] leading-[24px] mt-1'>No worries, we&apos;ll send you reset instructions.</p>
 
           <div className='mt-[16px]'>
-            <p className="text-primary-gray w-96 text-left mb-1 mt-[16px]">Email Address</p>
+            <p className="text-primary-gray  text-left mb-1 mt-[16px]">Email Address</p>
             <Input
               type="email"
               value={email}
@@ -181,7 +181,7 @@ export default function ForgotPassword() {
 
       {step === 2 && (
 
-        <GlassPanel className=" w-[584px] flex flex-col justify-around relative text-white">
+        <GlassPanel className=" w-[584px] max-md:w-full max-md:!rounded-b-none max-md:!border-0 max-md:!border-t-[0.5px] flex flex-col justify-around relative text-white">
 
           <div className='flex w-full justify-center items-center gap-[16px] mb-[16px]'>
             <div className={`h-[4px] rounded-full w-full ${isActiveStep(2) ? 'bg-white' : 'bg-primary-gray'}`}></div>
@@ -194,7 +194,7 @@ export default function ForgotPassword() {
           </div>
           <p className='text-light-gray text-[16px] leading-[24px] mt-1'>We sent a code to {email || 'your email'}.</p>
 
-          <div className="flex gap-4 justify-center my-8">
+          <div className="flex gap-4 max-md:gap-3 justify-center my-8">
             {otp.map((digit, index) => (
               <input
                 key={index}
@@ -204,7 +204,7 @@ export default function ForgotPassword() {
                 value={digit}
                 onChange={(e) => handleOtpChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
-                className={`w-[116px] h-[160px] text-center text-[64px] font-bold bg-black/20 
+                className={`w-[116px] h-[160px] max-sm:w-[78px] max-sm:h-[96px] text-center text-[64px] max-sm:text-[40px] font-bold bg-black/20 
                             border ${errors.otp ? 'border-[#79071D]' : 'border-white/20 '}   ring-0 focus:ring-0 focus:outline-none3
                           rounded-lg focus:border-white focus:outline-none text-white`}
                 inputMode="numeric"
@@ -238,7 +238,7 @@ export default function ForgotPassword() {
       )}
 
       {step === 3 && (
-        <GlassPanel className=" w-[584px] flex flex-col justify-around relative text-white">
+        <GlassPanel className=" w-[584px] max-md:w-full max-md:!rounded-b-none max-md:!border-0 max-md:!border-t-[0.5px] flex flex-col justify-around relative text-white">
 
 
           <div className='flex w-full justify-center items-center gap-[16px] mb-[16px]'>
@@ -253,7 +253,7 @@ export default function ForgotPassword() {
           <form onSubmit={handlePasswordSubmit} className="m-auto flex flex-col gap-4 w-full mt-[16px]">
 
             <div>
-              <p className="text-primary-gray w-96 text-left mb-1 mt-[10px]">New Password</p>
+              <p className="text-primary-gray  text-left mb-1 mt-[10px]">New Password</p>
               <Input
                 type="password"
                 value={password}
@@ -269,7 +269,7 @@ export default function ForgotPassword() {
               )}
             </div>
             <div>
-              <p className="text-primary-gray w-96 text-left mb-1 mt-[10px]">Confirm Password</p>
+              <p className="text-primary-gray text-left mb-1 mt-[10px]">Confirm Password</p>
               <Input
                 type="password"
                 value={confirmPassword}
@@ -299,7 +299,7 @@ export default function ForgotPassword() {
 
 
       {step === 4 && (
-        <GlassPanel className=" w-[584px] flex flex-col justify-between  items-center relative text-white !p-[40px]">
+        <GlassPanel className=" w-[584px] max-md:w-full max-md:!rounded-b-none max-md:!border-0 max-md:!border-t-[0.5px] flex flex-col justify-between  items-center relative text-white !p-[40px]">
 
           <div className='flex justify-center items-center bg-gradient-to-br from-[#3C3F42]  to-[#292C30] border border-primary-gray rounded-full h-[64px] w-[64px]'>
             <LuCheck className='text-white size-6' />
