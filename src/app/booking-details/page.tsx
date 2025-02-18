@@ -6,7 +6,6 @@ import { FeaturedVacation } from '@/db/models/itinerary';
 import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon, ClockIcon, HeartIcon, XMarkIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
 import GlassPanel from '@/src/components/figma/GlassPanel';
-import { Theme } from '@/src/components/enums/theme';
 import Button from '@/src/components/figma/Button';
 import { getAuthCookie } from '@/src/helpers/auth';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/16/solid';
@@ -26,8 +25,9 @@ import { GrLocation } from 'react-icons/gr';
 import { RxArrowTopRight } from 'react-icons/rx';
 import DrawerModal from '@/src/components/DrawerModal';
 import Input from '@/src/components/figma/Input';
+import ItineraryCalendar from '@/src/components/calendar/ItineraryCalendar';
 
-export default function MyBookings() {
+export default function BookingDetails() {
   const pathname = usePathname() as string;
   const router = useRouter();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -197,6 +197,8 @@ export default function MyBookings() {
             <p className='text-primary-gray text-sm mt-2'>Experience the ultimate Colorado vacation with a 6-day itinerary that takes you to Idaho Springs, Glenwood Springs, and Denver. Enjoy the adrenaline rush of white water rafting, the tranquility of camping, the intrigue of gold mines, and the challenge of hiking the Rockies.</p>
           </div>
 
+
+
         </div>
 
         <div className='md:col-span-4 lg:col-span-2'>
@@ -256,6 +258,12 @@ export default function MyBookings() {
 
       </div>
 
+
+      <div className='mt-8 px-[80px] max-sm:px-6 max-lg:px-10'>
+        <p className='text-white text-2xl font-bold'>Itinerary Details</p>
+
+        <ItineraryCalendar />
+      </div>
 
       <div className='mt-8 px-[80px] max-sm:px-6 max-lg:px-10'>
         <p className='text-white text-2xl font-bold'>Guide’s Message</p>
