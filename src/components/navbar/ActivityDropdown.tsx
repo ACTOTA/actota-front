@@ -45,7 +45,7 @@ export default function ActivityDropdown({
   }
 
   const displaySelectedItems = () => {
-    if (selected.length === 0) return `Select Preferred ${title}`;
+    if (selected.length === 0) return `Select  ${title}`;
 
     if (selected.length > 3) {
       const displayItems = selected.slice(0, 2);
@@ -91,7 +91,7 @@ export default function ActivityDropdown({
 
       {isOpen && (
         <div className="absolute p-3 z-10 w-full bg-black border border-primary-gray text-white rounded-lg shadow-lg mt-2 max-h-[466px] overflow-auto">
-          <p className="text-lg font-bold text-white">Select Preferred {title}</p>
+          <p className="text-lg font-bold text-white"> <span className="max-lg:hidden "> Select Preferred </span> {title}</p>
           <p className="text-sm  text-white">{selected.length} Selected</p>
           <p className="text-sm  text-white flex items-center gap-2 mt-4 "><input type="checkbox" checked={anySelected} onChange={() => setAnySelected(!anySelected)} className="rounded ring-0 focus:ring-0 focus:ring-offset-0" /> Any</p>
 

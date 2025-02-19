@@ -48,7 +48,7 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
         <GlassPanel  className='!p-4 !rounded-[22px] max-w-[864px] hover:cursor-pointer flex justify-between items-end mt-4 bg-gradient-to-br from-[#6B6B6B]/30 to-[black]'>
 
 
-            <div onClick={() => router.push(`/listings/1`)} className='flex justify-between relative gap-4 h-full w-full'>
+            <div onClick={() => router.push(`/listings/1`)} className='flex justify-between max-2xl:flex-col-reverse relative gap-4 h-full w-full'>
                 <div className=' w-full'>
                     <div className='flex justify-between items-center text-white'>
                         <p className='text-2xl font-bold'>{data?.trip_name}</p>
@@ -82,7 +82,7 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
                     </div>
                 </div>
 
-                    <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={300}  className='rounded-lg' />
+                    <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={300}  className='rounded-lg max-2xl:w-full' />
                     <div className='flex gap-2 absolute top-2 right-2'>
                         <button 
                             onClick={(e) => {

@@ -8,7 +8,7 @@ import Input from './figma/Input';
 export default function Newsletter() {
 
   return (
-    <section className='flex justify-center my-10 max-sm:mt-16 max-w-[1440px] max-sm:mx-4 mx-[80px] 2xl:mx-auto '>
+    <section className='flex justify-center my-10 max-sm:mt-16 max-w-[1440px] max-sm:mx-4 max-lg:mx-8 max-2xl:mx-[80px] 2xl:mx-auto '>
       <div className="p-4 sm:p-12 bg-[#012a6a] rounded-2xl w-full justify-between  items-center max-xl:flex-col-reverse gap-16 inline-flex m-auto">
         <div className="grow shrink basis-0 flex-col justify-start items-start gap-4 sm:gap-12  inline-flex">
           <div className="flex-col justify-center items-start gap-4 flex">

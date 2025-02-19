@@ -26,7 +26,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className=" text-white px-4 sm:px-20 py-10">
+    <footer className=" text-white px-4 sm:px-6 lg:px-16 2xl:px-20 py-10">
       <div className="max-w-[1440px] mx-auto">
         {/* Top section with logo and social links */}
 

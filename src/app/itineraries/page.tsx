@@ -10,6 +10,7 @@ import ItineraryPageFilter from '@/src/components/ItineraryPageFilter';
 import ItineraryPageAdvanceFilter from '@/src/components/ItineraryPageAdvanceFilter';
 import Dropdown from '@/src/components/figma/Dropdown';
 import Image from 'next/image';
+import ListingCard from '@/src/components/ListingCard';
 const Itineraries = () => {
     const [listings, setListings] = React.useState<FeaturedVacation[]>([{
         trip_name: "Lahore",
@@ -227,15 +228,15 @@ const Itineraries = () => {
     return (
         <div className="max-w-[1440px] mx-auto ">
 
-            <div className="grid grid-cols-3 gap-8 p-[80px] bg-gradient-to-b from-transparent via-[#080E14] to-[#080E14] ">
-                <div className="col-span-2 ">
-                    <h2 className="text-[40px] font-bold text-white">Itineraries for You</h2>
-                    <div className="flex items-center justify-between gap-2">
+            <div className="flex max-md:flex-col-reverse gap-8 p-[80px] max-lg:px-[50px] max-md:px-[25px] max-sm:px-[16px] bg-gradient-to-b from-transparent via-[#080E14] to-[#080E14] ">
+                <div className="w-[66%] max-md:w-full ">
+                    <h2 className="text-[40px] font-bold text-white max-md:hidden">Itineraries for You</h2>
+                    <div className="flex items-center justify-between flex-wrap gap-2">
 
                         <p className="text-white"> <b>{listings.length}</b> Itineraries found.</p>
 
 
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center max-md:justify-between gap-4">
                             <div>
 
                                 <Dropdown label={<div className="flex items-center gap-1">
@@ -261,21 +262,30 @@ const Itineraries = () => {
 
 
                     </div>
-                    {listings.map((listing) => (
-                        <ItineraryCard data={listing} />
-                    ))}
+                    <div className='max-sm:hidden'>
+                        {listings.map((listing) => (
+                            <ItineraryCard data={listing} />
+                        ))}
+                    </div>
+                    <div className='sm:hidden flex flex-col'>
+                        {listings.map((listing) => (
+                            <ListingCard data={listing} />
+                        ))}
+                    </div>
                     <div className="flex justify-center flex-col items-center pt-6">
                         <p className="text-white text-xl font-bold">See More Itineraries</p>
                         <Button variant="primary" className="bg-white text-black mt-4 ">Load More</Button>
                     </div>
                 </div>
-                <div className="col-span-1 pt-14 ">
+                <div className=" md:pt-14 w-[33%] max-md:w-full">
                     {advanceFilter ?
                         <ItineraryPageAdvanceFilter advanceFilter={advanceFilter} setAdvanceFilter={setAdvanceFilter} />
                         :
                         <ItineraryPageFilter advanceFilter={advanceFilter} setAdvanceFilter={setAdvanceFilter} />
                     }
                 </div>
+                <h2 className="text-[40px] font-bold text-white md:hidden">Itineraries for You</h2>
+
             </div>
             <Newsletter />
             <Footer />
