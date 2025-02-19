@@ -52,7 +52,7 @@ const ListingsSlider = ({ images, currentIndex, onSlideClick }: ListingsSliderPr
         ))}
       </Slider>
 
-      <GlassPanel className='absolute bottom-36 left-0 right-0 w-fit m-auto rounded-full flex items-center gap-4 !p-3 z-10'>
+      <GlassPanel className='absolute bottom-36 max-sm:bottom-6 left-0 right-0 w-fit m-auto rounded-full flex items-center gap-4 !p-3 z-10'>
         <ChevronLeftIcon 
           className='h-6 w-6 cursor-pointer hover:scale-110 transition-transform' 
           onClick={handlePrevClick} 
@@ -64,7 +64,7 @@ const ListingsSlider = ({ images, currentIndex, onSlideClick }: ListingsSliderPr
         />
       </GlassPanel>
 
-      <div className='flex gap-4 mt-4'>
+      <div className='flex gap-4 mt-4 max-sm:hidden'>
         {images.map((image, i) => (
           <div
             key={i}

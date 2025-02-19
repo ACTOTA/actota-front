@@ -55,20 +55,20 @@ const ActivityCard = ({ activity, formatTime, getActivityIcon, setIsFeedbackDraw
                                 </div>
 
                                 {/* Duration */}
-                                <div className='flex flex-col gap-1'>
+                                <div className='flex flex-col gap-1 max-sm:hidden'>
 
-                                <div className="flex items-center gap-2">
-                                    <FaRegClock className="w-4 h-4 text-white" />
-                                    <span className="text-white text-sm">1 hour</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <MdOutlineDirectionsCarFilled className="w-4 h-4 text-white" />
-                                    <span className="text-white text-sm">1 hour</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <LuRoute className="w-4 h-4 text-white" />
-                                    <span className="text-white text-sm">4.9 miles</span>
-                                </div>
+                                    <div className="flex items-center gap-2">
+                                        <FaRegClock className="w-4 h-4 text-white" />
+                                        <span className="text-white text-sm">1 hour</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <MdOutlineDirectionsCarFilled className="w-4 h-4 text-white" />
+                                        <span className="text-white text-sm">1 hour</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <LuRoute className="w-4 h-4 text-white" />
+                                        <span className="text-white text-sm">4.9 miles</span>
+                                    </div>
                                 </div>
                             </div>
 

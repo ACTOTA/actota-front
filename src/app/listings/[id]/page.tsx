@@ -18,6 +18,7 @@ import { GoHome } from 'react-icons/go';
 import { MdOutlineDirectionsCarFilled } from 'react-icons/md';
 import ActivityTag from '@/src/components/figma/ActivityTag';
 import ListingsSlider from '@/src/components/ListingsSlider';
+import LikeDislike from '@/src/components/LikeDislike';
 
 export default function Itinerary() {
   const pathname = usePathname() as string;
@@ -100,7 +101,7 @@ export default function Itinerary() {
     updated_at: new Date()
   });
   const [isLoading, setIsLoading] = useState(true);
-  
+
   const [currentIndex, setCurrentIndex] = useState(0);
 
   async function get_itinerary_by_id(id: string) {
@@ -153,7 +154,7 @@ export default function Itinerary() {
     window.location.href = `https://fareharbor.com/embeds/book/adventurecoloradotours/items/${listing.fareharbor_id}/availability/${timestamp}/book/?full-items=yes&flow=345668`;
   };
 
- 
+
 
 
   const handleSlideClick = (index: number) => {
@@ -162,16 +163,14 @@ export default function Itinerary() {
 
   return (
     <section className='w-full !h-full text-white p-[64px] max-sm:px-6 max-lg:px-10 gap-4'>
-      <div className='flex items-center gap-2 my-6'>
+      <div className='flex items-center gap-2 my-6 max-sm:hidden'>
         <ArrowLeftIcon className="h-6 w-6 hover:cursor-pointer" onClick={() => router.push("/")} />
         <p className='text-primary-gray text-sm'>Itineraries / <span className='text-white'>Denver Tour</span></p>
       </div>
-      <div className='flex gap-4 flex-col md:flex-row md:items-center '>
+      <div className='flex gap-4 flex-col md:flex-row md:items-center  max-sm:hidden'>
         <h1 className='text-4xl font-bold me-auto'>{listing.trip_name}</h1>
         <div className='flex items-center md:flex-nowrap flex-wrap gap-2'>
-          <Button variant="outline" size='none' className='p-4' onClick={() => { }}>
-            <FaRegHeart className='h-6 w-6 text-white' />
-          </Button>
+          <LikeDislike />
 
           <Button variant="outline" size='md' className='gap-1' onClick={() => { }}>
             <CgSoftwareUpload className='h-6 w-6 text-white' />
@@ -185,21 +184,23 @@ export default function Itinerary() {
         </div>
       </div>
 
-      
+
       <div className='flex max-sm:flex-col w-full gap-6 mt-4'>
 
-        
+
         <div className=' flex flex-col gap-4 w-[67%] max-sm:w-full'>
-          <ListingsSlider 
+          <ListingsSlider
             images={listing.images}
             currentIndex={currentIndex}
-           
+
             onSlideClick={handleSlideClick}
           />
 
-          
 
-          <div className='w-full h-full text-white mt-8 relative'>
+
+          <div className='w-full h-full text-white mt-8 max-sm:mt-0 relative'>
+            <h1 className='text-2xl font-bold  sm:hidden'>{listing.trip_name}</h1>
+
             <h2 className='text-white text-xl'><b>Overview</b></h2>
             <div className='grid sm:grid-cols-2 mt-4'>
               <div>
@@ -234,7 +235,7 @@ export default function Itinerary() {
 
               </div>
             </div>
-            <div className='my-8'>
+            <div className='my-8 max-sm:mb-0'>
               <h2 className='text-white text-xl'><b>About</b></h2>
               <p className='text-primary-gray text-sm mt-2'>{listing?.description}</p>
             </div>

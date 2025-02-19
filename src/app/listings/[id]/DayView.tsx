@@ -167,7 +167,7 @@ export default function DayView({ listing }: DayViewProps) {
 			</div>
 
 			{selectedView === 'map' ? (
-				<div className="flex gap-6">
+				<div className="flex gap-6 max-sm:flex-col-reverse">
 					{/* Left Side - Day Details */}
 					<div className="w-[320px] bg-[#141414] rounded-2xl p-6">
 						<div className="flex items-center gap-2 mb-4">
@@ -201,7 +201,7 @@ export default function DayView({ listing }: DayViewProps) {
 					</div>
 
 					{/* Right Side - Map */}
-					{/* <div className="flex-1">
+					<div className="flex-1">
 						<LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
 							<div className="w-full h-[800px] rounded-xl overflow-hidden">
 								<GoogleMap
@@ -232,7 +232,7 @@ export default function DayView({ listing }: DayViewProps) {
 								</GoogleMap>
 							</div>
 						</LoadScript>
-					</div> */}
+					</div>
 				</div>
 			) : (
 				<div className="space-y-4 border-l-2 border-dashed border-border-primary ps-6 ms-6">

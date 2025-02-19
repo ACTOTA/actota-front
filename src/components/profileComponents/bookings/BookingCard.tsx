@@ -137,7 +137,7 @@ const BookingCard: React.FC<ListingCardProps> = ({
                 </div>
                 <div className='flex gap-2'>
                     {data?.status !== "completed" && <Button variant='primary' className='!bg-[#C10B2F] text-white'>Cancel Trip</Button>}
-                    <Button onClick={() => router.push(`/my-bookings`)} variant='outline' className=' text-white gap-2'> View {data?.status === "completed" && !bookingConfirmedModal ? "Details" : ""} <CgArrowTopRight className='size-6' /></Button>
+                    <Button onClick={() => router.push(`/booking-details`)} variant='outline' className=' text-white gap-2'> View {data?.status === "completed" && !bookingConfirmedModal ? "Details" : ""} <CgArrowTopRight className='size-6' /></Button>
 
                 </div>
             </div>
