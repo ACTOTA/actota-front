@@ -36,7 +36,7 @@ export default function DrawerModal({isDrawerOpen, children, setIsDrawerOpen}: {
               leaveFrom="translate-x-0"
               leaveTo="translate-x-full"
             >
-              <Dialog.Panel className="relative flex flex-col  h-full max-w-2xl bg-black  ml-auto overflow-y-auto  shadow-xl">
+              <Dialog.Panel className="relative flex flex-col  h-full max-w-2xl max-md:w-full bg-black  ml-auto overflow-y-auto  shadow-xl">
              
 
                {children}

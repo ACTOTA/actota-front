@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from 'react'
 import Button from './figma/Button'
-import { XMarkIcon } from '@heroicons/react/20/solid'
+import { ArrowLeftIcon, XMarkIcon } from '@heroicons/react/20/solid'
 import Image from 'next/image'
 import Input from './figma/Input'
 import ActivityCard from '@/src/components/ActivityCard';
@@ -52,16 +52,21 @@ const FeedbackDrawer = ({ setIsDrawerOpen, activityCompleted = false }: { setIsD
 
   ];
   return (
-    <div className='flex flex-1 flex-col w-[600px] p-8'>
+    <div className='flex flex-1 flex-col w-[600px]   p-8'>
       <div className="flex items-center justify-between pb-2">
-        <h2 className="text-xl font-bold text-white">Submit Feedback</h2>
+      <ArrowLeftIcon  onClick={() => setIsDrawerOpen(false)} className="w-6 h-6 text-white sm:hidden" />
+
+        <h2 className="text-xl font-bold text-white max-sm:hidden">Submit Feedback</h2>
+        <h2 className=" text-white sm:hidden">Submit Feedback</h2>
         <Button
           variant='simple'
-          className='!p-0'
+          className='!p-0 max-sm:hidden'
           onClick={() => setIsDrawerOpen(false)}
         >
           <XMarkIcon className="w-6 h-6 text-white" />
         </Button>
+        <Image src="/images/Avatar.png" alt="profile" width={32} height={32} className="sm:hidden" />
+         
       </div>
       {/* Header */}
       {feedbackSent ? (

@@ -33,9 +33,9 @@ const FeedbackCard = ({ activity }: FeedbackCardProps) => {
             <div className="flex-1 bg-gradient-to-br from-[#FEDB25] via-border-primary to-border-primary rounded-xl p-[2px]">
                 <div className="flex-1 bg-black rounded-xl">
 
-                    <div className="flex-1 flex gap-4 bg-gradient-to-br from-white/20 to-white/5 rounded-xl p-2 relative">
+                    <div className="flex-1 flex max-sm:flex-col gap-4 bg-gradient-to-br from-white/20 to-white/5 rounded-xl p-2 relative">
 
-                        <Image src={activity.image} alt={activity.name} className='rounded' width={160} height={130} />
+                        <Image src={activity.image} alt={activity.name} className='rounded max-sm:w-full' width={160} height={130} />
                         <div className="flex justify-between items-end w-full">
                             <div className="flex items-start gap-10">
 

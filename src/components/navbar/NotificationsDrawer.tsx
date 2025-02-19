@@ -1,4 +1,4 @@
-import { ArrowRightIcon, DocumentCheckIcon, BellIcon, PencilIcon, UserPlusIcon, XMarkIcon, EyeIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
+import { ArrowRightIcon, DocumentCheckIcon, BellIcon, PencilIcon, UserPlusIcon, XMarkIcon, EyeIcon, CheckCircleIcon, ArrowLeftIcon } from '@heroicons/react/24/outline'
 import React from 'react'
 import Button from '../figma/Button'
 import Image from 'next/image'
@@ -24,12 +24,12 @@ const NotificationItem = ({ type, time, isRead, ...props }: {
 
                         {props.location && (
                             <div className='border border-primary-gray rounded-md p-2 w-full'>
-                            <div className="flex items-center gap-2">
-                                <IoLocationOutline /> {props.location}
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <BiTime /> {props.meetingTime}
-                            </div>
+                                <div className="flex items-center gap-2">
+                                    <IoLocationOutline /> {props.location}
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <BiTime /> {props.meetingTime}
+                                </div>
                             </div>
                         )}
                     </div>
@@ -85,25 +85,25 @@ const NotificationItem = ({ type, time, isRead, ...props }: {
             case 'trip-reminder':
                 return <Image src="/svg-icons/announcement-icon.svg" alt="trip reminder" width={20} height={20} />
             case 'meeting-info':
-                return <Image src="/images/no-profile.jpeg" alt="meeting info"  width={48} height={48}  />;
+                return <Image src="/images/no-profile.jpeg" alt="meeting info" width={48} height={48} />;
             case 'join-request':
-                return <Image src="/images/no-profile.jpeg" alt="meeting info"  width={48} height={48}  />;
+                return <Image src="/images/no-profile.jpeg" alt="meeting info" width={48} height={48} />;
             case 'edit-invite':
                 return <Image src="/svg-icons/edit-icon.svg" alt="edit invite" width={20} height={20} />
             case 'itinerary-edit':
                 return <Image src="/svg-icons/edit-icon.svg" alt="edit invite" width={20} height={20} />;
             case 'waiver':
-                return <Image src="/images/no-profile.jpeg" alt="meeting info"  width={48} height={48}  />;
+                return <Image src="/images/no-profile.jpeg" alt="meeting info" width={48} height={48} />;
             case 'guide-alert':
                 return <BellIcon className="w-6 h-6 text-white" />;
             case 'activity-completed':
-                return <CheckIcon  className="w-6 h-6 text-white  " />;
+                return <CheckIcon className="w-6 h-6 text-white  " />;
             case 'trip-completed':
-                return <CheckIcon  className="w-6 h-6 text-white  " />;
+                return <CheckIcon className="w-6 h-6 text-white  " />;
             case 'trip-summary':
                 return <ArrowRightIcon className="w-5 h-5 text-white" />;
             case 'view-invite':
-                return  <Image src="/images/no-profile.jpeg" alt="meeting info"  width={48} height={48}  />;
+                return <Image src="/images/no-profile.jpeg" alt="meeting info" width={48} height={48} />;
             default:
                 return null;
         }
@@ -115,7 +115,7 @@ const NotificationItem = ({ type, time, isRead, ...props }: {
                 {/* Icon based on notification type */}
             </div>
             <div className="flex-1">
-                <div className="flex justify-between gap-5 items-center">
+                <div className="flex justify-between max-sm:flex-wrap gap-5 items-center">
                     <div className='w-full'>
                         <div className="text-white">{renderContent()}</div>
                         {type !== 'meeting-info' && <div className="text-xs mt-2 text-primary-gray">{time}</div>}
@@ -232,22 +232,28 @@ const NotificationsDrawer = ({ setIsDrawerOpen }: { setIsDrawerOpen: (isDrawerOp
     ]
 
     return (
-        <div className='flex flex-1 flex-col w-[600px]'>
+        <div className='flex flex-1 flex-col w-[600px] max-sm:w-full'>
             <div className="flex items-center justify-between p-8 pb-2  ">
-                <h2 className="text-2xl font-bold text-white">Notification</h2>
+                <ArrowLeftIcon  onClick={() => setIsDrawerOpen(false)} className="w-6 h-6 text-white sm:hidden" />
+
+                <h2 className="text-2xl font-bold text-white max-sm:hidden">Notification</h2>
+                <h2 className=" sm:hidden text-white">Notification</h2>
                 <div className='flex  justify-between items-center gap-4 '>
-                    <Button variant='simple' className='text-white text-sm font-medium flex items-center gap-2'>
+                    <Button variant='simple' className='text-white text-sm font-medium flex items-center gap-2 max-sm:hidden'>
                         <PiChecksBold className="w-5 h-5" />
                         Mark all as read
                     </Button>
                     <Button
                         variant='simple'
-                        className='!p-0'
+                        className='!p-0 max-sm:hidden'
                         onClick={() => setIsDrawerOpen(false)}
+                        
                     >
                         <XMarkIcon className="w-6 h-6 text-white" />
                     </Button>
+                    <Image src="/images/Avatar.png" alt="profile" width={32} height={32} className="sm:hidden" />
                 </div>
+
             </div>
 
             <div className="flex flex-col overflow-y-auto">

@@ -201,7 +201,7 @@ export default function DayView({ listing }: DayViewProps) {
 					</div>
 
 					{/* Right Side - Map */}
-					<div className="flex-1">
+					{/* <div className="flex-1">
 						<LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
 							<div className="w-full h-[800px] rounded-xl overflow-hidden">
 								<GoogleMap
@@ -232,7 +232,7 @@ export default function DayView({ listing }: DayViewProps) {
 								</GoogleMap>
 							</div>
 						</LoadScript>
-					</div>
+					</div> */}
 				</div>
 			) : (
 				<div className="space-y-4 border-l-2 border-dashed border-border-primary ps-6 ms-6">
