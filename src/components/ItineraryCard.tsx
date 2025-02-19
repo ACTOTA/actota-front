@@ -71,7 +71,7 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
                         </div>
                         <div className='flex gap-1 text-xs  my-2'>
                             <MdOutlineDirectionsCarFilled className='h-[17px] w-[17px] text-white' />
-                            <p> {data?.activities?.length > 1 ? data?.activities?.length + " Activities" : data?.activities?.length + " Activity"}</p>
+                            <p> {data?.activities?.length ? data?.activities?.length > 1 ? data?.activities?.length + " Activities" : data?.activities?.length + " Activity" : "0 Activities"}</p>
                         </div>
                     </div>
                     <div className='flex justify-start items-center gap-3 text-white' >

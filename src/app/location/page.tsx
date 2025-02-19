@@ -117,40 +117,40 @@ const Location = () => {
   ]
   return (
     <div className='w-full h-full '>
-      <section className='flex justify-center  max-w-[1440px] px-[100px] 2xl:mx-auto '>
+      <section className='max-w-[1440px]  2xl:mx-auto '>
 
-        <div className=' text-white   '>
+        <div className='text-white'>
 
-          <div className=' flex items-center gap-2 my-6  pt-[80px]'>
+          <div className=' flex items-center gap-2 my-6  pt-[80px] max-sm:hidden px-[100px] max-sm:px-[16px]'>
             <ArrowLeftIcon className="h-6 w-6 hover:cursor-pointer" />
             <p className='text-primary-gray text-sm'>Explore / <span className='text-white'> St. Mary’s Glacier</span></p>
           </div>
-          <div className="w-full h-[588px] relative flex items-center justify-center">
+          <div className="w-full h-[588px] max-sm:h-[800px] relative flex items-center justify-center  ">
             <Image
               width={10}
               height={10}
               src="/hero-bg.svg"
               alt="hero background"
-              className="absolute inset-0 w-full h-[588px] object-cover rounded-[32px]"
+              className="absolute sm:left-[50px]  inset-0 w-full sm:w-[calc(100%-100px)] h-[588px] max-sm:h-[800px] object-cover rounded-[32px] max-sm:rounded-[0px]"
               priority
             />
 
             <div className={`relative w-full flex flex-col items-center justify-center       `}>
-              <p className='text-white text-[80px] font-extrabold leading-[88px] text-center'>
+              <p className='text-white text-[80px] max-sm:text-[56px] font-extrabold max-sm:font-bold leading-[88px] max-sm:leading-[72px] text-center'>
                 St. Mary’s Glacier
               </p>
 
-              <div className='flex items-center justify-center gap-8 mt-4'>
+              <div className='flex items-center justify-center gap-8 mt-4 max-sm:flex-col max-sm:gap-3 '>
                 <p className='text-white  text-center flex items-center gap-1'>
                   <FaStar className='text-[#FEDB25] mb-1' />
                   4.8
                   (112 Reviews)
                 </p>
-                <div className='w-[1px] h-[16px] bg-white'></div>
+                <div className='w-[1px] h-[16px] bg-white max-sm:hidden'/>
                 <p className='text-white  text-center'>
                   Hiking Trail
                 </p>
-                <div className='w-[1px] h-[16px] bg-white'></div>
+                <div className='w-[1px] h-[16px] bg-white max-sm:hidden'/>
                 <p className='text-white  text-center flex items-center gap-1'>
                   <MdOutlineDirectionsCarFilled className='text-white h-[20px] w-[20px]' />
                   1hr from Denver
@@ -159,8 +159,8 @@ const Location = () => {
 
             </div>
           </div>
-          <div className='flex items-start justify-center gap-4 mt-20'>
-            <div className='w-[288px] h-[352px] rounded-2xl border border-primary-gray relative overflow-hidden'>
+          <div className='flex items-start justify-center gap-4 mt-20 max-sm:-mt-20 flex-wrap px-[100px] max-sm:px-[16px]'>
+            <div className='w-[288px] max-sm:w-full h-[352px] rounded-2xl border border-primary-gray relative overflow-hidden'>
               <Image
                 width={10}
                 height={10}
@@ -174,7 +174,7 @@ const Location = () => {
                 <p className='rounded-full h-[24px] w-[24px] bg-white mr-6'></p>
               </div>
             </div>
-            <div className='w-[288px] h-[352px] rounded-2xl border border-primary-gray relative overflow-hidden'>
+            <div className='w-[288px] max-sm:w-full h-[352px] rounded-2xl border border-primary-gray relative overflow-hidden'>
               <Image
                 width={10}
                 height={10}
@@ -188,7 +188,7 @@ const Location = () => {
                 <p className='rounded-full h-[24px] w-[24px] bg-white mr-6'></p>
               </div>
             </div>
-            <div className='w-[288px] h-[352px] rounded-2xl border border-primary-gray relative overflow-hidden p-6'>
+            <div className='w-[288px] max-sm:w-full h-[352px] rounded-2xl border border-primary-gray relative overflow-hidden p-6'>
 
               <div className=' w-full h-[40px]   rounded-lg'>
                 <p className='text-primary-gray '>About</p>
@@ -196,7 +196,7 @@ const Location = () => {
                 <p className='text-primary-gray text-sm mt-10'>Explore this 2.6-km out-and-back trail near Idaho Springs, Colorado. Generally considered a moderately challenging route. This is a very popular area for cross-country skiing, fishing, and hiking, so you'll likely encounter other people while exploring. The best times to visit this trail are April through October. Dogs are welcome, but must be on a leash.</p>
               </div>
             </div>
-            <div className='w-[288px] h-[352px] rounded-2xl border border-primary-gray relative overflow-hidden'>
+            <div className='w-[288px] max-sm:w-full h-[352px] rounded-2xl border border-primary-gray relative overflow-hidden'>
               <Image
                 width={10}
                 height={10}
@@ -211,27 +211,29 @@ const Location = () => {
               </div>
             </div>
           </div>
-          <div className='flex justify-between mt-16'>
-            <p className='text-xl font-bold '>What <br />
-              to Do</p>
-            <p className='text-[56px] leading-[72px]  font-bold  -mt-3 '>Recommended <br /> Activities</p>
-            <p className='text-base font-normal text-primary-gray max-w-[380px]'>Saint Mary's Glacier is a gorgeous destination, and it is not terribly hard to reach. The trail is less than 2 miles round trip assuming you stop at the lake. The path is wide and climbs to the lake and glacier.</p>
+          <div className='flex justify-between mt-16 flex-wrap max-sm:flex-col max-sm:justify-center px-[100px] max-sm:px-[16px]'>
+            <p className='text-xl font-bold max-sm:text-[16px] max-sm:font-regular'>What <br className='max-sm:hidden'/>
+              to Do</p> <br className='sm:hidden'/>
+            <p className='text-[56px] leading-[72px]  font-bold  -mt-3 max-sm:text-[24px] max-sm:leading-[32px]'>Recommended <br className='max-sm:hidden'/> Activities</p>
+            <p className='text-base font-normal text-primary-gray max-w-[380px] max-sm:text-[14px] '>Saint Mary's Glacier is a gorgeous destination, and it is not terribly hard to reach. The trail is less than 2 miles round trip assuming you stop at the lake. The path is wide and climbs to the lake and glacier.</p>
           </div>
 
-          <div className='flex flex-wrap gap-4 mt-16'>
+          <div className='flex flex-wrap gap-4 mt-16 px-[100px] max-sm:px-[16px]'>
             {info.map((item) => (
               <SimpleCard showButton={true} image={item.image} title={item.title} description={item.description} />
             ))}
           </div>
 
-          <p className='text-xl font-bold mt-10'>Other Popular Activities</p>
-          <div className='flex gap-2 items-center mt-4'>
+          <p className='text-xl font-bold mt-10 px-[100px] max-sm:px-[16px]'>Other Popular Activities</p>
+          <div className='flex gap-2 items-center flex-wrap mt-4 px-[100px] max-sm:px-[16px]'>
             {["Cross-country skiing", "Fishing", "Hiking", "Snowshoeing"].map((item) => (
               <Button variant="outline" size="sm" className='!text-primary-gray text-[16px] font-normal'>{item}</Button>
             ))}
           </div>
-          <div className='flex flex-wrap gap-8 mt-20'>
+          <div className='flex  flex-wrap gap-8 mt-20 max-sm:flex-col px-[100px] max-sm:px-[16px] '>
             <div className="flex-1">
+            <p className='text-2xl font-bold sm:hidden'>The Area</p>
+            <p className='flex items-center gap-2 sm:hidden'><GrLocation /> <span>Denver, CO</span></p>
               <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string}>
                 <div className="w-full h-[370px] rounded-xl overflow-hidden">
                   <GoogleMap
@@ -251,11 +253,11 @@ const Location = () => {
                 </div>
               </LoadScript>
             </div>
-            <div className='flex-1 flex flex-col gap-2'>
-              <p className='text-2xl font-bold'>The Area</p>
-              <p className='flex items-center gap-2'><GrLocation /> <span>Denver, CO</span></p>
-              <div className='flex items-center gap-4 mt-4 '>
-                <div className='relative'>
+            <div className='max-w-full overflow-auto'>
+              <p className='text-2xl font-bold max-sm:hidden'>The Area</p>
+              <p className='flex items-center gap-2 max-sm:hidden'><GrLocation /> <span>Denver, CO</span></p>
+              <div className='flex items-center   gap-4 mt-4 '>
+                <div className='relative min-w-[284px]'>
                   <Image src="/images/hero-bg.jpg" alt="hero background" height={180} width={284} className=' rounded-lg mb-3' />
                   <div className='absolute top-2 right-2 h-[32px] w-[32px] bg-black/50  flex items-center justify-center rounded-[4px]'><RxArrowTopRight /></div>
                   <p className=' font-bold'>Hotel Name</p>
@@ -266,7 +268,7 @@ const Location = () => {
                   </p>
                   <p className='flex items-center gap-2'><GrLocation /> <span>Denver, CO</span></p>
                 </div>
-                <div className='relative'>
+                <div className='relative min-w-[284px]'>
                   <Image src="/images/hero-bg.jpg" alt="hero background" height={180} width={284} className=' rounded-lg mb-3' />
                   <div className='absolute top-2 right-2 h-[32px] w-[32px] bg-black/50  flex items-center justify-center rounded-[4px]'><RxArrowTopRight /></div>
 
@@ -284,13 +286,13 @@ const Location = () => {
           </div>
         </div>
       </section>
-      <section className='flex justify-center  max-w-[1440px] mx-[64px] 2xl:mx-auto '>
+      <section className='flex justify-center  max-w-[1440px] mx-[64px] 2xl:mx-auto max-sm:mx-[16px]'>
 
-        <div className=' w-full  ml-[20px] mt-10'>
+        <div className=' w-full  sm:ml-[20px] mt-10'>
 
           <div className=" flex justify-between items-center py-5  text-white">
-            <h2 className="text-[56px] font-bold">Itineraries for You</h2>
-            <Button variant="primary" size="md">Find More Itineraries</Button>
+            <h2 className="text-[56px] max-sm:text-[24px] max-sm:text-center font-bold">Itineraries for You</h2>
+            <Button variant="primary" size="md" className='max-sm:hidden'>Find More Itineraries</Button>
           </div>
           <div className="flex flex-wrap justify-center gap-4">
             {listings?.map((listing) => (
