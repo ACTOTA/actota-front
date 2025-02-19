@@ -19,6 +19,7 @@ interface ListingCardProps {
     actionLabel?: string;
     actionId?: string;
     bookingConfirmedModal?: boolean;
+    bookingDetailsPage?: boolean;
 }
 
 const BookingCard: React.FC<ListingCardProps> = ({
@@ -28,6 +29,7 @@ const BookingCard: React.FC<ListingCardProps> = ({
     actionLabel,
     actionId = "",
     bookingConfirmedModal = false,
+    bookingDetailsPage = false,
 }) => {
     const router = useRouter();
 
@@ -53,7 +55,7 @@ const BookingCard: React.FC<ListingCardProps> = ({
                     <Button variant='primary' size='sm' className='!bg-[#215CBA] text-white flex items-center gap-1'> {data.status === "upcoming" ? <CiCalendar className='text-white size-5' /> : data.status === "ongoing" ? <Image src="/svg-icons/ongoing-icon.svg" alt="clock" width={16} height={16} /> : <FaCheck className='text-white size-5' />} {data?.status === "upcoming" ? "in 98 days" : data?.status.charAt(0).toUpperCase() + data?.status.slice(1)}</Button>
                     {bookingConfirmedModal && <p className='text-sm text-primary-gray flex items-center gap-1'><Image src="/svg-icons/airplane.svg" alt="points" width={20} height={20} /> Booking no. <span className='text-white'>{data?.id}</span></p>}
                 </div>
-                <p className='text-sm text-primary-gray'>Booked  <span className='text-white'> {moment(data?.created_at).format("DD MMM YYYY")}</span> </p>
+                {/* <p className='text-sm text-primary-gray'>Booked  <span className='text-white'> {moment(data?.created_at).format("DD MMM YYYY")}</span> </p> */}
             </div>
             <div className="h-[1px] my-2 w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
 
@@ -96,7 +98,7 @@ const BookingCard: React.FC<ListingCardProps> = ({
 
                 </div>
 
-                {!bookingConfirmedModal && <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={204} className='rounded-lg object-cover' />}
+                {!bookingConfirmedModal && !bookingDetailsPage && <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={204} className='rounded-lg object-cover' />}
 
             </div>
 
@@ -129,15 +131,15 @@ const BookingCard: React.FC<ListingCardProps> = ({
 
 
 
-            <div className='flex justify-between items-center'>
+            <div className='flex justify-between items-center flex-wrap gap-2'>
                 <div>
                     <p className='flex items-center gap-2 text-white'> <Image src="/svg-icons/booking-points.svg" alt="points" width={20} height={20} />  +220 Points
                         ($22)</p>
                     <p className='text-sm text-primary-gray ml-7'>You’ll earn the points once you complete the trip.</p>
                 </div>
-                <div className='flex gap-2'>
-                    {data?.status !== "completed" && <Button variant='primary' className='!bg-[#C10B2F] text-white'>Cancel Trip</Button>}
-                    <Button onClick={() => router.push(`/booking-details`)} variant='outline' className=' text-white gap-2'> View {data?.status === "completed" && !bookingConfirmedModal ? "Details" : ""} <CgArrowTopRight className='size-6' /></Button>
+                <div className='flex max-md:w-full gap-2'>
+                    {data?.status !== "completed" && <Button variant={bookingDetailsPage ? "simple" : "primary"} className={`  ${bookingDetailsPage ? "!bg-transparent text-[#C10B2F] "  : "!bg-[#C10B2F]"}  text-white w-full`}> <span className={`${bookingDetailsPage ? "border-b border-b-[#C10B2F] " : "text-white"}`}> Cancel Trip</span></Button>}
+                    {!bookingDetailsPage && <Button onClick={() => router.push(`/booking-details`)} variant='outline' className=' text-white gap-2 w-full'> View {data?.status === "completed" && !bookingConfirmedModal ? "Details" : ""} <CgArrowTopRight className='size-6' /></Button>}
 
                 </div>
             </div>
