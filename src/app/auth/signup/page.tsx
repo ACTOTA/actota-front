@@ -10,34 +10,47 @@ import { setAuthCookie } from '@/src/helpers/auth';
 import GlassPanel from '@/src/components/figma/GlassPanel';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useSignUp } from '@/src/hooks/mutations/auth.mutation';
 
 export default function SignUp() {
   const router = useRouter();
+  const { mutate: signUp, isPending } = useSignUp();
   const [errors, setErrors] = useState({
-    fullName: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: ''
   });
   const [formData, setFormData] = useState({
-    fullName: '',
+    firstName: '',
+    lastName: '',
     email: '',
     password: ''
   });
 
   const validateForm = () => {
     let tempErrors = {
-      fullName: '',
+      firstName: '',
+      lastName: '',
       email: '',
       password: ''
     };
     let isValid = true;
 
     // Full Name validation
-    if (!formData.fullName) {
-      tempErrors.fullName = 'Please enter your full name.';
+    if (!formData.firstName) {
+      tempErrors.firstName = 'Please enter your full name.';
       isValid = false;
-    } else if (formData.fullName.length < 2) {
-      tempErrors.fullName = 'Name must be at least 2 characters long.';
+    } else if (formData.firstName.length < 2) {
+      tempErrors.firstName = 'Name must be at least 2 characters long.';
+      isValid = false;
+    }
+
+    if (!formData.lastName) {
+      tempErrors.lastName = 'Please enter your last name.';
+      isValid = false;
+    } else if (formData.lastName.length < 2) {
+      tempErrors.lastName = 'Name must be at least 2 characters long.';
       isValid = false;
     }
 
@@ -71,16 +84,6 @@ export default function SignUp() {
     }));
   };
 
-  const signUp = () => {
-    if (!validateForm()) {
-      return;
-    }
-    router.push("?modal=signupLoading")
-    setTimeout(() => {
-      router.push(window.location.pathname);
-    }, 3000)
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -89,31 +92,24 @@ export default function SignUp() {
     }
 
     try {
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
+      const response: any = await signUp(formData);
 
-      if (response.ok) {
-        const data = await response.json();
-        const authToken = data.auth_token;
-
-        if (authToken) {
-          const claims = await verifyJwt(authToken);
-          setAuthCookie(authToken, claims as Claims);
-        }
-
-        window.location.href = '/';
+      if (response?.success) {
+        router.push('/');
       } else {
-        console.log("Failed to create account.");
+        setErrors(prev => ({
+          ...prev,
+          email: 'Failed to create account'
+        }));
       }
     } catch (error) {
       console.error(error);
+      setErrors(prev => ({
+        ...prev,
+        email: 'An error occurred during signup'
+      }));
     }
-  }
+  };
 
   return (
     <GlassPanel className="w-[584px] max-md:w-full max-md:!rounded-b-none max-md:!border-0 max-md:!border-t-[0.5px] flex flex-col justify-around relative text-white">
@@ -128,19 +124,35 @@ export default function SignUp() {
           <p className="text-primary-gray  text-left mb-1 mt-[16px]">Full Name</p>
           <Input
             type="text"
-            name="fullName"
-            value={formData.fullName}
+            name="firstName"
+            value={formData.firstName}
             onChange={handleInputChange}
             placeholder="Full Name"
-            classname={errors.fullName ? 'border-[#79071D] ring-1 ring-[#79071D]' : ''}
+            classname={errors.firstName ? 'border-[#79071D] ring-1 ring-[#79071D]' : ''}
           />
-          {errors.fullName && (
+          {errors.firstName && (
             <div className="mt-1 px-2 py-1 text-sm text-white bg-[#79071D] rounded">
-              {errors.fullName}
+              {errors.firstName}
             </div>
           )}
         </div>
 
+        <div>
+          <p className="text-primary-gray  text-left mb-1 mt-[16px]">Last Name</p>
+          <Input
+            type="text"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleInputChange}
+            placeholder="Last Name"
+            classname={errors.firstName ? 'border-[#79071D] ring-1 ring-[#79071D]' : ''}
+          />
+          {errors.lastName && (
+            <div className="mt-1 px-2 py-1 text-sm text-white bg-[#79071D] rounded">
+              {errors.lastName}
+            </div>
+          )}
+        </div>
         <div>
           <p className="text-primary-gray  text-left mb-1 mt-[10px]">Email Address</p>
           <Input
@@ -177,8 +189,13 @@ export default function SignUp() {
           )}
         </div>
 
-        <Button onClick={signUp} variant="primary" className="bg-white text-black w-full my-[10px]">
-          Create My Account
+        <Button 
+          type="submit" 
+          variant="primary" 
+          className="bg-white text-black w-full my-[10px]"
+          disabled={isPending}
+        >
+          {isPending ? 'Creating Account...' : 'Create My Account'}
         </Button>
       </form>
 

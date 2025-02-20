@@ -1,0 +1,27 @@
+import { NextResponse } from 'next/server';
+import { getSession } from '@/src/lib/session';
+import actotaApi from '@/src/lib/apiClient';
+import axios from 'axios';
+export async function POST(request: Request) {
+  try {
+    const payload = (await request.json()) as { email: string; password: string };
+    console.log("signin route triggered",payload);
+
+    const response = await actotaApi.post(
+      "/api/auth/signin",
+      { email: payload.email, password: payload.password },
+    );
+
+    console.log(response.data, 'response from signin route');
+    return NextResponse.json(
+      { success: true, message: 'Login successful', data: response.data },
+      { status: 200 }
+    );
+  } catch (error:any) {
+    console.log(error, 'error from signin route');
+    return NextResponse.json(
+      { success: false, message: error.message || 'An error occurred' },
+      { status: 500 }
+    );
+  }
+} 

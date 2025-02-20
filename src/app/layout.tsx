@@ -7,6 +7,7 @@ import Navbar from "@/src/components/navbar/Navbar";
 import ClientOnly from "@/src/components/ClientOnly";
 import ModalContainer from "../components/ModalContainer";
 import DrawerModal from "../components/DrawerModal";
+import { Providers } from "./providers";
 
 export const metadata = {
   title: "ACTOTA!",
@@ -35,11 +36,13 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${font.className}`}>
-        <ClientOnly>
-          <ModalContainer />
-          <Navbar />
-        </ClientOnly>
-        <div>{children}</div>
+        <Providers>
+          <ClientOnly>
+            <ModalContainer />
+            <Navbar />
+          </ClientOnly>
+          <div>{children}</div>
+        </Providers>
       </body>
     </html>
   );

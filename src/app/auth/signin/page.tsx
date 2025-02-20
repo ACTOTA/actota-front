@@ -11,10 +11,12 @@ import Link from 'next/link';
 import { setAuthCookie } from '@/src/helpers/auth';
 import { verifyJwt, Claims } from '@/src/helpers/auth';
 import { useRouter } from "next/navigation";
+import { useLogin } from '@/src/hooks/mutations/auth.mutation';
+import axios from 'axios';
 
 export default function SignIn() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const { mutate: login, isPending } = useLogin();
   const [errors, setErrors] = useState({
     email: '',
     password: ''
@@ -52,17 +54,6 @@ export default function SignIn() {
     return isValid;
   };
 
-  const signIn = () => {
-
-    if (!validateForm()) {
-      return;
-    }
-    router.push("?modal=signinLoading")
-    setTimeout(() => {
-      router.push(window.location.pathname);
-    }, 3000)
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -70,52 +61,30 @@ export default function SignIn() {
       return;
     }
 
-    const formData = new FormData(e.currentTarget as HTMLFormElement);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-
-    console.log(formData);
-
     try {
-      const response = await fetch('/api/auth/signin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email,
-          password
-        })
-      });
+      const response:any = await login({ email, password });
+    
+    
 
-      if (response.ok) {
-        const data = await response.json();
-
-        const authToken = data.auth_token;
-
-        if (authToken) {
-          const claims = await verifyJwt(authToken) as Claims;
-          setAuthCookie(authToken, claims);
-
-        }
-
-        window.location.href = '/';
-
+      if (response) {
+        router.push('/');
       } else {
-        console.log("Failed to create account.");
+        setErrors(prev => ({
+          ...prev,
+          password: 'Invalid email or password'
+        }));
       }
     } catch (error) {
       console.error(error);
+      setErrors(prev => ({
+        ...prev,
+        password: 'An error occurred during login'
+      }));
     }
-
-  }
+  };
 
   return (
-
-
     <GlassPanel className=" w-[584px] max-md:w-full max-md:!rounded-b-none max-md:!border-0 max-md:!border-t-[0.5px] flex flex-col justify-around relative text-white">
-
-
       <div className="text-white flex justify-between items-center">
         <h3 className="text-2xl font-semibold">Welcome Back!</h3>
         <Image src="/images/actota-logo.png" alt="logo" width={110} height={20} />
@@ -165,7 +134,14 @@ export default function SignIn() {
           <input value={1} onChange={(e) => setRememberMe(e.target.checked)} type="checkbox" name="remember" id="remember" className="mr-2 rounded ring-0 border-none focus:ring-0 focus:outline-none" />
           <p className=' text-[14px] leading-[20px]'>Remember me on this device</p>
         </div>
-        <Button onClick={signIn} variant="primary" className="bg-white text-black w-full my-[10px]">Log In</Button>
+        <Button 
+          type="submit" 
+          variant="primary" 
+          className="bg-white text-black w-full my-[10px]"
+          disabled={isPending}
+        >
+          {isPending ? 'Logging in...' : 'Log In'}
+        </Button>
       </form>
 
       <div className="text-white flex justify-center items-center gap-[16px]">
@@ -175,7 +151,6 @@ export default function SignIn() {
       </div>
       <div className="flex justify-center items-center gap-[8px] my-[16px] pb-[16px]">
         <button className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer'>
-
           <Image src="/svg-icons/google.svg" alt="google" width={20} height={20} />
         </button>
         <button className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer'>

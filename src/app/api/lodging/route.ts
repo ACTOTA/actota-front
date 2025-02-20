@@ -1,4 +1,4 @@
-import { actotaApi } from '@/src/lib/api';
+import { actotaApi } from '@/src/lib/apiClient';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
