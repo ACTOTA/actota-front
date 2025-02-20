@@ -17,57 +17,47 @@ import DrawerModal from "../DrawerModal";
 import NotificationsDrawer from "./NotificationsDrawer";
 import { STEPS } from "@/src/types/steps";
 import Search from "./Search";
+import { useLogout } from "@/src/hooks/mutations/auth.mutation";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/src/hooks/useAuth";
 
 const Navbar = () => {
+  const { mutate: signOut, isPending } = useLogout();
+  const { user,isAuthenticated } = useAuth();
+  const router = useRouter();
     const pathname = usePathname();
-
     const isAuthRoute = pathname?.startsWith('/auth');
-    const [currentUser, setCurrentUser] = useState<SessionUser | any>(null)
+    const [currentUser, setCurrentUser] = useState<  any>(null)
     const [currStep, setCurrStep] = useState<STEPS | null>(null);
     const [classes, setClasses] = useState<string>('');
     const [loading, setLoading] = useState(true)
     const path = usePathname();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-    useEffect(() => {
-        console.log("Navbar path: ", path);
 
-        async function loadUser() {
-            try {
-                // const user = await getCurrentUser();
-                let user = {
-                    first_name: "Johnny",
-                    last_name: "John",
-                    email: "johnnyjohn@gmail.com",
-                    // image: "https://via.placeholder.com/150",
-                    _id: "123",
-                    created_at: new Date(),
-                    updated_at: new Date(),
-                }
-                setCurrentUser(user);
-                console.log("Navbar user: ", user);
-            } catch (error) {
-                console.error('Failed to load user:', error)
-            } finally {
-                setLoading(false)
-            }
-        }
-
-        loadUser()
-    }, [])
 
     const handleClick = () => {
         if (path !== "/") {
-            window.location.href = "/";
+            router.push("/");
         }
     }
 
+    useEffect(() => {
+        console.log("user in navbar", user);
+        if(user) {
+            setCurrentUser(user);
+        }else{
+            // router.push('/auth/signin');
+            setCurrentUser(null);
+        }
+    }, [user])
+
     async function handleSignout() {
         setCurrentUser(null);
-        // await signOut();
-        window.location.href = "/";
+        signOut();
+        router.push('/auth/signin');
     }
 
-    if (loading) return null
+    // if (loading) return null
 
     return (
         <div>

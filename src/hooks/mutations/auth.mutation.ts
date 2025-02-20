@@ -1,56 +1,84 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getErrorMessage } from '@/src/utils/getErrorMessage';
-import { LoginPayload, SignUpPayload } from '@/src/types/mutations/auth';
+import { LoginPayload, SignUpPayload, AuthResponse } from '@/src/types/mutations/auth';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 const useLogin = () => {
+  const router = useRouter();
   const queryClient = useQueryClient();
+  
   return useMutation({
     mutationFn: async (payload: LoginPayload) => {
-      console.warn(payload, 'payload');
-
-      const response = await axios.post(
+      const { data } = await axios.post<any>(
         "/api/auth/signin",
         payload
       );
-    
-      return response.data;
+      console.log('data from login', data);
+      return {auth_token: data.data.auth_token, user: payload};
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ['login'],
+    onSuccess: (data:any) => {
+      // Store auth data in React Query cache
+      queryClient.setQueryData(['auth'], {
+        auth_token: data.auth_token,
+        user: data.user,
+        isAuthenticated: true
       });
+      // Set token in axios headers for subsequent requests
+      axios.defaults.headers.common['Authorization'] = `Bearer ${data.auth_token}`;
+      // router.push('/');
+      router.back()
     },
-    onError(error) {
-
-      console.error('useLogin', getErrorMessage(error));
-    },
+   
   });
 };
 
 const useSignUp = () => {
   const queryClient = useQueryClient();
+  const router = useRouter();
   return useMutation({
     mutationFn: async (payload: SignUpPayload) => {
-      console.warn(payload, 'payload');
-
-      const response = await axios.post(
+      const { data } = await axios.post<any>(
         "/api/auth/signup",
         payload
       );
-    
-      return response.data;
+      return {auth_token: data.data.auth_token, user: payload};
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ['signUp'],
+    onSuccess: (data:any) => {
+      // Store auth data in React Query cache
+      queryClient.setQueryData(['auth'], {
+        auth_token: data.auth_token,
+        user: data.user,
+        isAuthenticated: true
       });
+      
+      // Set token in axios headers for subsequent requests
+      axios.defaults.headers.common['Authorization'] = `Bearer ${data.auth_token}`;
+      router.push('/');
     },
     onError(error) {
       console.error('useSignUp', getErrorMessage(error));
+      // Clear auth data on error
+      // queryClient.setQueryData(['auth'], null);
     },
   });
 };
 
+const useLogout = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async () => {
+      // const { data } = await axios.post("/api/auth/signout");
+      return {success: true};
+    },
+    onSuccess: () => {
+      // Clear auth data from cache
+      queryClient.setQueryData(['auth'], null);
+      // Remove token from axios headers
+      delete axios.defaults.headers.common['Authorization'];
+    },
+  });
+};
 
-export { useLogin, useSignUp };
+export { useLogin, useSignUp, useLogout };

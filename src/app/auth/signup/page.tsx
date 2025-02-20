@@ -11,10 +11,12 @@ import GlassPanel from '@/src/components/figma/GlassPanel';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSignUp } from '@/src/hooks/mutations/auth.mutation';
+import { useAuth } from '@/src/hooks/useAuth';
 
 export default function SignUp() {
   const router = useRouter();
   const { mutate: signUp, isPending } = useSignUp();
+  const { isAuthenticated } = useAuth();
   const [errors, setErrors] = useState({
     firstName: '',
     lastName: '',
@@ -27,6 +29,13 @@ export default function SignUp() {
     email: '',
     password: ''
   });
+
+  // Redirect if already authenticated
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/');
+    }
+  }, [isAuthenticated, router]);
 
   const validateForm = () => {
     let tempErrors = {
@@ -86,29 +95,25 @@ export default function SignUp() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) return;
 
-    if (!validateForm()) {
-      return;
-    }
-
-    try {
-      const response: any = await signUp(formData);
-
-      if (response?.success) {
-        router.push('/');
-      } else {
-        setErrors(prev => ({
-          ...prev,
-          email: 'Failed to create account'
-        }));
+    signUp(
+      { 
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email, 
+        password: formData.password 
+      },
+      {
+       
+        onError: (error) => {
+          setErrors(prev => ({
+            ...prev,
+            email: 'Failed to create account'
+          }));
+        }
       }
-    } catch (error) {
-      console.error(error);
-      setErrors(prev => ({
-        ...prev,
-        email: 'An error occurred during signup'
-      }));
-    }
+    );
   };
 
   return (

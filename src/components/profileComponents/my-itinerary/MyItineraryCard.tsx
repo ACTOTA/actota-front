@@ -6,13 +6,10 @@ import Button from '@/src/components/figma/Button';
 import { FeaturedVacation } from '@/db/models/itinerary';
 import Image from 'next/image';
 import GlassPanel from '@/src/components/figma/GlassPanel';
-import { Theme } from '@/src/components/enums/theme';
-import { FaCar, FaCheck, FaPersonWalking } from 'react-icons/fa6';
-import { GoClock, GoHome } from "react-icons/go";
+import { FaPersonWalking } from 'react-icons/fa6';
+import { GoHome } from "react-icons/go";
 import { LuUsers } from "react-icons/lu";
-import { CgArrowRight, CgArrowTopRight, CgSoftwareUpload } from "react-icons/cg";
-import { FaRegHeart } from "react-icons/fa";
-import { IoLeafOutline } from "react-icons/io5";
+import { CgArrowRight } from "react-icons/cg";
 import { CiCalendar } from 'react-icons/ci';
 import { MdOutlineDirectionsCarFilled } from 'react-icons/md';
 import moment from 'moment';
@@ -61,7 +58,7 @@ const MyItineraryCard: React.FC<ListingCardProps> = ({
             </div>
             <div className="h-[1px] my-2 w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
 
-            <div onClick={() => router.push(`/listings/1`)} className='flex justify-between relative gap-4 h-full w-full'>
+            <div onClick={() => router.push(`/itineraries/1`)} className='flex justify-between relative gap-4 h-full w-full'>
                 <div className='w-full'>
 
                     <div className='flex  items-center gap-3 my-3 text-white' >

@@ -8,15 +8,14 @@ import { HiOutlineMail } from 'react-icons/hi';
 import { BiLock } from 'react-icons/bi';
 import Button from '@/src/components/figma/Button';
 import Link from 'next/link';
-import { setAuthCookie } from '@/src/helpers/auth';
-import { verifyJwt, Claims } from '@/src/helpers/auth';
 import { useRouter } from "next/navigation";
 import { useLogin } from '@/src/hooks/mutations/auth.mutation';
-import axios from 'axios';
-
+import { useAuth } from '@/src/hooks/useAuth';
+import { getErrorMessage } from '@/src/utils/getErrorMessage';
 export default function SignIn() {
   const router = useRouter();
   const { mutate: login, isPending } = useLogin();
+  const { isAuthenticated, user } = useAuth();
   const [errors, setErrors] = useState({
     email: '',
     password: ''
@@ -24,6 +23,14 @@ export default function SignIn() {
   const [rememberMe, setRememberMe] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  // Redirect if already authenticated
+  React.useEffect(() => {
+    console.log('isAuthenticated', isAuthenticated);
+    if (isAuthenticated) {
+      router.push('/');
+    }
+  }, [isAuthenticated, router, user]);
 
   const validateForm = () => {
     let tempErrors = {
@@ -56,31 +63,13 @@ export default function SignIn() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) return;
 
-    if (!validateForm()) {
-      return;
-    }
+    router.push("?modal=signinLoading");
 
-    try {
-      const response:any = await login({ email, password });
-    
-    
-
-      if (response) {
-        router.push('/');
-      } else {
-        setErrors(prev => ({
-          ...prev,
-          password: 'Invalid email or password'
-        }));
-      }
-    } catch (error) {
-      console.error(error);
-      setErrors(prev => ({
-        ...prev,
-        password: 'An error occurred during login'
-      }));
-    }
+    login(
+      { email, password }, 
+    );
   };
 
   return (
@@ -134,9 +123,9 @@ export default function SignIn() {
           <input value={1} onChange={(e) => setRememberMe(e.target.checked)} type="checkbox" name="remember" id="remember" className="mr-2 rounded ring-0 border-none focus:ring-0 focus:outline-none" />
           <p className=' text-[14px] leading-[20px]'>Remember me on this device</p>
         </div>
-        <Button 
-          type="submit" 
-          variant="primary" 
+        <Button
+          type="submit"
+          variant="primary"
           className="bg-white text-black w-full my-[10px]"
           disabled={isPending}
         >

@@ -44,7 +44,7 @@ const FavoritesCard: React.FC<ListingCardProps> = ({
         <GlassPanel className='!p-4 !rounded-[22px] max-w-[864px] hover:cursor-pointer flex justify-between items-end mt-4 bg-gradient-to-br from-[#6B6B6B]/30 to-[black]'>
 
 
-            <div onClick={() => router.push(`/listings/1`)} className='flex justify-between relative gap-4 h-full w-full'>
+            <div onClick={() => router.push(`/itineraries/1`)} className='flex justify-between relative gap-4 h-full w-full'>
                 <div>
                     <div className='flex justify-start items-center gap-1 text-white' >
 
