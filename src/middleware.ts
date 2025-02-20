@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { getIronSession } from 'iron-session';
-import { cookieConfig } from './lib/config/cookies';
-import { getSession } from './lib/session';
+// import { cookieConfig } from './lib/config/cookies';
+// import { getSession } from './lib/session';
 
 export async function middleware(request: NextRequest) {
-  const session = await getSession();
+  // const session = await getSession();
 
   // Check if user is authenticated
   if (false) {
