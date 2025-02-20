@@ -19,129 +19,28 @@ import { MdOutlineDirectionsCarFilled } from 'react-icons/md';
 import ActivityTag from '@/src/components/figma/ActivityTag';
 import ListingsSlider from '@/src/components/ListingsSlider';
 import LikeDislike from '@/src/components/LikeDislike';
+import { useItineraryById } from '@/src/hooks/queries/itinerarieById/useItineraryByIdQuery';
 
 export default function Itinerary() {
   const pathname = usePathname() as string;
   const router = useRouter();
-
+  
   const objectId = pathname.substring(pathname.lastIndexOf('/') + 1);
-  const [listing, setListings] = useState<FeaturedVacation>({
-    trip_name: "Yellowstone Adventure",
-    fareharbor_id: 12345,
-    person_cost: 599.99,
-    min_age: 12,
-    min_guests: 2,
-    max_guests: 12,
-    length_days: 3,
-    length_hours: 72,
-    start_location: {
-      city: "Bozeman",
-      state: "Montana",
-      coordinates: [45.6770, -111.0429]
-    },
-    end_location: {
-      city: "West Yellowstone",
-      state: "Montana",
-      coordinates: [44.6622, -111.1044]
-    },
-    description: "Experience the wonders of Yellowstone National Park on this 3-day adventure...",
-    days: {
-      "day1": [
-        {
-          time: "08:00:00",
-          location: {
-            name: "Old Faithful",
-            coordinates: [44.4605, -110.8281]
-          },
-          name: "Geyser Watching",
-          type: "sightseeing"
-        },
-        {
-          time: "14:00:00",
-          location: {
-            name: "Grand Prismatic Spring",
-            coordinates: [44.5251, -110.8390]
-          },
-          name: "Hot Spring Visit",
-          type: "hiking"
-        }
-      ],
-      "day2": [
-        {
-          time: "09:00:00",
-          location: {
-            name: "Lamar Valley",
-            coordinates: [44.8520, -110.2147]
-          },
-          name: "Wildlife Viewing",
-          type: "safari"
-        }
-      ]
-    },
-    activities: [
-      {
-        label: "Hiking",
-        description: "Moderate difficulty trails with spectacular views",
-        tags: ["outdoor", "active", "nature"]
-      },
-      {
-        label: "Wildlife Watching",
-        description: "Observe bison, elk, and possibly bears in their natural habitat",
-        tags: ["wildlife", "photography", "nature"]
-      }
-    ],
-    images: [
-      "/images/hero-bg.jpg",
-      "/images/maroon-bells.jpg",
-      "/images/hero-bg.jpg"
-    ],
-    start_date: new Date("2024-06-15"),
-    end_date: new Date("2024-06-17"),
-    created_at: new Date(),
-    updated_at: new Date()
-  });
-  const [isLoading, setIsLoading] = useState(true);
+  const { data, isLoading, error } = useItineraryById(objectId);
+  
+  // Access the actual itinerary data from the response
+  const itineraryData = data?.data;
+  
+  const [listing, setListings] = useState<any>();
+
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  async function get_itinerary_by_id(id: string) {
-    try {
-      const token = await getAuthCookie();
-
-      const response = await fetch(`/api/itineraries/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        cache: 'no-store'
-      });
-
-      const result = await response.json();
-      return JSON.parse(JSON.stringify(result));
-    } catch (error) {
-      return { error: 'Failed to fetch itinerary' };
+  useEffect(() => {
+    if (data) {
+      setListings(data.data);
     }
-  }
-
-
-
-  // useEffect(() => {
-  //   const fetchListings = async () => {
-  //     try {
-  //       const fetchedListing = await get_itinerary_by_id(objectId);
-  //       setListings(fetchedListing);
-  //       setMainPhoto({ 0: fetchedListing.images[0] });
-  //     } catch (error) {
-  //       console.error('Failed to fetch activities:', error);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-  //   fetchListings();
-  // }, []);
-
-  // if (isLoading) {
-  //   return <div className='text-white'>Loading...</div>;
-  // }
+  }, [data]);
 
   if (!listing) {
     return <div className='text-white'>No data available</div>;
@@ -153,9 +52,6 @@ export default function Itinerary() {
     const timestamp = listing.start_date.getTime() / 1000;
     window.location.href = `https://fareharbor.com/embeds/book/adventurecoloradotours/items/${listing.fareharbor_id}/availability/${timestamp}/book/?full-items=yes&flow=345668`;
   };
-
-
-
 
   const handleSlideClick = (index: number) => {
     setCurrentIndex(index);
@@ -184,19 +80,13 @@ export default function Itinerary() {
         </div>
       </div>
 
-
       <div className='flex max-sm:flex-col w-full gap-6 mt-4'>
-
-
         <div className=' flex flex-col gap-4 w-[67%] max-sm:w-full'>
           <ListingsSlider
             images={listing.images}
             currentIndex={currentIndex}
-
             onSlideClick={handleSlideClick}
           />
-
-
 
           <div className='w-full h-full text-white mt-8 max-sm:mt-0 relative'>
             <h1 className='text-2xl font-bold  sm:hidden'>{listing.trip_name}</h1>
@@ -232,18 +122,13 @@ export default function Itinerary() {
                     <ActivityTag key={i} activity={activity.label} />
                   ))}
                 </div>
-
               </div>
             </div>
             <div className='my-8 max-sm:mb-0'>
               <h2 className='text-white text-xl'><b>About</b></h2>
               <p className='text-primary-gray text-sm mt-2'>{listing?.description}</p>
             </div>
-
           </div>
-
-
-
         </div>
         <div className='w-[33%] max-sm:w-full'>
           <div className=' bg-[#141414] rounded-2xl'>
@@ -271,7 +156,6 @@ export default function Itinerary() {
       <div className='flex-1 h-full w-full mt-8'>
         <DayView listing={listing} />
       </div>
-
     </section>
   );
 }

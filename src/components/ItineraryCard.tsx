@@ -48,7 +48,7 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
         <GlassPanel  className='!p-4 !rounded-[22px] max-w-[864px] hover:cursor-pointer flex justify-between items-end mt-4 bg-gradient-to-br from-[#6B6B6B]/30 to-[black]'>
 
 
-            <div onClick={() => router.push(`/itineraries/1`)} className='flex justify-between max-2xl:flex-col-reverse relative gap-4 h-full w-full'>
+            <div onClick={() => router.push(`/itineraries/${data._id.$oid}`)} className='flex justify-between max-2xl:flex-col-reverse relative gap-4 h-full w-full'>
                 <div className=' w-full'>
                     <div className='flex justify-between items-center text-white'>
                         <p className='text-2xl font-bold'>{data?.trip_name}</p>

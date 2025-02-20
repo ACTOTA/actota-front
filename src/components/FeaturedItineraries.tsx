@@ -7,240 +7,20 @@ import axios from "axios";
 import Button from "@/src/components/figma/Button";
 import Dropdown from "./figma/Dropdown";
 import Image from "next/image";
+import { useItineraries } from "../hooks/queries/itineraries/useItineraryQuery";
+
 export default function FeaturedItineraries() {
-  const [listings, setListings] = React.useState<FeaturedVacation[]>([{
-    trip_name: "Lahore",
-    fareharbor_id: 1,
-    person_cost: 100,
-    min_age: 18,
-    min_guests: 1,
-    max_guests: 10,
-    length_days: 1,
-    length_hours: 1,
-    start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    description: "Lahore is a city in Pakistan",
-    days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
-    activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
-    images: ["/images/hero-bg.jpg"],
-    start_date: new Date(),
-    end_date: new Date(),
-    created_at: new Date(),
-    updated_at: new Date()
-  },
-  {
-    trip_name: "Lahore",
-    fareharbor_id: 1,
-    person_cost: 100,
-    min_age: 18,
-    min_guests: 1,
-    max_guests: 10,
-    length_days: 1,
-    length_hours: 1,
-    start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    description: "Lahore is a city in Pakistan",
-    days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
-    activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
-    images: ["/images/hero-bg.jpg"],
-    start_date: new Date(),
-    end_date: new Date(),
-    created_at: new Date(),
-    updated_at: new Date()
-  }, {
-    trip_name: "Lahore",
-    fareharbor_id: 1,
-    person_cost: 100,
-    min_age: 18,
-    min_guests: 1,
-    max_guests: 10,
-    length_days: 1,
-    length_hours: 1,
-    start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    description: "Lahore is a city in Pakistan",
-    days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
-    activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
-    images: ["/images/hero-bg.jpg"],
-    start_date: new Date(),
-    end_date: new Date(),
-    created_at: new Date(),
-    updated_at: new Date()
-  }, {
-    trip_name: "Lahore",
-    fareharbor_id: 1,
-    person_cost: 100,
-    min_age: 18,
-    min_guests: 1,
-    max_guests: 10,
-    length_days: 1,
-    length_hours: 1,
-    start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    description: "Lahore is a city in Pakistan",
-    days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
-    activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
-    images: ["/images/hero-bg.jpg"],
-    start_date: new Date(),
-    end_date: new Date(),
-    created_at: new Date(),
-    updated_at: new Date()
-  }, {
-    trip_name: "Lahore",
-    fareharbor_id: 1,
-    person_cost: 100,
-    min_age: 18,
-    min_guests: 1,
-    max_guests: 10,
-    length_days: 1,
-    length_hours: 1,
-    start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    description: "Lahore is a city in Pakistan",
-    days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
-    activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
-    images: ["/images/hero-bg.jpg"],
-    start_date: new Date(),
-    end_date: new Date(),
-    created_at: new Date(),
-    updated_at: new Date()
-  }, {
-    trip_name: "Lahore",
-    fareharbor_id: 1,
-    person_cost: 100,
-    min_age: 18,
-    min_guests: 1,
-    max_guests: 10,
-    length_days: 1,
-    length_hours: 1,
-    start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    description: "Lahore is a city in Pakistan",
-    days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
-    activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
-    images: ["/images/hero-bg.jpg"],
-    start_date: new Date(),
-    end_date: new Date(),
-    created_at: new Date(),
-    updated_at: new Date()
-  }, {
-    trip_name: "Lahore",
-    fareharbor_id: 1,
-    person_cost: 100,
-    min_age: 18,
-    min_guests: 1,
-    max_guests: 10,
-    length_days: 1,
-    length_hours: 1,
-    start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    description: "Lahore is a city in Pakistan",
-    days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
-    activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
-    images: ["/images/hero-bg.jpg"],
-    start_date: new Date(),
-    end_date: new Date(),
-    created_at: new Date(),
-    updated_at: new Date()
-  }, {
-    trip_name: "Lahore",
-    fareharbor_id: 1,
-    person_cost: 100,
-    min_age: 18,
-    min_guests: 1,
-    max_guests: 10,
-    length_days: 1,
-    length_hours: 1,
-    start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    description: "Lahore is a city in Pakistan",
-    days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
-    activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
-    images: ["/images/hero-bg.jpg"],
-    start_date: new Date(),
-    end_date: new Date(),
-    created_at: new Date(),
-    updated_at: new Date()
-  }, {
-    trip_name: "Lahore",
-    fareharbor_id: 1,
-    person_cost: 100,
-    min_age: 18,
-    min_guests: 1,
-    max_guests: 10,
-    length_days: 1,
-    length_hours: 1,
-    start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    description: "Lahore is a city in Pakistan",
-    days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
-    activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
-    images: ["/images/hero-bg.jpg"],
-    start_date: new Date(),
-    end_date: new Date(),
-    created_at: new Date(),
-    updated_at: new Date()
-  }, {
-    trip_name: "Lahore",
-    fareharbor_id: 1,
-    person_cost: 100,
-    min_age: 18,
-    min_guests: 1,
-    max_guests: 10,
-    length_days: 1,
-    length_hours: 1,
-    start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    description: "Lahore is a city in Pakistan",
-    days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
-    activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
-    images: ["/images/hero-bg.jpg"],
-    start_date: new Date(),
-    end_date: new Date(),
-    created_at: new Date(),
-    updated_at: new Date()
-  }, {
-    trip_name: "Lahore",
-    fareharbor_id: 1,
-    person_cost: 100,
-    min_age: 18,
-    min_guests: 1,
-    max_guests: 10,
-    length_days: 1,
-    length_hours: 1,
-    start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    description: "Lahore is a city in Pakistan",
-    days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
-    activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
-    images: ["/images/hero-bg.jpg"],
-    start_date: new Date(),
-    end_date: new Date(),
-    created_at: new Date(),
-    updated_at: new Date()
-  }]);
+  const { data: itineraries, isLoading: itinerariesLoading, error: itinerariesError } = useItineraries();
+  console.log(itineraries?.data,"itineraries");
+  const [listings, setListings] = React.useState<any[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [selectedActivity, setSelectedActivity] = useState([]);
-  // useEffect(() => {
-  //   async function fetchListings() {
-  //     try {
-  //       setIsLoading(true);
-  //       const response = await axios.get("/api/itinerary");
-  //       console.log("response", response.data);
-
-  //     } catch (error) {
-  //       console.error('Failed to fetch activities:', error);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   }
-
-  //   fetchListings();
-  // }, []); // Empty dependency array means run once on mount
-
-  // if (isLoading) {
-  //   return <div>Loading...</div>;
-  // }
+ 
+  useEffect(() => {
+    if (itineraries) {
+      setListings(itineraries.data);
+    }
+  }, [itineraries]);
 
   return (
     <section className=" w-full text-white">
@@ -293,10 +73,11 @@ export default function FeaturedItineraries() {
 
         </div>
         <div className="flex flex-wrap justify-start max-sm:justify-center gap-4">
-          {listings?.map((listing) => (
+        {itinerariesLoading && <div>Loading...</div>}
+        {itinerariesError && <div>Error: {itinerariesError.message}</div>}
+          {listings.length > 0 && listings?.map((listing) => (
             <ListingCard
-              // key={(listing._id as { $oid: string }).$oid}
-              key={listing.trip_name}
+              key={(listing._id as { $oid: string }).$oid}
               data={listing}
             />
           ))}
