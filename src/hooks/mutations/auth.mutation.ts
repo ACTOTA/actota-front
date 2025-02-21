@@ -2,11 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getErrorMessage } from '@/src/utils/getErrorMessage';
 import { LoginPayload, SignUpPayload, AuthResponse } from '@/src/types/mutations/auth';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
 
 const useLogin = () => {
-  const router = useRouter();
-  const queryClient = useQueryClient();
   
   return useMutation({
     mutationFn: async (payload: LoginPayload) => {
@@ -19,15 +16,13 @@ const useLogin = () => {
     },
     onSuccess: (data:any) => {
       // Store auth data in React Query cache
-      queryClient.setQueryData(['auth'], {
-        auth_token: data.auth_token,
-        user: data.user,
-        isAuthenticated: true
-      });
-      // Set token in axios headers for subsequent requests
-      axios.defaults.headers.common['Authorization'] = `Bearer ${data.auth_token}`;
+      // queryClient.setQueryData(['auth'], {
+      //   auth_token: data.auth_token,
+      //   user: data.user,
+      //   isAuthenticated: true
+      // });
       // router.push('/');
-      router.back()
+      // router.back()
     },
    
   });
@@ -35,7 +30,6 @@ const useLogin = () => {
 
 const useSignUp = () => {
   const queryClient = useQueryClient();
-  const router = useRouter();
   return useMutation({
     mutationFn: async (payload: SignUpPayload) => {
       const { data } = await axios.post<any>(
@@ -46,15 +40,13 @@ const useSignUp = () => {
     },
     onSuccess: (data:any) => {
       // Store auth data in React Query cache
-      queryClient.setQueryData(['auth'], {
-        auth_token: data.auth_token,
-        user: data.user,
-        isAuthenticated: true
-      });
+      // queryClient.setQueryData(['auth'], {
+      //   auth_token: data.auth_token,
+      //   user: data.user,
+      //   isAuthenticated: true
+      // });
       
-      // Set token in axios headers for subsequent requests
-      axios.defaults.headers.common['Authorization'] = `Bearer ${data.auth_token}`;
-      router.push('/');
+      // router.push('/');
     },
     onError(error) {
       console.error('useSignUp', getErrorMessage(error));
@@ -74,9 +66,9 @@ const useLogout = () => {
     },
     onSuccess: () => {
       // Clear auth data from cache
-      queryClient.setQueryData(['auth'], null);
+      // queryClient.setQueryData(['auth'], null);
+      localStorage.removeItem('auth');
       // Remove token from axios headers
-      delete axios.defaults.headers.common['Authorization'];
     },
   });
 };

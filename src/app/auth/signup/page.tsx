@@ -105,7 +105,14 @@ export default function SignUp() {
         password: formData.password 
       },
       {
-       
+        onSuccess: (data:any) => {
+          localStorage.setItem('auth', JSON.stringify({
+            auth_token: data.auth_token,
+            user: {email: formData.email, password: formData.password},
+            isAuthenticated: true
+          }));
+          router.push('/');
+        },
         onError: (error) => {
           setErrors(prev => ({
             ...prev,

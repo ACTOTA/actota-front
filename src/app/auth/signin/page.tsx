@@ -69,9 +69,21 @@ export default function SignIn() {
 
     login(
       { email, password }, 
+      {
+        onSuccess: (data:any) => {
+          localStorage.setItem('auth', JSON.stringify({
+            auth_token: data.auth_token,
+            user: {email: email, password: password},
+            isAuthenticated: true
+          }));
+          router.push('/');
+        },
+        onError: (error) => {
+          console.error('Login error:', error);
+        }
+      }
     );
   };
-
   return (
     <GlassPanel className=" w-[584px] max-md:w-full max-md:!rounded-b-none max-md:!border-0 max-md:!border-t-[0.5px] flex flex-col justify-around relative text-white">
       <div className="text-white flex justify-between items-center">

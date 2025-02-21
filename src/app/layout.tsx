@@ -8,7 +8,7 @@ import ClientOnly from "@/src/components/ClientOnly";
 import ModalContainer from "../components/ModalContainer";
 import DrawerModal from "../components/DrawerModal";
 import { Providers } from "./providers";
-
+import { Toaster } from "react-hot-toast";
 export const metadata = {
   title: "ACTOTA!",
   description: "Personalized Tours Made Easy",
@@ -42,6 +42,7 @@ export default async function RootLayout({
             <Navbar />
           </ClientOnly>
           <div>{children}</div>
+        <Toaster />
         </Providers>
       </body>
     </html>

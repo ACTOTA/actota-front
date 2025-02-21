@@ -46,7 +46,7 @@ const Navbar = () => {
         if(user) {
             setCurrentUser(user);
         }else{
-            // router.push('/auth/signin');
+            router.push('/auth/signin');
             setCurrentUser(null);
         }
     }, [user])

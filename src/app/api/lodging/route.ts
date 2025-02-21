@@ -1,28 +1,15 @@
-import { actotaApi } from '@/src/lib/apiClient';
+import actotaApi from '@/src/lib/apiClient';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
 	try {
+		const response = await actotaApi.get('/api/lodging');
 
-		// TODO: Replace with Actota API
-		// TODO: replace env public api url to use local host
-
-		const response = await actotaApi.get('/api/lodging', {
-			headers: {
-				'Content-Type': 'application/json',
-				// TODO: put hardcoded token as for now
-				// "Authorization": `Bearer ${session.token}`
-			},
-		});
-
-
-		const data = response.data;
-
-		return NextResponse.json(data);
+		return NextResponse.json({success: true,message: "Lodging fetched successfully", data: response.data});
 	} catch (error) {
 		console.error('Fetch error:', error);
 		return NextResponse.json(
-			{ error: 'Failed to fetch activities' },
+			{ error: 'Failed to fetch lodging' },
 			{ status: 500 }
 		);
 	}

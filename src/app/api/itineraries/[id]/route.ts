@@ -1,44 +1,25 @@
-import { NextResponse } from 'next/server';
 import actotaApi from '@/src/lib/apiClient';
+import { NextResponse } from 'next/server';
 
-export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
     const { id } = params;
-    console.log('Fetching itinerary with ID:', id);
+    console.log(id, "id in get itinerary by id route");
 
-    // Use direct localhost URL during development
-    const baseUrl = process.env.NODE_ENV === 'development' 
-      ? 'http://localhost:3000' 
-      : process.env.NEXT_PUBLIC_API_URL;
+    // Make the request with additional headers
+    const response = await actotaApi.get(`/api/itineraries/${id}`);
 
-    const response = await fetch(`${baseUrl}/api/itineraries/${id}`, {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      // Add credentials if needed
-      credentials: 'include',
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
+    // If we get here, we should have JSON data
     return NextResponse.json({
-      success: true,
-      message: "Itinerary fetched successfully",
-      data: data
+      success: true, 
+      message: "itinerary by id fetched successfully",
+      data: response.data
     });
 
   } catch (error: any) {
-    console.error('API route error:', error);
+    console.error('Fetch error:', error.message);
     return NextResponse.json(
-      {
+      { 
         success: false,
         error: 'Failed to fetch itinerary',
         details: error.message
