@@ -1,11 +1,9 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { FeaturedVacation } from "@/db/models/itinerary";
 import ItineraryCard from '@/src/components/ItineraryCard';
 import Button from '@/src/components/figma/Button';
 import Newsletter from '@/src/components/Newsletter';
 import Footer from '@/src/components/Footer';
-import Filter from '@/src/components/DrawerModal';
 import ItineraryPageFilter from '@/src/components/ItineraryPageFilter';
 import ItineraryPageAdvanceFilter from '@/src/components/ItineraryPageAdvanceFilter';
 import Dropdown from '@/src/components/figma/Dropdown';
@@ -20,7 +18,7 @@ const Itineraries = () => {
 
     useEffect(() => {
         if (itineraries) {
-          setListings(itineraries.data);
+          setListings(itineraries?.data);
         }
       }, [itineraries]);
     return (

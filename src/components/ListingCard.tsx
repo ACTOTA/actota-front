@@ -2,7 +2,6 @@ import { useRouter } from 'next/navigation';
 
 import React, { useCallback } from 'react';
 import Button from '@/src/components/figma/Button';
-import { FeaturedVacation } from '@/db/models/itinerary';
 import Image from 'next/image';
 import { FaPersonWalking } from 'react-icons/fa6';
 import { GoClock } from "react-icons/go";
@@ -10,7 +9,7 @@ import { LuUsers } from "react-icons/lu";
 import { IoLeafOutline } from "react-icons/io5";
 import LikeDislike from './LikeDislike';
 interface ListingCardProps {
-    data: FeaturedVacation;
+    data: any;
     onAction?: (id: string) => void;
     disabled?: boolean;
     actionLabel?: string;

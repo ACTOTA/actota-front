@@ -2,15 +2,9 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react';
-import { FeaturedVacation } from '@/db/models/itinerary';
-import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon, ClockIcon, HeartIcon } from '@heroicons/react/20/solid';
-import Image from 'next/image';
-import GlassPanel from '@/src/components/figma/GlassPanel';
+import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon } from '@heroicons/react/20/solid';
 import Button from '@/src/components/figma/Button';
 import DayView from './DayView';
-import { getAuthCookie } from '@/src/helpers/auth';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/16/solid';
-import { FaRegHeart } from 'react-icons/fa6';
 import { CgSoftwareUpload } from 'react-icons/cg';
 import { LuUsers } from 'react-icons/lu';
 import { PiClockDuotone } from 'react-icons/pi';

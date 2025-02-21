@@ -1,21 +1,13 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation'
-import React, { useEffect, useState } from 'react';
-import { FeaturedVacation } from '@/db/models/itinerary';
-import { ArrowLeftIcon, ArrowRightIcon, CalendarIcon, ClockIcon, HeartIcon, XMarkIcon } from '@heroicons/react/20/solid';
+import React, { useState } from 'react';
+import { ArrowLeftIcon, XMarkIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
-import GlassPanel from '@/src/components/figma/GlassPanel';
 import Button from '@/src/components/figma/Button';
-import { getAuthCookie } from '@/src/helpers/auth';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/16/solid';
-import { FaRegHeart, FaStar } from 'react-icons/fa6';
+import {  FaStar } from 'react-icons/fa6';
 import { CgSoftwareUpload } from 'react-icons/cg';
-import { LuArrowRight, LuUser, LuUsers } from 'react-icons/lu';
-import { PiClockDuotone } from 'react-icons/pi';
-import { GoHome } from 'react-icons/go';
-import { MdOutlineDirectionsCarFilled } from 'react-icons/md';
-import ActivityTag from '@/src/components/figma/ActivityTag';
+import { LuArrowRight, LuUser } from 'react-icons/lu';
 import BookingCard from '@/src/components/profileComponents/bookings/BookingCard';
 import Newsletter from '@/src/components/Newsletter';
 import Footer from '@/src/components/Footer';

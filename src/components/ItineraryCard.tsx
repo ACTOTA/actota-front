@@ -2,7 +2,6 @@
 import { useRouter } from 'next/navigation';
 
 import React, { useCallback, useEffect } from 'react';
-import { FeaturedVacation } from '@/db/models/itinerary';
 import Image from 'next/image';
 import GlassPanel from '@/src/components/figma/GlassPanel';
 import { FaPersonWalking } from 'react-icons/fa6';
@@ -15,7 +14,7 @@ import { CiCalendar } from 'react-icons/ci';
 import { MdOutlineDirectionsCarFilled } from 'react-icons/md';
 import LikeDislike from './LikeDislike';
 interface ListingCardProps {
-    data: FeaturedVacation;
+    data: any;
     onAction?: (id: string) => void;
     disabled?: boolean;
     actionLabel?: string;

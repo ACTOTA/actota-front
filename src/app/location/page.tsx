@@ -1,9 +1,7 @@
 "use client"
-import { FeaturedVacation } from '@/db/models/itinerary'
 import Button from '@/src/components/figma/Button'
 import Footer from '@/src/components/Footer'
 import ListingCard from '@/src/components/ListingCard'
-import MapPage from '@/src/components/MapPage'
 import Newsletter from '@/src/components/Newsletter'
 import SimpleCard from '@/src/components/SimpleCard'
 import { ArrowLeftIcon } from '@heroicons/react/20/solid'
@@ -15,7 +13,7 @@ import { GrLocation } from 'react-icons/gr'
 import { MdOutlineDirectionsCarFilled } from 'react-icons/md'
 import { RxArrowTopRight } from "react-icons/rx";
 const Location = () => {
-  const [listings, setListings] = React.useState<FeaturedVacation[]>([{
+  const [listings, setListings] = React.useState<any[]>([{
     trip_name: "Lahore",
     fareharbor_id: 1,
     person_cost: 100,

@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import ListingCard from "@/src/components/ListingCard";
-import { FeaturedVacation } from "@/db/models/itinerary";
-import axios from "axios";
 import Button from "@/src/components/figma/Button";
 import Dropdown from "./figma/Dropdown";
 import Image from "next/image";
@@ -11,14 +9,13 @@ import { useItineraries } from "../hooks/queries/itineraries/useItineraryQuery";
 
 export default function FeaturedItineraries() {
   const { data: itineraries, isLoading: itinerariesLoading, error: itinerariesError } = useItineraries();
-  console.log(itineraries?.data,"itineraries");
   const [listings, setListings] = React.useState<any[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [selectedActivity, setSelectedActivity] = useState([]);
  
   useEffect(() => {
     if (itineraries) {
-      setListings(itineraries.data);
+      setListings(itineraries?.data);
     }
   }, [itineraries]);
 
