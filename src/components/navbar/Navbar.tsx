@@ -19,11 +19,12 @@ import { STEPS } from "@/src/types/steps";
 import Search from "./Search";
 import { useLogout } from "@/src/hooks/mutations/auth.mutation";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/src/hooks/useAuth";
+// import { useAuth } from "@/src/hooks/useAuth";
 
 const Navbar = () => {
+     const user = JSON.parse(localStorage.getItem('auth') || '{}')?.user;
   const { mutate: signOut, isPending } = useLogout();
-  const { user,isAuthenticated } = useAuth();
+//   const { user,isAuthenticated } = useAuth();
   const router = useRouter();
     const pathname = usePathname();
     const isAuthRoute = pathname?.startsWith('/auth');
@@ -45,11 +46,14 @@ const Navbar = () => {
         console.log("user in navbar", user);
         if(user) {
             setCurrentUser(user);
-        }else{
-            router.push('/auth/signin');
+        }
+        else{
+            if(window.location.pathname !== '/auth/signin'){
+                router.push('/auth/signin');
+            }
             setCurrentUser(null);
         }
-    }, [user])
+    }, [])
 
     async function handleSignout() {
         setCurrentUser(null);

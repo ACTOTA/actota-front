@@ -10,8 +10,8 @@ import { useLodging } from '../hooks/queries/lodging/useLodgingQuery';
 import { useItineraries } from '../hooks/queries/itineraries/useItineraryQuery';
 const Landing = () => {
   // const { data: lodging } = useLodging();
-  const { data: activities, isLoading, error } = useActivities();
-  console.log(activities);
+  // const { data: activities, isLoading, error } = useActivities();
+  // console.log(activities);
   return (
     <>
       <FeaturedItineraries />

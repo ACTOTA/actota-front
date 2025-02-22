@@ -1,6 +1,6 @@
 import actotaApi from '@/src/lib/apiClient';
 import { useQuery } from '@tanstack/react-query';
-
+// import { useAuth } from '@/src/hooks/useAuth';
 interface Itinerary {
   // Define your activity type here
   id: string;
@@ -9,6 +9,8 @@ interface Itinerary {
 
 async function fetchItineraryById(id: string): Promise<any> {
   try {
+    const token = JSON.parse(localStorage.getItem('auth') || '{}')?.auth_token;
+    // const { token } = useAuth();
     // const response = await fetch(`/api/itineraries/${id}`, {
     //   headers: {
     //     'Content-Type': 'application/json',
@@ -18,7 +20,11 @@ async function fetchItineraryById(id: string): Promise<any> {
     //   credentials: 'include',
     // });
 
-    const response = await actotaApi.get(`/api/itineraries/${id}`);
+    const response = await actotaApi.get(`/api/itineraries/${id}`,{ headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`,
+    }});
     console.log(response.data, "response from itinerary by id");
     return response.data;
    

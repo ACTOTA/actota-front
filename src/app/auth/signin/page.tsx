@@ -10,12 +10,14 @@ import Button from '@/src/components/figma/Button';
 import Link from 'next/link';
 import { useRouter } from "next/navigation";
 import { useLogin } from '@/src/hooks/mutations/auth.mutation';
-import { useAuth } from '@/src/hooks/useAuth';
+// import { useAuth } from '@/src/hooks/useAuth';
 import { getErrorMessage } from '@/src/utils/getErrorMessage';
 export default function SignIn() {
   const router = useRouter();
   const { mutate: login, isPending } = useLogin();
-  const { isAuthenticated, user } = useAuth();
+  // const { isAuthenticated, user } = useAuth();
+  const isAuthenticated = JSON.parse(localStorage.getItem('auth') || '{}')?.isAuthenticated;
+  const user = JSON.parse(localStorage.getItem('auth') || '{}')?.user;
   const [errors, setErrors] = useState({
     email: '',
     password: ''
@@ -76,7 +78,7 @@ export default function SignIn() {
             user: {email: email, password: password},
             isAuthenticated: true
           }));
-          router.push('/');
+         window.location.href = '/';
         },
         onError: (error) => {
           console.error('Login error:', error);

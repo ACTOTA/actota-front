@@ -12,11 +12,40 @@ import DrawerModal from '@/src/components/DrawerModal';
 // Add this constant for the API key
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
 
-interface DayViewProps {
-	listing: any;
+interface Location {
+	name: string;
+	coordinates: number[];
 }
 
+interface Activity {
+	time: string;
+	location: Location;
+	name: string;
+}
 
+interface ListingData {
+	_id: { $oid: string };
+	trip_name: string;
+	length_days: number;
+	start_location: {
+		city: string;
+		state: string;
+		coordinates: number[];
+	};
+	end_location: {
+		city: string;
+		state: string;
+		coordinates: number[];
+	};
+	days: {
+		[key: string]: Activity[];
+	};
+	start_date?: string;
+}
+
+interface DayViewProps {
+	listing: ListingData;
+}
 
 const defaultCenter = {
 	lat: 39.7392,
@@ -52,13 +81,20 @@ export default function DayView({ listing }: DayViewProps) {
 	}, []);
 
 	const formatTime = (time: string) => {
-		const [hours] = time.split(':');
-		const parsedHours = parseInt(hours);
-		return `${parsedHours}:00${parsedHours >= 12 ? 'PM' : 'AM'}`;
+		try {
+			const [hours, minutes] = time.split(':');
+			const parsedHours = parseInt(hours);
+			const period = parsedHours >= 12 ? 'PM' : 'AM';
+			const displayHours = parsedHours > 12 ? parsedHours - 12 : parsedHours;
+			return `${displayHours}:${minutes}${period}`;
+		} catch (error) {
+			return time;
+		}
 	};
 
 	// Format date helper
-	const formatDate = (date: Date) => {
+	const formatDate = (date: string | Date | undefined) => {
+		if (!date) return '';
 		return new Intl.DateTimeFormat('en-US', {
 			day: '2-digit',
 			month: 'short',
@@ -82,30 +118,30 @@ export default function DayView({ listing }: DayViewProps) {
 
 	// Get coordinates for the selected day's activities
 	const getDayCoordinates = () => {
-		const dayKey = `day${selectedDay}`;
-		const activities = listing.days[dayKey] || [];
+		const dayActivities = listing.days[selectedDay.toString()] || [];
+		const coordinates = [];
 
 		// Add start location if it's day 1
-		const coordinates = selectedDay === 1 ? [
-			{
-				lat: listing.start_location.coordinates[0],
-				lng: listing.start_location.coordinates[1]
-			}
-		] : [];
+		if (selectedDay === 1) {
+			coordinates.push({
+				lat: listing.start_location.coordinates[1],
+				lng: listing.start_location.coordinates[0]
+			});
+		}
 
 		// Add activity locations
-		activities.forEach(activity => {
+		dayActivities.forEach(activity => {
 			coordinates.push({
-				lat: activity.location.coordinates[0],
-				lng: activity.location.coordinates[1]
+				lat: activity.location.coordinates[1],
+				lng: activity.location.coordinates[0]
 			});
 		});
 
 		// Add end location if it's the last day
 		if (selectedDay === listing.length_days) {
 			coordinates.push({
-				lat: listing.end_location.coordinates[0],
-				lng: listing.end_location.coordinates[1]
+				lat: listing.end_location.coordinates[1],
+				lng: listing.end_location.coordinates[0]
 			});
 		}
 
@@ -127,21 +163,22 @@ export default function DayView({ listing }: DayViewProps) {
 		};
 	};
 
+	const currentDayActivities = listing.days[selectedDay.toString()] || [];
+
 	return (
 		<div className="w-full">
 			{/* View Toggle */}
 			<div className="inline-flex justify-start gap-2 mb-9 border border-border-primary rounded-full p-1">
 				<Button
 					onClick={() => setSelectedView('map')}
-					className={` border-white px-[50px] !py-2 ${selectedView === 'map' ? 'bg-gradient-to-r from-white/20 to-white/5' : ''}`}
-
+					className={`border-white px-[50px] !py-2 ${selectedView === 'map' ? 'bg-gradient-to-r from-white/20 to-white/5' : ''}`}
 					variant={selectedView === 'map' ? 'outline' : 'simple'}
 				>
 					Map
 				</Button>
 				<Button
 					onClick={() => setSelectedView('day')}
-					className={` border-white px-[25px] !py-2 ${selectedView === 'day' ? 'bg-gradient-to-r from-white/20 to-white/5' : ''}`}
+					className={`border-white px-[25px] !py-2 ${selectedView === 'day' ? 'bg-gradient-to-r from-white/20 to-white/5' : ''}`}
 					variant={selectedView === 'day' ? 'outline' : 'simple'}
 				>
 					Day by Day
@@ -156,7 +193,7 @@ export default function DayView({ listing }: DayViewProps) {
 						<Button
 							key={day}
 							onClick={() => setSelectedDay(day)}
-							className={` border-white px-[25px] !py-2 ${selectedDay === day ? 'bg-gradient-to-r from-white/20 to-white/5' : ''}`}
+							className={`border-white px-[25px] !py-2 ${selectedDay === day ? 'bg-gradient-to-r from-white/20 to-white/5' : ''}`}
 							variant={selectedDay === day ? 'outline' : 'simple'}
 						>
 							{day}
@@ -171,17 +208,16 @@ export default function DayView({ listing }: DayViewProps) {
 					<div className="w-[320px] bg-[#141414] rounded-2xl p-6">
 						<div className="flex items-center gap-2 mb-4">
 							<BsCalendar4 className="text-white" />
-							<span className="text-white">{formatDate(listing?.start_date || new Date())}</span>
+							<span className="text-white">{formatDate(listing?.start_date)}</span>
 							<span className="text-gray-400 ml-auto">Day {selectedDay}</span>
 						</div>
 
 						<div className="space-y-6">
-							{listing.days[`day${selectedDay}`]?.map((activity, index, array) => (
+							{currentDayActivities.map((activity, index, array) => (
 								<React.Fragment key={index}>
-									{/* Activity */}
 									<div className="flex gap-3">
 										<div className="rounded-full bg-[#262626] p-2">
-											{getActivityIcon(activity.type)}
+											{getActivityIcon(activity.name)}
 										</div>
 										<div className="flex-1">
 											<h3 className="text-white text-sm">{activity.name}</h3>
@@ -189,8 +225,6 @@ export default function DayView({ listing }: DayViewProps) {
 											<p className="text-gray-400 text-sm">{formatTime(activity.time)}</p>
 										</div>
 									</div>
-
-									{/* Vertical Line (if not last item) */}
 									{index < array.length - 1 && (
 										<div className="w-[1px] h-4 bg-gray-600 ml-[22px]"></div>
 									)}
@@ -235,7 +269,7 @@ export default function DayView({ listing }: DayViewProps) {
 				</div>
 			) : (
 				<div className="space-y-4 border-l-2 border-dashed border-border-primary ps-6 ms-6">
-					{listing.days[`day${selectedDay}`]?.map((activity, index) => (
+					{currentDayActivities.map((activity, index) => (
 						<ActivityCard
 							key={index}
 							activity={activity}
