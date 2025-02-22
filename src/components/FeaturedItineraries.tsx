@@ -70,8 +70,8 @@ export default function FeaturedItineraries() {
 
         </div>
         <div className="flex flex-wrap justify-start max-sm:justify-center gap-4">
-        {itinerariesLoading && <div>Loading...</div>}
-        {itinerariesError && <div>Error: {itinerariesError.message}</div>}
+        {itinerariesLoading && <div className="text-white text-center w-full">Loading...</div>}
+        {itinerariesError && <div className="text-white text-center w-full">Error: {itinerariesError.message}</div>}
           {listings.length > 0 && listings?.map((listing) => (
             <ListingCard
               key={(listing._id as { $oid: string }).$oid}

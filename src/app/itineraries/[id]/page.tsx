@@ -74,18 +74,18 @@ export default function Itinerary() {
  
 
   if (isLoading) {
-    return <div className='text-white'>Loading...</div>;
+    return <div className='text-white flex justify-center items-center h-screen'>Loading...</div>;
   }
 
   if (error) {
     console.error('Error details:', error);
-    return <div className='text-white'>Error: {error.message}</div>;
+    return <div className='text-white flex justify-center items-center h-screen'>Error: {error.message}</div>;
   }
 
   console.log('Rendering with data:', { apiResponse, itineraryData });
 
   if (!itineraryData) {
-    return <div className='text-white'>Loading itinerary data...</div>;
+    return <div className='text-white flex justify-center items-center h-screen'>Loading itinerary data...</div>;
   }
 
   const handleBooking = () => {
