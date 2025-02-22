@@ -44,7 +44,7 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
 
 
     return (
-        <GlassPanel  className='!p-4 !rounded-[22px] max-w-[864px] hover:cursor-pointer flex justify-between items-end mt-4 bg-gradient-to-br from-[#6B6B6B]/30 to-[black]'>
+        <GlassPanel className='!p-4 !rounded-[22px] max-w-[864px] hover:cursor-pointer flex justify-between items-end mt-4 bg-gradient-to-br from-[#6B6B6B]/30 to-[black]'>
 
 
             <div onClick={() => router.push(`/itineraries/${data._id.$oid}`)} className='flex justify-between max-2xl:flex-col-reverse relative gap-4 h-full w-full'>
@@ -81,19 +81,19 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
                     </div>
                 </div>
 
-                    <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={300}  className='rounded-lg max-2xl:w-full' />
-                    <div className='flex gap-2 absolute top-2 right-2'>
-                        <button 
-                            onClick={(e) => {
-                                e.stopPropagation();  // Stop the event from bubbling up
-                                router.push("?modal=shareModal");
-                            }} 
-                            className='bg-[#05080D] rounded-full h-10 w-10 flex items-center justify-center'
-                        > 
-                           <Image src="/svg-icons/share.svg" alt="share" height={20} width={20} />
-                        </button>
-                       <LikeDislike />
-                    </div>
+                <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={300} className='rounded-lg max-2xl:w-full' />
+                <div className='flex gap-2 absolute top-2 right-2'>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();  // Stop the event from bubbling up
+                            router.push("?modal=shareModal");
+                        }}
+                        className='bg-[#05080D] rounded-full h-10 w-10 flex items-center justify-center'
+                    >
+                        <Image src="/svg-icons/share.svg" alt="share" height={20} width={20} />
+                    </button>
+                    <LikeDislike />
+                </div>
             </div>
 
 

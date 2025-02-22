@@ -12,7 +12,7 @@ const Booking = () => {
   const [bookings, setBookings] = React.useState<any[]>([{
     id: 1,
     status: "upcoming",
-    delay_insurance: false,
+    delay_insurance: true,
     trip_name: "Lahore",
     fareharbor_id: 1,
     person_cost: 100,
@@ -103,7 +103,7 @@ const Booking = () => {
     return (
       <div>
         {bookings.filter((booking) => booking.status === activeTab || activeTab === "all").map((booking) => (
-          <BookingCard key={booking.id} data={booking} />
+          <BookingCard  key={booking.id} data={booking} />
         ))}
       </div>
     )
@@ -112,7 +112,13 @@ const Booking = () => {
     <div className="flex flex-col gap-8">
       {/* header section */}
       <div className="flex flex-col gap-4">
-        <div className="font-bold text-2xl">Bookings</div>
+        <div className="font-bold flex items-center justify-between gap-2 text-2xl"><p className="">Bookings</p>
+        <Link
+            href="/profile/bookings"
+            className="text-base border-b-2 border-[#BBD4FB] text-[#BBD4FB] md:hidden"
+          >
+            Can’t find your booking?
+          </Link></div>
         <div className="flex justify-between items-end">
           <div className="flex gap-2">
             {tabs.map((tab) => (
@@ -133,7 +139,7 @@ const Booking = () => {
           </div>
           <Link
             href="/profile/bookings"
-            className="text-base border-b-2 border-[#BBD4FB] text-[#BBD4FB]"
+            className="text-base border-b-2 border-[#BBD4FB] text-[#BBD4FB] max-md:hidden"
           >
             Can’t find your booking?
           </Link>

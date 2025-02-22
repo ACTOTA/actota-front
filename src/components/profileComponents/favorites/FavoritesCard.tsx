@@ -41,17 +41,20 @@ const FavoritesCard: React.FC<ListingCardProps> = ({
 
 
     return (
-        <GlassPanel className='!p-4 !rounded-[22px] max-w-[864px] hover:cursor-pointer flex justify-between items-end mt-4 bg-gradient-to-br from-[#6B6B6B]/30 to-[black]'>
+        <GlassPanel className='!p-4 max-sm:!p-0 max-sm:border-none !rounded-[22px] max-w-[864px] hover:cursor-pointer flex justify-between items-end mt-4 bg-gradient-to-br from-[#6B6B6B]/30 to-[black]'>
 
 
-            <div onClick={() => router.push(`/itineraries/1`)} className='flex justify-between relative gap-4 h-full w-full'>
+            <div onClick={() => router.push(`/itineraries/1`)} className='flex justify-between max-lg:flex-col-reverse relative gap-4 h-full w-full'>
                 <div>
-                    <div className='flex justify-start items-center gap-1 text-white' >
+                    <div className='flex justify-start items-center flex-wrap gap-1 max-w-[70%] text-white max-md:absolute max-md:top-2 max-md:left-2' >
 
                         <div className=' bg-gradient-to-r from-[#0252D0] to-[#012A6A]  rounded-full px-3 py-1  flex items-center justify-center gap-1'> <Image src="/svg-icons/popular-icon.svg" alt="Popular" height={20} width={20} className='h-5 w-5 text-white' />Popular</div>
                         <div className=' bg-[#05080D]  rounded-full px-3 py-1  flex items-center justify-center gap-1'> <IoLeafOutline className='h-5 w-5 text-white' />Mindfulness</div>
                     </div>
-                    <p className='text-2xl font-bold mt-3 flex items-center gap-2'>{data?.trip_name} {data?.day_itinerary ? <Button variant='primary' size='sm' className='!bg-[#215CBA] text-white text-xs font-normal'>Day  1/3</Button> : ""}</p>
+                    <div className='max-md:flex w-full justify-between'>
+<div>
+
+                    <p className='text-2xl font-bold mt-3 max-md:mt-0 flex items-center gap-2'>{data?.trip_name} {data?.day_itinerary ? <Button variant='primary' size='sm' className='!bg-[#215CBA] text-white text-xs font-normal'>Day  1/3</Button> : ""}</p>
 
                     <p className='py-2 text-sm text-primary-gray'>Denver, Idaho Springs, Glenwood Springs, 2 More.</p>
                     <div className='flex justify-start items-center gap-3  mb-2 text-white' >
@@ -70,13 +73,16 @@ const FavoritesCard: React.FC<ListingCardProps> = ({
                         </div>
                     </div>
 
+</div>
                     <div>
                         <p className='text-xs text-primary-gray '>from</p>
                         <p className='text-xl font-bold'>${data.person_cost}</p>
                     </div>
+                    </div>
+
                 </div>
 
-                <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={300} objectFit='cover' className='rounded-lg' />
+                <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={300} objectFit='cover' className='rounded-lg max-lg:w-full' />
                 <div className='flex gap-2 absolute top-2 right-2'>
                     <div onClick={(e) => {
                         e.stopPropagation();

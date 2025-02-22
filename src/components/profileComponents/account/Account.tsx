@@ -13,13 +13,13 @@ const Account = () => {
       component: <Personal />
     },
     {
-      id: "verification", 
+      id: "verification",
       label: "Verification & Change Password",
       component: <VerificationPasswor />
     },
     {
       id: "email",
-      label: "Email Notification", 
+      label: "Email Notification",
       component: <EmailNotification />
     }
   ];
@@ -30,28 +30,28 @@ const Account = () => {
   };
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="">
       {/* header section */}
-      <div className="flex flex-col gap-4">
         <div className="font-bold text-2xl">Account</div>
-        <div className="flex gap-2">
-          {tabs.map(tab => (
-            <Button
-              key={tab.id}
-              variant="outline"
-              size="sm"
-              className={
-                activeTab === tab.id
-                  ? "!border-white !text-white"
-                  : "!border-border-primary !text-border-primary"
-              }
-              onClick={() => setActiveTab(tab.id)}
-            >
-              {tab.label}
-            </Button>
-          ))}
+        <div className=' overflow-auto scrollbar-hide my-4'>
+          <div className="flex items-center gap-2">
+            {tabs.map(tab => (
+              <Button
+                key={tab.id}
+                variant="outline"
+                size="sm"
+                className={
+                  activeTab === tab.id
+                    ? "!border-white !text-white whitespace-nowrap"
+                    : "!border-border-primary !text-border-primary whitespace-nowrap"
+                }
+                onClick={() => setActiveTab(tab.id)}
+              >
+                {tab.label}
+              </Button>
+            ))}
+          </div>
         </div>
-      </div>
       {/* body section */}
       <div>{renderContent()}</div>
     </div>

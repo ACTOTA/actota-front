@@ -23,7 +23,7 @@ const Personal = () => {
     <div className="gap-4 flex flex-col">
       <div className="flex justify-between items-center">
         <div className="font-bold text-xl">Personal Information</div>
-        <Button variant="outline" size="sm" className="flex gap-2 items-center">
+        <Button variant="outline" size="sm" className="flex gap-2 items-center max-md:hidden">
           <FiEdit3 />
           Edit
         </Button>
@@ -33,7 +33,7 @@ const Personal = () => {
           <Image src={ProfileImage} alt="Profile" width={80} height={80} />
           <div className="text-white flex flex-col gap-1">
             <div className="font-bold text-base leading-6">Profile Picture</div>
-            <div className="flex gap-2 items-center text-sm text-primary-gray">
+            <div className="flex flex-wrap gap-2 items-center text-sm text-primary-gray">
               <div>JPEG or PNG</div>
               <GoDotFill />
               <div>Recommended 500 x 500px, max 500KB.</div>
@@ -43,12 +43,12 @@ const Personal = () => {
         <Button
           variant="outline"
           size="sm"
-          className="flex gap-2 items-center py-2.5 !px-4"
+          className="flex gap-2 items-center py-2.5 !px-4 max-md:hidden"
         >
           Upload New Picture <PlusIcon className="w-5 h-5" />
         </Button>
       </div>
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 max-md:flex max-md:flex-col gap-6">
         <div className="flex flex-col gap-2">
           <div className="text-sm font-bold">Legal Name</div>
           <Input
@@ -129,9 +129,9 @@ const Personal = () => {
           </div>
         </div>
 
-        <div className="flex w-full gap-3">
-          <div className=" text-sm font-normal p-3 border w-1/3 border-primary-gray rounded-lg bg-gradient-to-l from-primary-gray/20 to-primary-gray/30">
-            <div className="flex gap-3 items-center justify-between">
+        <div className="flex max-md:flex-col w-full gap-3">
+          <div className=" text-sm font-normal p-3 border w-1/3 max-md:w-full border-primary-gray max-md:border-none max-md:!bg-none rounded-lg bg-gradient-to-l from-primary-gray/20 to-primary-gray/30">
+            <div className="flex w-full gap-3 items-center justify-between">
               <div className="flex gap-3 items-center">
                 <BsApple className="w-5 h-5" />
                 Apple
@@ -142,8 +142,8 @@ const Personal = () => {
               </div>
             </div>
           </div>
-          <div className=" text-sm font-normal p-3 border w-1/3 border-primary-gray rounded-lg bg-gradient-to-l from-primary-gray/20 to-primary-gray/30">
-            <div className="flex gap-3 items-center justify-between">
+          <div className=" text-sm font-normal p-3 border w-1/3 max-md:w-full border-primary-gray max-md:border-none max-md:!bg-none rounded-lg bg-gradient-to-l from-primary-gray/20 to-primary-gray/30">
+            <div className="flex w-full gap-3 items-center justify-between">
               <div className="flex gap-3 items-center">
                 <FcGoogle className="w-5 h-5" />
                 Google
@@ -154,8 +154,8 @@ const Personal = () => {
               </div>
             </div>
           </div>
-          <div className=" text-sm font-normal p-3 border w-1/3 border-primary-gray rounded-lg bg-gradient-to-l from-primary-gray/20 to-primary-gray/30">
-            <div className="flex gap-3 items-center justify-between">
+          <div className=" text-sm font-normal p-3 border w-1/3 max-md:w-full border-primary-gray max-md:border-none max-md:!bg-none rounded-lg bg-gradient-to-l from-primary-gray/20 to-primary-gray/30">
+            <div className="flex w-full gap-3 items-center justify-between">
               <div className="flex gap-3 items-center">
                 <FaFacebook className="w-5 h-5 text-blue-500 bg-white rounded-full" />
                 Facebook
@@ -168,7 +168,7 @@ const Personal = () => {
           </div>
         </div>
 
-        <div className=" text-base font-normal text-primary-gray flex items-center gap-2">
+        <div className=" text-base font-normal text-primary-gray flex flex-wrap items-center gap-2">
           <span className="border-b-[#F43E62] text-[#F43E62] border-b-2">
             Delete my account
           </span>

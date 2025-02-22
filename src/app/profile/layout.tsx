@@ -13,7 +13,7 @@ export default function ProfileLayout({
     <div className="relative flex max-w-[1280px] mx-auto pt-20">
       {/* Mobile Menu Button */}
       {!isSidebarOpen && <button 
-        className="md:hidden absolute top-[70px] left-7 z-30 flex items-center gap-2 text-white"
+        className="md:hidden absolute top-[70px] left-4 z-30 flex items-center gap-2 text-white"
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -30,7 +30,7 @@ export default function ProfileLayout({
         <Sidebar onItemClick={() => setIsSidebarOpen(false)} />
       </div>
 
-      <div className="flex-1  text-white p-8 relative">
+      <div className="w-full  text-white p-8 max-md:p-4 relative">
     
         {children}
       </div>

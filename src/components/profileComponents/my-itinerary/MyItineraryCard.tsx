@@ -55,9 +55,9 @@ const MyItineraryCard: React.FC<ListingCardProps> = ({
                     <Button variant='outline' size='sm' className=' text-white gap-2'> View <CgArrowRight className='size-6' /></Button>
                 </div>
             </div>
-            <div className="h-[1px] my-2 w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
+            <div className="h-[1px] max-lg:hidden my-2 w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
 
-            <div onClick={() => router.push(`/itineraries/1`)} className='flex justify-between relative gap-4 h-full w-full'>
+            <div onClick={() => router.push(`/itineraries/1`)} className='flex justify-between max-lg:flex-col-reverse relative gap-4 h-full w-full'>
                 <div className='w-full'>
 
                     <div className='flex  items-center gap-3 my-3 text-white' >
@@ -92,7 +92,7 @@ const MyItineraryCard: React.FC<ListingCardProps> = ({
 
                 </div>
 
-                <Image src={data.images[0] || ""} alt="Vacation Picture" height={136} width={204} className='rounded-lg object-cover' />
+                <Image src={data.images[0] || ""} alt="Vacation Picture" height={136} width={204} className='rounded-lg object-cover max-lg:w-full' />
 
             </div>
 

@@ -7,6 +7,7 @@ import { FiSearch } from "react-icons/fi";
 import FavoritesCard from "./FavoritesCard";
 import Dropdown from "../../figma/Dropdown";
 import Image from "next/image";
+import ListingCard from "../../ListingCard";
 
 const Favorites = () => {
   const [activeTab, setActiveTab] = useState("all");
@@ -98,7 +99,8 @@ const Favorites = () => {
     return (
       <div>
         {favorites.filter((favorite) => favorite.day_itinerary === (activeTab === "dayItineraries") || activeTab === "all").map((favorite) => (
-          <FavoritesCard key={favorite.id} data={favorite} />
+              <FavoritesCard key={favorite.id} data={favorite} />
+
         ))}
       </div>
     )

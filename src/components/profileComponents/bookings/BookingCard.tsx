@@ -98,7 +98,7 @@ const BookingCard: React.FC<ListingCardProps> = ({
 
                 </div>
 
-                {!bookingConfirmedModal && !bookingDetailsPage && <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={204} className='rounded-lg object-cover' />}
+                {!bookingConfirmedModal && !bookingDetailsPage && <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={204} className='rounded-lg object-cover max-md:hidden' />}
 
             </div>
 

@@ -296,7 +296,7 @@ const Payment = () => {
               </div>
             </div>
 
-            <table className="w-full  text-white text-sm ">
+            <table className="w-full overflow-auto text-white text-sm ">
               <thead className="text-primary-gray font-normal text-left ">
                 <tr>
                   <th className="py-5">Purchase </th>
@@ -337,18 +337,18 @@ const Payment = () => {
 
             {savedCards.map((item) => (
               <div key={item.id} className="">
-                <div className="flex items-center justify-between bg-[#666666]/10 rounded-2xl border border-primary-gray p-4 mb-2">
-                  <div className="text-white text-xl font-bold flex items-center gap-2">
-                    <div className="flex items-center justify-center bg-black rounded-lg h-[50px] w-[80px]">
+                <div className="flex items-center justify-between bg-[#666666]/10 rounded-2xl border max-sm:border-none border-primary-gray p-4 mb-2">
+                  <div className="text-white  text-xl font-bold flex items-center max-sm:flex-col max-sm:items-start justify-start gap-2">
+                    <div className="flex items-center justify-center max-sm:justify-start sm:bg-black rounded-lg sm:h-[50px] w-[80px] max-sm:w-full">
                       <Image src={item.cardType === "Visa" ? "/svg-icons/visa-logo.svg" : "/svg-icons/mastercard-logo.svg"} alt="card" height={24} width={38} />
                     </div>
 
-                    <div className="flex flex-col gap-1">
-                      <span className="text-white font-bold">{item.cardNumber}</span>
-                      <span className="text-primary-gray text-sm"> Exp. Date  <span className="text-white"> {item.expiryDate}</span></span>
+                    <div className=" gap-1">
+                      <p className="text-white font-bold">{item.cardNumber}</p>
+                      <p className="text-primary-gray text-sm"> Exp. Date  <span className="text-white"> {item.expiryDate}</span></p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center max-sm:flex-col max-sm:items-end  gap-2">
                     {item.isDefault ?
                       <Button variant="primary" size="sm" className={`mx-auto !bg-[#215CBA] !text-white`}>Default</Button> :
                       <Button
@@ -374,8 +374,8 @@ const Payment = () => {
               </div>
             )}
             {addNewCard && (
-              <div className='flex gap-2 mt-8'>
-                <div className='flex-1 flex flex-col gap-2'>
+              <div className='flex gap-2 mt-8 w-full'>
+                <div className='sm:flex-1 flex flex-col gap-2  max-sm:w-full'>
                   <div className="flex items-center justify-between">
                     <p className='text-white text-xl font-bold flex items-center gap-2'>
                       <MdOutlineAddCard className="text-white size-6" /> Add a new card
@@ -470,7 +470,7 @@ const Payment = () => {
                     </Button>
                   </div>
                 </div>
-                <div className="flex-1"/>
+                <div className="flex-1 max-sm:hidden"/>
               </div>
             )}
           </div>

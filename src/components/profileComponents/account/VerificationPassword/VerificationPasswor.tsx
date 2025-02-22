@@ -15,14 +15,13 @@ const VerificationPasswor = () => {
   const [showPassword, setShowPassword] = useState(false);
   console.log(currentPassword, "currentPassword");
   return (
-    <div className="gap-4 flex flex-col">
-      <div className="flex items-start gap-8 w-full">
+      <div className="flex items-start max-md:flex-col gap-8 w-full">
         {/* verification */}
-        <div className="flex flex-col gap-6 w-1/2">
+        <div className="flex flex-col gap-6 w-1/2 max-md:w-full">
           <div className="font-bold text-xl">Verification</div>
           <div className="flex flex-col gap-2">
             {/* email  */}
-            <div className=" flex items-center justify-between p-3 border w-full border-primary-gray rounded-lg bg-gradient-to-l from-primary-gray/20 to-primary-gray/30">
+            <div className=" flex items-center justify-between p-3 border w-full border-primary-gray max-md:border-none max-md:!bg-none rounded-lg bg-gradient-to-l from-primary-gray/20 to-primary-gray/30">
               <div className="flex gap-3 items-center">
                 <CiMail className="w-6 h-6" />
                 <div>
@@ -38,7 +37,7 @@ const VerificationPasswor = () => {
               </div>
             </div>
             {/* phone  */}
-            <div className=" flex items-center justify-between p-3 border w-full border-primary-gray rounded-lg bg-gradient-to-l from-primary-gray/20 to-primary-gray/30">
+            <div className=" flex items-center justify-between p-3 border w-full border-primary-gray max-md:border-none max-md:!bg-none rounded-lg bg-gradient-to-l from-primary-gray/20 to-primary-gray/30">
               <div className="flex gap-3 items-center">
                 <CiMail className="w-6 h-6" />
                 <div>
@@ -56,8 +55,8 @@ const VerificationPasswor = () => {
           </div>
         </div>
         {/* change password */}
-        <div className="flex flex-col gap-4 w-1/2">
-          <div className="font-bold text-xl">Verification</div>
+        <div className="flex flex-col gap-4 w-1/2 max-md:w-full">
+          <div className="font-bold text-xl">Change Password</div>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <div className="text-sm font-bold text-primary-gray">
@@ -112,7 +111,6 @@ const VerificationPasswor = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
