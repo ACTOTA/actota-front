@@ -54,10 +54,11 @@ import Van from "@/public/transportation-icons/van.svg";
 import ActivityDropdown from './navbar/ActivityDropdown'
 import DateMenu from './navbar/DateMenu'
 import GuestMenu from './navbar/GuestMenu'
+import { ArrowLeftIcon } from '@heroicons/react/20/solid'
 
 
 
-const ItineraryPageFilter = ({ advanceFilter, setAdvanceFilter }: { advanceFilter: boolean, setAdvanceFilter: (value: boolean) => void }) => {
+const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter }: { setShowFilter?: (value: boolean) => void, advanceFilter: boolean, setAdvanceFilter: (value: boolean) => void }) => {
     const [toggle, setToggle] = useState(false);
 
 
@@ -111,6 +112,7 @@ const ItineraryPageFilter = ({ advanceFilter, setAdvanceFilter }: { advanceFilte
     return (
         <GlassPanel className=' !rounded-3xl !p-[24px] bg-gradient-to-br from-[#6B6B6B]/30 to-[black] '>
             <div className='w-full'>
+                <p onClick={() => setShowFilter?.(false)} className='text-left text-white text-sm flex items-center gap-2 cursor-pointer mb-2 md:hidden'><ArrowLeftIcon className='size-4' />Filter </p>
 
                 <div className='flex justify-between items-center w-full'>
                     <p className='text-white  font-bold'>Trip Budget</p>

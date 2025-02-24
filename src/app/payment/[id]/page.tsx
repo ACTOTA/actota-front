@@ -8,16 +8,23 @@ import SplitPaymentCard from '@/src/components/SplitPaymentCard'
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/20/solid'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { CgArrowTopRight } from 'react-icons/cg'
 import { FaStar } from 'react-icons/fa6'
 import { GoArrowRight } from 'react-icons/go'
 import { HiOutlineMail } from 'react-icons/hi'
 import { LuRoute, LuUser } from 'react-icons/lu'
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { IoAlertCircleOutline } from 'react-icons/io5'
+import { useItineraryById } from '@/src/hooks/queries/itinerarieById/useItineraryByIdQuery'
 const Payment = () => {
-    const router = useRouter();
+    const pathname = usePathname() as string;
+  const router = useRouter();
+  const user = JSON.parse(localStorage.getItem('auth') || '{}').user;
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const objectId = pathname.substring(pathname.lastIndexOf('/') + 1);
+  const { data: apiResponse, isLoading, error } = useItineraryById(objectId);
+  const [itineraryData, setItineraryData] = useState<any | null>(null);
     const [showPaymentReview, setShowPaymentReview] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState([{
         id: 1,
@@ -75,7 +82,10 @@ const Payment = () => {
             selected: false
         }
     ]);
-    const user = JSON.parse(localStorage.getItem('auth') || '{}')?.user;
+
+
+
+
 
     const handleInsuranceToggle = (id: number) => {
         setPaymentInsurance(prevInsurance =>
@@ -92,6 +102,37 @@ const Payment = () => {
             router.push("?modal=bookingConfirmed")
         }, 3000)
     }
+
+
+
+  useEffect(() => {
+    if (apiResponse) {
+      console.log('Setting itinerary data:', apiResponse);
+      setItineraryData(apiResponse);
+    }
+  }, [apiResponse]);
+
+  const basePrice = itineraryData.person_cost * (itineraryData.min_group || 1);
+  const selectedInsurance = paymentInsurance
+    .filter(insurance => insurance.selected)
+    .reduce((total, insurance) => total + insurance.price, 0);
+  const totalAmount = basePrice + selectedInsurance;
+
+
+  if (isLoading) {
+    return <div className='text-white flex justify-center items-center h-screen'>Loading...</div>;
+  }
+
+  if (error) {
+    console.error('Error details:', error);
+    return <div className='text-white flex justify-center items-center h-screen'>{user ? 'Error: ' + error.message : 'Please login to view itinerary details'}</div>;
+  }
+
+  console.log('Rendering with data:', { apiResponse, itineraryData });
+
+  if (!itineraryData) {
+    return <div className='text-white flex justify-center items-center h-screen'>Loading itinerary data...</div>;
+  }
     return (
         <section className='w-full !h-full text-white   bg-[url("/images/payment-page-bg.png")] bg-cover bg-center bg-repeat'>
             <div className='grid grid-cols-6 gap-6 pt-[78px]'>
@@ -100,10 +141,10 @@ const Payment = () => {
                 <div className={`lg:col-span-4 col-span-6 flex flex-col gap-4 w-full pl-[80px] max-lg:px-[20px] ${showPaymentReview ? 'max-lg:hidden' : ''}`}>
                     <div className='flex items-center gap-2 mt-5'>
                         <ArrowLeftIcon className="h-6 w-6 hover:cursor-pointer" />
-                        <p className='text-primary-gray text-sm'>Itineraries /  Denver Tour  /   <span className='text-white'>Confirm Reservation</span></p>
+                        <p className='text-primary-gray text-sm'>Itineraries /  {itineraryData.trip_name}  /   <span className='text-white'>Confirm Reservation</span></p>
                     </div>
                     <h1 className='text-4xl font-bold'>Confirm your Reservation</h1>
-                    <PaymentPageCard />
+                    <PaymentPageCard itineraryData={itineraryData}  />
                     <p className='text-white text-2xl font-bold mt-12'>Insurance</p>
                     {paymentInsurance.map((insurance) => (
                         <PaymentInsuranceCard
@@ -152,8 +193,6 @@ const Payment = () => {
                                 <p className='text-white font-bold'> {item.name}</p>
                             </div>
                         ))}
-
-
                     </div>
                     <div className='flex gap-2 max-md:flex-col-reverse'>
                         <div className='flex-1 flex flex-col gap-2'>
@@ -261,44 +300,55 @@ const Payment = () => {
                 <div className={`col-span-6 lg:col-span-2 flex flex-col  w-full bg-black pt-[50px] max-lg:pt-[20px] pl-[32px] pr-[64px] ${showPaymentReview ? '' : 'max-lg:hidden'}`}>
                     <p onClick={() => setShowPaymentReview(false)} className='text-left text-white text-sm flex items-center gap-2 cursor-pointer'><ArrowLeftIcon className='size-4' />Reservation Details </p>
                     <p className='text-center'>Total amount</p>
-                    <p className='text-white text-[64px] font-bold text-center'><span className='text-primary-gray'>$</span> 1000</p>
+                    <p className='text-white text-[64px] font-bold text-center'><span className='text-primary-gray'>$</span> {totalAmount}</p>
 
                     <p className='text-sm text-primary-gray mb-2'>Promo Code</p>
                     <Input placeholder='Enter promo code' icon={<Image src={"/svg-icons/promo-code.svg"} alt='search icon' width={16} height={16} />} />
                     <p className='text-sm text-[#BBD4FB] mt-1'>You saved $45 on this booking!</p>
                     <p className='text-xl  mt-8'>Payment Detail</p>
+
+                <div className='flex justify-between mt-2'>
+                    <p className='text-sm text-primary-gray'>Base Cost (${itineraryData.person_cost} × {itineraryData.min_group} guests)</p>
+                    <p className='text-sm text-white'>${basePrice}</p>
+                </div>
                     <div className='flex justify-between mt-2' >
                         <p className='text-sm text-primary-gray'>Activity Cost</p>
-                        <p className='text-sm text-white'> $1000</p>
+                        <p className='text-sm text-white'> ${itineraryData.activity_cost || 0}</p>
                     </div>
                     <div className='flex justify-between mt-2' >
                         <p className='text-sm text-primary-gray'>Lodging Cost</p>
-                        <p className='text-sm text-white'> $1000</p>
+                        <p className='text-sm text-white'> ${itineraryData.lodging_cost || 0}</p>
                     </div>
                     <div className='flex justify-between mt-2' >
                         <p className='text-sm text-primary-gray'>Transport Cost</p>
-                        <p className='text-sm text-white'> $1000</p>
+                        <p className='text-sm text-white'> ${itineraryData.transport_cost || 0}</p>
                     </div>
                     <div className='flex justify-between mt-2' >
                         <p className='text-sm text-primary-gray'>Travel agent fee</p>
-                        <p className='text-sm text-white'> $1000</p>
+                        <p className='text-sm text-white'> ${itineraryData.travel_agent_fee || 0}</p>
                     </div>
                     <div className='flex justify-between mt-2' >
                         <p className='text-sm text-primary-gray'>Service fee</p>
-                        <p className='text-sm text-white'> $1000</p>
+                        <p className='text-sm text-white'> ${itineraryData.service_fee || 0}</p>
                     </div>
+                    {paymentInsurance.filter(insurance => insurance.selected).map(insurance => (
+                    <div key={insurance.id} className='flex justify-between mt-2'>
+                        <p className='text-sm text-primary-gray'>{insurance.name}</p>
+                        <p className='text-sm text-white'>${insurance.price}</p>
+                    </div>
+                ))}
                     <div className='flex justify-between mt-2' >
                         <p className='text-sm text-primary-gray'>Promo Code</p>
-                        <p className='text-sm text-[#5389DF]'> -$45</p>
+                        <p className='text-sm text-[#5389DF]'> ${itineraryData.promo_code || 0}</p>
                     </div>
                     <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent mt-4"></div>
                     <div className='flex justify-between my-3' >
                         <p className=' font-bold text-white'>Total Amount</p>
-                        <p className='text-xl font-bold text-white'> $1000</p>
+                        <p className='text-xl font-bold text-white'> ${totalAmount}</p>
                     </div>
 
                     {user ? (
-                        <Button onClick={() => confirmBooking()} variant="primary" className="gap-2">Pay $1000  <GoArrowRight className='size-5' /></Button>
+                        <Button onClick={() => confirmBooking()} variant="primary" className="gap-2">Pay ${totalAmount}  <GoArrowRight className='size-5' /></Button>
                     ) : (
                         <Button onClick={() => router.push("?modal=guestCheckout")} variant="outline" className="gap-2">Checkout as a Guest  <GoArrowRight className='size-5' /></Button>
                     )}

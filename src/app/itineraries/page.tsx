@@ -10,8 +10,10 @@ import Dropdown from '@/src/components/figma/Dropdown';
 import Image from 'next/image';
 import ListingCard from '@/src/components/ListingCard';
 import { useItineraries } from '@/src/hooks/queries/itineraries/useItineraryQuery';
+import { ArrowRightIcon } from '@heroicons/react/20/solid';
 const Itineraries = () => {
     const [listings, setListings] = React.useState<any[]>([]);
+    const [showFilter, setShowFilter] = useState(false)
     const [advanceFilter, setAdvanceFilter] = useState(false)
   const { data: itineraries, isLoading: itinerariesLoading, error: itinerariesError } = useItineraries();
 
@@ -25,7 +27,7 @@ const Itineraries = () => {
         <div className="max-w-[1440px] mx-auto ">
 
             <div className="flex max-md:flex-col-reverse gap-8 p-[80px] max-lg:px-[50px] max-md:px-[25px] max-sm:px-[16px] bg-gradient-to-b from-transparent via-[#080E14] to-[#080E14] ">
-                <div className="w-[66%] max-md:w-full ">
+                <div className={`w-[66%] max-md:w-full ${showFilter ? 'max-md:hidden' : ''}`}>
                     <h2 className="text-[40px] font-bold text-white max-md:hidden">Itineraries for You</h2>
                     <div className="flex items-center justify-between flex-wrap gap-2">
 
@@ -40,7 +42,7 @@ const Itineraries = () => {
                                     <p className="text-primary-gray text-sm  mr-5">Theme</p>
                                 </div>} options={["popular", "new", "old"]} onSelect={() => { }} className="border-none !bg-[#141414] rounded-lg" />
                             </div>
-                            <div>
+                            <div className='max-md:hidden'>
 
                                 <Dropdown label={<div className="flex items-center gap-1">
                                     <div>
@@ -49,6 +51,10 @@ const Itineraries = () => {
                                     </div>
                                 </div>} options={["Lowest Price", "Highest Price", "Any Duration"]} onSelect={() => { }} className="border-none !bg-[#141414] rounded-lg" />
 
+                            </div>
+
+                            <div className='md:hidden'>
+                                <Button variant="simple" className=" gap-1" onClick={() => setShowFilter(!showFilter)}><Image src="/svg-icons/filter.svg" alt="filter" width={24} height={24} /> Filter <ArrowRightIcon className='size-4' /></Button>
                             </div>
 
 
@@ -75,11 +81,11 @@ const Itineraries = () => {
                         <Button variant="primary" className="bg-white text-black mt-4 ">Load More</Button>
                     </div>
                 </div>
-                <div className=" md:pt-14 w-[33%] max-md:w-full">
+                <div className={`${showFilter ? '' : 'max-md:hidden'} md:pt-14 w-[33%] max-md:w-full`}>
                     {advanceFilter ?
-                        <ItineraryPageAdvanceFilter advanceFilter={advanceFilter} setAdvanceFilter={setAdvanceFilter} />
+                        <ItineraryPageAdvanceFilter setShowFilter={setShowFilter} advanceFilter={advanceFilter} setAdvanceFilter={setAdvanceFilter} />
                         :
-                        <ItineraryPageFilter advanceFilter={advanceFilter} setAdvanceFilter={setAdvanceFilter} />
+                        <ItineraryPageFilter setShowFilter={setShowFilter} advanceFilter={advanceFilter} setAdvanceFilter={setAdvanceFilter} />
                     }
                 </div>
                 <h2 className="text-[40px] font-bold text-white md:hidden">Itineraries for You</h2>

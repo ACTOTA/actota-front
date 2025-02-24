@@ -57,7 +57,7 @@ interface ItineraryData {
 export default function Itinerary() {
   const pathname = usePathname() as string;
   const router = useRouter();
-  
+  const user = JSON.parse(localStorage.getItem('auth') || '{}').user;
   const objectId = pathname.substring(pathname.lastIndexOf('/') + 1);
   const { data: apiResponse, isLoading, error } = useItineraryById(objectId);
   
@@ -71,7 +71,8 @@ export default function Itinerary() {
     }
   }, [apiResponse]);
 
- 
+  const basePrice = itineraryData?.person_cost * (itineraryData?.min_group || 1);
+   
 
   if (isLoading) {
     return <div className='text-white flex justify-center items-center h-screen'>Loading...</div>;
@@ -79,7 +80,7 @@ export default function Itinerary() {
 
   if (error) {
     console.error('Error details:', error);
-    return <div className='text-white flex justify-center items-center h-screen'>Error: {error.message}</div>;
+    return <div className='text-white flex justify-center items-center h-screen'>{user ? 'Error: ' + error.message : 'Please login to view itinerary details'}</div>;
   }
 
   console.log('Rendering with data:', { apiResponse, itineraryData });
@@ -89,7 +90,7 @@ export default function Itinerary() {
   }
 
   const handleBooking = () => {
-    router.push(`/payment`);
+    router.push(`/payment/${itineraryData._id.$oid}`);
     // if (!itineraryData.fareharbor_id) return;
     // const timestamp = new Date().getTime() / 1000;
     // window.location.href = `https://fareharbor.com/embeds/book/adventurecoloradotours/items/${itineraryData.fareharbor_id}/availability/${timestamp}/book/?full-items=yes&flow=345668`;
@@ -181,31 +182,31 @@ export default function Itinerary() {
             </div>
           </div>
         </div>
-
+        {/* reservation details */}
         <div className='w-[33%] max-sm:w-full'>
           <div className='bg-[#141414] rounded-2xl'>
             <div className='rounded-lg p-4 flex flex-col gap-1'>
               <b className='text-white text-lg mb-4'>Reservation Details</b>
               <div className='flex justify-between mb-2'>
                 <p className='text-primary-gray'>Activity costs</p>
-                <p>${itineraryData.person_cost}</p>
+                <p>${itineraryData?.activity_cost || 0}</p>
               </div>
               <div className='flex justify-between mb-2'>
                 <p className='text-primary-gray'>Lodging costs</p>
-                <p>${itineraryData.person_cost}</p>
+                <p>${itineraryData?.lodging_cost || 0}</p>
               </div>
               <div className='flex justify-between mb-2'>
                 <p className='text-primary-gray'>Transport costs</p>
-                <p>${itineraryData.person_cost}</p>
+                <p>${itineraryData?.transport_cost || 0}</p>
               </div>
               <div className='flex justify-between'>
                 <p className='text-primary-gray'>Service fee</p>
-                <p>${itineraryData.person_cost}</p>
+                <p>${itineraryData?.service_fee || 0}</p>
               </div>
               <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent my-2"></div>
               <div className='text-white font-bold flex justify-between mb-4'>
                 <p>Total amount</p>
-                <p>${itineraryData.person_cost * 4}</p>
+                <p>${basePrice}</p>
               </div>
               <Button onClick={handleBooking} variant='primary' className='text-black text-sm font-bold'>
                 <p>Proceed to Payment</p>

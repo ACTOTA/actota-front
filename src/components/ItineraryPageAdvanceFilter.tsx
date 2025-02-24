@@ -53,6 +53,7 @@ import Luxury from "@/public/transportation-icons/luxury.svg";
 import PartyBus from "@/public/transportation-icons/partyBus.svg";
 import Van from "@/public/transportation-icons/van.svg";
 import ActivityDropdown from './navbar/ActivityDropdown'
+import { ArrowLeftIcon } from '@heroicons/react/20/solid'
 
 
 const activities = [
@@ -99,7 +100,7 @@ const transportation = [
 
 ];
 
-const ItineraryPageAdvanceFilter = ({ advanceFilter, setAdvanceFilter }: { advanceFilter: boolean, setAdvanceFilter: (value: boolean) => void }) => {
+const ItineraryPageAdvanceFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter }: { setShowFilter?: (value: boolean) => void, advanceFilter: boolean, setAdvanceFilter: (value: boolean) => void }) => {
 
     const [toggle, setToggle] = useState(false);
     const [count, setCount] = useState(0);
@@ -116,6 +117,7 @@ const ItineraryPageAdvanceFilter = ({ advanceFilter, setAdvanceFilter }: { advan
     return (
         <GlassPanel className=' !rounded-3xl !p-[24px] bg-gradient-to-br from-[#6B6B6B]/30 to-[black] '>
             <div className='w-full'>
+            <p onClick={() => setShowFilter?.(false)} className='text-left text-white text-sm flex items-center gap-2 cursor-pointer mb-2 md:hidden'><ArrowLeftIcon className='size-4' />Filter </p>
 
                 <div className='flex justify-between items-center w-full'>
                     <p className='text-white  font-bold'>Trip Budget</p>
