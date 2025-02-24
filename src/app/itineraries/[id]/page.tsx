@@ -89,9 +89,10 @@ export default function Itinerary() {
   }
 
   const handleBooking = () => {
-    if (!itineraryData.fareharbor_id) return;
-    const timestamp = new Date().getTime() / 1000;
-    window.location.href = `https://fareharbor.com/embeds/book/adventurecoloradotours/items/${itineraryData.fareharbor_id}/availability/${timestamp}/book/?full-items=yes&flow=345668`;
+    router.push(`/payment`);
+    // if (!itineraryData.fareharbor_id) return;
+    // const timestamp = new Date().getTime() / 1000;
+    // window.location.href = `https://fareharbor.com/embeds/book/adventurecoloradotours/items/${itineraryData.fareharbor_id}/availability/${timestamp}/book/?full-items=yes&flow=345668`;
   };
 
   const formatDate = (date: string) => {

@@ -3,8 +3,10 @@ import Button from '../figma/Button'
 import { FaCheck } from 'react-icons/fa6'
 import Image from 'next/image'
 import BookingCard from '../profileComponents/bookings/BookingCard'
-
+import { ArrowLeftIcon } from '@heroicons/react/20/solid'
+import { useRouter } from 'next/navigation';
 const BookingConfirmed = () => {
+    const router = useRouter();
     const [bookings, setBookings] = React.useState<any>({
         id: 1,
         status: "upcoming",
@@ -30,15 +32,21 @@ const BookingConfirmed = () => {
     }
     );
     return (
-        <div className='flex flex-col items-center justify-center'>
+        <div className='flex flex-col items-center justify-center overflow-y-auto !h-full '>
+            <div className='w-full md:hidden'>
+
+                <p onClick={() => router.push("/payment")} className=' text-left text-white text-sm flex items-center gap-2 cursor-pointer'><ArrowLeftIcon className='size-4' />Reservation Details </p>
+            </div>
+
+
             <div className='flex justify-center items-center bg-gradient-to-br from-[#0252D0]  to-[#012A6A] rounded-full h-[64px] w-[64px]'>
                 <FaCheck className='text-white size-6' />
             </div>
             <p className='text-white text-2xl font-bold mt-4'>Your booking is confirmed!</p>
             <p className='text-white  text-center py-2 '>We’ve sent a confirmation email to <b>test@gmail.com</b></p>
-            <div className='flex w-full gap-4 mt-2'>
+            <div className='flex flex-col lg:flex-row w-full gap-4 mt-2'>
 
-                <div className='w-[707px]'>
+                <div className='w-full lg:w-[707px]'>
                     <p className='text-white font-bold mb-2'>Booking Details</p>
 
                     <BookingCard data={bookings} bookingConfirmedModal={true} />
@@ -46,7 +54,7 @@ const BookingConfirmed = () => {
                 </div>
 
 
-                <div className='w-[271px] '>
+                <div className='w-full lg:w-[271px] '>
                     <p className='text-white font-bold mb-4'>Payment Details</p>
                     <div className=' bg-[#141414] rounded-2xl border border-primary-gray'>
                         <div className=' rounded-lg p-4 flex flex-col  gap-1 '>

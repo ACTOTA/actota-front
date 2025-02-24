@@ -21,18 +21,19 @@ const PaymentPageCard = ({
     imageSrc = '/images/hero-bg.jpg',
 }) => {
     return (
-        <div className="!p-4 !rounded-2xl max-w-[843px] flex justify-between items-end hover:cursor-pointer mt-4 bg-gradient-to-r from-[#1A1A1A] to-[#0D0D0D]/70 border border-primary-gray">
-            <div className="flex justify-between gap-4 w-full">
-                <div className="flex flex-col justify-between text-white">
-                    <div>
-                        <div className="inline-flex items-center gap-1 mb-2 bg-black rounded-full p-2 pr-4">
+        <div className="md:!p-4 !rounded-2xl max-w-[843px]  hover:cursor-pointer mt-4 bg-gradient-to-r from-[#1A1A1A] to-[#0D0D0D]/70 border border-primary-gray max-md:!bg-transparent max-md:border-none">
+            <div className="relative flex justify-between items-center max-md:flex-col-reverse gap-4 w-full max-md:!bg-transparent">
+                <div className="flex flex-col justify-between text-white max-md:w-full max-md:!bg-transparent">
+                      <div>
+
+                        <div className=" inline-flex items-center max-md:absolute max-md:top-2 max-md:left-2 gap-1 mb-2 bg-black rounded-full p-2 pr-4">
                             <Image src="/svg-icons/diamond.svg" alt="rare find" width={24} height={24} />
                             <span className="">Rare Find!</span>
                         </div>
+                      </div>
                         <h3 className="text-2xl font-bold">{tripName}</h3>
-                    </div>
 
-                    <div className="flex justify-between gap-4 mt-2 text-sm">
+                    <div className="flex justify-between gap-4 mt-2 text-sm max-md:w-full max-md:!bg-transparent">
                         <div className='flex flex-col gap-1'>
 
                             <div className="flex items-center gap-1">
@@ -75,17 +76,15 @@ const PaymentPageCard = ({
                     </div>
                 </div>
 
-                <div className="relative">
                     <Image
                         src={imageSrc}
                         alt="Trip Image"
                         height={200}
                         width={300}
                         objectFit="cover"
-                        className="rounded-lg"
+                        className="rounded-lg max-md:w-full"
                     />
 
-                </div>
             </div>
         </div>
     );
