@@ -44,7 +44,7 @@ export default function SearchBoxes({ step, ...rest }: SearchBoxesProps) {
 
   return (
     <div  className={`m-auto mt-4 bg-black/60 backdrop-filter   
-        before:rounded-3xl rounded-3xl flex flex-col justify-center items-center box-content  w-[${dimensions.w}px]`}  {...rest}>
+        before:rounded-3xl rounded-3xl flex flex-col justify-center items-center box-content  w-[${dimensions.w}px] max-md:!w-full`}  {...rest}>
       {step === STEPS.LOCATION && <LocationMenu />    }
       {step === STEPS.DATE && <DateMenu />}
       {step == STEPS.GUESTS && <GuestMenu />}

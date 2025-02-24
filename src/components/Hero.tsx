@@ -40,14 +40,14 @@ export default function Hero() {
                      duration-700 ease-in-out
                      ${currStep != null ? 'opacity-0  pointer-events-none h-0' : 'opacity-100 h-[400px] translate-y-0'}
                      `}>
-                    <p className='text-white text-7xl font-extrabold leading-[88px] text-center'>
+                    <p className='text-white text-7xl max-md:text-4xl font-extrabold leading-[88px] text-center'>
                         Book Your
                         <span className={alexBrush.className}> Dream </span>
                         Trip
                     </p>
 
-                    <p className='text-white text-7xl font-extrabold leading-[88px] text-center flex items-center gap-2'>
-                        with a Few Clicks <img src="/svg-icons/mingcute-cursor.svg" alt="hero background" className="mt-6" />
+                    <p className='text-white text-7xl max-md:text-4xl font-extrabold leading-[88px] text-center flex items-center gap-2'>
+                        with a Few Clicks <img src="/svg-icons/mingcute-cursor.svg" alt="hero background" className="mt-6 max-md:hidden" />
                     </p>
                 </div>
                 <div className={` h-full z-50 

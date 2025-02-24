@@ -37,7 +37,7 @@ export default function DateMenu() {
             label: `${month.slice(0, 3)} ${currentYear}`,
             selected: month === "January" ? true : false
         }));
-        
+
         return [
             ...months
         ];
@@ -97,7 +97,7 @@ export default function DateMenu() {
         );
     }
     return (
-        <section className="w-full text-white backdrop-blur-md border-2 border-border-primary rounded-3xl flex-col justify-center items-center gap-2 pl-4 pr-4 pt-6 pb-4">
+        <section className="w-full h-full text-white backdrop-blur-md border-2 border-border-primary rounded-3xl flex-col justify-center items-center gap-2 pl-4 pr-4 pt-6 pb-4">
             <div className="h-9 gap-2 w-full flex justify-center">
                 {dateSettings.map((item, i) => (
                     <div key={i} className={`px-3 py-2 h-full bg-black/50 rounded-[200px] border border-white hover:cursor-pointer hover:bg-black/70 hover:border-[#FFF]
@@ -111,70 +111,74 @@ export default function DateMenu() {
 
             {dateSettings[0].selected === true ? (
                 <>
-            <DateMenuCalendar onDateRangeChange={handleDateRangeChange} />
-            <div className='w-full grid grid-cols-2 gap-4'>
-                <div className="justify-center items-center gap-4 inline-flex">
-                    <div className="text-white text-base font-bold  leading-normal text-center">Start Time</div>
-                    <div className="flex-col justify-start items-end gap-2 inline-flex">
-                        <select
-                            value={startTime}
-                            onChange={handleStartTimeChange}
-                            className="h-12  bg-transparent border-none text-[#f7f7f7] text-base font-normal  leading-normal z-10"
-                        >
-                            {timeOptions.map(time => (
-                                <option key={time} value={time} className=''>{time}</option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-                <div className="justify-center items-center gap-4 inline-flex">
-                    <div className="text-white text-base font-bold  leading-normal">End Time</div>
-                    <div className="flex-col justify-start items-end gap-2 inline-flex ">
-                        <select
-                            value={endTime}
-                            onChange={handleEndTimeChange}
-                            className="h-12  bg-transparent border-none text-[#f7f7f7] text-base font-normal  leading-normal z-10"
-                        >
-                            {timeOptions.map(time => (
-                                <option key={time} value={time} className=''>{time}</option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-                <div className="h-8 gap-2 w-full flex">
-                    {rangeSettings.map((item, i) => (
-                        <div key={i} className={`px-3 py-1.5 h-full bg-black/50 rounded-[200px] border border-white hover:cursor-pointer hover:bg-black/70 hover:border-[#FFF]
-                            ${item.selected ? "px-3 py-1.5 h-full bg-black/50 rounded-[200px] border border-white" : "neutral-03 opacity-50"}`}
-                            onClick={() => handleSelect(item.label)}>
-                            <div className="text-white text-sm font-normal leading-tight whitespace-nowrap">{item.label}</div>
+
+                    <DateMenuCalendar onDateRangeChange={handleDateRangeChange} />
+                    <div className='w-full  gap-4 '>
+                <div className='flex justify-between items-center flex-wrap'>
+                        <div className="flex justify-center items-center gap-4 ">
+                            <div className="text-white text-base font-bold  leading-normal text-center">Start Time</div>
+                            <div className="flex-col justify-start items-end gap-2 inline-flex">
+                                <select
+                                    value={startTime}
+                                    onChange={handleStartTimeChange}
+                                    className="h-12  bg-transparent border-none text-[#f7f7f7] text-base font-normal  leading-normal z-10"
+                                >
+                                    {timeOptions.map(time => (
+                                        <option key={time} value={time} className=''>{time}</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
-                    ))}
+                        <div className="justify-center items-center gap-4 flex">
+                            <div className="text-white text-base font-bold  leading-normal">End Time</div>
+                            <div className="flex-col justify-start items-end gap-2 inline-flex ">
+                                <select
+                                    value={endTime}
+                                    onChange={handleEndTimeChange}
+                                    className="h-12  bg-transparent border-none text-[#f7f7f7] text-base font-normal  leading-normal z-10"
+                                >
+                                    {timeOptions.map(time => (
+                                        <option key={time} value={time} className=''>{time}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
                 </div>
-            </div>
-            </>
+
+                        <div className="h-8 gap-2 w-full flex overflow-x-scroll">
+                            {rangeSettings.map((item, i) => (
+                                <div key={i} className={`px-3 py-1.5 h-full bg-black/50 rounded-[200px] border border-white hover:cursor-pointer hover:bg-black/70 hover:border-[#FFF]
+                            ${item.selected ? "px-3 py-1.5 h-full bg-black/50 rounded-[200px] border border-white" : "neutral-03 opacity-50"}`}
+                                    onClick={() => handleSelect(item.label)}>
+                                    <div className="text-white text-sm font-normal leading-tight whitespace-nowrap">{item.label}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </>
             ) : (
                 <div className='flex flex-col items-start justify-start mt-8'>
                     <p className='text-white text-xl font-bold'>How long you're staying?</p>
-                    <div className="h-8 gap-2 w-full flex mt-4">
-                    {estimatedStay.map((item, i) => (
-                        <div key={i} className={`px-3 py-1.5 h-full bg-black/50 rounded-[200px] border border-white hover:cursor-pointer hover:bg-black/70 hover:border-[#FFF]
+                    <div className="h-8 gap-2 w-full flex flex-wrap mt-4">
+                        {estimatedStay.map((item, i) => (
+                            <div key={i} className={`px-3 py-1.5 h-full bg-black/50 rounded-[200px] border border-white hover:cursor-pointer hover:bg-black/70 hover:border-[#FFF]
                             ${item.selected ? "px-3 py-1.5 h-full bg-black/50 rounded-[200px] border border-white" : "neutral-03 opacity-50"}`}
-                            onClick={() => handleEstimatedStayChange(item.label)}>
-                            <div className="text-white text-sm font-normal leading-tight whitespace-nowrap">{item.label}</div>
-                        </div>
-                    ))}
-                </div> 
+                                onClick={() => handleEstimatedStayChange(item.label)}>
+                                <div className="text-white text-sm font-normal leading-tight whitespace-nowrap">{item.label}</div>
+                            </div>
+                        ))}
+                    </div>
 
-                <p className='text-white text-xl font-bold mt-8'>When do you want to go?</p>
+                    <p className='text-white text-xl font-bold mt-8'>When do you want to go?</p>
                     <div className=" gap-2 w-[90%] flex flex-wrap  ">
-                    {whenToGo.map((item, i) => (
-                        <div key={i} className={`px-3 py-1.5 h-full mt-4 bg-black/50 rounded-[200px] border border-white hover:cursor-pointer hover:bg-black/70 hover:border-[#FFF]
+                        {whenToGo.map((item, i) => (
+                            <div key={i} className={`px-3 py-1.5 h-full mt-4 bg-black/50 rounded-[200px] border border-white hover:cursor-pointer hover:bg-black/70 hover:border-[#FFF]
                             ${item.selected ? "px-3 py-1.5 h-full bg-black/50 rounded-[200px] border border-white" : "neutral-03 opacity-50"}`}
-                            onClick={() => handleWhenToGoChange(item.label)}>
-                            <div className="text-white text-sm font-normal leading-tight whitespace-nowrap">{item.label}</div>
-                        </div>
-                    ))}
-                </div> 
+                                onClick={() => handleWhenToGoChange(item.label)}>
+                                <div className="text-white text-sm font-normal leading-tight whitespace-nowrap">{item.label}</div>
+                            </div>
+                        ))}
+                    </div>
 
                 </div>
             )}

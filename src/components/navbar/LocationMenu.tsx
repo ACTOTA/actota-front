@@ -119,7 +119,7 @@ export default function LocationMenu() {
 
   return (
    
-      <section className="flex flex-col justify-between backdrop-blur-md gap-6 py-6 h-full w-[584px] z-20 p-4 border-2 border-border-primary rounded-3xl">
+      <section className="flex flex-col justify-between backdrop-blur-md gap-6 py-6 h-full w-[584px] max-md:w-full z-20 p-4 border-2 border-border-primary rounded-3xl">
         <div>
           <div className="h-2" />
           <div className="relative">
