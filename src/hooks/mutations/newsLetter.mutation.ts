@@ -32,7 +32,7 @@ const useNewsLetterUnsubscribe = () => {
   return useMutation({
     mutationFn: async (email: string) => {
       try {
-        const response = await actotaApi.post<NewsletterResponse>(
+        const response = await actotaApi.put<NewsletterResponse>(
           '/api/newsletter/unsubscribe',
           { email }
         );

@@ -31,17 +31,17 @@ export default function Newsletter() {
           toast.error(error instanceof Error ? error.message : 'Failed to unsubscribe');
         }
       });
-    }
-    subscribe(email, {
-      onSuccess: (data) => {
-        toast.success('Successfully subscribed to newsletter!');
+    } else {
+      subscribe(email, {
+        onSuccess: (data) => {
+          toast.success('Successfully subscribed to newsletter!');
         setEmail(''); // Clear the input
         localStorage.setItem('newsletter', email);
       },
       onError: (error) => {
         toast.error(error instanceof Error ? error.message : 'Failed to subscribe');
       }
-    });
+    });}
   };
 
   return (
