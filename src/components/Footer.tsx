@@ -58,22 +58,22 @@ export default function Footer() {
               </Link>
             </div>
           </div>
-          <div className='flex justify-between max-sm:flex-wrap gap-8'>
+          <div className='w-full flex justify-between max-sm:flex-wrap gap-8'>
 
-          {navigation.map((column, index) => (
-            <div key={index}>
-              <h3 className="text-lg font-semibold mb-6">{column.title}</h3>
-              <ul className="space-y-4">
-                {column.links.map((link, linkIndex) => (
-                  <li key={linkIndex}>
-                    <Link href={link === "Explore" ? "/location" : "#"} className="text-gray-400 hover:text-white">
-                      {link}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+            {navigation.map((column, index) => (
+              <div key={index}>
+                <h3 className="text-lg font-semibold mb-6">{column.title}</h3>
+                <ul className="space-y-4">
+                  {column.links.map((link, linkIndex) => (
+                    <li key={linkIndex}>
+                      <Link href={link === "Explore" ? "/location" : "#"} className="text-gray-400 hover:text-white">
+                        {link}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
 
