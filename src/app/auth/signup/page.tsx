@@ -1,22 +1,18 @@
 'use client';
 import React, { useState } from 'react';
 import Input from '@/src/components/figma/Input';
-import { HiOutlineMail } from 'react-icons/hi';
-import { BiLock } from 'react-icons/bi';
 import Button from '@/src/components/figma/Button';
 import Link from 'next/link';
-import { verifyJwt, Claims } from '@/src/helpers/auth';
-import { setAuthCookie } from '@/src/helpers/auth';
 import GlassPanel from '@/src/components/figma/GlassPanel';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSignUp } from '@/src/hooks/mutations/auth.mutation';
-import { useAuth } from '@/src/hooks/useAuth';
 
 export default function SignUp() {
   const router = useRouter();
   const { mutate: signUp, isPending } = useSignUp();
-  const { isAuthenticated } = useAuth();
+  const isAuthenticated = JSON.parse(localStorage.getItem('auth') || '{}')?.isAuthenticated;
+
   const [errors, setErrors] = useState({
     firstName: '',
     lastName: '',
@@ -111,7 +107,7 @@ export default function SignUp() {
             user: {email: formData.email, password: formData.password},
             isAuthenticated: true
           }));
-          router.push('/');
+          window.location.href = '/';
         },
         onError: (error) => {
           router.back()
