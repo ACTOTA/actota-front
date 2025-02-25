@@ -116,8 +116,8 @@ const ItineraryPageAdvanceFilter = ({ setShowFilter, advanceFilter, setAdvanceFi
 
     return (
         <GlassPanel className=' !rounded-3xl !p-[24px] bg-gradient-to-br from-[#6B6B6B]/30 to-[black] '>
-            <div className='w-full'>
-            <p onClick={() => setShowFilter?.(false)} className='text-left text-white text-sm flex items-center gap-2 cursor-pointer mb-2 md:hidden'><ArrowLeftIcon className='size-4' />Filter </p>
+            <div className='w-full '>
+                <p onClick={() => setShowFilter?.(false)} className='text-left text-white text-sm flex items-center gap-2 cursor-pointer mb-2 lg:hidden'><ArrowLeftIcon className='size-4' />Filter </p>
 
                 <div className='flex justify-between items-center w-full'>
                     <p className='text-white  font-bold'>Trip Budget</p>
@@ -148,7 +148,9 @@ const ItineraryPageAdvanceFilter = ({ setShowFilter, advanceFilter, setAdvanceFi
                     </div>
 
                 </div>
-                <div className="inline-flex justify-start  my-5 border border-border-primary rounded-full p-1">
+                <div className='overflow-auto scrollbar-hide'>
+
+                <div className=" inline-flex justify-start  my-5 border border-border-primary rounded-full p-1">
                     <Button
                         onClick={() => setSelectedView('activities')}
                         className={` border-white  !py-2 ${selectedView === 'activities' ? 'bg-gradient-to-r from-white/20 to-white/5' : ''}`}
@@ -172,6 +174,8 @@ const ItineraryPageAdvanceFilter = ({ setShowFilter, advanceFilter, setAdvanceFi
                         Transport
                     </Button>
                 </div>
+                </div>
+
                 {selectedView === 'transport' && <div className='flex items-center justify-between '>
 
                     <p className='flex items-center gap-2 text-white'><MdOutlineDirectionsCarFilled className='h-6 w-6' /> Transportation</p>

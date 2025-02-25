@@ -112,7 +112,7 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter }:
     return (
         <GlassPanel className=' !rounded-3xl !p-[24px] bg-gradient-to-br from-[#6B6B6B]/30 to-[black] '>
             <div className='w-full'>
-                <p onClick={() => setShowFilter?.(false)} className='text-left text-white text-sm flex items-center gap-2 cursor-pointer mb-2 md:hidden'><ArrowLeftIcon className='size-4' />Filter </p>
+                <p onClick={() => setShowFilter?.(false)} className='text-left text-white text-sm flex items-center gap-2 cursor-pointer mb-2 lg:hidden'><ArrowLeftIcon className='size-4' />Filter </p>
 
                 <div className='flex justify-between items-center w-full'>
                     <p className='text-white  font-bold'>Trip Budget</p>

@@ -27,7 +27,7 @@ const Itineraries = () => {
         <div className="max-w-[1440px] mx-auto ">
 
             <div className="flex max-md:flex-col-reverse gap-8 p-[80px] max-lg:px-[50px] max-md:px-[25px] max-sm:px-[16px] bg-gradient-to-b from-transparent via-[#080E14] to-[#080E14] ">
-                <div className={`w-[66%] max-md:w-full ${showFilter ? 'max-md:hidden' : ''}`}>
+                <div className={`w-[66%] max-lg:w-full ${showFilter ? 'max-lg:hidden' : ''}`}>
                     <h2 className="text-[40px] font-bold text-white max-md:hidden">Itineraries for You</h2>
                     <div className="flex items-center justify-between flex-wrap gap-2">
 
@@ -53,7 +53,7 @@ const Itineraries = () => {
 
                             </div>
 
-                            <div className='md:hidden'>
+                            <div className='lg:hidden'>
                                 <Button variant="simple" className=" gap-1" onClick={() => setShowFilter(!showFilter)}><Image src="/svg-icons/filter.svg" alt="filter" width={24} height={24} /> Filter <ArrowRightIcon className='size-4' /></Button>
                             </div>
 
@@ -81,7 +81,7 @@ const Itineraries = () => {
                         <Button variant="primary" className="bg-white text-black mt-4 ">Load More</Button>
                     </div>
                 </div>
-                <div className={`${showFilter ? '' : 'max-md:hidden'} md:pt-14 w-[33%] max-md:w-full`}>
+                <div className={`${showFilter ? '' : 'max-lg:hidden'} md:pt-14 w-[33%] max-lg:w-full`}>
                     {advanceFilter ?
                         <ItineraryPageAdvanceFilter setShowFilter={setShowFilter} advanceFilter={advanceFilter} setAdvanceFilter={setAdvanceFilter} />
                         :
