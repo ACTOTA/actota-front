@@ -38,7 +38,7 @@ export default function WhyBook() {
           <p className='text-white sm:text-primary-gray mt-[16px] sm:text-center'>With innovative features like itineraries customizing and budget allocation, we offer a seamless booking experience for your dream trip. </p>
           <div className="flex justify-center items-center flex-wrap gap-8 self-stretch mt-8 sm:mt-[80px]">
             {info.map((item, i) => (
-              <SimpleCard showButton={false} image={item.image} title={item.title} description={item.description} />
+              <SimpleCard key={i} showButton={false} image={item.image} title={item.title} description={item.description} />
 
             ))}
 

@@ -36,8 +36,8 @@ const FAQs = () => {
                 </div>
 
                 <dl className=" flex-1  divide-gray-900/10 -mt-4">
-                    {faqs.map((faq) => (
-                        <Disclosure key={faq.question} as="div" className="pt-6 w-full">
+                    {faqs.map((faq, i) => (
+                        <Disclosure key={i} as="div" className="pt-6 w-full">
                             <dt>
                                 <Disclosure.Button className="group flex w-full items-start justify-between text-left">
                                     <span className="sm:text-[20px] font-bold">{faq.question}</span>

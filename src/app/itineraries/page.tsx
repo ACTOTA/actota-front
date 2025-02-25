@@ -65,15 +65,15 @@ const Itineraries = () => {
 
                     </div>
                     <div className='max-sm:hidden'>
-                        {listings.map((listing) => (
-                            <ItineraryCard data={listing} />
+                        {listings.map((listing, i) => (
+                            <ItineraryCard key={i} data={listing} />
                         ))}
                     </div>
                     <div className='sm:hidden flex flex-col'>
                     {itinerariesLoading && <div>Loading...</div>}
                     {itinerariesError && <div>Error: {itinerariesError.message}</div>}
-                        {listings.length > 0 && listings.map((listing) => (
-                            <ListingCard data={listing} />
+                        {listings.length > 0 && listings.map((listing, i) => (
+                            <ListingCard key={i} data={listing} />
                         ))}
                     </div>
                     <div className="flex justify-center flex-col items-center pt-6">
