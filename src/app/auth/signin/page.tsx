@@ -81,6 +81,11 @@ export default function SignIn() {
          window.location.href = '/';
         },
         onError: (error) => {
+          router.back()
+          setErrors({
+            email: '',
+            password: 'Invalid email or password'
+          });
           console.error('Login error:', error);
         }
       }

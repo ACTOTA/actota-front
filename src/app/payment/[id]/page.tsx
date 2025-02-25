@@ -112,7 +112,7 @@ const Payment = () => {
     }
   }, [apiResponse]);
 
-  const basePrice = itineraryData.person_cost * (itineraryData.min_group || 1);
+  const basePrice = itineraryData?.person_cost * (itineraryData?.min_group || 1);
   const selectedInsurance = paymentInsurance
     .filter(insurance => insurance.selected)
     .reduce((total, insurance) => total + insurance.price, 0);

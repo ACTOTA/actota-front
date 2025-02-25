@@ -114,6 +114,7 @@ export default function SignUp() {
           router.push('/');
         },
         onError: (error) => {
+          router.back()
           setErrors(prev => ({
             ...prev,
             email: 'Failed to create account'
