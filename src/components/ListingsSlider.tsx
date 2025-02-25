@@ -113,13 +113,13 @@ const ListingsSlider = ({ listing, currentIndex, onSlideClick }: ListingsSliderP
       )}
 
       {images.length > 1 && (
-        <div className='flex gap-4 mt-4 max-sm:hidden overflow-x-auto pb-2'>
+        <div className='flex gap-4 mt-2 p-1 max-sm:hidden overflow-x-auto '>
           {images.map((image, i) => (
             <div
               key={i}
               className={`rounded-[10px] cursor-pointer relative transition-transform duration-200 
-                hover:scale-105 active:scale-95 flex-shrink-0
-                ${i === currentIndex ? 'ring-2 ring-white' : ''}`}
+               
+                ${i === currentIndex ? 'ring-1 ring-white' : ''}`}
               onClick={() => handleThumbnailClick(i)}
             >
               <Image
