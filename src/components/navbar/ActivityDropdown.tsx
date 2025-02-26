@@ -20,6 +20,7 @@ interface ActivityDropdownProps {
   className?: string;
   activities: ActivityType[];
   title?: string;
+  showSaveButton?: boolean;
 }
 
 
@@ -27,7 +28,8 @@ export default function ActivityDropdown({
   onSelect,
   className,
   activities,
-  title
+  title,
+ showSaveButton = true
 }: ActivityDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
@@ -111,9 +113,9 @@ export default function ActivityDropdown({
               ))}
             </div>
           </div>}
-          <div className="flex justify-end mt-4">
+          {showSaveButton && <div className="flex justify-end mt-4">
             <Button variant="primary" size="md" className="">Save</Button>
-          </div>
+          </div>}
 
         </div>
       )}

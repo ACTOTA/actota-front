@@ -29,7 +29,7 @@ const Itineraries = () => {
     return (
         <div className="max-w-[1440px] mx-auto ">
 
-            <div className="flex max-md:flex-col-reverse gap-8 p-[80px] max-lg:px-[50px] max-md:px-[25px] max-sm:px-[16px] bg-gradient-to-b from-transparent via-[#080E14] to-[#080E14] ">
+            <div className="flex max-md:flex-col-reverse gap-8 p-[80px] max-xl:px-[40px] max-lg:px-[50px] max-md:px-[25px] max-sm:px-[16px] bg-gradient-to-b from-transparent via-[#080E14] to-[#080E14] ">
                 <div className={`w-[66%] max-lg:w-full ${showFilter ? 'max-lg:hidden' : ''}`}>
                     <h2 className="text-[40px] font-bold text-white max-md:hidden">Itineraries for You</h2>
                     <div className="flex items-center justify-between flex-wrap gap-2">
@@ -88,7 +88,7 @@ const Itineraries = () => {
                     {advanceFilter ?
                         <ItineraryPageAdvanceFilter setShowFilter={setShowFilter} advanceFilter={advanceFilter} setAdvanceFilter={setAdvanceFilter} />
                         :
-                        <ItineraryPageFilter setShowFilter={setShowFilter} advanceFilter={advanceFilter} setAdvanceFilter={setAdvanceFilter} />
+                            <ItineraryPageFilter setShowFilter={setShowFilter} advanceFilter={advanceFilter} setAdvanceFilter={setAdvanceFilter} />
                     }
                 </div>
                 <h2 className="text-[40px] font-bold text-white md:hidden">Itineraries for You</h2>

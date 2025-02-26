@@ -251,6 +251,7 @@ const ItineraryPageAdvanceFilter = ({ setShowFilter, advanceFilter, setAdvanceFi
                                 onSelect={(value) => { }}
                                 activities={activities}
                                 title="Activities"
+                                showSaveButton={false}
                             />
 
                         </div>
@@ -271,6 +272,7 @@ const ItineraryPageAdvanceFilter = ({ setShowFilter, advanceFilter, setAdvanceFi
                                     onSelect={(value) => { }}
                                     activities={lodging}
                                     title="Lodging"
+                                    showSaveButton={false}
                                 />
                             </div>
 
@@ -282,6 +284,7 @@ const ItineraryPageAdvanceFilter = ({ setShowFilter, advanceFilter, setAdvanceFi
                                 onSelect={(value) => { }}
                                 activities={transportation}
                                 title="Transportation"
+                                showSaveButton={false}
                             />
 
                         </div>

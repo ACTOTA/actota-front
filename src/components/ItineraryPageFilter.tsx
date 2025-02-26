@@ -55,6 +55,8 @@ import ActivityDropdown from './navbar/ActivityDropdown'
 import DateMenu from './navbar/DateMenu'
 import GuestMenu from './navbar/GuestMenu'
 import { ArrowLeftIcon } from '@heroicons/react/20/solid'
+import ItineraryPageFilterDateMenuCalendar from './ItineraryPageFilterDateMenuCalendar'
+import ItineraryPageDateMenu from './ItineraryPageDateMenu'
 
 
 
@@ -142,7 +144,7 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter }:
                         <p className='text-white  font-bold mb-2'>Dates</p>
 
                         <Dropdown isOpend={isCalendarOpen} setIsOpend={setIsCalendarOpen} className='w-full' onSelect={() => { }} options={[]} />
-                        {isCalendarOpen && <div className='mt-2'> <DateMenu /></div>}
+                        {isCalendarOpen && <div className='mt-2 '> <ItineraryPageDateMenu /></div>}
                     </div>
                     <div className=' w-full mt-4'>
                         <p className='text-white  font-bold mb-2'>Guests</p>
@@ -157,6 +159,7 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter }:
                         onSelect={(value) => { }}
                         activities={activities}
                         title="Activities"
+                        showSaveButton={false}
                     />
 
                 </div>
@@ -166,6 +169,7 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter }:
                         onSelect={(value) => { }}
                         activities={lodging}
                         title="Lodging"
+                        showSaveButton={false}
                     />
 
                 </div>
@@ -175,6 +179,7 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter }:
                         onSelect={(value) => { }}
                         activities={transportation}
                         title="Transportation"
+                        showSaveButton={false}
                     />
                 </div>
                 {advanceFilter ?
