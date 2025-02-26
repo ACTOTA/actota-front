@@ -11,8 +11,7 @@ const useLogin = () => {
         "/api/auth/signin",
         payload
       );
-      console.log('data from login', data);
-      return {auth_token: data.data.auth_token, user: payload};
+      return data;
     },
     onSuccess: (data:any) => {
       // Store auth data in React Query cache
@@ -36,7 +35,7 @@ const useSignUp = () => {
         "/api/auth/signup",
         payload
       );
-      return {auth_token: data.data.auth_token, user: payload};
+      return data;
     },
     onSuccess: (data:any) => {
       // Store auth data in React Query cache

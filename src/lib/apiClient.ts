@@ -26,21 +26,21 @@ const actotaApi = axios.create({
 //   }
 // );
 
-// actotaApi.interceptors.response.use(
-//   (response) => {
-//     return response;
-//   },
-//   (error) => {
-//     if (error.response && error.response.status === 401) {
-//       // Handle unauthorized error
-//       localStorage.removeItem('auth');
-//       // Optionally redirect to login page
-//       if (typeof window !== 'undefined') {
-//         window.location.href = '/login';
-//       }
-//     }
-//     return Promise.reject(error);
-//   }
-// );
+actotaApi.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // Handle unauthorized error
+      localStorage.removeItem('auth');
+      // Optionally redirect to login page
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default actotaApi;

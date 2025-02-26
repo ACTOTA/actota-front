@@ -102,9 +102,10 @@ export default function SignUp() {
       },
       {
         onSuccess: (data:any) => {
+          router.back()
           localStorage.setItem('auth', JSON.stringify({
-            auth_token: data.auth_token,
-            user: {email: formData.email, password: formData.password},
+            auth_token: data.data.auth_token,
+            user: {user_id: data.data._id.$oid, first_name: data.data.first_name, last_name: data.data.last_name, email: data.data.email,},
             isAuthenticated: true
           }));
           window.location.href = '/';

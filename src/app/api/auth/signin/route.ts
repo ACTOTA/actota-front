@@ -5,18 +5,24 @@ import axios from 'axios';
 export async function POST(request: Request) {
   try {
     const payload = (await request.json()) as { email: string; password: string };
-    console.log("signin route triggered",payload);
 
     const response = await actotaApi.post(
       "/api/auth/signin",
       { email: payload.email, password: payload.password },
     );
 
-    console.log(response.data, 'response from signin route');
-    return NextResponse.json(
-      { success: true, message: 'Login successful', data: response.data },
-      { status: 200 }
-    );
+    if(response.data.auth_token){
+      const sessionResponse = await actotaApi.get(
+        "/api/auth/session",
+        { headers: {
+          'Authorization': `Bearer ${response.data.auth_token}`,
+        }},
+      );
+      return NextResponse.json(
+        { success: true, message: 'Login successful', data:{...sessionResponse.data, auth_token: response.data.auth_token} },
+        { status: 200 }
+      );
+    }
   } catch (error:any) {
     console.log(error, 'error from signin route');
     return NextResponse.json(
