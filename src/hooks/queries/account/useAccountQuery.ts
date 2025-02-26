@@ -1,7 +1,7 @@
 import actotaApi from '@/src/lib/apiClient';
 import { useQuery } from '@tanstack/react-query';
 
-async function getPersonalInfo(id: string): Promise<any> {
+async function getAccountInfo(id: string): Promise<any> {
   try {
     const token = JSON.parse(localStorage.getItem('auth') || '{}')?.auth_token;
   
@@ -20,10 +20,10 @@ async function getPersonalInfo(id: string): Promise<any> {
   }
 }
 
-export function usePersonalInfo(id: string) {
+export function useAccountInfo(id: string) {
   return useQuery({
-    queryKey: ['personalInfo'],
-    queryFn: () => getPersonalInfo(id),
+    queryKey: ['accountInfo'],
+    queryFn: () => getAccountInfo(id),
    
   });
 }

@@ -2,7 +2,7 @@
 import Toggle from "@/src/components/Toggle/Toggle";
 import React, { useState } from "react";
 
-const EmailNotification = () => {
+const EmailNotification = (data: any) => {
   const [accountActivities, setAccountActivities] = useState(true);
   const [bookingUpdates, setBookingUpdates] = useState(true);
   const [reminders, setReminders] = useState(true);

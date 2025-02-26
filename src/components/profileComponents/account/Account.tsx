@@ -4,23 +4,26 @@ import Button from "../../figma/Button";
 import Personal from "./PersonalInformation/Personal";
 import VerificationPasswor from "./VerificationPassword/VerificationPasswor";
 import EmailNotification from "./EmailNotification/EmailNotification";
+import { useAccountInfo } from "@/src/hooks/queries/account/useAccountQuery";
 const Account = () => {
+  const { data: accountInfo } = useAccountInfo(JSON.parse(localStorage.getItem('auth') || '{}')?.user?.user_id);
+  console.log(accountInfo, 'account info');
   const [activeTab, setActiveTab] = useState("personal");
   const tabs = [
     {
       id: "personal",
       label: "Personal information",
-      component: <Personal />
+      component: <Personal data={accountInfo} />
     },
     {
       id: "verification",
       label: "Verification & Change Password",
-      component: <VerificationPasswor />
+      component: <VerificationPasswor data={accountInfo} />
     },
     {
       id: "email",
       label: "Email Notification",
-      component: <EmailNotification />
+      component: <EmailNotification data={accountInfo} />
     }
   ];
 

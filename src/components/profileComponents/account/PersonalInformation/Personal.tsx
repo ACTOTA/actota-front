@@ -15,7 +15,7 @@ import PhoneInput from 'react-phone-number-input'
 import { E164Number } from 'libphonenumber-js'
 import 'react-phone-number-input/style.css'
 
-const Personal = () => {
+const Personal = (data: any) => {
   const [firstName, setFirstName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState<E164Number | undefined>();
   console.log(phoneNumber, 'phoneNumber')
@@ -52,6 +52,7 @@ const Personal = () => {
         <div className="flex flex-col gap-2">
           <div className="text-sm font-bold">Legal Name</div>
           <Input
+            value={data.data.first_name}
             placeholder="Legal Name"
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setFirstName(e.target.value)
@@ -61,6 +62,7 @@ const Personal = () => {
         <div className="flex flex-col gap-2">
           <div className="text-sm font-bold">Display Name</div>
           <Input
+            value={data.data.last_name}
             placeholder="Display Name"
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setFirstName(e.target.value)
@@ -70,6 +72,7 @@ const Personal = () => {
         <div className="flex flex-col gap-2">
           <div className="text-sm font-bold">Email</div>
           <Input
+            value={data.data.email}
             placeholder="Email"
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setFirstName(e.target.value)
@@ -80,15 +83,14 @@ const Personal = () => {
           <div className="text-sm font-bold">Phone Number</div>
           <div className="relative">
             <PhoneInput
-
+              // value={phoneNumber}
               placeholder="Enter phone number"
-              value={phoneNumber}
+              value={data.data.phone}
               onChange={setPhoneNumber}
               maxLength={15}
               international
               defaultCountry="US"
-              className="focus-within:border-white px-4 border border-primary-gray rounded-lg"
-              class="!bg-transparent text-white w-full border-0 border-l ms-2 outline-none focus:outline-none focus:border-white focus:ring-0"
+              className= "PhoneInputInput focus-within:border-white px-4 border border-primary-gray rounded-lg !bg-transparent "
               style={{
                 '--PhoneInputCountrySelectArrow-opacity': '1',
                 '--PhoneInputCountrySelectArrow-color': 'white',
@@ -102,6 +104,7 @@ const Personal = () => {
         <div className="flex flex-col gap-2">
           <div className="text-sm font-bold">Date of Birth</div>
           <Input
+            value={data.data.birth_date || ''}
             placeholder="Date of Birth"
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setFirstName(e.target.value)

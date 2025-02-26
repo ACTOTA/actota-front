@@ -21,6 +21,7 @@ interface SidebarProps {
 
 const Sidebar = ({ onItemClick }: SidebarProps) => {
   const pathname = usePathname();
+  const user = JSON.parse(localStorage.getItem('auth') || '{}')?.user;
 
   const primaryNavItems = [
     {
@@ -89,7 +90,7 @@ const Sidebar = ({ onItemClick }: SidebarProps) => {
         <div className="flex items-center gap-4">
           <Image src={ProfileImage} alt="Profile" width={56} height={56} />
           <div className="text-white flex flex-col gap-1">
-            <div className="font-bold text-xl">John James</div>
+            <div className="font-bold text-xl">{user?.first_name || 'John'} {user?.last_name || 'James'}</div>
             <div className="flex items-center gap-2">
               <div className="p-[2px]">
                 <CompanyIcon />

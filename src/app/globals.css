@@ -19,6 +19,18 @@ body {
   display: none;  /* Chrome, Safari and Opera */
 }
 
+.PhoneInputInput {
+  background-color: black !important;
+}
+
+.PhoneInputInput > input {
+  border: none !important;
+  border-left: 1px solid #9C9C9C !important;
+  outline: none !important;
+  box-shadow: none !important;
+  /* background-color: red !important; */
+}
+
 /* 
 html,
  body,

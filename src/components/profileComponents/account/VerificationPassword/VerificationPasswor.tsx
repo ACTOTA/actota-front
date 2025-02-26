@@ -10,7 +10,7 @@ import LockIcon from "@/public/sidebar-icons/lock-icon.svg";
 import { IoEyeSharp } from "react-icons/io5";
 import { FaRegEyeSlash } from "react-icons/fa";
 
-const VerificationPasswor = () => {
+const VerificationPasswor = (data: any) => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   console.log(currentPassword, "currentPassword");
@@ -27,7 +27,7 @@ const VerificationPasswor = () => {
                 <div>
                   <div className="text-sm font-normal leading-5">Email</div>
                   <div className="font-bold text-base leading-6">
-                    user@email.com
+                    {data.data.email}
                   </div>
                 </div>
               </div>
@@ -43,7 +43,7 @@ const VerificationPasswor = () => {
                 <div>
                   <div className="text-sm font-normal leading-5">Phone</div>
                   <div className="font-bold text-base leading-6">
-                    Unverified
+                    {data.data.phone ? data.data.phone : 'null'}
                   </div>
                 </div>
               </div>
