@@ -309,7 +309,7 @@ const Payment = () => {
 
               <tbody className="w-full ">
                 {purchaseHistory.map((item, i) => (
-                  <div key={i}>
+                  <React.Fragment key={item.id}>
                     <tr className="w-full">
                       <td colSpan={5}>
                         <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent" />
@@ -327,7 +327,8 @@ const Payment = () => {
                         <Button variant="primary" size="sm" className={`mx-auto ${item.status === "paid" ? "!bg-[#215CBA]" : "!bg-[#FFC107]"} text-white`}>{item.status === "paid" ? "Paid" : "Pending"}</Button>
                       </td>
                     </tr>
-                  </div>
+                  </React.Fragment>
+
                 ))}
               </tbody>
             </table>

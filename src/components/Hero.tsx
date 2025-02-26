@@ -50,7 +50,7 @@ export default function Hero() {
                         with a Few Clicks <img src="/svg-icons/mingcute-cursor.svg" alt="hero background" className="mt-6 max-md:hidden" />
                     </p>
                 </div>
-                <div className={` h-full z-50 
+                <div className={` h-full z-40 
                     ${classes}`}>
                     <Search setClasses={setClasses} currStep={currStep} setCurrStep={setCurrStep} navbar={false} />
                 </div>
