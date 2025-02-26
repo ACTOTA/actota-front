@@ -24,10 +24,10 @@ export default function ProfileLayout({
       {/* Sidebar with responsive classes */}
       <div className={`
         md:relative md:translate-x-0 md:block bg-black
-        fixed top-20 left-0 h-full z-20 transform transition-transform duration-300 ease-in-out
+        fixed max-md:top-20 top-2 left-0 h-full max-md:w-full z-20 transform transition-transform duration-300 ease-in-out
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <Sidebar onItemClick={() => setIsSidebarOpen(false)} />
+        <Sidebar onItemClick={() =>{ setIsSidebarOpen(false)}} />
       </div>
 
       <div className="w-full  text-white p-8 max-md:p-4 relative">
