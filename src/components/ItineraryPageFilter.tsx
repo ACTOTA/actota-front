@@ -111,6 +111,7 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter }:
 
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [isGuestOpen, setIsGuestOpen] = useState(false);
+    const [destination, setDestination] = useState([1]);
     return (
         <GlassPanel className=' !rounded-3xl !p-[24px] bg-gradient-to-br from-[#6B6B6B]/30 to-[black] '>
             <div className='w-full'>
@@ -129,16 +130,20 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter }:
                 </div>
                 <div className='mt-4 flex justify-between items-center w-full'>
                     <p className='text-white  font-bold'>Destination</p>
-                    <p className='text-[#BBD4FB] font-normal flex items-center gap-1'>Add <span className='text-2xl'> +</span></p>
+                    <p onClick={() => setDestination([...destination, 1])} className='text-[#BBD4FB] font-normal flex items-center gap-1'>Add <span className='text-2xl'> +</span></p>
 
                 </div>
-                <div className='mt-2 flex justify-between items-center gap-2 w-full'>
-                    <div className='w-full'>
-                        <Input icon={<GrLocation aria-hidden="true" className="size-6 text-white" />} className='w-full ' placeholder='Search Destination' />
-                    </div>
-                    <RxCross2 className='text-white size-6' />
+                {destination.map((item, i) => {
+                    return (
+                        <div key={i} className='mt-2 flex justify-between items-center gap-2 w-full'>
+                            <div className='w-full'>
+                                <Input icon={<GrLocation aria-hidden="true" className="size-6 text-white" />} className='w-full ' placeholder='Search Destination' />
+                            </div>
+                            <RxCross2 onClick={() => setDestination(destination.filter((_, index) => index !== i))} className='text-white size-6' />
 
-                </div>
+                        </div>
+                    )
+                })}
                 <div className={` flex justify-between items-center w-full gap-3 ${!advanceFilter ? 'flex-col' : 'flex-row'}`}>
                     <div className=' w-full mt-6'>
                         <p className='text-white  font-bold mb-2'>Dates</p>
