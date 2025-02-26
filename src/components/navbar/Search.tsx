@@ -60,7 +60,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
         console.log('scrolling');
         if (window.scrollY >= initialPosition && !navbar) {
           console.log('reached initial position');
-          setClasses?.('fixed top-[8px]  left-1/2 -translate-x-1/2');
+          setClasses?.(' fixed top-[8px]  left-1/2 -translate-x-1/2  h-fit');
 
           setClassName('w-[580px] md:w-[640px] xl:w-[700px] 2xl:w-[720px] ');
         } else {
