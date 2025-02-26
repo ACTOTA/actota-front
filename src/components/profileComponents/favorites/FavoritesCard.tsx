@@ -118,7 +118,7 @@ const FavoritesCard: React.FC<FavoritesCardProps> = ({ data }) => {
                     <div 
                         onClick={(e) => {
                             e.stopPropagation();
-                            router.push("?modal=shareModal");
+                            router.push(`?modal=shareModal&itineraryId=${data._id.$oid}`)
                         }} 
                         className='bg-[#05080D] rounded-full h-10 w-10 flex items-center justify-center'
                     >

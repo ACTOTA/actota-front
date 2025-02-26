@@ -14,9 +14,10 @@ type InputProps = {
   widthIcon?: string;
   rightIcon?: React.ReactNode;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  readOnly?: boolean;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-export default function Input({ id, name, type, placeholder, value, icon, classname, widthIcon, rightIcon, onChange }: InputProps) {
+export default function Input({ id, name, type, placeholder, value, icon, classname, widthIcon, rightIcon, onChange, readOnly }: InputProps) {
   const [showPassword, setShowPassword] = useState(type === 'password');
 
   const toggleShowPassword = () => {
@@ -31,6 +32,7 @@ export default function Input({ id, name, type, placeholder, value, icon, classn
         </div>
       )}
       <input
+        readOnly={readOnly}
         id={id}
         name={name}
         type={showPassword ? 'text' : type}
@@ -50,7 +52,7 @@ export default function Input({ id, name, type, placeholder, value, icon, classn
         </div>
       )}
     {rightIcon && (
-      <div className='absolute inset-y-0 right-0 pr-3 flex items-center text-white cursor-pointer'>
+      <div className='absolute inset-y-0 right-0 px-3 flex items-center bg-black z-50 text-white cursor-pointer'>
         {rightIcon}
       </div>
     )}

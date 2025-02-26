@@ -54,7 +54,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();  // Stop the event from bubbling up
-                                    router.push("?modal=shareModal");
+                                    router.push(`?modal=shareModal&itineraryId=${data._id.$oid}`)
                                 }}
                                 className='bg-[#05080D] rounded-full h-10 w-10 flex items-center justify-center'
                             >

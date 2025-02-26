@@ -117,7 +117,7 @@ export default function Itinerary() {
         <h1 className='text-4xl font-bold me-auto'>{itineraryData.trip_name}</h1>
         <div className='flex items-center md:flex-nowrap flex-wrap gap-2'>
           <LikeDislike liked={itineraryData.isFavorite ? itineraryData.isFavorite : false} favoriteId={itineraryData._id.$oid} />
-          <Button variant="outline" size='md' className='gap-1'>
+          <Button onClick={() => {router.push(`&itineraryI?modal=shareModald=${itineraryData._id.$oid}`)}} variant="outline" size='md' className='gap-1'>
             <CgSoftwareUpload className='h-6 w-6 text-white' />
             <p>Share</p>
           </Button>
