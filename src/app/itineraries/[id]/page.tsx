@@ -15,6 +15,7 @@ import ListingsSlider from '@/src/components/ListingsSlider';
 import LikeDislike from '@/src/components/LikeDislike';
 import { useItineraryById } from '@/src/hooks/queries/itinerarieById/useItineraryByIdQuery';
 import { useFavorites } from '@/src/hooks/queries/account/useFavoritesQuery';
+import Image from 'next/image';
 
 interface Location {
   city: string;
@@ -64,6 +65,7 @@ export default function Itinerary() {
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itineraryData, setItineraryData] = useState<ItineraryData | null>(null);
+
   const { data: favorites, isLoading: favoritesLoading, error: favoritesError } = useFavorites();
   useEffect(() => {
     if (apiResponse) {
@@ -116,7 +118,9 @@ export default function Itinerary() {
       <div className='flex gap-4 flex-col md:flex-row md:items-center max-sm:hidden'>
         <h1 className='text-4xl font-bold me-auto'>{itineraryData.trip_name}</h1>
         <div className='flex items-center md:flex-nowrap flex-wrap gap-2'>
-          <LikeDislike liked={itineraryData.isFavorite ? itineraryData.isFavorite : false} favoriteId={itineraryData._id.$oid} />
+        
+          
+           <LikeDislike className='border border-primary-gray rounded-full  h-[50px] w-[50px]' liked={itineraryData.isFavorite ? itineraryData.isFavorite : false} favoriteId={itineraryData._id.$oid} />
           <Button onClick={() => {router.push(`?modal=shareModal&itineraryId=${itineraryData._id.$oid}`)}} variant="outline" size='md' className='gap-1'>
             <CgSoftwareUpload className='h-6 w-6 text-white' />
             <p>Share</p>
@@ -130,12 +134,24 @@ export default function Itinerary() {
 
       <div className='flex max-sm:flex-col w-full gap-6 mt-4'>
         <div className='flex flex-col gap-4 w-[67%] max-sm:w-full'>
+        
+      {itineraryData?.images?.length <= 1 ? <div className='w-full aspect-[926/640] relative'>
+            <Image
+              src={itineraryData?.images[0]}
+              alt={`${itineraryData.trip_name} - Image ${1}`}
+              fill
+              priority
+              className='rounded-lg object-cover'
+              sizes='(max-width: 1536px) 71vw'
+            />
+          </div> :
+          
           <ListingsSlider
             listing={itineraryData}
             currentIndex={currentIndex}
             onSlideClick={setCurrentIndex}
           />
-
+      }
           <div className='w-full h-full text-white mt-8 max-sm:mt-0 relative'>
             <h1 className='text-2xl font-bold sm:hidden'>{itineraryData.trip_name}</h1>
 
