@@ -80,12 +80,12 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
 
   return (
     <div className="w-full  relative" id="search-bar">
-      <LoadScript
+      {/* <LoadScript
         googleMapsApiKey={API_KEY}
         libraries={['places', 'drawing', 'visualization', 'marker']}
         language="en"
         region="EN"
-        version="weekly">
+        version="weekly"> */}
 
         <div className={`items-center    justify-between ${navbar ? 'w-[420px]   h-[60px] text-primary-gray' : 'w-[720px] max-md:w-[520px] max-sm:w-[360px] max-sm:h-[50px] max-md:h-[60px] h-[82px] text-white'}  grid grid-cols-9 rounded-full border-2 border-border-primary
       bg-black/40 backdrop-filter  backdrop-blur-sm text-sm  text-left m-auto z-50
@@ -142,7 +142,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
           </div>
         )}
 
-      </LoadScript >
+      {/* </LoadScript > */}
     </div>
 
   );
