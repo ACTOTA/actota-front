@@ -109,7 +109,7 @@ export default function Itinerary() {
   return (
     <section className='w-full !h-full text-white p-[64px] max-sm:px-6 max-lg:px-10 gap-4'>
       <div className='flex items-center gap-2 my-6 max-sm:hidden'>
-        <ArrowLeftIcon className="h-6 w-6 hover:cursor-pointer" onClick={() => router.push("/")} />
+        <ArrowLeftIcon  className="h-6 w-6 hover:cursor-pointer" onClick={() => router.back()} />
         <p className='text-primary-gray text-sm'>Itineraries / <span className='text-white'>{itineraryData.trip_name}</span></p>
       </div>
 
@@ -117,7 +117,7 @@ export default function Itinerary() {
         <h1 className='text-4xl font-bold me-auto'>{itineraryData.trip_name}</h1>
         <div className='flex items-center md:flex-nowrap flex-wrap gap-2'>
           <LikeDislike liked={itineraryData.isFavorite ? itineraryData.isFavorite : false} favoriteId={itineraryData._id.$oid} />
-          <Button onClick={() => {router.push(`&itineraryI?modal=shareModald=${itineraryData._id.$oid}`)}} variant="outline" size='md' className='gap-1'>
+          <Button onClick={() => {router.push(`?modal=shareModal&itineraryId=${itineraryData._id.$oid}`)}} variant="outline" size='md' className='gap-1'>
             <CgSoftwareUpload className='h-6 w-6 text-white' />
             <p>Share</p>
           </Button>

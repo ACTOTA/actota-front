@@ -84,7 +84,7 @@ const Navbar = () => {
                                         <button onClick={() => setIsDrawerOpen(true)} className="rounded-full  text-white flex items-center justify-center p-3.5 border border-[#424242] max-sm:hidden relative">
                                             <Image src="/svg-icons/notification.svg" alt="User" width={28} height={28} className="rounded-full" />
                                             <div className="absolute top-3 right-3 w-2 h-2 bg-red-500 rounded-full" /> </button>
-                                        <Menu.Button className="inline-flex w-full justify-center items-center pr-4 gap-x-1.5 rounded-full  p-0.5 text-sm font-semibold text-white shadow-sm border border-[#424242] hover:bg-gray-800 max-sm:border-none">
+                                        <Menu.Button className="inline-flex w-full justify-center items-center pr-4 gap-x-1.5 rounded-full  p-0.5 text-sm font-semibold text-white shadow-sm border border-[#424242] sm:hover:bg-gray-800 max-sm:border-none">
                                             {currentUser.image ? <Image src={currentUser.image} alt="User" width={32} height={32} className="rounded-full" /> : <div className="rounded-full bg-[#00122D] text-white flex items-center justify-center p-3"> <LuUser className="w-6 h-6" /> </div>}
                                             <p className="max-sm:hidden">{(currentUser.first_name && currentUser.last_name) ? (currentUser.first_name + " " + currentUser.last_name) : currentUser.email}</p>
                                             <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-white max-sm:hidden" />

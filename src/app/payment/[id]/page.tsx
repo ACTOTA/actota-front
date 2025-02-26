@@ -140,7 +140,7 @@ const Payment = () => {
                 {/* left side */}
                 <div className={`lg:col-span-4 col-span-6 flex flex-col gap-4 w-full pl-[80px] max-lg:px-[20px] ${showPaymentReview ? 'max-lg:hidden' : ''}`}>
                     <div className='flex items-center gap-2 mt-5'>
-                        <ArrowLeftIcon className="h-6 w-6 hover:cursor-pointer" />
+                        <ArrowLeftIcon onClick={() => router.back()} className="h-6 w-6 hover:cursor-pointer" />
                         <p className='text-primary-gray text-sm'>Itineraries /  {itineraryData.trip_name}  /   <span className='text-white'>Confirm Reservation</span></p>
                     </div>
                     <h1 className='text-4xl font-bold'>Confirm your Reservation</h1>
@@ -298,7 +298,7 @@ const Payment = () => {
 
                 {/* right side */}
                 <div className={`col-span-6 lg:col-span-2 flex flex-col  w-full bg-black pt-[50px] max-lg:pt-[20px] pl-[32px] pr-[64px] ${showPaymentReview ? '' : 'max-lg:hidden'}`}>
-                    <p onClick={() => setShowPaymentReview(false)} className='text-left text-white text-sm flex items-center gap-2 cursor-pointer'><ArrowLeftIcon className='size-4' />Reservation Details </p>
+                    <p onClick={() => setShowPaymentReview(false)} className='text-left text-white text-sm flex items-center gap-2 cursor-pointer lg:hidden'><ArrowLeftIcon className='size-4' />Reservation Details </p>
                     <p className='text-center'>Total amount</p>
                     <p className='text-white text-[64px] font-bold text-center'><span className='text-primary-gray'>$</span> {totalAmount}</p>
 
