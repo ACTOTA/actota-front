@@ -138,7 +138,7 @@ const BookingCard: React.FC<ListingCardProps> = ({
                     <p className='text-sm text-primary-gray ml-7'>You’ll earn the points once you complete the trip.</p>
                 </div>
                 <div className='flex max-md:w-full gap-2'>
-                    {data?.status !== "completed" && <Button variant={bookingDetailsPage ? "simple" : "primary"} className={`  ${bookingDetailsPage ? "!bg-transparent text-[#C10B2F] "  : "!bg-[#C10B2F]"}  text-white w-full`}> <span className={`${bookingDetailsPage ? "border-b border-b-[#C10B2F] " : "text-white"}`}> Cancel Trip</span></Button>}
+                    {data?.status !== "completed" && <Button variant={bookingDetailsPage ? "simple" : "primary"} className={`  ${bookingDetailsPage ? "!bg-transparent text-[#C10B2F] "  : "!bg-[#C10B2F]"}  text-white w-full`}> <span className={`${bookingDetailsPage ? "border-b border-b-[#C10B2F] whitespace-nowrap " : "text-white whitespace-nowrap"}`}> Cancel Trip</span></Button>}
                     {!bookingDetailsPage && <Button onClick={() => router.push(`/booking-details`)} variant='outline' className=' text-white gap-2 w-full'> View {data?.status === "completed" && !bookingConfirmedModal ? "Details" : ""} <CgArrowTopRight className='size-6' /></Button>}
 
                 </div>

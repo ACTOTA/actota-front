@@ -14,6 +14,7 @@ import ActivityTag from '@/src/components/figma/ActivityTag';
 import ListingsSlider from '@/src/components/ListingsSlider';
 import LikeDislike from '@/src/components/LikeDislike';
 import { useItineraryById } from '@/src/hooks/queries/itinerarieById/useItineraryByIdQuery';
+import { useFavorites } from '@/src/hooks/queries/account/useFavoritesQuery';
 
 interface Location {
   city: string;
@@ -63,15 +64,16 @@ export default function Itinerary() {
   
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itineraryData, setItineraryData] = useState<ItineraryData | null>(null);
-
+  const { data: favorites, isLoading: favoritesLoading, error: favoritesError } = useFavorites();
   useEffect(() => {
     if (apiResponse) {
-      console.log('Setting itinerary data:', apiResponse);
-      setItineraryData(apiResponse);
+      const filteredItineraryData = favorites?.some((favorite: any) => favorite._id.$oid === apiResponse._id.$oid) ? {...apiResponse, isFavorite: true} : apiResponse;
+      console.log('Setting itinerary data:', filteredItineraryData);
+      setItineraryData(filteredItineraryData);
     }
   }, [apiResponse]);
 
-  const basePrice = itineraryData?.person_cost * (itineraryData?.min_group || 1);
+  const basePrice = (itineraryData?.person_cost ?? 0) * (itineraryData?.min_group ?? 1);
    
 
   if (isLoading) {
@@ -114,7 +116,7 @@ export default function Itinerary() {
       <div className='flex gap-4 flex-col md:flex-row md:items-center max-sm:hidden'>
         <h1 className='text-4xl font-bold me-auto'>{itineraryData.trip_name}</h1>
         <div className='flex items-center md:flex-nowrap flex-wrap gap-2'>
-          <LikeDislike />
+          <LikeDislike liked={itineraryData.isFavorite ? itineraryData.isFavorite : false} favoriteId={itineraryData._id.$oid} />
           <Button variant="outline" size='md' className='gap-1'>
             <CgSoftwareUpload className='h-6 w-6 text-white' />
             <p>Share</p>

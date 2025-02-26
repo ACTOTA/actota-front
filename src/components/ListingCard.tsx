@@ -60,7 +60,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
                             >
                                 <Image src="/svg-icons/share.svg" alt="share" height={20} width={20} />
                             </button>
-                            <LikeDislike />
+                            <LikeDislike liked={data.isFavorite ? data.isFavorite : false} favoriteId={data._id.$oid} />
 
                         </div>
                     </div>

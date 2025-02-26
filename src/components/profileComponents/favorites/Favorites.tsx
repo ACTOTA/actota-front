@@ -8,77 +8,26 @@ import FavoritesCard from "./FavoritesCard";
 import Dropdown from "../../figma/Dropdown";
 import Image from "next/image";
 import ListingCard from "../../ListingCard";
+import { useFavorites } from "@/src/hooks/queries/account/useFavoritesQuery";
 
 const Favorites = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [search, setSearch] = useState("");
-  const [favorites, setFavorites] = React.useState<any[]>([{
-    id: 1,
-    day_itinerary: true,
-    trip_name: "Lahore",
-    fareharbor_id: 1,
-    person_cost: 100,
-    min_age: 18,
-    min_guests: 1,
-    max_guests: 10,
-    length_days: 1,
-    length_hours: 1,
-    start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    description: "Lahore is a city in Pakistan",
-    days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
-    activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
-    images: ["/images/hero-bg.jpg"],
-    start_date: new Date(),
-    end_date: new Date(),
-    created_at: new Date(),
-    updated_at: new Date()
-  },
-  {
-    id: 2,
-    day_itinerary: false,
-    trip_name: "Lahore",
-    fareharbor_id: 1,
-    person_cost: 100,
-    min_age: 18,
-    min_guests: 1,
-    max_guests: 10,
-    length_days: 1,
-    length_hours: 1,
-    start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    description: "Lahore is a city in Pakistan",
-    days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
-    activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
-    images: ["/images/hero-bg.jpg"],
-    start_date: new Date(),
-    end_date: new Date(),
-    created_at: new Date(),
-    updated_at: new Date()
-  },
-  {
-    id: 3,
-    day_itinerary: false,
-    trip_name: "Lahore",
-    fareharbor_id: 1,
-    person_cost: 100,
-    min_age: 18,
-    min_guests: 1,
-    max_guests: 10,
-    length_days: 1,
-    length_hours: 1,
-    start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    description: "Lahore is a city in Pakistan",
-    days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
-    activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
-    images: ["/images/hero-bg.jpg"],
-    start_date: new Date(),
-    end_date: new Date(),
-    created_at: new Date(),
-    updated_at: new Date()
-  },
-  ]);
+  const { data: favoriteItineraries, isLoading, error } = useFavorites();
+
+  const filteredFavorites = React.useMemo(() => {
+    if (!favoriteItineraries) return [];
+    
+    return favoriteItineraries.filter((favorite: any) => {
+      const matchesSearch = favorite.trip_name.toLowerCase().includes(search.toLowerCase());
+      const matchesTab = activeTab === "all" || 
+        (activeTab === "dayItineraries" && favorite.length_days === 1) ||
+        (activeTab === "fullItineraries" && favorite.length_days > 1);
+      
+      return matchesSearch && matchesTab;
+    });
+  }, [favoriteItineraries, search, activeTab]);
+
   const tabs = [
     {
       id: "all",
@@ -95,16 +44,19 @@ const Favorites = () => {
   ];
 
   const renderContent = () => {
-    const tab = tabs.find((tab) => tab.id === activeTab);
+    if (isLoading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error.message}</div>;
+    if (!filteredFavorites.length) return <div>No favorites found</div>;
+
     return (
       <div>
-        {favorites.filter((favorite) => favorite.day_itinerary === (activeTab === "dayItineraries") || activeTab === "all").map((favorite) => (
-              <FavoritesCard key={favorite.id} data={favorite} />
-
+        {filteredFavorites.map((favorite: any) => (
+          <FavoritesCard key={favorite._id.$oid} data={favorite} />
         ))}
       </div>
-    )
+    );
   };
+
   return (
     <div className="flex flex-col gap-8">
       {/* header section */}

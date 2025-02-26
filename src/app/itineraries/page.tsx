@@ -11,16 +11,19 @@ import Image from 'next/image';
 import ListingCard from '@/src/components/ListingCard';
 import { useItineraries } from '@/src/hooks/queries/itineraries/useItineraryQuery';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
+import { useFavorites } from '@/src/hooks/queries/account/useFavoritesQuery';
 const Itineraries = () => {
     const [listings, setListings] = React.useState<any[]>([]);
     const [showFilter, setShowFilter] = useState(false)
     const [advanceFilter, setAdvanceFilter] = useState(false)
   const { data: itineraries, isLoading: itinerariesLoading, error: itinerariesError } = useItineraries();
+  const { data: favorites, isLoading: favoritesLoading, error: favoritesError } = useFavorites();
 
 
     useEffect(() => {
         if (itineraries) {
-          setListings(itineraries?.data);
+            const filteredListings = itineraries?.data?.map((listing: any) => favorites?.some((favorite: any) => favorite._id.$oid === listing._id.$oid ) ? {...listing, isFavorite: true} : listing);
+            setListings(filteredListings);
         }
       }, [itineraries]);
     return (
