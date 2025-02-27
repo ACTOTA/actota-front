@@ -14,6 +14,8 @@ import ActivityTag from '@/src/components/figma/ActivityTag';
 import ListingsSlider from '@/src/components/ListingsSlider';
 import LikeDislike from '@/src/components/LikeDislike';
 import { useItineraryById } from '@/src/hooks/queries/itinerarieById/useItineraryByIdQuery';
+import { useFavorites } from '@/src/hooks/queries/account/useFavoritesQuery';
+import Image from 'next/image';
 
 interface Location {
   city: string;
@@ -68,14 +70,17 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
   const [itineraryData, setItineraryData] = useState<ItineraryData>(initialData);
 
   const { data: apiResponse, isLoading, error } = useItineraryById(objectId);
-
+  
+  const { data: favorites, isLoading: favoritesLoading, error: favoritesError } = useFavorites();
   useEffect(() => {
     if (apiResponse) {
-      setItineraryData(apiResponse);
+      const filteredItineraryData = favorites?.some((favorite: any) => favorite._id.$oid === apiResponse._id.$oid) ? {...apiResponse, isFavorite: true} : apiResponse;
+      console.log('Setting itinerary data:', filteredItineraryData);
+      setItineraryData(filteredItineraryData);
     }
   }, [apiResponse]);
 
-  const basePrice = itineraryData.person_cost * (itineraryData.min_group || 1);
+  const basePrice = (itineraryData?.person_cost ?? 0) * (itineraryData?.min_group ?? 1);
    
 
   if (error) {
@@ -86,10 +91,6 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
   }
 
   console.log('Rendering with data:', { apiResponse, itineraryData });
-
-  if (!itineraryData) {
-    return <div className='text-white flex justify-center items-center h-screen'>Loading itinerary data...</div>;
-  }
 
   const handleBooking = () => {
     router.push(`/payment/${itineraryData._id.$oid}`);
@@ -109,15 +110,17 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
   return (
     <section className='w-full !h-full text-white p-[64px] max-sm:px-6 max-lg:px-10 gap-4'>
       <div className='flex items-center gap-2 my-6 max-sm:hidden'>
-        <ArrowLeftIcon className="h-6 w-6 hover:cursor-pointer" onClick={() => router.push("/")} />
+        <ArrowLeftIcon  className="h-6 w-6 hover:cursor-pointer" onClick={() => router.back()} />
         <p className='text-primary-gray text-sm'>Itineraries / <span className='text-white'>{itineraryData.trip_name}</span></p>
       </div>
 
       <div className='flex gap-4 flex-col md:flex-row md:items-center max-sm:hidden'>
         <h1 className='text-4xl font-bold me-auto'>{itineraryData.trip_name}</h1>
         <div className='flex items-center md:flex-nowrap flex-wrap gap-2'>
-          <LikeDislike />
-          <Button variant="outline" size='md' className='gap-1'>
+        
+          
+           <LikeDislike className='border border-primary-gray rounded-full  h-[50px] w-[50px]' liked={itineraryData.isFavorite ? itineraryData.isFavorite : false} favoriteId={itineraryData._id.$oid} />
+          <Button onClick={() => {router.push(`?modal=shareModal&itineraryId=${itineraryData._id.$oid}`)}} variant="outline" size='md' className='gap-1'>
             <CgSoftwareUpload className='h-6 w-6 text-white' />
             <p>Share</p>
           </Button>
@@ -130,12 +133,24 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
 
       <div className='flex max-sm:flex-col w-full gap-6 mt-4'>
         <div className='flex flex-col gap-4 w-[67%] max-sm:w-full'>
+        
+      {itineraryData?.images?.length <= 1 ? <div className='w-full aspect-[926/640] relative'>
+            <Image
+              src={itineraryData?.images[0]}
+              alt={`${itineraryData.trip_name} - Image ${1}`}
+              fill
+              priority
+              className='rounded-lg object-cover'
+              sizes='(max-width: 1536px) 71vw'
+            />
+          </div> :
+          
           <ListingsSlider
             listing={itineraryData}
             currentIndex={currentIndex}
             onSlideClick={setCurrentIndex}
           />
-
+      }
           <div className='w-full h-full text-white mt-8 max-sm:mt-0 relative'>
             <h1 className='text-2xl font-bold sm:hidden'>{itineraryData.trip_name}</h1>
 

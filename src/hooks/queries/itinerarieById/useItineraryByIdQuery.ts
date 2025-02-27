@@ -1,3 +1,4 @@
+"use client"
 import actotaApi from '@/src/lib/apiClient';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
@@ -8,13 +9,13 @@ interface Itinerary {
   // ... other fields
 }
 
-async function fetchItineraryById(id: string): Promise<any> {
+export async function fetchItineraryById(id: string): Promise<any> {
   try {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-        if(!user.user_id){
-          toast.error("Please login to view itinerary details");
-          throw new Error("Please login to view itinerary details");
-        }
+    // const user = JSON.parse(localStorage.getItem('user') || '{}');
+    //     if(!user.user_id){
+    //       toast.error("Please login to view itinerary details");
+    //       throw new Error("Please login to view itinerary details");
+    //     }
     const response = await actotaApi.get(`/api/itineraries/${id}`);
     console.log(response.data, "response from itinerary by id");
     return response.data;

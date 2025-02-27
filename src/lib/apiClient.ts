@@ -31,8 +31,8 @@ actotaApi.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status === 401) {
-      // signOut();
-      useLogout();
+      signOut();
+      // useLogout();
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
       }
