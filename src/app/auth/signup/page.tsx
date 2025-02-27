@@ -104,7 +104,14 @@ export default function SignUp() {
         password: formData.password 
       },
       {
-       
+        onSuccess: (data:any) => {
+          router.back()
+          localStorage.setItem('user', JSON.stringify(
+            {user_id: data.data._id.$oid, first_name: data.data.first_name, last_name: data.data.last_name, email: data.data.email,}
+          ));
+    
+         window.location.href = '/';
+        },
         onError: (error) => {
           router.back()
           setErrors(prev => ({

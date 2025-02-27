@@ -77,8 +77,11 @@ export default async function ItineraryPage({ params }: Props) {
         <div className="min-h-screen flex flex-col items-center justify-center text-white bg-[#05080D]">
           <h1 className="text-2xl font-bold mb-4">Please Login to View Itinerary Details</h1>
           <p className="text-gray-400 mb-6">You need to be logged in to access this content</p>
-          <Button variant="primary" className="  transition-colors">
+          <Button  variant="primary" className="  transition-colors">
+          
+          <a href="/auth/signin">
             Login Now
+          </a>
           </Button>
         </div>
       )

@@ -52,7 +52,7 @@ const Personal = (data: any) => {
         <div className="flex flex-col gap-2">
           <div className="text-sm font-bold">Legal Name</div>
           <Input
-            value={data.data.first_name}
+            value={data?.data?.first_name}
             placeholder="Legal Name"
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setFirstName(e.target.value)
@@ -62,7 +62,7 @@ const Personal = (data: any) => {
         <div className="flex flex-col gap-2">
           <div className="text-sm font-bold">Display Name</div>
           <Input
-            value={data.data.last_name}
+            value={data?.data?.last_name}
             placeholder="Display Name"
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setFirstName(e.target.value)
@@ -72,7 +72,7 @@ const Personal = (data: any) => {
         <div className="flex flex-col gap-2">
           <div className="text-sm font-bold">Email</div>
           <Input
-            value={data.data.email}
+            value={data?.data?.email}
             placeholder="Email"
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setFirstName(e.target.value)
@@ -85,7 +85,7 @@ const Personal = (data: any) => {
             <PhoneInput
               // value={phoneNumber}
               placeholder="Enter phone number"
-              value={data.data.phone}
+              value={data?.data?.phone}
               onChange={setPhoneNumber}
               maxLength={15}
               international
@@ -104,7 +104,7 @@ const Personal = (data: any) => {
         <div className="flex flex-col gap-2">
           <div className="text-sm font-bold">Date of Birth</div>
           <Input
-            value={data.data.birth_date || ''}
+            value={data?.data?.birth_date || ''}
             placeholder="Date of Birth"
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setFirstName(e.target.value)

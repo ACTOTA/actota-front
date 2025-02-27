@@ -17,10 +17,10 @@ import Search from "./Search";
 import { useLogout } from "@/src/hooks/mutations/auth.mutation";
 import { useRouter } from "next/navigation";
 import { LoadScript } from "@react-google-maps/api";
-import { getAuthCookie } from "@/src/helpers/auth";
+import { getAuthCookie, signOut } from "@/src/helpers/auth";
 const Navbar = () => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const { mutate: signOut, isPending } = useLogout();
+    // const { mutate: signOut, isPending } = useLogout();
     const router = useRouter();
     const pathname = usePathname();
     const isAuthRoute = pathname?.startsWith('/auth');
@@ -58,6 +58,7 @@ const Navbar = () => {
     async function handleSignout() {
         setCurrentUser(null);
         signOut();
+        localStorage.removeItem('user');
         window.location.href = '/auth/signin';
     }
 
