@@ -9,7 +9,6 @@ interface Itinerary {
 
 async function fetchItineraryById(id: string): Promise<any> {
   try {
-    const token = JSON.parse(localStorage.getItem('auth') || '{}')?.auth_token;
     // const { token } = useAuth();
     // const response = await fetch(`/api/itineraries/${id}`, {
     //   headers: {
@@ -20,11 +19,7 @@ async function fetchItineraryById(id: string): Promise<any> {
     //   credentials: 'include',
     // });
 
-    const response = await actotaApi.get(`/api/itineraries/${id}`,{ headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`,
-    }});
+    const response = await actotaApi.get(`/api/itineraries/${id}`);
     console.log(response.data, "response from itinerary by id");
     return response.data;
    

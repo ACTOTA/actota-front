@@ -8,16 +8,11 @@ const useAddFavorites = () => {
   return useMutation({
     mutationFn: async (favoriteId: string) => {
       try {
-        const token = JSON.parse(localStorage.getItem('auth') || '{}')?.auth_token;
-        const user = JSON.parse(localStorage.getItem('auth') || '{}')?.user;
-        console.log(token, "token");
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
             const response = await actotaApi.post(
           `/api/account/${user?.user_id}/favorites/${favoriteId}`,
           {},
-          {
-             headers: {
-            'Authorization': `Bearer ${token}`,
-          }}
+         
         );
         return response.data;
       } catch (error) {
@@ -35,15 +30,10 @@ const useRemoveFavorites = () => {
     return useMutation({
       mutationFn: async (favoriteId: string) => {
         try {
-          const token = JSON.parse(localStorage.getItem('auth') || '{}')?.auth_token;
-          const user = JSON.parse(localStorage.getItem('auth') || '{}')?.user;
-          console.log(token, "token");
+          const user = JSON.parse(localStorage.getItem('user') || '{}');
               const response = await actotaApi.delete(
             `/api/account/${user?.user_id}/favorites/${favoriteId}`,
-            {
-               headers: {
-              'Authorization': `Bearer ${token}`,
-            }}
+           
           );
           return response.data;
         } catch (error) {

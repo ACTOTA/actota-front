@@ -7,11 +7,10 @@ import GlassPanel from '@/src/components/figma/GlassPanel';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSignUp } from '@/src/hooks/mutations/auth.mutation';
-
+import { getAuthCookie } from '@/src/helpers/auth';
 export default function SignUp() {
   const router = useRouter();
   const { mutate: signUp, isPending } = useSignUp();
-  const isAuthenticated = JSON.parse(localStorage.getItem('auth') || '{}')?.isAuthenticated;
 
   const [errors, setErrors] = useState({
     firstName: '',
@@ -28,10 +27,14 @@ export default function SignUp() {
 
   // Redirect if already authenticated
   React.useEffect(() => {
-    if (isAuthenticated) {
-      router.push('/');
-    }
-  }, [isAuthenticated, router]);
+    const checkAuth = async () => {
+      const authStatus = await getAuthCookie();
+      if (authStatus) {
+        router.push('/');
+      }
+    };
+    checkAuth();
+  }, [ router]);
 
   const validateForm = () => {
     let tempErrors = {
@@ -101,15 +104,7 @@ export default function SignUp() {
         password: formData.password 
       },
       {
-        onSuccess: (data:any) => {
-          router.back()
-          localStorage.setItem('auth', JSON.stringify({
-            auth_token: data.data.auth_token,
-            user: {user_id: data.data._id.$oid, first_name: data.data.first_name, last_name: data.data.last_name, email: data.data.email,},
-            isAuthenticated: true
-          }));
-          window.location.href = '/';
-        },
+       
         onError: (error) => {
           router.back()
           setErrors(prev => ({

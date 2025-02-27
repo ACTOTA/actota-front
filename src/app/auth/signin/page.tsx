@@ -10,14 +10,12 @@ import Button from '@/src/components/figma/Button';
 import Link from 'next/link';
 import { useRouter } from "next/navigation";
 import { useLogin } from '@/src/hooks/mutations/auth.mutation';
-// import { useAuth } from '@/src/hooks/useAuth';
 import { getErrorMessage } from '@/src/utils/getErrorMessage';
+import { getAuthCookie } from '@/src/helpers/auth';
 export default function SignIn() {
   const router = useRouter();
   const { mutate: login, isPending } = useLogin();
-  // const { isAuthenticated, user } = useAuth();
-  const isAuthenticated = JSON.parse(localStorage.getItem('auth') || '{}')?.isAuthenticated;
-  const user = JSON.parse(localStorage.getItem('auth') || '{}')?.user;
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
   const [errors, setErrors] = useState({
     email: '',
     password: ''
@@ -28,11 +26,14 @@ export default function SignIn() {
 
   // Redirect if already authenticated
   React.useEffect(() => {
-    console.log('isAuthenticated', isAuthenticated);
-    if (isAuthenticated) {
-      router.push('/');
-    }
-  }, [isAuthenticated, router, user]);
+    const checkAuth = async () => {
+      const authStatus = await getAuthCookie();
+      if (authStatus) {
+        router.push('/');
+      }
+    };
+    checkAuth();
+  }, [ router, user]);
 
   const validateForm = () => {
     let tempErrors = {
@@ -72,16 +73,7 @@ export default function SignIn() {
     login(
       { email, password }, 
       {
-        onSuccess: (data:any) => {
-          router.back()
-          localStorage.setItem('auth', JSON.stringify({
-            auth_token: data.data.auth_token,
-            user: {user_id: data.data._id.$oid, first_name: data.data.first_name, last_name: data.data.last_name, email: data.data.email,},
-            isAuthenticated: true
-          }));
-
-         window.location.href = '/';
-        },
+       
         onError: (error) => {
           router.back()
           setErrors({
@@ -93,6 +85,38 @@ export default function SignIn() {
       }
     );
   };
+
+  const handleGoogleLogin = async () => {
+    router.push("?modal=signinLoading");
+    // Implement Google login logic here
+    try {
+      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
+    } catch (error) {
+      router.back();
+      console.error('Google login error:', error);
+    }
+  };
+
+  const handleAppleLogin = async () => {
+    router.push("?modal=signinLoading");
+    try {
+      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/apple`;
+    } catch (error) {
+      router.back();
+      console.error('Apple login error:', error);
+    }
+  };
+
+  const handleFacebookLogin = async () => {
+    router.push("?modal=signinLoading");
+    try {
+      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/facebook`;
+    } catch (error) {
+      router.back();
+      console.error('Facebook login error:', error);
+    }
+  };
+
   return (
     <GlassPanel className=" w-[584px] max-md:w-full max-md:!rounded-b-none max-md:!border-0 max-md:!border-t-[0.5px] flex flex-col justify-around relative text-white">
       <div className="text-white flex justify-between items-center">
@@ -160,13 +184,22 @@ export default function SignIn() {
         <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
       </div>
       <div className="flex justify-center items-center gap-[8px] my-[16px] pb-[16px]">
-        <button className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer'>
+        <button 
+          onClick={handleGoogleLogin}
+          className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer hover:bg-[#363636] transition-colors'
+        >
           <Image src="/svg-icons/google.svg" alt="google" width={20} height={20} />
         </button>
-        <button className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer'>
+        <button 
+          onClick={handleAppleLogin}
+          className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer hover:bg-[#363636] transition-colors'
+        >
           <Image src="/svg-icons/apple.svg" alt="apple" width={20} height={20} />
         </button>
-        <button className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer'>
+        <button 
+          onClick={handleFacebookLogin}
+          className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer hover:bg-[#363636] transition-colors'
+        >
           <Image src="/svg-icons/facebook.svg" alt="facebook" width={20} height={20} />
         </button>
       </div>

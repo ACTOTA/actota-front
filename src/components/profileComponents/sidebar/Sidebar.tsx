@@ -21,7 +21,7 @@ interface SidebarProps {
 
 const Sidebar = ({ onItemClick }: SidebarProps) => {
   const pathname = usePathname();
-  const user = JSON.parse(localStorage.getItem('auth') || '{}')?.user;
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   const primaryNavItems = [
     {

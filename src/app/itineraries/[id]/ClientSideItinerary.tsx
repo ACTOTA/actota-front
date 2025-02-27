@@ -61,7 +61,7 @@ interface ClientSideItineraryProps {
 export default function ClientSideItinerary({ initialData }: ClientSideItineraryProps) {
   const pathname = usePathname() as string;
   const router = useRouter();
-  const user = JSON.parse(localStorage.getItem('auth') || '{}').user;
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
   const objectId = pathname.substring(pathname.lastIndexOf('/') + 1);
   
   const [currentIndex, setCurrentIndex] = useState(0);

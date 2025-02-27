@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/src/lib/session';
 import actotaApi from '@/src/lib/apiClient';
+import { setAuthCookie } from '@/src/helpers/auth';
 export async function POST(request: Request) {
   try {
     const payload = (await request.json()) as { firstName: string; lastName: string; email: string; password: string };
@@ -9,6 +10,7 @@ export async function POST(request: Request) {
       { first_name: payload.firstName, last_name: payload.lastName, email: payload.email, password: payload.password },
     );
     if(response.data.auth_token){
+      setAuthCookie(response.data.auth_token);
       const sessionResponse = await actotaApi.get(
         "/api/auth/session",
         { headers: {
@@ -16,7 +18,7 @@ export async function POST(request: Request) {
         }},
       );
       return NextResponse.json(
-        { success: true, message: 'Signup successful', data:{...sessionResponse.data, auth_token: response.data.auth_token} },
+        { success: true, message: 'Signup successful', data: sessionResponse.data },
         { status: 200 }
       );
     }

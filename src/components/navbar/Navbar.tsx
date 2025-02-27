@@ -3,14 +3,11 @@
 import Container from "../Container";
 import Logo from "../Logo";
 import { useEffect, useState } from "react";
-import { SessionUser } from "@/src/types/session";
 import { usePathname } from "next/navigation";
-import { getCurrentUser } from "@/src/helpers/auth";
 import Button from "../figma/Button";
 import Link from "next/link";
 import { Menu } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import { signOut } from "@/src/helpers/auth";
 import Image from "next/image";
 import { LuUser } from "react-icons/lu";
 import DrawerModal from "../DrawerModal";
@@ -20,12 +17,10 @@ import Search from "./Search";
 import { useLogout } from "@/src/hooks/mutations/auth.mutation";
 import { useRouter } from "next/navigation";
 import { LoadScript } from "@react-google-maps/api";
-// import { useAuth } from "@/src/hooks/useAuth";
-
+import { getAuthCookie } from "@/src/helpers/auth";
 const Navbar = () => {
-    const user = JSON.parse(localStorage.getItem('auth') || '{}')?.user;
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
     const { mutate: signOut, isPending } = useLogout();
-    //   const { user,isAuthenticated } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
     const isAuthRoute = pathname?.startsWith('/auth');
@@ -44,22 +39,26 @@ const Navbar = () => {
     }
 
     useEffect(() => {
-        console.log("user in navbar", user);
-        if (user) {
-            setCurrentUser(user);
-        }
-        else {
-            if (window.location.pathname !== '/auth/signin') {
-                router.push('/auth/signin');
+        const checkAuth = async () => {
+            const authStatus = await getAuthCookie();
+            console.log("authStatus", authStatus);
+            if (authStatus) {
+                setCurrentUser(user);
             }
-            setCurrentUser(null);
+            else {
+                // if (window.location.pathname !== '/auth/signin') {
+                //     router.push('/auth/signin');
+                // }
+                setCurrentUser(null);
+            }
         }
-    }, [])
+        checkAuth();
+    }, []);
 
     async function handleSignout() {
         setCurrentUser(null);
         signOut();
-        router.push('/auth/signin');
+        window.location.href = '/auth/signin';
     }
 
     // if (loading) return null

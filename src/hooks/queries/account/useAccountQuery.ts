@@ -3,14 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 
 async function getAccountInfo(id: string): Promise<any> {
   try {
-    const token = JSON.parse(localStorage.getItem('auth') || '{}')?.auth_token;
   
 
-    const response = await actotaApi.get(`/api/account/${id}`,{ headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`,
-    }});
+    const response = await actotaApi.get(`/api/account/${id}`);
     console.log(response.data, "response from itinerary by id");
     return response.data;
    

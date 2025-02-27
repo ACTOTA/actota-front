@@ -20,7 +20,7 @@ import { useItineraryById } from '@/src/hooks/queries/itinerarieById/useItinerar
 const Payment = () => {
     const pathname = usePathname() as string;
   const router = useRouter();
-  const user = JSON.parse(localStorage.getItem('auth') || '{}').user;
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
   const [currentIndex, setCurrentIndex] = useState(0);
   const objectId = pathname.substring(pathname.lastIndexOf('/') + 1);
   const { data: apiResponse, isLoading, error } = useItineraryById(objectId);
