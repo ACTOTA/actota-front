@@ -57,10 +57,10 @@ const Navbar = () => {
     }, []);
 
     async function handleSignout() {
-        setCurrentUser(null);
         signOut();
         localStorage.removeItem('user');
         window.location.href = '/auth/signin';
+        setCurrentUser(null);
     }
 
     // if (loading) return null

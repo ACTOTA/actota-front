@@ -9,7 +9,13 @@ export interface Claims {
   iat: number
 };
 
-
+interface CookieOptions {
+  httpOnly: boolean;
+  secure: boolean;
+  sameSite: 'strict' | 'lax' | 'none';
+  expires: Date;
+  path: string;
+}
 
 export async function getCurrentUser() {
   const token = cookies().get('auth_token')?.value
@@ -48,8 +54,16 @@ export async function setAuthCookie(authToken: string, claims?: Claims) {
     expires: new Date(claims ? claims.exp * 1000 : Date.now() + 1000 * 60 * 60 * 24 * 30),
     path: '/'
   });
+ 
 }
 
+export async function setCookie(name: string, value: string, options: CookieOptions) {
+  cookies().set(name, value, options);
+}
+
+export async function getCookie(name: string) {
+  return cookies().get(name)?.value;
+}
 
 export async function signOut() {
   return cookies().delete('auth_token');

@@ -123,6 +123,36 @@ export default function SignUp() {
     );
   };
 
+
+  const handleGoogleLogin = async () => {
+    router.push("?modal=signinLoading");
+    try {
+      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`;
+    } catch (error) {
+      router.back();
+      console.error('Google login error:', error);
+    }
+  };
+
+  const handleAppleLogin = async () => {
+    // router.push("?modal=signinLoading");
+    try {
+      // window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/apple`;
+    } catch (error) {
+      router.back();
+      console.error('Apple login error:', error);
+    }
+  };
+
+  const handleFacebookLogin = async () => {
+    // router.push("?modal=signinLoading");
+    try {
+      // window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/facebook`;
+    } catch (error) {
+      router.back();
+      console.error('Facebook login error:', error);
+    }
+  };
   return (
     <GlassPanel className="w-[584px] max-md:w-full max-md:!rounded-b-none max-md:!border-0 max-md:!border-t-[0.5px] flex flex-col justify-around relative text-white">
       <div className="text-white flex justify-between items-center">
@@ -217,14 +247,14 @@ export default function SignUp() {
         <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
       </div>
       <div className="flex justify-center items-center gap-[8px] my-[16px] pb-[16px]">
-        <button className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer'>
+        <button onClick={handleGoogleLogin} className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer'>
 
           <Image src="/svg-icons/google.svg" alt="google" width={20} height={20} />
         </button>
-        <button className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer'>
+        <button onClick={handleAppleLogin} className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer'>
           <Image src="/svg-icons/apple.svg" alt="apple" width={20} height={20} />
         </button>
-        <button className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer'>
+        <button onClick={handleFacebookLogin} className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer'>
           <Image src="/svg-icons/facebook.svg" alt="facebook" width={20} height={20} />
         </button>
       </div>
