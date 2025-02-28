@@ -31,7 +31,9 @@ export default function Hero() {
         getCurrentUser().then((user: any) => {
           if (user) {
             console.log('user', user);
-            localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem('user', JSON.stringify(
+              {user_id: user._id.$oid, first_name: user.first_name, last_name: user.last_name, email: user.email,}
+            ));
             router.push('/');
           } else {
             router.push('/auth/signin?error=no_user');
