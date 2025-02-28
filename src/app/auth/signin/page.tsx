@@ -95,9 +95,8 @@ export default function SignIn() {
 
   const handleGoogleLogin = async () => {
     router.push("?modal=signinLoading");
-    // Implement Google login logic here
     try {
-      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
+      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`;
     } catch (error) {
       router.back();
       console.error('Google login error:', error);
@@ -107,7 +106,7 @@ export default function SignIn() {
   const handleAppleLogin = async () => {
     router.push("?modal=signinLoading");
     try {
-      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/apple`;
+      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/apple`;
     } catch (error) {
       router.back();
       console.error('Apple login error:', error);
@@ -117,7 +116,7 @@ export default function SignIn() {
   const handleFacebookLogin = async () => {
     router.push("?modal=signinLoading");
     try {
-      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/facebook`;
+      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/facebook`;
     } catch (error) {
       router.back();
       console.error('Facebook login error:', error);

@@ -43,6 +43,7 @@ const Navbar = () => {
             const authStatus = await getAuthCookie();
             console.log("authStatus", authStatus);
             if (authStatus) {
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
                 setCurrentUser(user);
             }
             else {

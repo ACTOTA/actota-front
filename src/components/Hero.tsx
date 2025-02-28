@@ -1,22 +1,47 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Search from '@/src/components/navbar/Search';
 import { Alex_Brush } from 'next/font/google';
 import { STEPS } from '../types/steps';
 import { useRouter } from 'next/navigation';
 import { FaHiking } from 'react-icons/fa';
+import { getCurrentUser, setAuthCookie } from '@/src/helpers/auth';
+import { useSearchParams } from 'next/navigation';
 const alexBrush = Alex_Brush({
     weight: ['400'],
     subsets: ['latin'],
 });
 
 export default function Hero() {
+    const searchParams = useSearchParams();
     const router = useRouter();
     const [currStep, setCurrStep] = useState<STEPS | null>(null);
     const [classes, setClasses] = React.useState<string>('');
     const [showCookieBanner, setShowCookieBanner] = React.useState<boolean>(false);
+
+  
+    useEffect(() => {
+        const token = searchParams.get('token');
+        
+        if (token) {
+
+        setAuthCookie(token);
+        getCurrentUser().then((user: any) => {
+          if (user) {
+            console.log('user', user);
+            localStorage.setItem('user', JSON.stringify(user));
+            router.push('/');
+          } else {
+            router.push('/auth/signin?error=no_user');
+          }
+        });
+          // Redirect to dashboard or home
+        //   router.push('/');
+        }
+      }, [searchParams, router]);
+
     // setTimeout(() => {
     //     if ( !showCookieBanner) {
     //         router.push("?modal=cookieBanner");
