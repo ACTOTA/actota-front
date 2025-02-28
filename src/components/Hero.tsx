@@ -20,6 +20,7 @@ export default function Hero() {
   const router = useRouter();
   const [currStep, setCurrStep] = useState<STEPS | null>(null);
   const [classes, setClasses] = React.useState<string>('');
+  const [cookieChecked, setCookieChecked] = useState(false);
 
   useEffect(() => {
     const token = searchParams.get('token');
@@ -42,13 +43,25 @@ export default function Hero() {
     }
   }, [searchParams, router]);
 
-  setTimeout(async () => {
-    const cookie: any = await getCookie('cookies');
-    console.log('cookie', cookie);
-    if (!cookie) {
-      router.push("?modal=cookieBanner");
-    }
-  }, 5000);
+  useEffect(() => {
+    const checkCookie = async () => {
+      if (!cookieChecked) {
+        const cookie: any = await getCookie('cookies');
+        console.log('cookie', cookie);
+        if (!cookie) {
+          router.push("?modal=cookieBanner");
+        }
+        setCookieChecked(true);
+      }
+    };
+
+    const timeoutId = setTimeout(() => {
+      checkCookie();
+    }, 5000);
+
+    return () => clearTimeout(timeoutId);
+  }, [cookieChecked, router]);
+
   return (
     <div className="w-full h-[100vh] relative flex items-center justify-center">
       <Image
