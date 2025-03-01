@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../../figma/Button";
 import Link from "next/link";
 import Input from "@/src/components/figma/Input";
@@ -11,9 +11,10 @@ import TrashIcon from "@/public/svg-icons/trash.svg";
 import { RiVisaLine } from "react-icons/ri";
 import Dropdown from "../../figma/Dropdown";
 import { useRouter } from "next/navigation";
+import { usePaymentMethods } from "@/src/hooks/queries/account/usePaymentMethodsQuery";
 
 interface Card {
-  id: number;
+  id: string | number;
   cardType: string;
   cardNumber: string;
   expiryDate: string;
@@ -34,24 +35,27 @@ const Payment = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("bookingsHistory");
   const [search, setSearch] = useState("");
-  const [savedCards, setSavedCards] = useState<Card[]>([
-    {
-      id: 1,
-      cardType: "Visa",
-      cardNumber: "1234567890123456",
-      expiryDate: "01/25",
-      cvv: "123",
-      isDefault: true,
-    },
-    {
-      id: 2,
-      cardType: "MasterCard",
-      cardNumber: "1234567890123456",
-      expiryDate: "01/25",
-      cvv: "123",
-      isDefault: false,
-    },
-  ]);
+
+  const { data: paymentMethods } = usePaymentMethods();
+  const [savedCards, setSavedCards] = useState<Card[]>([]);
+
+  // Convert payment methods data to card format when data is available
+  useEffect(() => {
+    if (paymentMethods && paymentMethods.length > 0) {
+      const formattedCards: Card[] = paymentMethods.map((method, index) => ({
+        id: method.id,
+        cardType: method.card.brand.charAt(0).toUpperCase() + method.card.brand.slice(1), // Capitalize brand name
+        cardNumber: `**** **** **** ${method.card.last4}`,
+        expiryDate: `${String(method.card.exp_month).padStart(2, '0')}/${String(method.card.exp_year).slice(-2)}`,
+        cvv: "***",
+        isDefault: index === 0, // Set first card as default
+        cardHolderName: method.billing_details.name || 'Card Holder'
+      }));
+
+      setSavedCards(formattedCards);
+    }
+  }, [paymentMethods]);
+
   const [addNewCard, setAddNewCard] = useState(false);
   const [cardFormData, setCardFormData] = useState<CardFormData>({
     cardHolderName: '',
@@ -107,6 +111,22 @@ const Payment = () => {
       component: <>Payment Methods</>,
     },
   ];
+
+  // Helper function to get the appropriate card brand image
+  const getCardBrandImage = (brand: string) => {
+    switch (brand.toLowerCase()) {
+      case 'visa':
+        return "/svg-icons/visa-logo.svg";
+      case 'mastercard':
+        return "/svg-icons/mastercard-logo.svg";
+      case 'amex':
+        return "/svg-icons/amex-logo.svg"; // If you have this asset
+      case 'discover':
+        return "/svg-icons/discover-logo.svg"; // If you have this asset
+      default:
+        return "/svg-icons/credit-card.svg"; // Default fallback
+    }
+  };
 
   // Validation function for card details
   const validateCardForm = () => {
@@ -184,6 +204,23 @@ const Payment = () => {
     }));
   };
 
+  // Detect card type based on the card number
+  const detectCardType = (cardNumber: string): string => {
+    const cleanNumber = cardNumber.replace(/\s+/g, '');
+
+    if (/^4/.test(cleanNumber)) {
+      return 'Visa';
+    } else if (/^5[1-5]/.test(cleanNumber)) {
+      return 'MasterCard';
+    } else if (/^3[47]/.test(cleanNumber)) {
+      return 'Amex';
+    } else if (/^6(?:011|5)/.test(cleanNumber)) {
+      return 'Discover';
+    } else {
+      return 'Unknown';
+    }
+  };
+
   // Add new card
   const handleAddCard = () => {
     if (!validateCardForm()) {
@@ -192,7 +229,7 @@ const Payment = () => {
 
     const newCard: Card = {
       id: Date.now(),
-      cardType: cardFormData.cardNumber.startsWith('4') ? 'Visa' : 'MasterCard',
+      cardType: detectCardType(cardFormData.cardNumber),
       cardNumber: cardFormData.cardNumber,
       expiryDate: cardFormData.expiryDate,
       cvv: cardFormData.cvv,
@@ -219,29 +256,31 @@ const Payment = () => {
   };
 
   // Delete card
-  const handleDeleteCard = (cardId: number) => {
+  const handleDeleteCard = (cardId: string | number) => {
     router.push("?modal=deletePaymentCard");
-    // setSavedCards(prev => {
-    //   const deletedCard = prev.find(card => card.id === cardId);
-    //   const remainingCards = prev.filter(card => card.id !== cardId);
-
-    //   // If deleted card was default, set first remaining card as default
-    //   if (deletedCard?.isDefault && remainingCards.length > 0) {
-    //     remainingCards[0].isDefault = true;
-    //   }
-
-    //   return remainingCards;
-    // });
+    // Implementation to actually delete the card would go here
+    // This would typically involve an API call to delete the payment method
   };
 
   // Set card as default
-  const handleSetDefaultCard = (cardId: number) => {
+  const handleSetDefaultCard = (cardId: string | number) => {
     setSavedCards(prev =>
       prev.map(card => ({
         ...card,
         isDefault: card.id === cardId
       }))
     );
+    // In a real implementation, you would also make an API call to update the default payment method
+  };
+
+  // Function to format and mask card number for display
+  const formatCardNumberForDisplay = (cardNumber: string) => {
+    if (cardNumber.includes('****')) {
+      return cardNumber; // Already masked
+    }
+
+    const last4 = cardNumber.replace(/\s+/g, '').slice(-4);
+    return `**** **** **** ${last4}`;
   };
 
   return (
@@ -334,41 +373,48 @@ const Payment = () => {
             </table>
           </div> :
           <div>
-            <p className="font-bold text-2xl mb-8">Saved Cards</p>
+            <p className="font-bold text-2xl mb-8">Saved Cards {savedCards.length > 0 && `(${savedCards.length})`}</p>
 
-            {savedCards.map((item) => (
-              <div key={item.id} className="">
-                <div className="flex items-center justify-between bg-[#666666]/10 rounded-2xl border max-sm:border-none border-primary-gray p-4 mb-2">
-                  <div className="text-white  text-xl font-bold flex items-center max-sm:flex-col max-sm:items-start justify-start gap-2">
-                    <div className="flex items-center justify-center max-sm:justify-start sm:bg-black rounded-lg sm:h-[50px] w-[80px] max-sm:w-full">
-                      <Image src={item.cardType === "Visa" ? "/svg-icons/visa-logo.svg" : "/svg-icons/mastercard-logo.svg"} alt="card" height={24} width={38} />
-                    </div>
+            {savedCards.length > 0 ? (
+              savedCards.map((item) => (
+                <div key={item.id} className="">
+                  <div className="flex items-center justify-between bg-[#666666]/10 rounded-2xl border max-sm:border-none border-primary-gray p-4 mb-2">
+                    <div className="text-white text-xl font-bold flex items-center max-sm:flex-col max-sm:items-start justify-start gap-2">
+                      <div className="flex items-center justify-center max-sm:justify-start sm:bg-black rounded-lg sm:h-[50px] w-[80px] max-sm:w-full">
+                        <Image src={getCardBrandImage(item.cardType)} alt={item.cardType} height={24} width={38} />
+                      </div>
 
-                    <div className=" gap-1">
-                      <p className="text-white font-bold">{item.cardNumber}</p>
-                      <p className="text-primary-gray text-sm"> Exp. Date  <span className="text-white"> {item.expiryDate}</span></p>
+                      <div className="gap-1">
+                        <p className="text-white font-bold">{formatCardNumberForDisplay(item.cardNumber)}</p>
+                        <p className="text-primary-gray text-sm"> Exp. Date <span className="text-white">{item.expiryDate}</span></p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center max-sm:flex-col max-sm:items-end  gap-2">
-                    {item.isDefault ?
-                      <Button variant="primary" size="sm" className={`mx-auto !bg-[#215CBA] !text-white`}>Default</Button> :
-                      <Button
-                        variant="simple"
-                        size="sm"
-                        className={`!p-0 !text-[#BBD4FB] border-b border-[#BBD4FB] !rounded-none`}
-                        onClick={() => handleSetDefaultCard(item.id)}
-                      >
-                        Set as default
-                      </Button>
-                    }
-                    <button onClick={() => handleDeleteCard(item.id)}>
-                      <TrashIcon className="text-white" />
-                    </button>
+                    <div className="flex items-center max-sm:flex-col max-sm:items-end gap-2">
+                      {item.isDefault ?
+                        <Button variant="primary" size="sm" className={`mx-auto !bg-[#215CBA] !text-white`}>Default</Button> :
+                        <Button
+                          variant="simple"
+                          size="sm"
+                          className={`!p-0 !text-[#BBD4FB] border-b border-[#BBD4FB] !rounded-none`}
+                          onClick={() => handleSetDefaultCard(item.id)}
+                        >
+                          Set as default
+                        </Button>
+                      }
+                      <button onClick={() => handleDeleteCard(item.id)}>
+                        <TrashIcon className="text-white" />
+                      </button>
+                    </div>
                   </div>
                 </div>
-
+              ))
+            ) : (
+              <div className="text-center py-8 text-primary-gray">
+                <p>No saved cards found.</p>
+                <p className="mt-2">Add a new card to get started.</p>
               </div>
-            ))}
+            )}
+
             {!addNewCard && (
               <div className="flex justify-end w-full items-end mt-8">
                 <Button variant="primary" size="md" onClick={() => setAddNewCard(true)}>Add New Card</Button>
@@ -471,7 +517,7 @@ const Payment = () => {
                     </Button>
                   </div>
                 </div>
-                <div className="flex-1 max-sm:hidden"/>
+                <div className="flex-1 max-sm:hidden" />
               </div>
             )}
           </div>

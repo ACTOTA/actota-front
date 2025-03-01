@@ -19,12 +19,12 @@ import { IoAlertCircleOutline } from 'react-icons/io5'
 import { useItineraryById } from '@/src/hooks/queries/itinerarieById/useItineraryByIdQuery'
 const Payment = () => {
     const pathname = usePathname() as string;
-  const router = useRouter();
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const objectId = pathname.substring(pathname.lastIndexOf('/') + 1);
-  const { data: apiResponse, isLoading, error } = useItineraryById(objectId);
-  const [itineraryData, setItineraryData] = useState<any | null>(null);
+    const router = useRouter();
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const objectId = pathname.substring(pathname.lastIndexOf('/') + 1);
+    const { data: apiResponse, isLoading, error } = useItineraryById(objectId);
+    const [itineraryData, setItineraryData] = useState<any | null>(null);
     const [showPaymentReview, setShowPaymentReview] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState([{
         id: 1,
@@ -105,34 +105,34 @@ const Payment = () => {
 
 
 
-  useEffect(() => {
-    if (apiResponse) {
-      console.log('Setting itinerary data:', apiResponse);
-      setItineraryData(apiResponse);
+    useEffect(() => {
+        if (apiResponse) {
+            console.log('Setting itinerary data:', apiResponse);
+            setItineraryData(apiResponse);
+        }
+    }, [apiResponse]);
+
+    const basePrice = itineraryData?.person_cost * (itineraryData?.min_group || 1);
+    const selectedInsurance = paymentInsurance
+        .filter(insurance => insurance.selected)
+        .reduce((total, insurance) => total + insurance.price, 0);
+    const totalAmount = basePrice + selectedInsurance;
+
+
+    if (isLoading) {
+        return <div className='text-white flex justify-center items-center h-screen'>Loading...</div>;
     }
-  }, [apiResponse]);
 
-  const basePrice = itineraryData?.person_cost * (itineraryData?.min_group || 1);
-  const selectedInsurance = paymentInsurance
-    .filter(insurance => insurance.selected)
-    .reduce((total, insurance) => total + insurance.price, 0);
-  const totalAmount = basePrice + selectedInsurance;
+    if (error) {
+        console.error('Error details:', error);
+        return <div className='text-white flex justify-center items-center h-screen'>{user ? 'Error: ' + error.message : 'Please login to view itinerary details'}</div>;
+    }
 
+    console.log('Rendering with data:', { apiResponse, itineraryData });
 
-  if (isLoading) {
-    return <div className='text-white flex justify-center items-center h-screen'>Loading...</div>;
-  }
-
-  if (error) {
-    console.error('Error details:', error);
-    return <div className='text-white flex justify-center items-center h-screen'>{user ? 'Error: ' + error.message : 'Please login to view itinerary details'}</div>;
-  }
-
-  console.log('Rendering with data:', { apiResponse, itineraryData });
-
-  if (!itineraryData) {
-    return <div className='text-white flex justify-center items-center h-screen'>Loading itinerary data...</div>;
-  }
+    if (!itineraryData) {
+        return <div className='text-white flex justify-center items-center h-screen'>Loading itinerary data...</div>;
+    }
     return (
         <section className='w-full !h-full text-white   bg-[url("/images/payment-page-bg.png")] bg-cover bg-center bg-repeat'>
             <div className='grid grid-cols-6 gap-6 pt-[78px]'>
@@ -144,7 +144,7 @@ const Payment = () => {
                         <p className='text-primary-gray text-sm'>Itineraries /  {itineraryData.trip_name}  /   <span className='text-white'>Confirm Reservation</span></p>
                     </div>
                     <h1 className='text-4xl font-bold'>Confirm your Reservation</h1>
-                    <PaymentPageCard itineraryData={itineraryData}  />
+                    <PaymentPageCard itineraryData={itineraryData} />
                     <p className='text-white text-2xl font-bold mt-12'>Insurance</p>
                     {paymentInsurance.map((insurance) => (
                         <PaymentInsuranceCard
@@ -307,10 +307,10 @@ const Payment = () => {
                     <p className='text-sm text-[#BBD4FB] mt-1'>You saved $45 on this booking!</p>
                     <p className='text-xl  mt-8'>Payment Detail</p>
 
-                <div className='flex justify-between mt-2'>
-                    <p className='text-sm text-primary-gray'>Base Cost (${itineraryData.person_cost} × {itineraryData.min_group} guests)</p>
-                    <p className='text-sm text-white'>${basePrice}</p>
-                </div>
+                    <div className='flex justify-between mt-2'>
+                        <p className='text-sm text-primary-gray'>Base Cost (${itineraryData.person_cost} × {itineraryData.min_group} guests)</p>
+                        <p className='text-sm text-white'>${basePrice}</p>
+                    </div>
                     <div className='flex justify-between mt-2' >
                         <p className='text-sm text-primary-gray'>Activity Cost</p>
                         <p className='text-sm text-white'> ${itineraryData.activity_cost || 0}</p>
@@ -332,11 +332,11 @@ const Payment = () => {
                         <p className='text-sm text-white'> ${itineraryData.service_fee || 0}</p>
                     </div>
                     {paymentInsurance.filter(insurance => insurance.selected).map(insurance => (
-                    <div key={insurance.id} className='flex justify-between mt-2'>
-                        <p className='text-sm text-primary-gray'>{insurance.name}</p>
-                        <p className='text-sm text-white'>${insurance.price}</p>
-                    </div>
-                ))}
+                        <div key={insurance.id} className='flex justify-between mt-2'>
+                            <p className='text-sm text-primary-gray'>{insurance.name}</p>
+                            <p className='text-sm text-white'>${insurance.price}</p>
+                        </div>
+                    ))}
                     <div className='flex justify-between mt-2' >
                         <p className='text-sm text-primary-gray'>Promo Code</p>
                         <p className='text-sm text-[#5389DF]'> ${itineraryData.promo_code || 0}</p>
