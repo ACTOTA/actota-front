@@ -5,6 +5,31 @@
 body {
   background-color: black;
 }
+.gradient-bg {
+  background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
+ 
+  backdrop-filter: blur(10px); /* Glass effect */
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
+.PhoneInputInput {
+  background-color: black !important;
+}
+
+.PhoneInputInput > input {
+  border: none !important;
+  border-left: 1px solid #9C9C9C !important;
+  outline: none !important;
+  box-shadow: none !important;
+  /* background-color: red !important; */
+}
 
 /* 
 html,

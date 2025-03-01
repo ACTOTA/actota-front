@@ -17,7 +17,7 @@ export default function AuthLayout({
         className="absolute inset-0 w-full h-screen object-cover"
         priority
       />
-      <div className=" w-full flex-1 flex items-center justify-center">
+      <div className="min-h-screen w-full flex-1 flex items-center max-md:items-end justify-center">
         {children}
       </div>
     </main>

@@ -1,11 +1,14 @@
 import React from "react";
-import { Nunito ,Manrope} from 'next/font/google';
+import { Nunito, Manrope } from "next/font/google";
 import "./globals.css";
-
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import Navbar from "@/src/components/navbar/Navbar";
-import ClientOnly from '@/src/components/ClientOnly';
-
-
+import ClientOnly from "@/src/components/ClientOnly";
+import ModalContainer from "../components/ModalContainer";
+import DrawerModal from "../components/DrawerModal";
+import { Providers } from "./providers";
+import { Toaster } from "react-hot-toast";
 export const metadata = {
   title: "ACTOTA!",
   description: "Personalized Tours Made Easy",
@@ -17,32 +20,30 @@ export const metadata = {
       rel: "apple-touch-icon-precomposed",
       url: "/images/logo.png",
     },
-    
   },
 };
 
 const font = Manrope({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 export default async function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-
   return (
     <html lang="en">
       <body className={`${font.className}`}>
-        <ClientOnly>
-          <Navbar />
-        </ClientOnly>
-        <div>
-          {children}
-        </div>
-
+        <Providers>
+          <ClientOnly>
+            <ModalContainer />
+            <Navbar />
+          </ClientOnly>
+          <div>{children}</div>
+        <Toaster />
+        </Providers>
       </body>
     </html>
   );

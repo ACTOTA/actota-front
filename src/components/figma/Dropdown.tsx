@@ -1,42 +1,87 @@
-// 'use client'
-//
-// import { useState } from 'react'
-// import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
-// import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
-//
-//
-//
-// export default function Dropdown(items: array) {
-//   const [selected, setSelected] = useState(items[0])
-//
-//   return (
-//     <Listbox value={selected} onChange={setSelected}>
-//       <Label className="block text-sm/6 font-medium text-gray-900">Assigned to</Label>
-//       <div className="relative mt-2">
-//         <ListboxButton className="relative w-full cursor-default rounded-md bg-white py-1.5 pl-3 pr-10 text-left text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm/6">
-//           <span className="pointer-events-none absolute inset-y-0 right-0 ml-3 flex items-center pr-2">
-//             <ChevronUpDownIcon aria-hidden="true" className="size-5 text-gray-400" />
-//           </span>
-//         </ListboxButton>
-//
-//         <ListboxOptions
-//           transition
-//           className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none data-[closed]:data-[leave]:opacity-0 data-[leave]:transition data-[leave]:duration-100 data-[leave]:ease-in sm:text-sm"
-//         >
-//           {items.map((item) => (
-//             <ListboxOption
-//               key={item.id}
-//               value={item.label}
-//               className="group relative cursor-default select-none py-2 pl-3 pr-9 text-gray-900 data-[focus]:bg-indigo-600 data-[focus]:text-white"
-//             >
-//               <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-indigo-600 group-data-[focus]:text-white [.group:not([data-selected])_&]:hidden">
-//                 <CheckIcon aria-hidden="true" className="size-5" />
-//               </span>
-//             </ListboxOption>
-//           ))}
-//         </ListboxOptions>
-//       </div>
-//     </Listbox>
-//   )
-// }
-//
+// components/Dropdown.js
+import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/20/solid";
+import { useState } from "react";
+
+interface DropdownProps {
+  label?: any;
+  options: string[];
+  onSelect: (selected: string | string[]) => void;
+  placeholder?: string;
+  multiSelect?: boolean;
+  isOpend?: boolean;
+  setIsOpend?: (isOpend: boolean) => void;
+  className?: string;
+}
+
+export default function Dropdown({
+  label,
+  options,
+  onSelect,
+  placeholder = "Select",
+  multiSelect = false,
+  isOpend = false,
+  setIsOpend = () => { },
+  className
+}: DropdownProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selected, setSelected] = useState<string[] | string | null>(multiSelect ? [] : null);
+
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+    setIsOpend(!isOpend);
+  }
+
+  const handleSelect = (option: string) => {
+    if (multiSelect) {
+      const isSelected = (selected as string[])?.includes(option);
+      const newSelected = isSelected
+        ? (selected as string[]).filter((item) => item !== option)
+        : [...(selected as string[] || []), option];
+      setSelected(newSelected);
+      onSelect(newSelected);
+    } else {
+      setSelected(option);
+      onSelect(option);
+      setIsOpen(false);
+    }
+  };
+
+  const isSelected = (option: string) =>
+    multiSelect ? (selected as string[])?.includes(option) : selected === option;
+
+  return (
+    <div className={`relative  w-full `}>
+      <button
+        type="button"
+        className={`w-full px-4 py-3 text-left bg-black/20 text-white rounded-lg  hover:bg-[#262626] focus:outline-none border border-primary-gray whitespace-nowrap flex items-center justify-between gap-2 ${className}`}
+        onClick={toggleDropdown}
+      >
+        {label && <div className="flex items-center gap-2">
+
+          {label}
+        </div>}
+        {multiSelect
+          ? (selected as string[])?.length > 0
+            ? (selected as string[]).join(", ")
+            : placeholder
+          : selected || placeholder}
+        <span className="float-right">{isOpen ? <ChevronUpIcon aria-hidden="true" className="h-[24px] w-[24px " /> : <ChevronDownIcon aria-hidden="true" className="h-[24px] w-[24px " />}</span>
+      </button>
+
+      {isOpen && (
+        <ul className={`absolute z-10 w-full bg-black text-white rounded-lg shadow-lg mt-2 max-h-48 overflow-auto ${isOpen && options.length > 0 ? ' border border-primary-gray' : ' '}`}>
+          {options.map((option, index) => (
+            <li
+              key={index}
+              className={`px-4 py-2 cursor-pointer hover:bg-[#262626] ${isSelected(option) ? "bg-[#262626]" : ""
+                }`}
+              onClick={() => handleSelect(option)}
+            >
+              {option}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}

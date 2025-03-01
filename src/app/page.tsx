@@ -1,17 +1,14 @@
 import React from 'react';
 import ClientOnly from "@/src/components/ClientOnly";
 import Hero from "@/src/components/Hero";
-import WhyBook from "@/src/components/WhyBook";
-import Newsletter from "@/src/components/Newsletter";
-import Footer from "@/src/components/Footer";
+
 import Head from 'next/head';
-import FeaturedItineraries from "@/src/components/FeaturedItineraries";
-import FAQs from '@/src/components/FAQs';
+import { Providers } from '@/src/app/providers';
+import Landing from "@/src/components/Landing";
 
 export default async function Home() {
 
 
-  // Since NearbyData is now properly imported, use it directly
   return (
     <>
       <Head>
@@ -25,11 +22,9 @@ export default async function Home() {
       <Hero />
 
       <ClientOnly>
-        <FeaturedItineraries />
-        <WhyBook />
-        <FAQs />
-        <Newsletter />
-        <Footer />
+        <Providers>
+          <Landing />
+        </Providers>
       </ClientOnly>
     </>
   );
