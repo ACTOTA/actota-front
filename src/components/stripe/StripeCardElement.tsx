@@ -41,8 +41,12 @@ const StripeCardForm = ({
             return;
           }
 
+          console.log('Fetching customer ID for user:', userId);
+
           const response = await actotaApi.post(`/api/account/${userId}/customer`);
           const { customer_id } = response.data;
+
+          console.log('Customer ID:', customer_id);
 
           if (customer_id) {
             setCustomerId(customer_id);

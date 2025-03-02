@@ -12,6 +12,8 @@ import { RiVisaLine } from "react-icons/ri";
 import Dropdown from "../../figma/Dropdown";
 import { useRouter } from "next/navigation";
 import { usePaymentMethods } from "@/src/hooks/queries/account/usePaymentMethodsQuery";
+import { useAttachPaymentMethod } from "@/src/hooks/mutations/payment.mutation";
+import StripeCardElement from "../../stripe/StripeCardElement";
 
 interface Card {
   id: string | number;
@@ -38,11 +40,13 @@ const Payment = () => {
 
   const { data: paymentMethods } = usePaymentMethods();
   const [savedCards, setSavedCards] = useState<Card[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { mutate: attachPaymentMethod } = useAttachPaymentMethod();
 
   // Convert payment methods data to card format when data is available
   useEffect(() => {
     if (paymentMethods && paymentMethods.length > 0) {
-      const formattedCards: Card[] = paymentMethods.map((method, index) => ({
+      const formattedCards: Card[] = paymentMethods.map((method: any, index: number) => ({
         id: method.id,
         cardType: method.card.brand.charAt(0).toUpperCase() + method.card.brand.slice(1), // Capitalize brand name
         cardNumber: `**** **** **** ${method.card.last4}`,
@@ -221,38 +225,15 @@ const Payment = () => {
     }
   };
 
-  // Add new card
+  // Add new card - this method is no longer used as the Stripe integration replaced it
   const handleAddCard = () => {
     if (!validateCardForm()) {
       return;
     }
-
-    const newCard: Card = {
-      id: Date.now(),
-      cardType: detectCardType(cardFormData.cardNumber),
-      cardNumber: cardFormData.cardNumber,
-      expiryDate: cardFormData.expiryDate,
-      cvv: cardFormData.cvv,
-      cardHolderName: cardFormData.cardHolderName,
-      isDefault: cardFormData.setAsDefault
-    };
-
-    setSavedCards(prev => {
-      let newCards = [...prev];
-      if (cardFormData.setAsDefault) {
-        newCards = newCards.map(card => ({ ...card, isDefault: false }));
-      }
-      return [...newCards, newCard];
-    });
-
-    setAddNewCard(false);
-    setCardFormData({
-      cardHolderName: '',
-      cardNumber: '',
-      expiryDate: '',
-      cvv: '',
-      setAsDefault: false
-    });
+    
+    // This function is kept for reference but is no longer used
+    // Now we use the Stripe Card Element to create payment methods
+    console.log("This method is deprecated. Using Stripe Card Element instead.");
   };
 
   // Delete card
@@ -422,7 +403,7 @@ const Payment = () => {
             )}
             {addNewCard && (
               <div className='flex gap-2 mt-8 w-full'>
-                <div className='sm:flex-1 flex flex-col gap-2  max-sm:w-full'>
+                <div className='sm:flex-1 flex flex-col gap-2 max-sm:w-full'>
                   <div className="flex items-center justify-between">
                     <p className='text-white text-xl font-bold flex items-center gap-2'>
                       <MdOutlineAddCard className="text-white size-6" /> Add a new card
@@ -448,56 +429,6 @@ const Payment = () => {
                       </div>
                     )}
                   </div>
-                  <div>
-                    <p className="text-primary-gray w-96 text-left mb-1 mt-[10px]">Card Number</p>
-                    <Input
-                      type="text"
-                      name="cardNumber"
-                      value={cardFormData.cardNumber}
-                      onChange={handleCardNumberChange}
-                      placeholder="Card Number"
-                      className={cardErrors.cardNumber ? 'border-[#79071D] ring-1 ring-[#79071D]' : ''}
-                    />
-                    {cardErrors.cardNumber && (
-                      <div className="mt-1 px-2 py-1 text-sm text-white bg-[#79071D] rounded">
-                        {cardErrors.cardNumber}
-                      </div>
-                    )}
-                  </div>
-                  <div className='flex gap-2'>
-                    <div className='flex-1'>
-                      <p className="text-primary-gray text-left mb-1 mt-[10px]">Expiry Date</p>
-                      <Input
-                        type="text"
-                        name="expiryDate"
-                        value={cardFormData.expiryDate}
-                        onChange={handleCardInputChange}
-                        placeholder="MM/YY"
-                        className={cardErrors.expiryDate ? 'border-[#79071D] ring-1 ring-[#79071D]' : ''}
-                      />
-                      {cardErrors.expiryDate && (
-                        <div className="mt-1 px-2 py-1 text-sm text-white bg-[#79071D] rounded">
-                          {cardErrors.expiryDate}
-                        </div>
-                      )}
-                    </div>
-                    <div className='flex-1'>
-                      <p className="text-primary-gray text-left mb-1 mt-[10px]">CVV</p>
-                      <Input
-                        type="text"
-                        name="cvv"
-                        value={cardFormData.cvv}
-                        onChange={handleCardInputChange}
-                        placeholder="***"
-                        className={cardErrors.cvv ? 'border-[#79071D] ring-1 ring-[#79071D]' : ''}
-                      />
-                      {cardErrors.cvv && (
-                        <div className="mt-1 px-2 py-1 text-sm text-white bg-[#79071D] rounded">
-                          {cardErrors.cvv}
-                        </div>
-                      )}
-                    </div>
-                  </div>
                   <div className="flex items-center gap-2 mt-[10px]">
                     <input
                       type="checkbox"
@@ -508,14 +439,27 @@ const Payment = () => {
                     />
                     <p className="text-primary-gray text-sm">Set as default</p>
                   </div>
-                  <div className="flex justify-end mt-[10px]">
-                    <Button
-                      variant="primary"
-                      onClick={handleAddCard}
-                    >
-                      Save Card
-                    </Button>
-                  </div>
+                  
+                  {/* Stripe Card Element */}
+                  <StripeCardElement 
+                    onSuccess={(paymentMethodId) => {
+                      // Call the mutation to attach the payment method to customer
+                      attachPaymentMethod({
+                        paymentMethodId,
+                        setAsDefault: cardFormData.setAsDefault
+                      });
+                      // Close the form
+                      setAddNewCard(false);
+                    }}
+                    onError={(error) => {
+                      console.error("Stripe error:", error);
+                      // Handle error (could set an error state here)
+                    }}
+                    setAsDefault={cardFormData.setAsDefault}
+                    cardHolderName={cardFormData.cardHolderName}
+                    isSubmitting={isSubmitting}
+                    setIsSubmitting={setIsSubmitting}
+                  />
                 </div>
                 <div className="flex-1 max-sm:hidden" />
               </div>
