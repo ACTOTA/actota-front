@@ -2,7 +2,6 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getSession } from "@/src/lib/session";
 import actotaApi from "@/src/lib/apiClient";
 
 export async function POST(request: NextRequest) {
@@ -19,9 +18,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get the user session for authentication
-    const session = getSession();
-    if (!session?.user) {
+    // Get the auth token
+    const token = cookies().get('auth_token')?.value;
+    if (!token) {
       return NextResponse.json(
         { error: "Authentication required" },
         { status: 401 }
@@ -32,15 +31,15 @@ export async function POST(request: NextRequest) {
     // This is important because Stripe operations should be performed
     // on the server side for security reasons
     const response = await actotaApi.post(
-      `/stripe/attach-payment-method`,
+      `/account/${paymentMethodId}/attach-payment-method`,
       {
-        customerId,
-        paymentMethodId,
-        setAsDefault: setAsDefault || false,
+        customer_id: customerId,
+        payment_id: paymentMethodId,
+        default: setAsDefault || false,
       },
       {
         headers: {
-          Authorization: `Bearer ${session.accessToken}`,
+          Authorization: `Bearer ${token}`,
         },
       }
     );

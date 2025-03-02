@@ -1,15 +1,28 @@
 import actotaApi from '@/src/lib/apiClient';
 import { useQuery } from '@tanstack/react-query';
 
+import { getClientSession } from '@/src/lib/session';
+
 async function getPaymentMethods(): Promise<any> {
   try {
-    // Only access localStorage in browser environment
+    // Only access session in browser environment
     let userId = '';
     if (typeof window !== 'undefined') {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      userId = user.user_id;
-
-      if (!userId) {
+      try {
+        const session = getClientSession();
+        if (!session.isLoggedIn || !session.user?.user_id) {
+          // Fall back to localStorage for compatibility
+          const user = JSON.parse(localStorage.getItem('user') || '{}');
+          userId = user.user_id;
+          
+          if (!userId) {
+            throw new Error("Please login");
+          }
+        } else {
+          userId = session.user.user_id;
+        }
+      } catch (error) {
+        console.error('Error accessing session:', error);
         throw new Error("Please login");
       }
     } else {

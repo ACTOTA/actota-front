@@ -1,6 +1,33 @@
-import { cookies } from "next/headers";
-import { serverEnv } from "@/src/lib/config/env/server-env";
+'use client';
 
-export const getSession = () => {
-    return null;
-};  
+import { Session, SessionUser } from "@/src/types/session";
+
+// Helper function to get session client-side (uses localStorage)
+export const getClientSession = (): Session => {
+  if (typeof window === 'undefined') {
+    return { user: null, isLoggedIn: false };
+  }
+
+  try {
+    const userStr = localStorage.getItem('user');
+    if (!userStr) {
+      return { user: null, isLoggedIn: false };
+    }
+
+    const user = JSON.parse(userStr);
+    if (!user || !user.user_id) {
+      return { user: null, isLoggedIn: false };
+    }
+
+    const token = localStorage.getItem('token');
+
+    return {
+      user,
+      isLoggedIn: true,
+      accessToken: token || undefined
+    };
+  } catch (error) {
+    console.error('Error getting client session:', error);
+    return { user: null, isLoggedIn: false };
+  }
+};

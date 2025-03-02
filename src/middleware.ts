@@ -1,17 +1,16 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-// import { cookieConfig } from './lib/config/cookies';
-// import { getSession } from './lib/session';
 
 export async function middleware(request: NextRequest) {
-  // const session = await getSession();
+  // Simple check for auth cookie existence - we'll handle full validation in the routes
+  const authToken = request.cookies.get('auth_token');
+  const isLoggedIn = !!authToken;
 
   // Check if user is authenticated
-  if (false) {
-    // if (!session.isLoggedIn) {
+  if (!isLoggedIn) {
     // Redirect to login if accessing protected routes
     if (request.nextUrl.pathname.startsWith('/profile')) {
-      const loginUrl = new URL('/login', request.url);
+      const loginUrl = new URL('/auth/signin', request.url);
       loginUrl.searchParams.set('from', request.nextUrl.pathname);
       return NextResponse.redirect(loginUrl);
     }

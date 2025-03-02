@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getErrorMessage } from '@/src/utils/getErrorMessage';
 import actotaApi from '@/src/lib/apiClient';
 import toast from 'react-hot-toast';
+import { getClientSession } from '@/src/lib/session';
 
 export interface AttachPaymentMethodParams {
   paymentMethodId: string;
@@ -13,18 +14,37 @@ export const useAttachPaymentMethod = () => {
 
   return useMutation({
     mutationFn: async (values: AttachPaymentMethodParams) => {
-      // Only access localStorage in browser environment
+      // Get user information from the client session
       let userId = '';
       let userEmail = '';
       let userName = '';
 
       if (typeof window !== 'undefined') {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        userId = user.user_id;
-        userEmail = user.email || '';
-        userName = user.name || user.firstName + ' ' + user.lastName || 'Customer';
+        try {
+          // First try to get from session
+          const session = getClientSession();
+          if (session.isLoggedIn && session.user) {
+            userId = session.user.user_id;
+            userEmail = session.user.email || '';
+            userName = session.user.name ||
+              (session.user.firstName && session.user.lastName ?
+                `${session.user.firstName} ${session.user.lastName}` :
+                (session.user.first_name && session.user.last_name ?
+                  `${session.user.first_name} ${session.user.last_name}` :
+                  'Customer'));
+          } else {
+            // Fall back to localStorage for compatibility
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            userId = user.user_id;
+            userEmail = user.email || '';
+            userName = user.name || (user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : 'Customer');
+          }
 
-        if (!userId) {
+          if (!userId) {
+            throw new Error("Please login");
+          }
+        } catch (error) {
+          console.error('Error getting user data:', error);
           throw new Error("Please login");
         }
       }
@@ -43,10 +63,10 @@ export const useAttachPaymentMethod = () => {
       try {
         // Make an API call to attach the payment method to the customer on Stripe's servers
         // This goes through our Next.js API route which then calls the backend service
-        const response = await actotaApi.post(`/api/stripe/attach-payment-method`, {
-          customerId,
-          paymentMethodId: values.paymentMethodId,
-          setAsDefault: values.setAsDefault
+        const response = await actotaApi.post(`/api/account/${values.paymentMethodId}/attach-payment-method`, {
+          customer_id: customerId,
+          payment_id: values.paymentMethodId,
+          default: values.setAsDefault
         });
 
         console.log('Payment method attached to customer', response.data);
@@ -136,13 +156,25 @@ export const useSetDefaultPaymentMethod = () => {
 
   return useMutation({
     mutationFn: async (paymentMethodId: string) => {
-      // Only access localStorage in browser environment
+      // Get user information from the client session
       let userId = '';
       if (typeof window !== 'undefined') {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        userId = user.user_id;
+        try {
+          // First try to get from session
+          const session = getClientSession();
+          if (session.isLoggedIn && session.user) {
+            userId = session.user.user_id;
+          } else {
+            // Fall back to localStorage for compatibility
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            userId = user.user_id;
+          }
 
-        if (!userId) {
+          if (!userId) {
+            throw new Error("Please login");
+          }
+        } catch (error) {
+          console.error('Error getting user data:', error);
           throw new Error("Please login");
         }
 
@@ -190,13 +222,25 @@ export const useDeletePaymentMethod = () => {
 
   return useMutation({
     mutationFn: async (paymentMethodId: string) => {
-      // Only access localStorage in browser environment
+      // Get user information from the client session
       let userId = '';
       if (typeof window !== 'undefined') {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        userId = user.user_id;
+        try {
+          // First try to get from session
+          const session = getClientSession();
+          if (session.isLoggedIn && session.user) {
+            userId = session.user.user_id;
+          } else {
+            // Fall back to localStorage for compatibility
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            userId = user.user_id;
+          }
 
-        if (!userId) {
+          if (!userId) {
+            throw new Error("Please login");
+          }
+        } catch (error) {
+          console.error('Error getting user data:', error);
           throw new Error("Please login");
         }
 
