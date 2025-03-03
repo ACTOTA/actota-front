@@ -54,7 +54,6 @@ export default function ActivitiesMenu() {
 
      const { data: lodgings } = useLodging();
   const { data: activity, isLoading, error } = useActivities();
-  console.log(activity,"activity",lodgings,"lodgings");
     const [selectedActivity, setSelectedActivity] = useState('Select preferred activities');
     const [selectedLodging, setSelectedLodging] = useState('Select preferred lodging');
     const [selectedTransportation, setSelectedTransportation] = useState('Select preferred transportation');

@@ -19,7 +19,6 @@ interface CookieOptions {
 
 export async function getCurrentUser() {
   const token = cookies().get('auth_token')?.value
-  console.log('Token:', token)
 
   if (!token) return null
 
@@ -30,7 +29,6 @@ export async function getCurrentUser() {
         'Authorization': `Bearer ${token}`,
       }},
     );
-    console.log('Response:', response)
 
     if (!response.data) return null
     return response.data

@@ -5,7 +5,6 @@ export default function WhyBook() {
 
   const queryClient = useQueryClient();
   const data = queryClient.getQueryData(['lodging']);
-  console.log(data);
 
   const info = [
     {

@@ -10,14 +10,13 @@ import { useFavorites } from "../hooks/queries/account/useFavoritesQuery";
 export default function FeaturedItineraries() {
   const { data: itineraries, isLoading: itinerariesLoading, error: itinerariesError } = useItineraries();
   const { data: favorites, isLoading: favoritesLoading, error: favoritesError } = useFavorites();
-  console.log(favorites, "favorites");
   const [listings, setListings] = React.useState<any[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [selectedActivity, setSelectedActivity] = useState([]);
  
   useEffect(() => {
     if (itineraries) {
-      const filteredListings = itineraries?.data?.map((listing: any) => favorites?.some((favorite: any) => favorite._id.$oid === listing._id.$oid ) ? {...listing, isFavorite: true} : listing);
+      const filteredListings =  itineraries?.data?.map((listing: any) => favorites?.some((favorite: any) => favorite._id.$oid === listing._id.$oid ) ? {...listing, isFavorite: true} : listing);
       setListings(filteredListings);
     }
   }, [itineraries]);

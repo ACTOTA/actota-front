@@ -9,7 +9,6 @@ const useAddFavorites = () => {
     mutationFn: async (favoriteId: string) => {
       try {
         const user = JSON.parse(localStorage.getItem('user') || '{}');
-        console.log(user, "user");
         if(!user.user_id){
           toast.error("Please login to add favorites");
           throw new Error("Please login to add favorites");

@@ -10,7 +10,6 @@ async function getAccountInfo(id: string): Promise<any> {
       throw new Error("Please login to view account info");
     }
     const response = await actotaApi.get(`/api/account/${id}`);
-    console.log(response.data, "response from itinerary by id");
     return response.data;
    
   } catch (error) {

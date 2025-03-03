@@ -18,7 +18,6 @@ import 'react-phone-number-input/style.css'
 const Personal = (data: any) => {
   const [firstName, setFirstName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState<E164Number | undefined>();
-  console.log(phoneNumber, 'phoneNumber')
   return (
     <div className="gap-4 flex flex-col">
       <div className="flex justify-between items-center">

@@ -107,7 +107,6 @@ const Payment = () => {
 
   useEffect(() => {
     if (apiResponse) {
-      console.log('Setting itinerary data:', apiResponse);
       setItineraryData(apiResponse);
     }
   }, [apiResponse]);
@@ -128,7 +127,6 @@ const Payment = () => {
     return <div className='text-white flex justify-center items-center h-screen'>{user ? 'Error: ' + error.message : 'Please login to view itinerary details'}</div>;
   }
 
-  console.log('Rendering with data:', { apiResponse, itineraryData });
 
   if (!itineraryData) {
     return <div className='text-white flex justify-center items-center h-screen'>Loading itinerary data...</div>;

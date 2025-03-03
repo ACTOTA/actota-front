@@ -13,7 +13,6 @@ import { FaRegEyeSlash } from "react-icons/fa";
 const VerificationPasswor = (data: any) => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  console.log(currentPassword, "currentPassword");
   return (
       <div className="flex items-start max-md:flex-col gap-8 w-full">
         {/* verification */}

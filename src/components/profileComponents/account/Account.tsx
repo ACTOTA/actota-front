@@ -7,7 +7,6 @@ import EmailNotification from "./EmailNotification/EmailNotification";
 import { useAccountInfo } from "@/src/hooks/queries/account/useAccountQuery";
 const Account = () => {
   const { data: accountInfo } = useAccountInfo(JSON.parse(localStorage.getItem('user') || '{}')?.user_id);
-  console.log(accountInfo, 'account info');
   const [activeTab, setActiveTab] = useState("personal");
   const tabs = [
     {

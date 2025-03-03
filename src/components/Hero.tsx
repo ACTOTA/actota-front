@@ -30,7 +30,6 @@ export default function Hero() {
       setAuthCookie(token);
       getCurrentUser().then((user: any) => {
         if (user) {
-          console.log('user', user);
           localStorage.setItem('user', JSON.stringify(
             { user_id: user._id.$oid, first_name: user.first_name, last_name: user.last_name, email: user.email, }
           ));
@@ -47,7 +46,6 @@ export default function Hero() {
     const checkCookie = async () => {
       if (!cookieChecked) {
         const cookie: any = await getCookie('cookies');
-        console.log('cookie', cookie);
         if (!cookie) {
           router.push("?modal=cookieBanner");
         }

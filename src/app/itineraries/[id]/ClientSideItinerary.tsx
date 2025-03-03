@@ -75,7 +75,6 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
   useEffect(() => {
     if (apiResponse) {
       const filteredItineraryData = favorites?.some((favorite: any) => favorite._id.$oid === apiResponse._id.$oid) ? {...apiResponse, isFavorite: true} : apiResponse;
-      console.log('Setting itinerary data:', filteredItineraryData);
       setItineraryData(filteredItineraryData);
     }
   }, [apiResponse]);
@@ -90,7 +89,6 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
     </div>;
   }
 
-  console.log('Rendering with data:', { apiResponse, itineraryData });
 
   const handleBooking = () => {
     router.push(`/payment/${itineraryData._id.$oid}`);
@@ -119,7 +117,7 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
         <div className='flex items-center md:flex-nowrap flex-wrap gap-2'>
         
           
-           <LikeDislike className='border border-primary-gray rounded-full  h-[50px] w-[50px]' liked={itineraryData.isFavorite ? itineraryData.isFavorite : false} favoriteId={itineraryData._id.$oid} />
+           <LikeDislike className='border border-primary-gray rounded-full  h-[50px] w-[50px]' liked={itineraryData?.isFavorite ? itineraryData?.isFavorite : false} favoriteId={itineraryData?._id.$oid} />
           <Button onClick={() => {router.push(`?modal=shareModal&itineraryId=${itineraryData._id.$oid}`)}} variant="outline" size='md' className='gap-1'>
             <CgSoftwareUpload className='h-6 w-6 text-white' />
             <p>Share</p>
