@@ -244,29 +244,26 @@ export const useDeletePaymentMethod = () => {
           throw new Error("Please login");
         }
 
-        // Step 1: Call the backend API to get the Stripe customer ID
-        const customerResponse = await actotaApi.post(`/api/account/${userId}/customer`);
-        const { customer_id: customerId } = customerResponse.data;
+        console.log(`Deleting payment method ${paymentMethodId}`);
 
-        if (!customerId) {
-          throw new Error("Failed to get customer ID from server");
+        try {
+          // Call our API endpoint to delete the payment method
+          const response = await actotaApi.delete(`/api/account/${userId}/payment-methods/${paymentMethodId}`);
+
+          console.log('Payment method deleted:', response.data);
+
+          // Also update the localStorage for backwards compatibility
+          const paymentMethods = JSON.parse(localStorage.getItem('paymentMethods') || '[]');
+          const updatedPaymentMethods = paymentMethods.filter(
+            (method: any) => method.id !== paymentMethodId
+          );
+          localStorage.setItem('paymentMethods', JSON.stringify(updatedPaymentMethods));
+
+          return { success: true };
+        } catch (error) {
+          console.error("Error deleting payment method:", error);
+          throw new Error("Failed to delete payment method");
         }
-
-        console.log(`Deleting payment method ${paymentMethodId} for customer: ${customerId}`);
-
-        // Get current payment methods
-        const paymentMethods = JSON.parse(localStorage.getItem('paymentMethods') || '[]');
-
-        // Filter out the specified payment method
-        // In a real implementation, this would make API calls to Stripe
-        const updatedPaymentMethods = paymentMethods.filter(
-          (method: any) => method.id !== paymentMethodId
-        );
-
-        // Save back to localStorage
-        localStorage.setItem('paymentMethods', JSON.stringify(updatedPaymentMethods));
-
-        return { success: true, customerId };
       }
 
       throw new Error("Cannot access localStorage");

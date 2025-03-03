@@ -12,8 +12,9 @@ import { RiVisaLine } from "react-icons/ri";
 import Dropdown from "../../figma/Dropdown";
 import { useRouter } from "next/navigation";
 import { usePaymentMethods } from "@/src/hooks/queries/account/usePaymentMethodsQuery";
-import { useAttachPaymentMethod } from "@/src/hooks/mutations/payment.mutation";
+import { useAttachPaymentMethod, useDeletePaymentMethod } from "@/src/hooks/mutations/payment.mutation";
 import StripeCardElement from "../../stripe/StripeCardElement";
+import DeletePaymentCard from "@/src/components/modals/DeletePaymentCard";
 
 interface Card {
   id: string | number;
@@ -37,11 +38,14 @@ const Payment = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("bookingsHistory");
   const [search, setSearch] = useState("");
+  const [isDeletingCard, setIsDeletingCard] = useState(false);
 
   const { data: paymentMethods } = usePaymentMethods();
   const [savedCards, setSavedCards] = useState<Card[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cardToDelete, setCardToDelete] = useState<string | null>(null);
   const { mutate: attachPaymentMethod } = useAttachPaymentMethod();
+  const { mutate: deletePaymentMethod } = useDeletePaymentMethod();
 
   // Convert payment methods data to card format when data is available
   useEffect(() => {
@@ -236,12 +240,48 @@ const Payment = () => {
     console.log("This method is deprecated. Using Stripe Card Element instead.");
   };
 
-  // Delete card
+  // Delete card - open modal for confirmation
   const handleDeleteCard = (cardId: string | number) => {
+    setCardToDelete(String(cardId));
     router.push("?modal=deletePaymentCard");
-    // Implementation to actually delete the card would go here
-    // This would typically involve an API call to delete the payment method
   };
+  
+  // Confirm card deletion
+  const confirmDeleteCard = () => {
+    if (cardToDelete) {
+      setIsDeletingCard(true);
+      deletePaymentMethod(cardToDelete, {
+        onSuccess: () => {
+          // Close the modal after successful deletion
+          router.back();
+          // Remove card from local state
+          setSavedCards(prev => prev.filter(card => String(card.id) !== cardToDelete));
+          setIsDeletingCard(false);
+          setCardToDelete(null);
+        },
+        onError: () => {
+          setIsDeletingCard(false);
+        }
+      });
+    }
+  };
+  
+  // Make the confirmDeleteCard function available in global window object
+  // This is a workaround to allow the modal to access this function
+  useEffect(() => {
+    // Define a type for the window object with our custom property
+    interface CustomWindow extends Window {
+      confirmDeletePaymentCard?: () => void;
+    }
+    
+    // Make the function accessible globally
+    (window as CustomWindow).confirmDeletePaymentCard = confirmDeleteCard;
+    
+    // Cleanup when component unmounts
+    return () => {
+      delete (window as CustomWindow).confirmDeletePaymentCard;
+    };
+  }, [cardToDelete]);
 
   // Set card as default
   const handleSetDefaultCard = (cardId: string | number) => {

@@ -269,7 +269,7 @@ export default function DayView({ listing }: DayViewProps) {
 				</div>
 			) : (
 				<div className="space-y-4 border-l-2 border-dashed border-border-primary ps-6 ms-6">
-					{currentDayActivities.map((activity, index) => (
+					{currentDayActivities.map((activity: Activity, index) => (
 						<ActivityCard
 							key={index}
 							activity={activity}
@@ -285,7 +285,7 @@ export default function DayView({ listing }: DayViewProps) {
 				isDrawerOpen={isDrawerOpen}
 				setIsDrawerOpen={setIsDrawerOpen}
 			>
-				<FeedbackDrawer setIsDrawerOpen={setIsDrawerOpen}/>
+				<FeedbackDrawer setIsDrawerOpen={setIsDrawerOpen} />
 			</DrawerModal>
 		</div>
 	);

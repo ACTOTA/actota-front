@@ -11,7 +11,7 @@ import Button from './figma/Button';
 interface ActivityCardProps {
     activity: {
         name: string;
-        type: string;
+        // type: string;
         time: string;
         location: {
             name: string;

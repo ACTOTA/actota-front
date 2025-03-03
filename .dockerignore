@@ -1,0 +1,6 @@
+.env
+.env.*
+credentials/
+node_modules
+.git/
+.gitignore

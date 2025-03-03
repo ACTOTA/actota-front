@@ -3,10 +3,10 @@ import { useQuery } from '@tanstack/react-query';
 interface Itinerary {
   // Define your activity type here
   id: string;
-  // ... other fields
+  data: any;
 }
 
-async function fetchItineraries(): Promise<any[]> {
+async function fetchItineraries(): Promise<Itinerary[]> {
   const response = await fetch('/api/itineraries', {
     headers: {
       'Content-Type': 'application/json',
