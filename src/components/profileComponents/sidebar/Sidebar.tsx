@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ArrowLeftIcon from "@/public/sidebar-icons/arrow-narrow-left.svg";
 import CompanyIcon from "@/public/sidebar-icons/company.svg";
 import LuggageIcon from "@/public/sidebar-icons/luggage-icon.svg";
@@ -21,7 +21,11 @@ interface SidebarProps {
 
 const Sidebar = ({ onItemClick }: SidebarProps) => {
   const pathname = usePathname();
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const [user,setUser] = useState<any>(null);
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    setUser(user);
+  }, []);
 
   const primaryNavItems = [
     {

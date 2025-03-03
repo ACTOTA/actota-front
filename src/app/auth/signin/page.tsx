@@ -15,7 +15,6 @@ import { getAuthCookie } from '@/src/helpers/auth';
 export default function SignIn() {
   const router = useRouter();
   const { mutate: login, isPending } = useLogin();
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
   const [errors, setErrors] = useState({
     email: '',
     password: ''
@@ -27,13 +26,14 @@ export default function SignIn() {
   // Redirect if already authenticated
   React.useEffect(() => {
     const checkAuth = async () => {
+
       const authStatus = await getAuthCookie();
       if (authStatus) {
         router.push('/');
       }
     };
     checkAuth();
-  }, [ router, user]);
+  }, [ router]);
 
   const validateForm = () => {
     let tempErrors = {

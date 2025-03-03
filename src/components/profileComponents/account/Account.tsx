@@ -1,14 +1,21 @@
 "use client";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Button from "../../figma/Button";
 import Personal from "./PersonalInformation/Personal";
 import VerificationPasswor from "./VerificationPassword/VerificationPasswor";
 import EmailNotification from "./EmailNotification/EmailNotification";
 import { useAccountInfo } from "@/src/hooks/queries/account/useAccountQuery";
 const Account = () => {
-  const { data: accountInfo } = useAccountInfo(JSON.parse(localStorage.getItem('user') || '{}')?.user_id);
   const [activeTab, setActiveTab] = useState("personal");
-  const tabs = [
+  const [user, setUser] = useState<any>(null);
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    setUser(user);
+  }, []);
+  
+  const { data: accountInfo } = useAccountInfo(user?.user_id || '');
+  
+  const tabs = useMemo(() => [
     {
       id: "personal",
       label: "Personal information",
@@ -24,7 +31,7 @@ const Account = () => {
       label: "Email Notification",
       component: <EmailNotification data={accountInfo} />
     }
-  ];
+  ], [accountInfo]);
 
   const renderContent = () => {
     const tab = tabs.find(tab => tab.id === activeTab);
