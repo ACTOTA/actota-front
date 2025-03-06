@@ -23,7 +23,6 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
 
       // Only close if click is outside both search-bar and search-box
       if (!searchBar?.contains(target) && !searchBox?.contains(target)) {
-        console.log('click outside');
         setCurrStep?.(null);
       }
     };
@@ -42,7 +41,6 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
     //   step == currStep ? ele.classList.remove(...selectedClasses, 'after:hidden') : ele.classList.add(...selectedClasses, 'after:hidden');
     // }
 
-    console.log("step", step);
     // currStep != null ? setCurrStep?.(null) : setCurrStep?.(step);
     setCurrStep?.(step);
 
@@ -57,9 +55,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
       const initialPosition = searchElement.getBoundingClientRect().top + window.scrollY;
 
       const handleScroll = () => {
-        console.log('scrolling');
         if (window.scrollY >= initialPosition && !navbar) {
-          console.log('reached initial position');
           setClasses?.(' fixed top-[8px]  left-1/2 -translate-x-1/2  h-fit');
 
           setClassName('w-[580px] md:w-[640px] xl:w-[700px] 2xl:w-[720px] ');

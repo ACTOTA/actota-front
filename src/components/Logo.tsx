@@ -4,7 +4,7 @@ interface LogoProps {
   className?: string;
 }
 
-const Logo: React.FC<LogoProps> = ({ onClick, className }) : LogoProps => {
+const Logo: React.FC<LogoProps> = ({ onClick, className }): LogoProps => {
 
   return (
     <svg width="132" height="24" viewBox="0 0 132 24" fill="none" xmlns="http://www.w3.org/2000/svg" className={className} onClick={onClick}>

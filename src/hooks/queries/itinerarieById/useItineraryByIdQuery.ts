@@ -17,7 +17,6 @@ export async function fetchItineraryById(id: string): Promise<any> {
     //       throw new Error("Please login to view itinerary details");
     //     }
     const response = await actotaApi.get(`/api/itineraries/${id}`);
-    console.log(response.data, "response from itinerary by id");
     return response.data;
    
   } catch (error) {

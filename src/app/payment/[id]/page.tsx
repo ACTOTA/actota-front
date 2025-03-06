@@ -121,6 +121,7 @@ const Payment = () => {
 
     if (isLoading) {
         return <div className='text-white flex justify-center items-center h-screen'>Loading...</div>;
+
     }
 
     if (error) {
@@ -133,6 +134,7 @@ const Payment = () => {
     if (!itineraryData) {
         return <div className='text-white flex justify-center items-center h-screen'>Loading itinerary data...</div>;
     }
+
     return (
         <section className='w-full !h-full text-white   bg-[url("/images/payment-page-bg.png")] bg-cover bg-center bg-repeat'>
             <div className='grid grid-cols-6 gap-6 pt-[78px]'>

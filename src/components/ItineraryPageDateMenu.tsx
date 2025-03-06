@@ -44,7 +44,6 @@ export default function DateMenu() {
     });
 
     const handleDateRangeChange = (startDate: string | null, endDate: string | null) => {
-        console.log('Date range changed:', startDate, endDate);
     }
 
     const handleStartTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

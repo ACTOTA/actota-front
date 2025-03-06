@@ -27,7 +27,6 @@ export async function POST(request: Request) {
       );
     }
   } catch (error:any) {
-    console.log(error, 'error from signin route');
     return NextResponse.json(
       { success: false, message: error.message || 'An error occurred' },
       { status: 500 }

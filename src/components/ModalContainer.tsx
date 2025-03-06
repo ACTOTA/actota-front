@@ -35,7 +35,6 @@ export default function ModalContainer() {
           signup: <Signup />,
           bookingConfirmed: <BookingConfirmed />,
     };
-    console.log(openModal,"openModal");
    
     if (!openModal) return null; // No modal is open
 

@@ -17,7 +17,6 @@ export default function SearchBoxes({ step, ...rest }: SearchBoxesProps) {
   const [mapLoaded, setMapLoaded] = useState(false);
 
   const dimensions = useMemo(() => {
-    console.log("step", step);
     switch (step) {
       case STEPS.LOCATION:
         return { w: 584, h: 596 };
@@ -36,7 +35,6 @@ export default function SearchBoxes({ step, ...rest }: SearchBoxesProps) {
     if (step === STEPS.LOCATION) {
       setMapLoaded(true);
     }
-    console.log("dimensions", dimensions);
 
   }, [step, dimensions]);
 

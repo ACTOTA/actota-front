@@ -11,6 +11,7 @@ import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { FaCheck } from 'react-icons/fa';
 import { LuCheck } from 'react-icons/lu';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 export default function ForgotPassword() {
   const router = useRouter();
@@ -132,7 +133,7 @@ export default function ForgotPassword() {
     e.preventDefault();
     if (validatePasswords()) {
       // Handle password reset logic here
-      console.log('Password reset successful');
+      toast.success('Password reset successful');
     }
   };
 
