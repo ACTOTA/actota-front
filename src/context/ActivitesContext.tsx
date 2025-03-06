@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 interface ActivitySelectValue {
   label: string;
@@ -11,14 +11,15 @@ interface ActivitiesContextType {
   totalDuration: number;
 }
 
+// Create the base context
 const ActivitiesContext = createContext<ActivitiesContextType>({
   activities: [],
-  updateActivities: () => {},
+  updateActivities: () => { },
   totalDuration: 0,
 });
 
 interface ActivitiesProviderProps {
-  children: ReactNode; // This is the line that defines what `children` should be
+  children: ReactNode;
 }
 
 export const ActivitiesProvider: React.FC<ActivitiesProviderProps> = ({ children }) => {
@@ -37,4 +38,22 @@ export const ActivitiesProvider: React.FC<ActivitiesProviderProps> = ({ children
   );
 };
 
-export const useActivities = () => useContext(ActivitiesContext);
+// Updated hook that returns data in a query-like format
+export const useActivities = () => {
+  const context = useContext(ActivitiesContext);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  // If no context found, throw an error
+  if (!context) {
+    throw new Error('useActivities must be used within an ActivitiesProvider');
+  }
+
+  return {
+    data: context.activities,
+    isLoading,
+    error,
+    updateActivities: context.updateActivities,
+    totalDuration: context.totalDuration
+  };
+};

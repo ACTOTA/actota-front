@@ -8,7 +8,8 @@ import { IoLocationOutline } from 'react-icons/io5';
 import { AiFillStar } from 'react-icons/ai';
 import { LuRoute } from 'react-icons/lu';
 import Button from './figma/Button';
-interface ActivityCardProps {
+
+export interface ActivityCardProps {
     activity: {
         name: string;
         type: string;

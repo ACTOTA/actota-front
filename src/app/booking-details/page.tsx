@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { ArrowLeftIcon, XMarkIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
 import Button from '@/src/components/figma/Button';
-import {  FaStar } from 'react-icons/fa6';
+import { FaStar } from 'react-icons/fa6';
 import { CgSoftwareUpload } from 'react-icons/cg';
 import { LuArrowRight, LuUser } from 'react-icons/lu';
 import BookingCard from '@/src/components/profileComponents/bookings/BookingCard';
@@ -66,7 +66,6 @@ export default function BookingDetails() {
       <div className='flex gap-4 max-sm:mt-4 md:items-center px-[64px] max-sm:px-6 max-lg:px-10'>
         <h1 className='text-4xl max-sm:text-2xl font-bold me-auto'>{bookings.trip_name}</h1>
         <div className='flex items-center md:flex-nowrap flex-wrap gap-2'>
-          <LikeDislike bookings={bookings} />
 
           <Button variant="outline" size='sm' className='gap-1' onClick={() => { }}>
             <CgSoftwareUpload className='h-6 w-6 text-white' />
@@ -76,7 +75,7 @@ export default function BookingDetails() {
       </div>
       <div className='grid md:grid-cols-12 lg:grid-cols-7 gap-6 mt-4 px-[80px] max-sm:px-6 max-lg:px-10 '>
         <div className='md:col-span-8 lg:col-span-5 -mt-4 '>
-          <BookingCard data={bookings}  bookingDetailsPage={true} />
+          <BookingCard data={bookings} bookingDetailsPage={true} />
 
           <div className='md:hidden max-md:mt-4'>
             <PricesCard bookings={bookings} />
@@ -311,53 +310,53 @@ export default function BookingDetails() {
 const PricesCard = (bookings: any) => {
   return (
     <div className=' bg-[#141414] rounded-2xl border border-primary-gray'>
-    <div className=' rounded-lg p-4 flex flex-col  gap-1 '>
-      <div className='flex justify-between  mb-2'>
-        <p className='text-white font-bold'> Total amount</p><p className='text-white font-bold'>${bookings.person_cost}</p></div>
+      <div className=' rounded-lg p-4 flex flex-col  gap-1 '>
+        <div className='flex justify-between  mb-2'>
+          <p className='text-white font-bold'> Total amount</p><p className='text-white font-bold'>${bookings.person_cost}</p></div>
 
-      <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent my-2"></div>
+        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent my-2"></div>
 
-      <div className='flex justify-between mt-2' >
-        <p className='text-sm text-primary-gray'>Activity Cost</p>
-        <p className='text-sm text-white'> $1000</p>
-      </div>
-      <div className='flex justify-between mt-2' >
-        <p className='text-sm text-primary-gray'>Lodging Cost</p>
-        <p className='text-sm text-white'> $1000</p>
-      </div>
-      <div className='flex justify-between mt-2' >
-        <p className='text-sm text-primary-gray'>Transport Cost</p>
-        <p className='text-sm text-white'> $1000</p>
-      </div>
-      <div className='flex justify-between mt-2' >
-        <p className='text-sm text-primary-gray'>Travel agent fee</p>
-        <p className='text-sm text-white'> $1000</p>
-      </div>
-      <div className='flex justify-between mt-2' >
-        <p className='text-sm text-primary-gray'>Service fee</p>
-        <p className='text-sm text-white'> $1000</p>
-      </div>
-      <div className='flex justify-between mt-2' >
-        <p className='text-sm text-primary-gray'>Promo Code</p>
-        <p className='text-sm text-[#5389DF]'> -$45</p>
-      </div>
+        <div className='flex justify-between mt-2' >
+          <p className='text-sm text-primary-gray'>Activity Cost</p>
+          <p className='text-sm text-white'> $1000</p>
+        </div>
+        <div className='flex justify-between mt-2' >
+          <p className='text-sm text-primary-gray'>Lodging Cost</p>
+          <p className='text-sm text-white'> $1000</p>
+        </div>
+        <div className='flex justify-between mt-2' >
+          <p className='text-sm text-primary-gray'>Transport Cost</p>
+          <p className='text-sm text-white'> $1000</p>
+        </div>
+        <div className='flex justify-between mt-2' >
+          <p className='text-sm text-primary-gray'>Travel agent fee</p>
+          <p className='text-sm text-white'> $1000</p>
+        </div>
+        <div className='flex justify-between mt-2' >
+          <p className='text-sm text-primary-gray'>Service fee</p>
+          <p className='text-sm text-white'> $1000</p>
+        </div>
+        <div className='flex justify-between mt-2' >
+          <p className='text-sm text-primary-gray'>Promo Code</p>
+          <p className='text-sm text-[#5389DF]'> -$45</p>
+        </div>
 
 
 
-      <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent my-2"></div>
+        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent my-2"></div>
 
-      <div className='mt-2 flex justify-between gap-2'>
+        <div className='mt-2 flex justify-between gap-2'>
 
-        <Button size='md' variant='outline' className=' !bg-black text-sm font-bold gap-2 flex-1' >
-          <Image src={"/svg-icons/printer.svg"} alt="print" width={20} height={20} />
-          <p>Print</p>
-        </Button>
-        <Button size='md' variant='outline' className=' !bg-black text-sm font-bold gap-2 flex-1' >
-          <Image src={"/svg-icons/download.svg"} alt="print" width={20} height={20} />
-          <p>Download</p>
-        </Button>
+          <Button size='md' variant='outline' className=' !bg-black text-sm font-bold gap-2 flex-1' >
+            <Image src={"/svg-icons/printer.svg"} alt="print" width={20} height={20} />
+            <p>Print</p>
+          </Button>
+          <Button size='md' variant='outline' className=' !bg-black text-sm font-bold gap-2 flex-1' >
+            <Image src={"/svg-icons/download.svg"} alt="print" width={20} height={20} />
+            <p>Download</p>
+          </Button>
+        </div>
       </div>
     </div>
-  </div>
   )
 }
