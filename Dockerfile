@@ -1,38 +1,33 @@
 # Use a Node.js base image with platform specified
-FROM --platform=linux/amd64 node:21-alpine
+FROM --platform=linux/amd64 node:21 AS builder
 WORKDIR /app
 
 # Copy package files and install dependencies
 COPY package*.json ./
-RUN npm ci --omit=dev
+RUN npm install
 
-# Create a basic next.config.js file
-RUN echo 'module.exports = { reactStrictMode: true };' > next.config.js
+# Copy the application code
+COPY . .
 
-# Create minimal directory structure
-RUN mkdir -p public
-RUN mkdir -p .next/static/chunks
+# Create a .env.local file for static builds if needed
+# Uncomment and modify this if you need environment variables during build
+# RUN echo "NEXT_PUBLIC_API_URL=https://your-api-url.com" > .env.local
 
-# Install Next.js directly
-RUN npm install next@14.2.20
-
-# Create a simple placeholder page
-RUN mkdir -p pages
-RUN echo 'export default function Home() { return <div style={{ padding: "20px" }}><h1>Application Starting</h1><p>The application is initializing in Docker mode.</p></div>; }' > pages/index.js
-RUN next build
+# Build the application with specific output settings
+RUN npx next build
 
 # Set to production environment
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV PORT=3000
 
-# Expose the port (Cloud Run typically uses 8080)
-EXPOSE 3000
+# Expose the port
+EXPOSE 8080
 
 # Add a non-root user to run the app
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs && \
     chown -R nextjs:nodejs /app
+
 USER nextjs
 
 # Start the application

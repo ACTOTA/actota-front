@@ -16,7 +16,11 @@ fi
 
 # Build the Docker image
 echo "Building Docker image..."
-docker build --platform=linux/amd64 -t $IMAGE_NAME .
+
+docker buildx build --platform linux/amd64 \
+  --tag ${IMAGE_NAME}:amd64 \
+  --push \
+  .
 
 # Push the image to Google Container Registry
 echo "Pushing image to Google Container Registry..."
