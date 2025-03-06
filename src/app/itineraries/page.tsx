@@ -16,16 +16,15 @@ const Itineraries = () => {
     const [listings, setListings] = React.useState<any[]>([]);
     const [showFilter, setShowFilter] = useState(false)
     const [advanceFilter, setAdvanceFilter] = useState(false)
-  const { data: itineraries, isLoading: itinerariesLoading, error: itinerariesError } = useItineraries();
-  const { data: favorites, isLoading: favoritesLoading, error: favoritesError } = useFavorites();
-
+    const { data: itineraries, isLoading: itinerariesLoading, error: itinerariesError } = useItineraries();
+    const { data: favorites, isLoading: favoritesLoading, error: favoritesError } = useFavorites();
 
     useEffect(() => {
         if (itineraries) {
-            const filteredListings = itineraries?.data?.map((listing: any) => favorites?.some((favorite: any) => favorite._id.$oid === listing._id.$oid ) ? {...listing, isFavorite: true} : listing);
+            const filteredListings = itineraries?.data?.map((listing: any) => favorites?.some((favorite: any) => favorite._id.$oid === listing._id.$oid) ? { ...listing, isFavorite: true } : listing);
             setListings(filteredListings);
         }
-      }, [itineraries]);
+    }, [itineraries]);
     return (
         <div className="max-w-[1440px] mx-auto ">
 
@@ -73,8 +72,8 @@ const Itineraries = () => {
                         ))}
                     </div>
                     <div className='sm:hidden flex flex-col'>
-                    {itinerariesLoading && <div>Loading...</div>}
-                    {itinerariesError && <div>Error: {itinerariesError.message}</div>}
+                        {itinerariesLoading && <div>Loading...</div>}
+                        {itinerariesError && <div>Error: {itinerariesError.message}</div>}
                         {listings.length > 0 && listings.map((listing, i) => (
                             <ListingCard key={i} data={listing} />
                         ))}
@@ -88,7 +87,7 @@ const Itineraries = () => {
                     {advanceFilter ?
                         <ItineraryPageAdvanceFilter setShowFilter={setShowFilter} advanceFilter={advanceFilter} setAdvanceFilter={setAdvanceFilter} />
                         :
-                            <ItineraryPageFilter setShowFilter={setShowFilter} advanceFilter={advanceFilter} setAdvanceFilter={setAdvanceFilter} />
+                        <ItineraryPageFilter setShowFilter={setShowFilter} advanceFilter={advanceFilter} setAdvanceFilter={setAdvanceFilter} />
                     }
                 </div>
                 <h2 className="text-[40px] font-bold text-white md:hidden">Itineraries for You</h2>

@@ -13,10 +13,10 @@ export default function FeaturedItineraries() {
   const [listings, setListings] = React.useState<any[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [selectedActivity, setSelectedActivity] = useState([]);
- 
+
   useEffect(() => {
     if (itineraries) {
-      const filteredListings =  itineraries?.data?.map((listing: any) => favorites?.some((favorite: any) => favorite._id.$oid === listing._id.$oid ) ? {...listing, isFavorite: true} : listing);
+      const filteredListings = itineraries?.map((listing: any) => favorites?.some((favorite: any) => favorite._id.$oid === listing._id.$oid) ? { ...listing, isFavorite: true } : listing);
       setListings(filteredListings);
     }
   }, [itineraries]);
@@ -72,8 +72,8 @@ export default function FeaturedItineraries() {
 
         </div>
         <div className="flex flex-wrap justify-start max-sm:justify-center gap-4">
-        {itinerariesLoading && <div className="text-white text-center w-full">Loading...</div>}
-        {itinerariesError && <div className="text-white text-center w-full">Error: {itinerariesError.message}</div>}
+          {itinerariesLoading && <div className="text-white text-center w-full">Loading...</div>}
+          {itinerariesError && <div className="text-white text-center w-full">Error: {itinerariesError.message}</div>}
           {listings.length > 0 && listings?.map((listing) => (
             <ListingCard
               key={(listing._id as { $oid: string }).$oid}

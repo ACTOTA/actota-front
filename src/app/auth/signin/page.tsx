@@ -33,7 +33,7 @@ export default function SignIn() {
       }
     };
     checkAuth();
-  }, [ router]);
+  }, [router]);
 
   const validateForm = () => {
     let tempErrors = {
@@ -71,15 +71,15 @@ export default function SignIn() {
     router.push("?modal=signinLoading");
 
     login(
-      { email, password }, 
+      { email, password },
       {
-        onSuccess: (data:any) => {
+        onSuccess: (data: any) => {
           router.back()
           localStorage.setItem('user', JSON.stringify(
-            {user_id: data.data._id.$oid, first_name: data.data.first_name, last_name: data.data.last_name, email: data.data.email,}
+            { user_id: data.data._id.$oid, first_name: data.data.first_name, last_name: data.data.last_name, email: data.data.email, }
           ));
-    
-         window.location.href = '/';
+
+          window.location.href = '/';
         },
         onError: (error) => {
           router.back()
@@ -190,19 +190,19 @@ export default function SignIn() {
         <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
       </div>
       <div className="flex justify-center items-center gap-[8px] my-[16px] pb-[16px]">
-        <button 
+        <button
           onClick={handleGoogleLogin}
           className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer hover:bg-[#363636] transition-colors'
         >
           <Image src="/svg-icons/google.svg" alt="google" width={20} height={20} />
         </button>
-        <button 
+        <button
           onClick={handleAppleLogin}
           className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer hover:bg-[#363636] transition-colors'
         >
           <Image src="/svg-icons/apple.svg" alt="apple" width={20} height={20} />
         </button>
-        <button 
+        <button
           onClick={handleFacebookLogin}
           className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer hover:bg-[#363636] transition-colors'
         >
