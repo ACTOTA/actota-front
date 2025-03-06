@@ -12,6 +12,7 @@ module.exports = {
       'storage.googleapis.com'
     ]
   },
+  output: 'standalone', // Added for Docker deployment
   async rewrites() {
     return [
       {
@@ -28,4 +29,3 @@ module.exports = {
     return config;
   },
 }
-
