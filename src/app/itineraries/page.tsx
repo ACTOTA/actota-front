@@ -20,11 +20,15 @@ const Itineraries = () => {
     const { data: favorites, isLoading: favoritesLoading, error: favoritesError } = useFavorites();
 
     useEffect(() => {
-        if (itineraries) {
-            const filteredListings = itineraries?.data?.map((listing: any) => favorites?.some((favorite: any) => favorite._id.$oid === listing._id.$oid) ? { ...listing, isFavorite: true } : listing);
-            setListings(filteredListings);
+        if (itineraries && itineraries.data) {
+            const filteredListings = itineraries.data.map((listing: any) =>
+                favorites?.some((favorite: any) => favorite._id.$oid === listing._id.$oid)
+                    ? { ...listing, isFavorite: true }
+                    : listing
+            );
+            setListings(filteredListings || []);
         }
-    }, [itineraries]);
+    }, [itineraries, favorites]);
     return (
         <div className="max-w-[1440px] mx-auto ">
 

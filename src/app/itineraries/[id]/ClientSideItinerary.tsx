@@ -16,50 +16,7 @@ import LikeDislike from '@/src/components/LikeDislike';
 import { useItineraryById } from '@/src/hooks/queries/itinerarieById/useItineraryByIdQuery';
 import { useFavorites } from '@/src/hooks/queries/account/useFavoritesQuery';
 import Image from 'next/image';
-
-interface Location {
-  city: string;
-  state: string;
-  coordinates: number[];
-}
-
-interface Activity {
-  label: string;
-  description: string;
-  tags: string[];
-}
-
-interface ItineraryData {
-  _id: { $oid: string };
-  fareharbor_id: string | null;
-  trip_name: string;
-  person_cost: number;
-  min_age: number | null;
-  min_group: number;
-  max_group: number;
-  length_days: number;
-  length_hours: number;
-  start_location: Location;
-  end_location: Location;
-  description: string;
-  days: Record<string, Array<{
-    time: string;
-    location: {
-      name: string;
-      coordinates: number[];
-    };
-    name: string;
-  }>>;
-  activities: Activity[];
-  activity_cost: number;
-  lodging_cost: number;
-  transport_cost: number;
-  service_fee: number;
-  is_favorite: boolean;
-  images: string[];
-  created_at: string;
-  updated_at: string;
-}
+import { ItineraryData } from '@/src/types/itineraries';
 
 interface ClientSideItineraryProps {
   initialData: ItineraryData;

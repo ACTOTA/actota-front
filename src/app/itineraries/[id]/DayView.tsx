@@ -8,56 +8,13 @@ import Button from '@/src/components/figma/Button';
 import ActivityCard from '@/src/components/ActivityCard';
 import FeedbackDrawer from '@/src/components/FeedbackDrawer';
 import DrawerModal from '@/src/components/DrawerModal';
+import { ItineraryData } from '@/src/types/itineraries';
 
 // Add this constant for the API key
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
 
-interface Location {
-	name: string;
-	coordinates: number[];
-}
-
-interface Activity {
-	time: string;
-	location: Location;
-	type: string;
-	name: string;
-}
-
-interface ListingData {
-	_id: { $oid: string };
-	fareharbor_id: string | null;
-	trip_name: string;
-	person_cost: number;
-	min_age: number | null;
-	min_group: number;
-	max_group: number;
-	length_days: number;
-	length_hours: number;
-	start_location: Location;
-	end_location: Location;
-	description: string;
-	days: Record<string, Array<{
-		time: string;
-		location: {
-			name: string;
-			coordinates: number[];
-		};
-		name: string;
-	}>>;
-	activities: Activity[];
-	activity_cost: number;
-	lodging_cost: number;
-	transport_cost: number;
-	service_fee: number;
-	is_favorite: boolean;
-	images: string[];
-	created_at: string;
-	updated_at: string;
-}
-
 interface DayViewProps {
-	listing: ListingData;
+	listing: ItineraryData;
 }
 
 const defaultCenter = {
@@ -282,7 +239,7 @@ export default function DayView({ listing }: DayViewProps) {
 				</div>
 			) : (
 				<div className="space-y-4 border-l-2 border-dashed border-border-primary ps-6 ms-6">
-					{currentDayActivities.map((activity: Activity, index) => (
+					{currentDayActivities.map((activity, index) => (
 						<ActivityCard
 							key={index}
 							activity={activity}
