@@ -3,42 +3,46 @@ name: Deploy to Cloud Run
 on:
   push:
     branches:
-      # - main  # Trigger for your main/production branch
-      - uat   # Trigger for your UAT branch (create this branch if you don't have one)
+      - main
+      - uat
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  SERVICE_NAME: ${{ vars.SERVICE_NAME }} # Use the vars.
-  REGION: ${{ vars.REGION }} # Use the vars.
-  NODE_ENV: ${{ vars.NODE_ENV }}
-  NEXT_PUBLIC_AUTH_SECRET: ${{secrets.NEXT_PUBLIC_AUTH_SECRET }}
-  NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
-  NEXTAUTH_URL: ${{ vars.NEXTAUTH_URL }}
-  NEXT_PUBLIC_GOOGLE_MAPS_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_KEY }}
-
-
-
+  SERVICE_NAME: my-nextjs-app  #CHANGE
+  REGION: us-central1
+  # Define these here for clarity and easy modification, even though
+  # they're primarily used as build arguments.
+  NODE_ENV: production  # Or set based on branch
+  NEXT_PUBLIC_API_URL: http://your-api-url:8080 # CHANGE: Your actual API URL
+  NEXT_TELEMETRY_DISABLED: 1
+  NEXTAUTH_URL: http://your-auth-url #CHANGE
+  NEXT_PUBLIC_GOOGLE_MAPS_KEY: ${{secrets.NEXT_PUBLIC_GOOGLE_MAPS_KEY}}
+  NEXT_PUBLIC_AUTH_SECRET: ${{secrets.NEXT_PUBLIC_AUTH_SECRET}}
 
 jobs:
   deploy-uat:
-    if: github.ref == 'refs/heads/uat'  # Only run this job for the 'uat' branch
+    if: github.ref == 'refs/heads/uat'
     runs-on: ubuntu-latest
-    environment: UAT  # Specify the UAT environment
+    environment: UAT
 
     steps:
       - uses: actions/checkout@v3
       - id: 'auth'
         uses: 'google-github-actions/auth@v1'
         with:
-          credentials_json: '${{ secrets.GCP_SA_KEY }}' #Uses the secret in UAT
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      # Build the Docker image, passing build arguments
       - name: Build
-        run: docker build \
-          --build-arg NODE_ENV=$NODE_ENV \
-          --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
-          --build-arg NEXTAUTH_URL=$NEXTAUTH_URL \
-          --build-arg NEXT_PUBLIC_GOOGLE_MAPS_KEY=$NEXT_PUBLIC_GOOGLE_MAPS_KEY \
-          --build-arg NEXT_PUBLIC_AUTH_SECRET=$NEXT_PUBLIC_AUTH_SECRET \
-          -t gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA .
+        run: |
+          docker build \
+            --build-arg NODE_ENV=$NODE_ENV \
+            --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+            --build-arg NEXTAUTH_URL=$NEXTAUTH_URL \
+            --build-arg NEXT_PUBLIC_GOOGLE_MAPS_KEY=$NEXT_PUBLIC_GOOGLE_MAPS_KEY \
+            --build-arg NEXT_PUBLIC_AUTH_SECRET=$NEXT_PUBLIC_AUTH_SECRET \
+            -t gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA .
+
       - name: Configure Docker
         run: gcloud auth configure-docker --quiet
       - name: Push
@@ -50,34 +54,35 @@ jobs:
             --region $REGION \
             --platform managed \
             --allow-unauthenticated # Adjust
-  #
-  # deploy-prod: #Create different steps for different deployments
-  #   if: github.ref == 'refs/heads/main'  # Only run this job for the 'main' branch
-  #   runs-on: ubuntu-latest
-  #   environment: production #Create a production enviornment
-  #
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - id: 'auth'
-  #       uses: 'google-github-actions/auth@v1'
-  #       with:
-  #         credentials_json: '${{ secrets.GCP_SA_KEY }}' #Uses the secret in production
-  #     - name: Build
-  #       run: docker build \
-  #         --build-arg NODE_ENV=$NODE_ENV \
-  #         --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
-  #         --build-arg NEXTAUTH_URL=$NEXTAUTH_URL \
-  #         --build-arg NEXT_PUBLIC_GOOGLE_MAPS_KEY=$NEXT_PUBLIC_GOOGLE_MAPS_KEY \
-  #         --build-arg NEXT_PUBLIC_AUTH_SECRET=$NEXT_PUBLIC_AUTH_SECRET \
-  #         -t gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA .
-  #     - name: Configure Docker
-  #       run: gcloud auth configure-docker --quiet
-  #     - name: Push
-  #       run: docker push gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA
-  #     - name: Deploy
-  #       run: |
-  #         gcloud run deploy $SERVICE_NAME \
-  #           --image gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA \
-  #           --region $REGION \
-  #           --platform managed \
-  #           --allow-unauthenticated
+
+  deploy-prod: #Create different steps for different deployments
+      if: github.ref == 'refs/heads/main'  # Only run this job for the 'main' branch
+      runs-on: ubuntu-latest
+      environment: production #Create a production enviornment
+
+      steps:
+        - uses: actions/checkout@v3
+        - id: 'auth'
+          uses: 'google-github-actions/auth@v1'
+          with:
+            credentials_json: '${{ secrets.GCP_SA_KEY }}' #Uses the secret in production
+        - name: Build
+          run: |
+            docker build \
+              --build-arg NODE_ENV=$NODE_ENV \
+              --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL \
+              --build-arg NEXTAUTH_URL=$NEXTAUTH_URL \
+              --build-arg NEXT_PUBLIC_GOOGLE_MAPS_KEY=$NEXT_PUBLIC_GOOGLE_MAPS_KEY \
+              --build-arg NEXT_PUBLIC_AUTH_SECRET=$NEXT_PUBLIC_AUTH_SECRET \
+              -t gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA .
+        - name: Configure Docker
+          run: gcloud auth configure-docker --quiet
+        - name: Push
+          run: docker push gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA
+        - name: Deploy
+          run: |
+            gcloud run deploy $SERVICE_NAME \
+              --image gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA \
+              --region $REGION \
+              --platform managed \
+              --allow-unauthenticated
