@@ -8,14 +8,14 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  SERVICE_NAME: my-nextjs-app  #CHANGE
+  SERVICE_NAME: actota-frontend
   REGION: us-central1
   # Define these here for clarity and easy modification, even though
   # they're primarily used as build arguments.
-  NODE_ENV: production  # Or set based on branch
-  NEXT_PUBLIC_API_URL: http://your-api-url:8080 # CHANGE: Your actual API URL
+  NODE_ENV: ${{vars.NODE_ENV}}
+  NEXT_PUBLIC_API_URL: ${{vars.NEXT_PUBLIC_API_URL}}
   NEXT_TELEMETRY_DISABLED: 1
-  NEXTAUTH_URL: http://your-auth-url #CHANGE
+  NEXTAUTH_URL: ${{vars.NEXTAUTH_URL}}
   NEXT_PUBLIC_GOOGLE_MAPS_KEY: ${{secrets.NEXT_PUBLIC_GOOGLE_MAPS_KEY}}
   NEXT_PUBLIC_AUTH_SECRET: ${{secrets.NEXT_PUBLIC_AUTH_SECRET}}
 
