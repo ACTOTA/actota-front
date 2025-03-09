@@ -1,0 +1,63 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      # - main  # Trigger for your main/production branch
+      - uat   # Trigger for your UAT branch (create this branch if you don't have one)
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  SERVICE_NAME: ${{ vars.SERVICE_NAME }} # Use the vars.
+  REGION: ${{ vars.REGION }} # Use the vars.
+
+jobs:
+  deploy-uat:
+    if: github.ref == 'refs/heads/uat'  # Only run this job for the 'uat' branch
+    runs-on: ubuntu-latest
+    environment: UAT  # Specify the UAT environment
+
+    steps:
+      - uses: actions/checkout@v3
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}' #Uses the secret in UAT
+      - name: Build
+        run: docker build -t gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA .
+      - name: Configure Docker
+        run: gcloud auth configure-docker --quiet
+      - name: Push
+        run: docker push gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA
+      - name: Deploy
+        run: |
+          gcloud run deploy $SERVICE_NAME \
+            --image gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA \
+            --region $REGION \
+            --platform managed \
+            --allow-unauthenticated # Adjust
+
+  deploy-prod: #Create different steps for different deployments
+    if: github.ref == 'refs/heads/main'  # Only run this job for the 'main' branch
+    runs-on: ubuntu-latest
+    environment: production #Create a production enviornment
+
+    steps:
+      - uses: actions/checkout@v3
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}' #Uses the secret in production
+      - name: Build
+        run: docker build -t gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA .
+      - name: Configure Docker
+        run: gcloud auth configure-docker --quiet
+      - name: Push
+        run: docker push gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA
+      - name: Deploy
+        run: |
+          gcloud run deploy $SERVICE_NAME \
+            --image gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA \
+            --region $REGION \
+            --platform managed \
+            --allow-unauthenticated # Adjust
