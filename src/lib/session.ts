@@ -9,7 +9,9 @@ export const getClientSession = (): Session => {
   }
 
   try {
-    const userStr = localStorage.getItem('user');
+    // Use safe localStorage wrapper
+    const { getLocalStorageItem } = require('@/src/utils/browserStorage');
+    const userStr = getLocalStorageItem('user');
     if (!userStr) {
       return { user: null, isLoggedIn: false };
     }
@@ -19,7 +21,7 @@ export const getClientSession = (): Session => {
       return { user: null, isLoggedIn: false };
     }
 
-    const token = localStorage.getItem('token');
+    const token = getLocalStorageItem('token');
 
     return {
       user,

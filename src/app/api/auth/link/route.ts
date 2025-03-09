@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import actotaApi from '@/src/lib/apiClient';
 import { getAuthCookie } from '@/src/helpers/auth';
 
+export const dynamic = "force-dynamic";
+
 export async function POST(request: Request) {
   try {
     const authToken = await getAuthCookie();

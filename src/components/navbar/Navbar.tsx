@@ -18,8 +18,9 @@ import { useLogout } from "@/src/hooks/mutations/auth.mutation";
 import { useRouter } from "next/navigation";
 import { LoadScript } from "@react-google-maps/api";
 import { getAuthCookie, signOut } from "@/src/helpers/auth";
+import { getLocalStorageItem } from "@/src/utils/browserStorage";
 const Navbar = () => {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const user = JSON.parse(getLocalStorageItem('user') || '{}');
     // const { mutate: signOut, isPending } = useLogout();
     const router = useRouter();
     const pathname = usePathname();
@@ -42,7 +43,7 @@ const Navbar = () => {
         const checkAuth = async () => {
             const authStatus = await getAuthCookie();
             if (authStatus) {
-                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                const user = JSON.parse(getLocalStorageItem('user') || '{}');
                 setCurrentUser(user);
             }
             else {
@@ -57,7 +58,8 @@ const Navbar = () => {
 
     async function handleSignout() {
         signOut();
-        localStorage.removeItem('user');
+        const { removeLocalStorageItem } = require('@/src/utils/browserStorage');
+        removeLocalStorageItem('user');
         window.location.href = '/auth/signin';
         setCurrentUser(null);
     }

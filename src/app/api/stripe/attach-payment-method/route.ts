@@ -1,8 +1,9 @@
-"use server";
 
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import actotaApi from "@/src/lib/apiClient";
+
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {

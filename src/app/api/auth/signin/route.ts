@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import actotaApi from '@/src/lib/apiClient';
 import axios from 'axios';
 import { setAuthCookie } from '@/src/helpers/auth';
+
+export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   try {
     const payload = (await request.json()) as { email: string; password: string };

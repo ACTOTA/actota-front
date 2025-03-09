@@ -17,7 +17,7 @@ fi
 # Build the Docker image
 echo "Building Docker image..."
 
-docker buildx build --platform linux/amd64 \
+docker buildx build --platform linux/amd64 --no-cache \
   --tag ${IMAGE_NAME}:amd64 \
   --push \
   .

@@ -1,0 +1,39 @@
+# .dockerignore
+
+# dependencies
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# next.js local build output - we'll build inside Docker
+out
+
+# misc
+.git
+.github
+.gitignore
+README.md
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+
+# testing
+/coverage
+/test-results
+
+# editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

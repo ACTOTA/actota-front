@@ -33,7 +33,9 @@ const StripeCardForm = ({
     const getCustomerId = async () => {
       try {
         if (typeof window !== 'undefined') {
-          const user = JSON.parse(localStorage.getItem('user') || '{}');
+          // Use safe localStorage wrapper
+          const { getLocalStorageItem } = await import('@/src/utils/browserStorage');
+          const user = JSON.parse(getLocalStorageItem('user') || '{}');
           const userId = user.user_id;
 
           if (!userId) {

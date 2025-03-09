@@ -1,7 +1,10 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useState } from 'react';
+import ClientOnly from '@/src/components/ClientOnly';
 import { ArrowLeftIcon, XMarkIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
 import Button from '@/src/components/figma/Button';
@@ -20,7 +23,7 @@ import Input from '@/src/components/figma/Input';
 import ItineraryCalendar from '@/src/components/calendar/ItineraryCalendar';
 import LikeDislike from '@/src/components/LikeDislike';
 
-export default function BookingDetails() {
+function BookingDetails() {
   const pathname = usePathname() as string;
   const router = useRouter();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -303,6 +306,14 @@ export default function BookingDetails() {
         </div>
       </DrawerModal>
     </section>
+  );
+}
+
+export default function BookingDetailsPage() {
+  return (
+    <ClientOnly>
+      <BookingDetails />
+    </ClientOnly>
   );
 }
 

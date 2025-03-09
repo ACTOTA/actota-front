@@ -13,6 +13,11 @@ module.exports = {
     ]
   },
   output: 'standalone', // Added for Docker deployment
+  experimental: {
+    // Server Actions are now enabled by default
+  },
+  // Disable static optimization for all pages since we need dynamic functionality
+  staticPageGenerationTimeout: 120,
   async rewrites() {
     return [
       {

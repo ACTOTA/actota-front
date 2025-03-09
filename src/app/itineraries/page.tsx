@@ -1,6 +1,10 @@
 'use client'
+
+export const dynamic = 'force-dynamic';
+
 import React, { useEffect, useState } from 'react'
 import ItineraryCard from '@/src/components/ItineraryCard';
+import ClientOnly from '@/src/components/ClientOnly';
 import Button from '@/src/components/figma/Button';
 import Newsletter from '@/src/components/Newsletter';
 import Footer from '@/src/components/Footer';
@@ -104,4 +108,15 @@ const Itineraries = () => {
     )
 }
 
-export default Itineraries
+// Wrap in a safe server component for initial render
+const ItinerariesPage = () => {
+  return (
+    <>
+      <ClientOnly>
+        <Itineraries />
+      </ClientOnly>
+    </>
+  )
+}
+
+export default ItinerariesPage

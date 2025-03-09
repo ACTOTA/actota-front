@@ -45,7 +45,9 @@ const useLogout = () => {
     },
     onSuccess: () => {
       signOut();
-      localStorage.removeItem('user');
+      // Use safe localStorage wrapper
+      const { removeLocalStorageItem } = require('@/src/utils/browserStorage');
+      removeLocalStorageItem('user');
     },
   });
 };
