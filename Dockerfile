@@ -1,70 +1,33 @@
 # Use the official Node.js 20 image as the base for the build stage
 FROM --platform=linux/amd64 node:20-alpine as builder
-
 # Set the working directory
 WORKDIR /app
-
-# Copy package files first (for better layer caching)
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Configure npm
+# Increase the timeout for npm
 RUN npm config set fetch-retry-maxtimeout 60000
-
-# Install production dependencies first (for caching)
-RUN npm install --omit=dev
-
-# Copy the rest of the application code
-COPY . .
-
-# Install dev dependencies for build
+# Use a different npm registry (optional)
+RUN npm config set registry https://registry.npmjs.org/
+# Update npm to the latest version
+RUN npm install -g npm@latest
+# Install dependencies
 RUN npm install
-
-# Set NODE_OPTIONS to ensure enough memory for the build
-ENV NODE_OPTIONS="--max-old-space-size=4096"
-
+# Correctly copy the entire project
+COPY . .
 # Build the Next.js app
 RUN npm run build
-
-# Explicitly set permissions after the build
-RUN chown -R node:node /app
-
-# Verify build output exists
-RUN ls -la .next || (echo "Build failed - .next directory not created" && exit 1)
-
-# Production stage
+# After the npm run build step
+RUN ls -la /app/.next
+# Use the official Node.js 20 image as the base for the production stage
 FROM --platform=linux/amd64 node:20-alpine
+# Set the working directory
 WORKDIR /app
-
-# Set production environment (only once)
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
-
-# First copy package files
-COPY --from=builder /app/package*.json ./
-
-# Install ONLY production dependencies
-RUN npm install --omit=dev
-
-# Copy ONLY what's needed for production, ensuring correct paths
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/next.config.js ./
-
-# Create a non-root user and group with ID 1001
-RUN addgroup -g 1001 nodejs && \
-    adduser -u 1001 -G nodejs -s /bin/sh -D nextjs
-
-# Set correct ownership for application files (using numeric IDs)
-RUN chown -R 1001:1001 /app
-
-# Change to the non-root user
-USER nextjs
-
-# Verify the .next directory was copied correctly
-RUN ls -la .next || (echo ".next directory not copied from builder" && exit 1)
-
-# Expose the port
+# Copy the entire app from the builder stage
+COPY --from=builder /app .
+# Install production dependencies
+RUN npm install --production
+# Expose the port that will be defined by the PORT environment variable
 EXPOSE 8080
-
-# Use a specific start command
-CMD ["npm", "start", "--", "-p", "${PORT:-8080}"]
+# Start the app with environment variable for PORT
+CMD ["sh", "-c", "npm start -- -p ${PORT:-8080}"]
