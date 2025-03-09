@@ -60,4 +60,4 @@ jobs:
             --image gcr.io/$PROJECT_ID/$SERVICE_NAME:$GITHUB_SHA \
             --region $REGION \
             --platform managed \
-            --allow-unauthenticated # Adjust
+            --allow-unauthenticated
