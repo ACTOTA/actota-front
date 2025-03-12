@@ -39,7 +39,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
 
     return (
-        <div onClick={() => router.push(`/itineraries`)}
+        <div onClick={() => router.push(`/itineraries/${data._id.$oid}`)}
             className='hover:cursor-pointer group min-w-[308px] h-[400px] bg-white rounded-2xl text-white
              border border-border-primary max-sm:border-none flex-col justify-between items-end inline-flex overflow-hidden'>
 
@@ -97,7 +97,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
                 </div>
             </div>
 
-           
+
         </div>
     );
 }

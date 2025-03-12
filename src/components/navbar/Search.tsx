@@ -9,7 +9,8 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
   const router = useRouter();
   const [className, setClassName] = useState<string>('');
   const searchRef = useRef<HTMLDivElement>(null);
-  
+  const [isTop, setIsTop] = useState(true);
+
   // State for search inputs
   const [locationValue, setLocationValue] = useState("");
   const [durationValue, setDurationValue] = useState("");
@@ -60,17 +61,17 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
         break;
     }
   };
-  
+
   // Function to get activity count for display
   const getActivityCount = (value: string | undefined, showDetails: boolean = false) => {
     if (!value) return showDetails ? "Trip Details" : "What";
-    
+
     // Count the activities by splitting the comma-separated list
     const activities = value.split(',').filter(item => item.trim().length > 0);
     const count = activities.length;
-    
+
     if (count === 0) return showDetails ? "Trip Details" : "What";
-    
+
     if (showDetails) {
       // For the secondary text, show "n Activities"
       return `${count} ${count === 1 ? 'Activity' : 'Activities'}`;
@@ -89,11 +90,14 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
 
       const handleScroll = () => {
         if (window.scrollY >= initialPosition && !navbar) {
-          setClasses?.(' fixed top-[8px]  left-1/2 -translate-x-1/2  h-fit');
-          setClassName('w-[580px] md:w-[640px] xl:w-[700px] 2xl:w-[720px] ');
+          // Set fixed position and explicitly set height to 60px
+          setClasses?.('fixed top-[8px] left-1/2 -translate-x-1/2 h-[60px]');
+          setClassName('w-[580px] md:w-[640px] xl:w-[700px] 2xl:w-[720px] h-[60px]');
+          setIsTop(false);
         } else {
           setClasses?.('');
           setClassName('');
+          setIsTop(true);
         }
       };
 
@@ -103,8 +107,10 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
   }, [searchRef, setClasses, navbar]);
 
   return (
-    <div className="w-full relative" id="search-bar">
-      <div className={`items-center justify-between ${navbar ? 'w-[420px] h-[60px] text-primary-gray' : 'w-[720px] max-md:w-[520px] max-sm:w-[360px] max-sm:h-[50px] max-md:h-[60px] h-[82px] text-white'} grid grid-cols-9 rounded-full border-2 border-border-primary
+    <div className={`items-center justify-between ${navbar ? '...' : '...'} ... ${className}`} ref={searchRef}>
+      <div className={`items-center justify-between ${navbar ? 'w-[420px] h-[60px] text-primary-gray  max-2xl:h-[60px]' : 'w-[720px] max-md:w-[520px] max-sm:w-[360px] max-sm:h-[50px] max-md:h-[60px] text-white'} 
+      ${isTop ? 'h-[82px]' : ''}
+      grid grid-cols-9 rounded-full border-2 border-border-primary
       bg-black/40 backdrop-filter backdrop-blur-sm text-sm text-left m-auto z-50
       transition-all duration-300 ease-in-out ${className}`} ref={searchRef}>
 
@@ -160,8 +166,8 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
           )}
         </section>
 
-        <section className={`${navbar ? ' h-[55px] w-[55px] pr-1 -ml-2' : ' max-md:h-[55px] max-md:w-[55px] max-sm:h-[45px] max-sm:w-[45px] max-md:pr-1 max-md:-ml-2 h-full w-full px-2'} col-span-1 flex justify-center items-center`}>
-          <div onClick={() => router.push('/itineraries')} className="w-full aspect-square relative rounded-full bg-white cursor-pointer
+        <section className={`${navbar ? ' h-[55px] w-[55px] pr-1 -ml-2' : 'm-auto max-2xl:h-[58px] max-2xl:w-[58px] max-md:h-[55px] max-md:w-[55px] max-sm:h-[45px] max-sm:w-[45px] max-md:pr-1 max-md:-ml-2 h-full w-full px-2'} col-span-1 flex justify-center items-center`}>
+          <div onClick={() => router.push('/itineraries')} className="w-full aspect-square relative rounded-full bg-white cursor-pointer m-auto
             transition-all duration-300 ease-in-out">
             <BiSearch size={24} className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 text-black" />
           </div>
@@ -170,8 +176,8 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
 
       {currStep != null && (
         <div id='search-box' className="w-full">
-          <SearchBoxes 
-            step={currStep} 
+          <SearchBoxes
+            step={currStep}
             updateSearchValue={updateSearchValue}
             locationValue={locationValue}
             durationValue={durationValue}
