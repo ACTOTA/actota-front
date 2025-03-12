@@ -7,6 +7,11 @@ import { MdOutlineDirectionsCarFilled } from "react-icons/md";
 import { FaPersonWalking } from "react-icons/fa6";
 import ActivityDropdown from './ActivityDropdown';
 
+interface ActivitiesMenuProps {
+    updateSearchValue?: (value: string) => void;
+    activitiesValue?: string;
+}
+
 
 // activity icons
 import ATVing from "@/public/activity-icons/atVing.svg";
@@ -50,15 +55,40 @@ import { useActivities } from '@/src/hooks/queries/activity/useActivityQuery';
 import { useLodging } from '@/src/hooks/queries/lodging/useLodgingQuery';
 
 
-export default function ActivitiesMenu() {
+export default function ActivitiesMenu({ updateSearchValue, activitiesValue }: ActivitiesMenuProps) {
 
     const lodgings = useLodging();
     const activity = useActivities();
-    const [selectedActivity, setSelectedActivity] = useState('Select preferred activities');
+    const [selectedActivity, setSelectedActivity] = useState(activitiesValue || 'Select preferred activities');
     const [selectedLodging, setSelectedLodging] = useState('Select preferred lodging');
     const [selectedTransportation, setSelectedTransportation] = useState('Select preferred transportation');
     const [lodgingEnabled, setLodgingEnabled] = useState(true);
     const [transportationEnabled, setTransportationEnabled] = useState(false);
+
+    // Update parent component when selections change
+    useEffect(() => {
+        updateSummary();
+    }, [selectedActivity, selectedLodging, selectedTransportation, lodgingEnabled, transportationEnabled]);
+
+    const updateSummary = () => {
+        const activities = [];
+        
+        if (selectedActivity && selectedActivity !== 'Select preferred activities') {
+            activities.push(selectedActivity);
+        }
+        
+        if (lodgingEnabled && selectedLodging && selectedLodging !== 'Select preferred lodging') {
+            activities.push(selectedLodging);
+        }
+        
+        if (transportationEnabled && selectedTransportation && selectedTransportation !== 'Select preferred transportation') {
+            activities.push(selectedTransportation);
+        }
+        
+        // Join with commas for proper parsing when counting in the Search component
+        const summary = activities.join(', ');
+        updateSearchValue?.(summary);
+    };
 
     const staticActivities = [
         { id: 'atving', label: 'ATVing', icon: ATVing },

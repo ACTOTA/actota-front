@@ -1,14 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PlusMinusButton, { ButtonType } from '../figma/PlusMinusButton';
 
-export default function GuestMenu() {
+interface GuestMenuProps {
+  updateSearchValue?: (value: string) => void;
+  guestsValue?: string;
+}
 
+export default function GuestMenu({ updateSearchValue, guestsValue }: GuestMenuProps) {
     const max = 10;
 
-    const [adults, setAdults] = React.useState(0);
-    const [children, setChildren] = React.useState(0);
-    const [infants, setInfants] = React.useState(0);
+    // Parse existing guest values if available
+    const parseExistingValues = () => {
+      if (!guestsValue) return { adults: 0, children: 0, infants: 0 };
+      
+      const parts = guestsValue.split(', ');
+      const adults = parseInt(parts[0]?.split(' ')[0] || '0', 10);
+      const children = parts.length > 1 ? parseInt(parts[1]?.split(' ')[0] || '0', 10) : 0;
+      const infants = parts.length > 2 ? parseInt(parts[2]?.split(' ')[0] || '0', 10) : 0;
+      
+      return { adults, children, infants };
+    };
+    
+    const initialValues = parseExistingValues();
+    const [adults, setAdults] = useState(initialValues.adults);
+    const [children, setChildren] = useState(initialValues.children);
+    const [infants, setInfants] = useState(initialValues.infants);
 
+    useEffect(() => {
+      updateGuestSummary();
+    }, [adults, children, infants]);
+
+    const updateGuestSummary = () => {
+      let summary = '';
+      
+      if (adults > 0) {
+        summary += `${adults} adult${adults !== 1 ? 's' : ''}`;
+      }
+      
+      if (children > 0) {
+        summary += summary ? `, ${children} child${children !== 1 ? 'ren' : ''}` : `${children} child${children !== 1 ? 'ren' : ''}`;
+      }
+      
+      if (infants > 0) {
+        summary += summary ? `, ${infants} infant${infants !== 1 ? 's' : ''}` : `${infants} infant${infants !== 1 ? 's' : ''}`;
+      }
+      
+      if (!summary) {
+        summary = ''; // Keep empty if no guests selected
+      }
+      
+      updateSearchValue?.(summary);
+    };
 
     const updateInfant = (value: ButtonType) => () => {
         if (value === ButtonType.plus) {
@@ -35,7 +77,7 @@ export default function GuestMenu() {
     };
 
     return (
-        <section className="h-full w-full text-white backdrop-blur-md  border-2 border-border-primary rounded-3xl grid grid-rows-3 gap-3 text-lg z-20 p-4">
+        <section className="h-full w-full text-white backdrop-blur-md border-2 border-border-primary rounded-3xl grid grid-rows-3 gap-3 text-lg z-20 p-4">
             <div className="flex justify-between">
                 <div>
                     <p>Adults</p>
@@ -73,5 +115,5 @@ export default function GuestMenu() {
                 </div>
             </div>
         </section>
-    )
+    );
 }
