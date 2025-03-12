@@ -98,9 +98,6 @@ const Navbar = () => {
                         <div className="flex flex-row items-start justify-between w-full h-full" >
                             <Logo onClick={handleClick} className="hover:cursor-pointer z-50 my-auto" />
 
-                            {window.location.pathname !== "/" && <div className="z-50 max-lg:hidden">
-                                <Search setClasses={setClasses} currStep={currStep} setCurrStep={setCurrStep} navbar={true} />
-                            </div>}
 
                             {currentUser ? (
                                 <div className="mt-1">

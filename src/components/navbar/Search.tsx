@@ -142,7 +142,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
       )}
 
       <div className={`relative ${navbar ? '' : 'max-lg:fixed max-lg:bottom-5 max-lg:h-[60px] max-lg:left-0 max-lg:right-0 max-lg:px-4 max-lg:z-50 max-lg:pb-2'}`} id="search-bar">
-        <div className={`items-center justify-between ${navbar ? 'w-[420px] h-[60px] text-primary-gray max-2xl:h-[60px]' : 'w-[720px] max-lg:w-full max-lg:h-[60px] max-md:w-[520px] max-sm:w-[360px] max-sm:h-[50px] max-md:h-[60px] text-white'} 
+        <div className={`items-center justify-between ${navbar ? 'w-[500px] h-[60px] text-primary-gray max-2xl:h-[60px]' : 'w-[720px] max-lg:w-full max-lg:h-[60px] max-md:w-[520px] max-sm:w-[360px] max-sm:h-[50px] max-md:h-[60px] text-white'} 
         ${isTop && !navbar ? 'h-[82px]' : 'h-[60px]'}
         grid grid-cols-9 rounded-full border-2 border-border-primary
         bg-black/40 backdrop-filter backdrop-blur-sm text-sm text-left m-auto z-50
