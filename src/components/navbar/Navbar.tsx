@@ -78,7 +78,7 @@ const Navbar = () => {
                     <div className="py-2 w-full h-full px-4 sm:px-[64px] " >
                         {/* <Container> */}
                         <div className="flex flex-row items-start justify-between w-full h-full" >
-                            <Logo onClick={handleClick} className="hover:cursor-pointer z-50 mt-5" />
+                            <Logo onClick={handleClick} className="hover:cursor-pointer z-50 my-auto" />
 
                             {window.location.pathname !== "/" && <div className="z-50 max-lg:hidden">
 
