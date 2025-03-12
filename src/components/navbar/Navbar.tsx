@@ -19,9 +19,9 @@ import { useRouter } from "next/navigation";
 import { LoadScript } from "@react-google-maps/api";
 import { getAuthCookie, signOut } from "@/src/helpers/auth";
 import { getLocalStorageItem } from "@/src/utils/browserStorage";
+
 const Navbar = () => {
     const user = JSON.parse(getLocalStorageItem('user') || '{}');
-    // const { mutate: signOut, isPending } = useLogout();
     const router = useRouter();
     const pathname = usePathname();
     const isAuthRoute = pathname?.startsWith('/auth');
@@ -31,7 +31,31 @@ const Navbar = () => {
     const [loading, setLoading] = useState(true)
     const path = usePathname();
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [isNotificationDrawerOpen, setIsNotificationDrawerOpen] = useState(false);
+    const [screenWidth, setScreenWidth] = useState(
+        typeof window !== 'undefined' ? window.innerWidth : 0
+    );
 
+    // Track screen width for responsive design
+    useEffect(() => {
+        const handleResize = () => {
+            setScreenWidth(window.innerWidth);
+        };
+
+        if (typeof window !== 'undefined') {
+            setScreenWidth(window.innerWidth);
+            window.addEventListener('resize', handleResize);
+        }
+
+        return () => {
+            if (typeof window !== 'undefined') {
+                window.removeEventListener('resize', handleResize);
+            }
+        };
+    }, []);
+
+    // Determine if we're on a small screen
+    const isSmallScreen = screenWidth < 1100 && window.location.pathname !== ""; // Adjust breakpoint as needed
 
     const handleClick = () => {
         if (path !== "/") {
@@ -47,9 +71,6 @@ const Navbar = () => {
                 setCurrentUser(user);
             }
             else {
-                // if (window.location.pathname !== '/auth/signin') {
-                //     router.push('/auth/signin');
-                // }
                 setCurrentUser(null);
             }
         }
@@ -64,8 +85,6 @@ const Navbar = () => {
         setCurrentUser(null);
     }
 
-    // if (loading) return null
-
     return (
         <div>
             <LoadScript
@@ -75,33 +94,79 @@ const Navbar = () => {
                 region="EN"
                 version="weekly">
                 <div className={`fixed h-[78px] z-30 w-full bg-black/70 backdrop-blur-sm text-white flex items-center ${isAuthRoute ? 'hidden' : ''}`}>
-                    <div className="py-2 w-full h-full px-4 sm:px-[64px] " >
-                        {/* <Container> */}
+                    <div className="py-2 w-full h-full px-4" >
                         <div className="flex flex-row items-start justify-between w-full h-full" >
-                            <Logo onClick={handleClick} className="hover:cursor-pointer z-50 mt-5" />
+                            <Logo onClick={handleClick} className="hover:cursor-pointer z-50 my-auto" />
 
-                            {window.location.pathname !== "/" && <div className="z-50 max-lg:hidden">
-
-                                <Search setClasses={setClasses} currStep={currStep} setCurrStep={setCurrStep} navbar={true} />
-                            </div>}
 
                             {currentUser ? (
                                 <div className="mt-1">
                                     <Menu as="div" className="relative inline-block text-left text-white">
                                         <div className="flex items-center gap-2">
-                                            <button onClick={() => setIsDrawerOpen(true)} className="rounded-full  text-white flex items-center justify-center p-3.5 border border-[#424242] max-sm:hidden relative">
-                                                <Image src="/svg-icons/notification.svg" alt="User" width={28} height={28} className="rounded-full" />
-                                                <div className="absolute top-3 right-3 w-2 h-2 bg-red-500 rounded-full" /> </button>
-                                            <Menu.Button className="inline-flex w-full justify-center items-center pr-4 gap-x-1.5 rounded-full  p-0.5 text-sm font-semibold text-white shadow-sm border border-[#424242] sm:hover:bg-gray-800 max-sm:border-none">
-                                                {currentUser.image ? <Image src={currentUser.image} alt="User" width={32} height={32} className="rounded-full" /> : <div className="rounded-full bg-[#00122D] text-white flex items-center justify-center p-3"> <LuUser className="w-6 h-6" /> </div>}
-                                                <p className="max-sm:hidden">{(currentUser.first_name && currentUser.last_name) ? (currentUser.first_name + " " + currentUser.last_name) : currentUser.email}</p>
-                                                <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-white max-sm:hidden" />
+                                            {/* Show notification button only on larger screens */}
+                                            {!isSmallScreen && (
+                                                <button
+                                                    onClick={() => setIsNotificationDrawerOpen(true)}
+                                                    className="rounded-full text-white flex items-center justify-center p-3.5 border border-[#424242] relative"
+                                                >
+                                                    <Image src="/svg-icons/notification.svg" alt="Notifications" width={28} height={28} className="rounded-full" />
+                                                    <div className="absolute bg-red-500 rounded-full" />
+                                                </button>
+                                            )}
+
+                                            <Menu.Button className="inline-flex w-full justify-center items-center gap-x-1.5 rounded-full p-0.5 text-sm font-semibold text-white shadow-sm border border-[#424242] sm:hover:bg-gray-800 max-sm:border-none">
+                                                {currentUser.image ?
+                                                    <Image src={currentUser.image} alt="User" width={32} height={32} className="rounded-full" /> :
+                                                    <div className="rounded-full bg-[#00122D] text-white flex items-center justify-center p-3">
+                                                        <LuUser className="w-6 h-6" />
+                                                    </div>
+                                                }
+                                                {!isSmallScreen && (
+                                                    <>
+                                                        <p>{(currentUser.first_name && currentUser.last_name) ?
+                                                            (currentUser.first_name + " " + currentUser.last_name) :
+                                                            currentUser.email}
+                                                        </p>
+                                                        <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-white" />
+                                                    </>
+                                                )}
                                             </Menu.Button>
                                         </div>
 
                                         <Menu.Items
                                             className="absolute right-0 z-10 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-black/90 border border-white/20 shadow-lg ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
                                         >
+                                            {/* Show user name at top for small screens */}
+                                            {isSmallScreen && (
+                                                <div className="px-4 py-3 border-b border-white/10">
+                                                    <p className="text-sm font-medium">
+                                                        {(currentUser.first_name && currentUser.last_name) ?
+                                                            (currentUser.first_name + " " + currentUser.last_name) :
+                                                            currentUser.email}
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            {/* Show notifications option on small screens */}
+                                            {isSmallScreen && (
+                                                <div className="">
+                                                    <Menu.Item>
+                                                        <button
+                                                            onClick={() => {
+                                                                setIsNotificationDrawerOpen(true);
+                                                                // Optional: close the menu when opening notifications
+                                                                document.body.click();
+                                                            }}
+                                                            className="w-full text-left px-4 py-2 pt-3 text-sm hover:bg-red-500/20 hover:rounded-t-md flex items-center"
+                                                        >
+                                                            <Image src="/svg-icons/notification.svg" alt="Notifications" width={20} height={20} className="mr-2" />
+                                                            Notifications
+                                                            <div className="ml-2 w-2 h-2 bg-red-500 rounded-full" />
+                                                        </button>
+                                                    </Menu.Item>
+                                                </div>
+                                            )}
+
                                             <div className="">
                                                 <Menu.Item>
                                                     <Link href="/profile" className="block px-4 py-2 pt-3 text-sm data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none 
@@ -110,7 +175,6 @@ const Navbar = () => {
                                                     </Link>
                                                 </Menu.Item>
                                                 <Menu.Item>
-
                                                     <Link href="/profile/favorites" className="block px-4 py-2 text-sm data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none 
                                                     hover:bg-red-500/20">
                                                         Favorites
@@ -128,7 +192,6 @@ const Navbar = () => {
                                                         Payments
                                                     </Link>
                                                 </Menu.Item>
-
                                             </div>
                                             <div className="">
                                                 <Menu.Item>
@@ -145,7 +208,7 @@ const Navbar = () => {
                                                 </Menu.Item>
                                                 <Menu.Item>
                                                     <div className="block px-4 py-2 pb-3 text-sm data-[focus]:bg-gray-100 data-[focus]:text-gray-900 data-[focus]:outline-none 
-                                                    hover:bg-red-500/20 hover:rounded-b-md" onClick={handleSignout}>
+                                                    hover:bg-red-500/20 hover:rounded-b-md cursor-pointer" onClick={handleSignout}>
                                                         Sign Out
                                                     </div>
                                                 </Menu.Item>
@@ -160,14 +223,15 @@ const Navbar = () => {
                                 </div>
                             )}
                         </div>
-                        {/* </Container> */}
                     </div>
                 </div>
+
+                {/* Notification drawer */}
                 <DrawerModal
-                    isDrawerOpen={isDrawerOpen}
-                    setIsDrawerOpen={setIsDrawerOpen}
+                    isDrawerOpen={isNotificationDrawerOpen}
+                    setIsDrawerOpen={setIsNotificationDrawerOpen}
                 >
-                    <NotificationsDrawer setIsDrawerOpen={setIsDrawerOpen} />
+                    <NotificationsDrawer setIsDrawerOpen={setIsNotificationDrawerOpen} />
                 </DrawerModal>
             </LoadScript>
         </div>
@@ -175,5 +239,3 @@ const Navbar = () => {
 }
 
 export default Navbar;
-
-

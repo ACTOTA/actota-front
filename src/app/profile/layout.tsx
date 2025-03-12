@@ -7,12 +7,12 @@ export default function ProfileLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
     <div className="relative flex max-w-[1280px] mx-auto pt-20">
       {/* Mobile Menu Button */}
-      {!isSidebarOpen && <button 
+      {!isSidebarOpen && <button
         className="md:hidden absolute top-[70px] left-4 z-30 flex items-center gap-2 text-white"
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
       >
@@ -27,11 +27,11 @@ export default function ProfileLayout({
         fixed max-md:top-20 top-2 left-0 h-full max-md:w-full z-20 transform transition-transform duration-300 ease-in-out
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <Sidebar onItemClick={() =>{ setIsSidebarOpen(false)}} />
+        <Sidebar onItemClick={() => { setIsSidebarOpen(false) }} />
       </div>
 
       <div className="w-full  text-white p-8 max-md:p-4 relative">
-    
+
         {children}
       </div>
     </div>

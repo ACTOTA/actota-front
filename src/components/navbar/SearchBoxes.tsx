@@ -5,16 +5,25 @@ import LocationMenu from './LocationMenu';
 import DateMenu from './DateMenu';
 import GuestMenu from './GuestMenu';
 import ActivitiesMenu from './ActivitiesMenu';
-import { LoadScript } from '@react-google-maps/api';
-const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
 
 type SearchBoxesProps = {
   step: STEPS;
+  updateSearchValue?: (step: STEPS, value: string) => void;
+  locationValue?: string;
+  durationValue?: string;
+  guestsValue?: string;
+  activitiesValue?: string;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-export default function SearchBoxes({ step, ...rest }: SearchBoxesProps) {
-
-  const [mapLoaded, setMapLoaded] = useState(false);
+export default function SearchBoxes({
+  step,
+  updateSearchValue,
+  locationValue,
+  durationValue,
+  guestsValue,
+  activitiesValue,
+  ...rest
+}: SearchBoxesProps) {
 
   const dimensions = useMemo(() => {
     switch (step) {
@@ -31,24 +40,41 @@ export default function SearchBoxes({ step, ...rest }: SearchBoxesProps) {
     }
   }, [step]);
 
-  useEffect(() => {
-    if (step === STEPS.LOCATION) {
-      setMapLoaded(true);
-    }
-
-  }, [step, dimensions]);
-
-
-
   return (
-    <div  className={`m-auto mt-4 bg-black/60 backdrop-filter   
-        before:rounded-3xl rounded-3xl flex flex-col justify-center items-center box-content  w-[${dimensions.w}px] max-md:!w-full`}  {...rest}>
-      {step === STEPS.LOCATION && <LocationMenu />    }
-      {step === STEPS.DATE && <DateMenu />}
-      {step == STEPS.GUESTS && <GuestMenu />}
-      {step === STEPS.ACTIVITIES &&
+    <div className={`m-auto mt-4
+        before:rounded-3xl rounded-3xl flex flex-col justify-center items-center box-content 
+        max-lg:max-h-[70vh] max-lg:overflow-y-auto max-lg:w-full
+        w-full lg:w-[${dimensions.w}px] max-w-full mx-auto`} {...rest}>
+      {step === STEPS.LOCATION &&
+        <LocationMenu
+          updateSearchValue={(value) => updateSearchValue?.(STEPS.LOCATION, value)}
+          locationValue={locationValue}
+          className='bg-black/60 backdrop-filter max-lg:mt-0 max-lg:mb-4'
+        />
+      }
 
-        <ActivitiesMenu />
+      {step === STEPS.DATE &&
+        <DateMenu
+          updateSearchValue={(value) => updateSearchValue?.(STEPS.DATE, value)}
+          durationValue={durationValue}
+          className='bg-black/60 backdrop-filter max-lg:mt-0 max-lg:mb-4'
+        />
+      }
+
+      {step === STEPS.GUESTS &&
+        <GuestMenu
+          updateSearchValue={(value) => updateSearchValue?.(STEPS.GUESTS, value)}
+          guestsValue={guestsValue}
+          className='bg-black/60 backdrop-filter max-lg:mt-0 max-lg:mb-4'
+        />
+      }
+
+      {step === STEPS.ACTIVITIES &&
+        <ActivitiesMenu
+          updateSearchValue={(value) => updateSearchValue?.(STEPS.ACTIVITIES, value)}
+          activitiesValue={activitiesValue}
+          className='bg-black/60 backdrop-filter max-lg:mt-0 max-lg:mb-4'
+        />
       }
     </div>
   )

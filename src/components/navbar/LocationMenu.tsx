@@ -3,8 +3,6 @@ import { GrLocation } from "react-icons/gr";
 import Button from "../figma/Button";
 import MapPage from "../MapPage";
 import Input from "../figma/Input";
-import { LoadScript } from "@react-google-maps/api";
-const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
 
 interface Location {
   city: string;
@@ -14,8 +12,14 @@ interface Location {
   country: string;
 }
 
-export default function LocationMenu() {
-  const [searchTerm, setSearchTerm] = useState("");
+interface LocationMenuProps {
+  updateSearchValue?: (value: string) => void;
+  locationValue?: string;
+  className?: string;
+}
+
+export default function LocationMenu({ updateSearchValue, locationValue, className }: LocationMenuProps) {
+  const [searchTerm, setSearchTerm] = useState(locationValue || "");
   const [results, setResults] = useState<Location[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -72,9 +76,9 @@ export default function LocationMenu() {
 
                       // Updated component mapping to handle different location types
                       addressComponents.forEach((component) => {
-                        if (component.types.includes("locality") || 
-                            component.types.includes("postal_town") ||
-                            component.types.includes("administrative_area_level_3")) {
+                        if (component.types.includes("locality") ||
+                          component.types.includes("postal_town") ||
+                          component.types.includes("administrative_area_level_3")) {
                           city = component.long_name;
                         }
                         if (component.types.includes("administrative_area_level_1")) {
@@ -113,51 +117,63 @@ export default function LocationMenu() {
 
   const handleLocationSelect = (location: Location) => {
     setSelectedLocation(location);
-    setSearchTerm(`${location.city}, ${location.state}`);
+    const locationText = `${location.city}, ${location.state}`;
+    setSearchTerm(locationText);
     setResults([]);
+    updateSearchValue?.(locationText);
+  };
+
+  const handleConfirmLocation = () => {
+    if (selectedLocation) {
+      const locationText = `${selectedLocation.city}, ${selectedLocation.state}`;
+      updateSearchValue?.(locationText);
+    }
   };
 
   return (
-   
-      <section className="flex flex-col justify-between backdrop-blur-md gap-6 py-6 h-full w-[584px] max-md:w-full z-20 p-4 border-2 border-border-primary rounded-3xl">
-        <div>
-          <div className="h-2" />
-          <div className="relative">
-            <Input
-              placeholder="Search for a city..."
-              type="search"
-              value={searchTerm}
-              onChange={handleInputChange}
-              icon={<GrLocation aria-hidden="true" className="size-5 text-white" />}
-            />
-            {results.length > 0 && (
-              <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-black/30 backdrop-blur-md py-1 text-base shadow-lg ring-1 ring-white/20 focus:outline-none sm:text-sm">
-                {results.map((location, index) => (
-                  <li
-                    key={index}
-                    className="relative cursor-pointer py-3 px-4 text-white hover:bg-white/20 transition-colors duration-200"
-                    onClick={() => handleLocationSelect(location)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <GrLocation className="size-4" />
-                      <div>
-                        <div className="font-medium">{location.city}</div>
-                        <div className="text-sm text-gray-300">{location.state } {location.country} </div>
-                      </div>
+    <section className={`flex flex-col justify-between backdrop-blur-md gap-6 py-6 h-full w-full max-w-[584px] z-20 p-4 border-2 border-border-primary rounded-3xl ${className}`} >
+      <div>
+        <div className="h-2" />
+        <div className="relative">
+          <Input
+            placeholder="Search for a city..."
+            type="search"
+            value={searchTerm}
+            onChange={handleInputChange}
+            icon={<GrLocation aria-hidden="true" className="size-5 text-white" />}
+          />
+          {results.length > 0 && (
+            <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-black/30 backdrop-blur-md py-1 text-base shadow-lg ring-1 ring-white/20 focus:outline-none sm:text-sm">
+              {results.map((location, index) => (
+                <li
+                  key={index}
+                  className="relative cursor-pointer py-3 px-4 text-white hover:bg-white/20 transition-colors duration-200"
+                  onClick={() => handleLocationSelect(location)}
+                >
+                  <div className="flex items-center gap-3">
+                    <GrLocation className="size-4" />
+                    <div>
+                      <div className="font-medium">{location.city}</div>
+                      <div className="text-sm text-gray-300">{location.state} {location.country}</div>
                     </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-        <div className="w-full">
-          <MapPage visible={true} location={selectedLocation} />
-        </div>
-        <Button variant="primary" className="bg-white text-black h-14 w-full" disabled={!selectedLocation}>
-          <p>Confirm Location</p>
-        </Button>
-      </section>
-
+      </div>
+      <div className="w-full">
+        <MapPage visible={true} location={selectedLocation} />
+      </div>
+      <Button
+        variant="primary"
+        className="bg-white text-black h-14 w-full"
+        disabled={!selectedLocation}
+        onClick={handleConfirmLocation}
+      >
+        <p>Confirm Location</p>
+      </Button>
+    </section >
   );
 }

@@ -64,9 +64,18 @@ export default function DateMenuCalendar({ onDateRangeChange }: DateMenuCalendar
       }
     }
 
+    // Format dates for display
+    const formatDate = (dateString: string) => {
+      const d = new Date(dateString);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
+    
+    const formattedStartDate = newStartDate ? formatDate(newStartDate) : null;
+    const formattedEndDate = newEndDate ? formatDate(newEndDate) : null;
+
     setStartDate(newStartDate);
     setEndDate(newEndDate);
-    onDateRangeChange(newStartDate, newEndDate);
+    onDateRangeChange(formattedStartDate, formattedEndDate);
   }
 
 

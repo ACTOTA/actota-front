@@ -72,7 +72,7 @@ export default function FeaturedItineraries() {
           </div>
 
         </div>
-        <div className="flex flex-wrap justify-start max-sm:justify-center gap-4">
+        <div className="flex flex-wrap justify-center max-sm:justify-center gap-4">
           {itinerariesLoading && <div className="text-white text-center w-full">Loading...</div>}
           {itinerariesError && <div className="text-white text-center w-full">Error: {itinerariesError.message}</div>}
           {listings.length > 0 && listings?.map((listing) => (
