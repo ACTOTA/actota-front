@@ -51,13 +51,13 @@ const MyItineraryCard: React.FC<ListingCardProps> = ({
 
                 </div>
                 <div className='flex gap-2'>
-                   <Button variant='primary' size='sm' className='!bg-[#C10B2F] text-white'>Delete</Button>
+                    <Button variant='primary' size='sm' className='!bg-[#C10B2F] text-white'>Delete</Button>
                     <Button variant='outline' size='sm' className=' text-white gap-2'> View <CgArrowRight className='size-6' /></Button>
                 </div>
             </div>
             <div className="h-[1px] max-lg:hidden my-2 w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
 
-            <div onClick={() => router.push(`/itineraries/1`)} className='flex justify-between max-lg:flex-col-reverse relative gap-4 h-full w-full'>
+            <div onClick={() => router.push(`/itineraries/${data._id.$oid}`)} className='flex justify-between max-lg:flex-col-reverse relative gap-4 h-full w-full'>
                 <div className='w-full'>
 
                     <div className='flex  items-center gap-3 my-3 text-white' >

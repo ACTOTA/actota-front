@@ -9,6 +9,12 @@ import ModalContainer from "../components/ModalContainer";
 import DrawerModal from "../components/DrawerModal";
 import { Providers } from "./providers";
 import { Toaster } from "react-hot-toast";
+import dynamic from "next/dynamic";
+
+// Dynamically import the SessionChecker to avoid SSR issues
+const SessionChecker = dynamic(() => import('@/src/components/SessionChecker'), {
+  ssr: false,
+});
 export const metadata = {
   title: "ACTOTA!",
   description: "Personalized Tours Made Easy",
@@ -40,6 +46,8 @@ export default async function RootLayout({
           <ClientOnly>
             <ModalContainer />
             <Navbar />
+            {/* Add SessionChecker to validate sessions across the app */}
+            <SessionChecker />
           </ClientOnly>
           <div>{children}</div>
         <Toaster />

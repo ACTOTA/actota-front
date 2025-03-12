@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import GlassPanel from '@/src/components/figma/GlassPanel';
 import Input from '@/src/components/figma/Input';
@@ -8,20 +8,30 @@ import { HiOutlineMail } from 'react-icons/hi';
 import { BiLock } from 'react-icons/bi';
 import Button from '@/src/components/figma/Button';
 import Link from 'next/link';
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useLogin } from '@/src/hooks/mutations/auth.mutation';
 import { getErrorMessage } from '@/src/utils/getErrorMessage';
 import { getAuthCookie } from '@/src/helpers/auth';
 export default function SignIn() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { mutate: login, isPending } = useLogin();
   const [errors, setErrors] = useState({
     email: '',
     password: ''
   });
+  const [sessionError, setSessionError] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  
+  // Check for session expiration from URL params
+  useEffect(() => {
+    const expired = searchParams.get('expired');
+    if (expired === 'true') {
+      setSessionError('Your session has expired. Please log in again.');
+    }
+  }, [searchParams]);
 
   // Redirect if already authenticated
   React.useEffect(() => {
@@ -131,6 +141,12 @@ export default function SignIn() {
       </div>
       <p className='text-light-gray text-[16px] leading-[24px] mt-1'>Sign in to your account to continue.</p>
       <form onSubmit={(e) => handleSubmit(e)} className="m-auto flex flex-col gap-4 w-full mt-[16px]">
+        {sessionError && (
+          <div className="mt-1 px-4 py-3 text-sm text-white bg-[#79071D] rounded-md">
+            {sessionError}
+          </div>
+        )}
+        
         <div>
           <p className="text-primary-gray text-left mb-1 mt-[16px]">Email Address</p>
           <Input

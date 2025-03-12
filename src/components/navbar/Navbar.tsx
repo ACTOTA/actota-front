@@ -39,6 +39,19 @@ const Navbar = () => {
         }
     }
 
+    // Import the useSessionValidator hook
+    const { useSessionValidator } = require('@/src/hooks/useSessionValidator');
+
+    // Use the session validator to automatically check for session expiration
+    useSessionValidator({
+        onInvalidSession: () => {
+            setCurrentUser(null);
+            if (window.location.pathname.startsWith('/profile')) {
+                window.location.href = '/auth/signin';
+            }
+        }
+    });
+
     useEffect(() => {
         const checkAuth = async () => {
             const authStatus = await getAuthCookie();
@@ -47,9 +60,6 @@ const Navbar = () => {
                 setCurrentUser(user);
             }
             else {
-                // if (window.location.pathname !== '/auth/signin') {
-                //     router.push('/auth/signin');
-                // }
                 setCurrentUser(null);
             }
         }
