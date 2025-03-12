@@ -71,11 +71,11 @@ export default function Hero() {
         priority
       />
 
-      <div className={`relative w-full transition-all duration-700 ease-in-out  flex flex-col items-center justify-center
+      <div className={`relative w-full transition-all duration-700 ease-in-out flex flex-col items-center justify-center
                 ${currStep != null ? 'h-full' : 'h-0'}`}>
-        <div className={` py-[50px] flex flex-col justify-center items-center bg-[url('/hero-bg-airoplane.svg')] bg-cover bg-center 
-                     duration-700 ease-in-out
-                     ${currStep != null ? 'opacity-0  pointer-events-none h-0' : 'opacity-100 h-[400px] translate-y-0'}
+        <div className={`py-[50px] flex flex-col justify-center items-center bg-[url('/hero-bg-airoplane.svg')] bg-cover bg-center 
+                     duration-700 ease-in-out max-lg:pb-[80px]
+                     ${currStep != null ? 'opacity-0 pointer-events-none h-0' : 'opacity-100 h-[400px] translate-y-0'}
                      `}>
           <p className='text-white text-7xl max-md:text-4xl font-extrabold leading-[88px] text-center'>
             Book Your
@@ -87,8 +87,7 @@ export default function Hero() {
             with a Few Clicks <img src="/svg-icons/mingcute-cursor.svg" alt="hero background" className="mt-6 max-md:hidden" />
           </p>
         </div>
-        <div className={`  z-40 
-                    ${classes !== '' ? 'fixed top-[8px]  left-1/2 -translate-x-1/2  h-auto' : 'h-full'}`}>
+        <div className={`z-40 ${classes !== '' && 'lg:fixed lg:top-[8px] lg:left-1/2 lg:-translate-x-1/2 lg:h-auto'}`}>
           <Search setClasses={setClasses} currStep={currStep} setCurrStep={setCurrStep} navbar={false} />
         </div>
       </div>

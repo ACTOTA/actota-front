@@ -24,16 +24,22 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
       const searchBox = document.getElementById('search-box');
 
       // Only close if click is outside both search-bar and search-box
-      if (!searchBar?.contains(target) && !searchBox?.contains(target)) {
+      if (searchBar && searchBox && !searchBar.contains(target) && !searchBox.contains(target)) {
         setCurrStep?.(null);
       }
     };
 
+    // Add a short delay before adding the click listener to prevent immediate closure
+    let timeoutId: NodeJS.Timeout;
+    
     if (currStep !== null) {
-      document.addEventListener('mousedown', handleClickOutside);
+      timeoutId = setTimeout(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+      }, 100);
     }
 
     return () => {
+      clearTimeout(timeoutId);
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [currStep, setCurrStep]);
@@ -87,32 +93,61 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
       if (!searchElement) return;
 
       const initialPosition = searchElement.getBoundingClientRect().top + window.scrollY;
-
+      
       const handleScroll = () => {
-        if (window.scrollY >= initialPosition && !navbar) {
-          // Set fixed position and explicitly set height to 60px
-          setClasses?.('fixed top-[8px] left-1/2 -translate-x-1/2 h-[60px]');
-          setClassName('w-[580px] md:w-[640px] xl:w-[700px] 2xl:w-[720px] h-[60px]');
-          setIsTop(false);
+        // Only apply scroll-based positioning on larger screens
+        if (window.innerWidth >= 1024) {
+          if (window.scrollY >= initialPosition && !navbar) {
+            // Set fixed position for large screens
+            setClasses?.('fixed top-[8px] left-1/2 -translate-x-1/2 h-[60px]');
+            setClassName('w-[580px] md:w-[640px] xl:w-[700px] 2xl:w-[720px] h-[60px]');
+            setIsTop(false);
+          } else {
+            setClasses?.('');
+            setClassName('');
+            setIsTop(true);
+          }
         } else {
+          // No scroll-based positioning needed for smaller screens
+          // as we have fixed position at bottom already
           setClasses?.('');
           setClassName('');
           setIsTop(true);
         }
       };
 
+      // Initial check
+      handleScroll();
+
+      // Also listen for window resize
+      const handleResize = () => {
+        handleScroll();
+      };
+
+      window.addEventListener('resize', handleResize);
       document.addEventListener('scroll', handleScroll, { passive: true });
-      return () => document.removeEventListener('scroll', handleScroll);
+      
+      return () => {
+        document.removeEventListener('scroll', handleScroll);
+        window.removeEventListener('resize', handleResize);
+      };
     }, 100);
   }, [searchRef, setClasses, navbar]);
 
   return (
-    <div className={`items-center justify-between ${navbar ? '...' : '...'} ... ${className}`} ref={searchRef}>
-      <div className={`items-center justify-between ${navbar ? 'w-[420px] h-[60px] text-primary-gray  max-2xl:h-[60px]' : 'w-[720px] max-md:w-[520px] max-sm:w-[360px] max-sm:h-[50px] max-md:h-[60px] text-white'} 
-      ${isTop ? 'h-[82px]' : ''}
-      grid grid-cols-9 rounded-full border-2 border-border-primary
-      bg-black/40 backdrop-filter backdrop-blur-sm text-sm text-left m-auto z-50
-      transition-all duration-300 ease-in-out ${className}`} ref={searchRef}>
+    <>
+      {/* Background overlay for mobile when search boxes are open */}
+      {currStep !== null && !navbar && (
+        <div className="hidden max-lg:block fixed inset-0 bg-black/60 backdrop-blur-[2px] z-40" onClick={() => setCurrStep?.(null)}></div>
+      )}
+      
+      <div className={`w-full relative ${navbar ? '' : 'max-lg:fixed max-lg:bottom-5 max-lg:left-0 max-lg:right-0 max-lg:px-4 max-lg:z-50 max-lg:pb-2'}`} id="search-bar">
+        <div className={`items-center justify-between ${navbar ? 'w-[420px] h-[60px] text-primary-gray max-2xl:h-[60px]' : 'w-[720px] max-lg:w-full max-lg:h-[60px] max-md:w-[520px] max-sm:w-[360px] max-sm:h-[50px] max-md:h-[60px] text-white'} 
+        ${isTop && !navbar ? 'h-[82px]' : 'h-[60px]'}
+        grid grid-cols-9 rounded-full border-2 border-border-primary
+        bg-black/40 backdrop-filter backdrop-blur-sm text-sm text-left m-auto z-50
+        shadow-lg max-lg:shadow-xl
+        transition-all duration-300 ease-in-out ${className}`} ref={searchRef}>
 
         <section onClick={() => handleSelect(STEPS.LOCATION)}
           id={STEPS.LOCATION.toString()}
@@ -175,7 +210,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
       </div>
 
       {currStep != null && (
-        <div id='search-box' className="w-full">
+        <div id='search-box' className="w-full max-lg:absolute max-lg:bottom-[calc(100%+10px)] max-lg:left-1/2 max-lg:-translate-x-1/2 max-lg:w-[min(95vw,720px)]">
           <SearchBoxes
             step={currStep}
             updateSearchValue={updateSearchValue}
@@ -186,6 +221,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
           />
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }

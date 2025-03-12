@@ -202,7 +202,7 @@ export default function ActivitiesMenu({ updateSearchValue, activitiesValue }: A
 
     ];
     return (
-        <section className="flex flex-col    backdrop-blur-md text-white border-2 border-border-primary rounded-3xl gap-4 h-full w-[520px] max-md:w-full z-20 text-lg p-4">
+        <section className="flex flex-col backdrop-blur-md text-white border-2 border-border-primary rounded-3xl gap-4 h-full w-full max-w-[520px] mx-auto z-20 text-lg p-4">
             <div className='mb-2'>
                 <p className='flex items-center gap-2 mb-2'><FaPersonWalking className='h-6 w-6 ' /> Activities</p>
 

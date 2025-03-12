@@ -77,7 +77,7 @@ export default function GuestMenu({ updateSearchValue, guestsValue }: GuestMenuP
     };
 
     return (
-        <section className="h-full w-full text-white backdrop-blur-md border-2 border-border-primary rounded-3xl grid grid-rows-3 gap-3 text-lg z-20 p-4">
+        <section className="h-full w-full max-w-[400px] mx-auto text-white backdrop-blur-md border-2 border-border-primary rounded-3xl grid grid-rows-3 gap-3 text-lg z-20 p-4">
             <div className="flex justify-between">
                 <div>
                     <p>Adults</p>

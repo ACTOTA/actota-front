@@ -41,8 +41,10 @@ export default function SearchBoxes({
   }, [step]);
 
   return (
-    <div className={`m-auto mt-4 bg-black/60 backdrop-filter   
-        before:rounded-3xl rounded-3xl flex flex-col justify-center items-center box-content w-[${dimensions.w}px] max-md:!w-full`} {...rest}>
+    <div className={`m-auto mt-4 bg-black/60 backdrop-filter max-lg:mt-0 max-lg:mb-4
+        before:rounded-3xl rounded-3xl flex flex-col justify-center items-center box-content 
+        max-lg:max-h-[70vh] max-lg:overflow-y-auto max-lg:w-full
+        w-full lg:w-[${dimensions.w}px] max-w-full mx-auto`} {...rest}>
       {step === STEPS.LOCATION && 
         <LocationMenu 
           updateSearchValue={(value) => updateSearchValue?.(STEPS.LOCATION, value)}

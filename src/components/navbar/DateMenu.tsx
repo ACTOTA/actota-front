@@ -145,7 +145,7 @@ export default function DateMenu({ updateSearchValue, durationValue }: DateMenuP
     }
     
     return (
-        <section className="w-full h-full text-white backdrop-blur-md border-2 border-border-primary rounded-3xl flex-col justify-center items-center gap-2 pl-4 pr-4 pt-6 pb-4">
+        <section className="w-full max-w-[720px] mx-auto h-full text-white backdrop-blur-md border-2 border-border-primary rounded-3xl flex-col justify-center items-center gap-2 pl-4 pr-4 pt-6 pb-4">
             <div className="h-9 gap-2 w-full flex justify-center">
                 {dateSettings.map((item, i) => (
                     <div key={i} className={`px-3 py-2 h-full bg-black/50 rounded-[200px] border border-white hover:cursor-pointer hover:bg-black/70 hover:border-[#FFF]
