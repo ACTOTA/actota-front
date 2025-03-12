@@ -15,9 +15,10 @@ interface Location {
 interface LocationMenuProps {
   updateSearchValue?: (value: string) => void;
   locationValue?: string;
+  className?: string;
 }
 
-export default function LocationMenu({ updateSearchValue, locationValue }: LocationMenuProps) {
+export default function LocationMenu({ updateSearchValue, locationValue, className }: LocationMenuProps) {
   const [searchTerm, setSearchTerm] = useState(locationValue || "");
   const [results, setResults] = useState<Location[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
@@ -75,9 +76,9 @@ export default function LocationMenu({ updateSearchValue, locationValue }: Locat
 
                       // Updated component mapping to handle different location types
                       addressComponents.forEach((component) => {
-                        if (component.types.includes("locality") || 
-                            component.types.includes("postal_town") ||
-                            component.types.includes("administrative_area_level_3")) {
+                        if (component.types.includes("locality") ||
+                          component.types.includes("postal_town") ||
+                          component.types.includes("administrative_area_level_3")) {
                           city = component.long_name;
                         }
                         if (component.types.includes("administrative_area_level_1")) {
@@ -130,7 +131,7 @@ export default function LocationMenu({ updateSearchValue, locationValue }: Locat
   };
 
   return (
-    <section className="flex flex-col justify-between backdrop-blur-md gap-6 py-6 h-full w-full max-w-[584px] z-20 p-4 border-2 border-border-primary rounded-3xl">
+    <section className={`flex flex-col justify-between backdrop-blur-md gap-6 py-6 h-full w-full max-w-[584px] z-20 p-4 border-2 border-border-primary rounded-3xl ${className}`} >
       <div>
         <div className="h-2" />
         <div className="relative">
@@ -165,14 +166,14 @@ export default function LocationMenu({ updateSearchValue, locationValue }: Locat
       <div className="w-full">
         <MapPage visible={true} location={selectedLocation} />
       </div>
-      <Button 
-        variant="primary" 
-        className="bg-white text-black h-14 w-full" 
+      <Button
+        variant="primary"
+        className="bg-white text-black h-14 w-full"
         disabled={!selectedLocation}
         onClick={handleConfirmLocation}
       >
         <p>Confirm Location</p>
       </Button>
-    </section>
+    </section >
   );
 }

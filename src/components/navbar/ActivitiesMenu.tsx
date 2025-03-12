@@ -10,6 +10,7 @@ import ActivityDropdown from './ActivityDropdown';
 interface ActivitiesMenuProps {
     updateSearchValue?: (value: string) => void;
     activitiesValue?: string;
+    className?: string;
 }
 
 
@@ -55,7 +56,7 @@ import { useActivities } from '@/src/hooks/queries/activity/useActivityQuery';
 import { useLodging } from '@/src/hooks/queries/lodging/useLodgingQuery';
 
 
-export default function ActivitiesMenu({ updateSearchValue, activitiesValue }: ActivitiesMenuProps) {
+export default function ActivitiesMenu({ updateSearchValue, activitiesValue, className }: ActivitiesMenuProps) {
 
     const lodgings = useLodging();
     const activity = useActivities();
@@ -72,19 +73,19 @@ export default function ActivitiesMenu({ updateSearchValue, activitiesValue }: A
 
     const updateSummary = () => {
         const activities = [];
-        
+
         if (selectedActivity && selectedActivity !== 'Select preferred activities') {
             activities.push(selectedActivity);
         }
-        
+
         if (lodgingEnabled && selectedLodging && selectedLodging !== 'Select preferred lodging') {
             activities.push(selectedLodging);
         }
-        
+
         if (transportationEnabled && selectedTransportation && selectedTransportation !== 'Select preferred transportation') {
             activities.push(selectedTransportation);
         }
-        
+
         // Join with commas for proper parsing when counting in the Search component
         const summary = activities.join(', ');
         updateSearchValue?.(summary);
@@ -202,7 +203,7 @@ export default function ActivitiesMenu({ updateSearchValue, activitiesValue }: A
 
     ];
     return (
-        <section className="flex flex-col backdrop-blur-md text-white border-2 border-border-primary rounded-3xl gap-4 h-full w-full max-w-[520px] mx-auto z-20 text-lg p-4">
+        <section className={`flex flex-col backdrop-blur-md text-white border-2 border-border-primary rounded-3xl gap-4 h-full w-full max-w-[520px] mx-auto z-20 text-lg p-4 ${className}`}>
             <div className='mb-2'>
                 <p className='flex items-center gap-2 mb-2'><FaPersonWalking className='h-6 w-6 ' /> Activities</p>
 

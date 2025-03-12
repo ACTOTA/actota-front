@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import DateMenuCalendar from '../figma/DateMenuCalendar';
 
 interface DateMenuProps {
-  updateSearchValue?: (value: string) => void;
-  durationValue?: string;
+    updateSearchValue?: (value: string) => void;
+    durationValue?: string;
+    className?: string;
 }
 
-export default function DateMenu({ updateSearchValue, durationValue }: DateMenuProps) {
+export default function DateMenu({ updateSearchValue, durationValue, className }: DateMenuProps) {
     const [startDate, setStartDate] = useState<string | null>(null);
     const [endDate, setEndDate] = useState<string | null>(null);
     const [startTime, setStartTime] = useState('09:00');
@@ -50,14 +51,14 @@ export default function DateMenu({ updateSearchValue, durationValue }: DateMenuP
         if (durationValue) {
             // Handle initialization from durationValue if needed
         }
-        
+
         updateDurationSummary();
-    }, [startDate, endDate, startTime, endTime, 
+    }, [startDate, endDate, startTime, endTime,
         dateSettings, rangeSettings, estimatedStay, whenToGo]);
 
     const updateDurationSummary = () => {
         let summary = '';
-        
+
         if (dateSettings[0].selected) {
             // Exact dates mode
             if (startDate && endDate) {
@@ -65,7 +66,7 @@ export default function DateMenu({ updateSearchValue, durationValue }: DateMenuP
             } else if (startDate) {
                 summary = startDate;
             }
-            
+
             // Add selected range if available
             const selectedRange = rangeSettings.find(r => r.selected);
             if (selectedRange && selectedRange.label !== "Exact dates") {
@@ -75,16 +76,16 @@ export default function DateMenu({ updateSearchValue, durationValue }: DateMenuP
             // Flexible mode
             const selectedStay = estimatedStay.find(s => s.selected);
             const selectedWhen = whenToGo.find(w => w.selected);
-            
+
             if (selectedStay) {
                 summary = selectedStay.label;
             }
-            
+
             if (selectedWhen) {
                 summary += summary ? ` in ${selectedWhen.label}` : selectedWhen.label;
             }
         }
-        
+
         updateSearchValue?.(summary);
     };
 
@@ -109,7 +110,7 @@ export default function DateMenu({ updateSearchValue, durationValue }: DateMenuP
             }))
         );
     }
-    
+
     // Generate time options from 00:00 to 23:45 in 15-minute increments
     const timeOptions = Array.from({ length: 96 }, (_, i) => {
         const hours = Math.floor(i / 4).toString().padStart(2, '0');
@@ -143,9 +144,9 @@ export default function DateMenu({ updateSearchValue, durationValue }: DateMenuP
             }))
         );
     }
-    
+
     return (
-        <section className="w-full max-w-[720px] mx-auto h-full text-white backdrop-blur-md border-2 border-border-primary rounded-3xl flex-col justify-center items-center gap-2 pl-4 pr-4 pt-6 pb-4">
+        <section className={`w-full max-w-[720px] mx-auto h-full text-white backdrop-blur-md border-2 border-border-primary rounded-3xl flex-col justify-center items-center gap-2 pl-4 pr-4 pt-6 pb-4 ${className}`}>
             <div className="h-9 gap-2 w-full flex justify-center">
                 {dateSettings.map((item, i) => (
                     <div key={i} className={`px-3 py-2 h-full bg-black/50 rounded-[200px] border border-white hover:cursor-pointer hover:bg-black/70 hover:border-[#FFF]
