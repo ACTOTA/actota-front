@@ -4,6 +4,7 @@ import { BiSearch } from 'react-icons/bi';
 import { STEPS } from '@/src/types/steps';
 import SearchBoxes from './SearchBoxes';
 import { useRouter } from "next/navigation";
+import actotaApi from '@/src/lib/apiClient';
 
 export default function Search({ setClasses, currStep, setCurrStep, navbar }: { setClasses?: Dispatch<SetStateAction<string>>, currStep?: STEPS | null, setCurrStep?: Dispatch<SetStateAction<STEPS | null>>, navbar?: boolean }) {
   const router = useRouter();
@@ -66,6 +67,26 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
       default:
         break;
     }
+  };
+
+  // Function to handle search submission
+  const handleSearch = () => {
+    console.log('Search button clicked with values:', {
+      location: locationValue,
+      duration: durationValue,
+      guests: guestsValue,
+      activities: activitiesValue,
+    });
+    
+    // Collect search parameters and encode them for URL
+    const params = new URLSearchParams();
+    if (locationValue) params.append('location', locationValue);
+    if (durationValue) params.append('duration', durationValue);
+    if (guestsValue) params.append('guests', guestsValue);
+    if (activitiesValue) params.append('activities', activitiesValue);
+    
+    // Redirect to itineraries page with search params
+    router.push(`/itineraries?${params.toString()}`);
   };
 
   // Function to get activity count for display
@@ -202,7 +223,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
           </section>
 
           <section className={`${navbar ? ' h-[55px] w-[55px] pr-1 -ml-2' : 'm-auto max-2xl:h-[58px] max-2xl:w-[58px] max-md:h-[55px] max-md:w-[55px] max-sm:h-[45px] max-sm:w-[45px] max-md:pr-1 max-md:-ml-2 h-full w-full px-2'} col-span-1 flex justify-center items-center`}>
-            <div onClick={() => router.push('/itineraries')} className="w-full aspect-square relative rounded-full bg-white cursor-pointer m-auto
+            <div onClick={() => handleSearch()} className="w-full aspect-square relative rounded-full bg-white cursor-pointer m-auto
             transition-all duration-300 ease-in-out">
               <BiSearch size={24} className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 text-black" />
             </div>
