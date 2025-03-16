@@ -4,7 +4,6 @@ import { BiSearch } from 'react-icons/bi';
 import { STEPS } from '@/src/types/steps';
 import SearchBoxes from './SearchBoxes';
 import { useRouter } from "next/navigation";
-import actotaApi from '@/src/lib/apiClient';
 
 export default function Search({ setClasses, currStep, setCurrStep, navbar }: { setClasses?: Dispatch<SetStateAction<string>>, currStep?: STEPS | null, setCurrStep?: Dispatch<SetStateAction<STEPS | null>>, navbar?: boolean }) {
   const router = useRouter();
@@ -13,10 +12,10 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
   const [isTop, setIsTop] = useState(true);
 
   // State for search inputs
-  const [locationValue, setLocationValue] = useState("");
-  const [durationValue, setDurationValue] = useState("");
-  const [guestsValue, setGuestsValue] = useState("");
-  const [activitiesValue, setActivitiesValue] = useState("");
+  const [locationValue, setLocationValue] = useState<string[]>([]);
+  const [durationValue, setDurationValue] = useState<string[]>([]);
+  const [guestsValue, setGuestsValue] = useState<string[]>([]);
+  const [activitiesValue, setActivitiesValue] = useState<string[]>([]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -53,16 +52,17 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
   const updateSearchValue = (step: STEPS, value: string) => {
     switch (step) {
       case STEPS.LOCATION:
-        setLocationValue(value);
+        setLocationValue(value ? [value] : []);
         break;
       case STEPS.DATE:
-        setDurationValue(value);
+        setDurationValue(value ? [value] : []);
         break;
       case STEPS.GUESTS:
-        setGuestsValue(value);
+        setGuestsValue(value ? [value] : []);
         break;
       case STEPS.ACTIVITIES:
-        setActivitiesValue(value);
+        // Split the comma-separated string into an array of values
+        setActivitiesValue(value ? value.split(',').map(item => item.trim()).filter(item => item.length > 0) : []);
         break;
       default:
         break;
@@ -72,29 +72,39 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
   // Function to handle search submission
   const handleSearch = () => {
     console.log('Search button clicked with values:', {
-      location: locationValue,
+      locations: locationValue,
       duration: durationValue,
       guests: guestsValue,
       activities: activitiesValue,
     });
-    
+
     // Collect search parameters and encode them for URL
     const params = new URLSearchParams();
-    if (locationValue) params.append('location', locationValue);
-    if (durationValue) params.append('duration', durationValue);
-    if (guestsValue) params.append('guests', guestsValue);
-    if (activitiesValue) params.append('activities', activitiesValue);
-    
+
+    // Handle array values by adding each item with the same parameter name
+    if (locationValue.length > 0) {
+      locationValue.forEach(loc => params.append('location', loc));
+    }
+
+    if (durationValue.length > 0) {
+      durationValue.forEach(dur => params.append('duration', dur));
+    }
+
+    if (guestsValue.length > 0) {
+      guestsValue.forEach(guest => params.append('guests', guest));
+    }
+
+    if (activitiesValue.length > 0) {
+      activitiesValue.forEach(activity => params.append('activities', activity));
+    }
+
+    console.log('Search parameters:', params.toString());
     // Redirect to itineraries page with search params
     router.push(`/itineraries?${params.toString()}`);
   };
 
   // Function to get activity count for display
-  const getActivityCount = (value: string | undefined, showDetails: boolean = false) => {
-    if (!value) return showDetails ? "Trip Details" : "What";
-
-    // Count the activities by splitting the comma-separated list
-    const activities = value.split(',').filter(item => item.trim().length > 0);
+  const getActivityCount = (activities: string[], showDetails: boolean = false) => {
     const count = activities.length;
 
     if (count === 0) return showDetails ? "Trip Details" : "What";
@@ -177,10 +187,10 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
             rounded-full cursor-pointer z-10 h-full w-full col-span-2
             flex flex-col justify-center gap-1 text-center relative
           `}>
-            <p>{locationValue ? locationValue.split(',')[0] : "Where"}</p>
+            <p>{locationValue.length > 0 ? locationValue[0] : "Where"}</p>
             {!navbar && (
               <p className="text-primary-gray max-md:hidden">
-                {locationValue || "Location"}
+                {locationValue.length > 0 ? locationValue[0] : "Location"}
               </p>
             )}
           </section>
@@ -189,10 +199,10 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
             id={STEPS.DATE.toString()}
             className={`${currStep == STEPS.DATE ? 'border-2 border-white bg-black/50' : currStep !== STEPS.GUESTS && 'after:content-[""] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
         flex flex-col justify-center gap-1 text-center relative`}>
-            <p>{durationValue ? durationValue.split(' ')[0] : "When"}</p>
+            <p>{durationValue.length > 0 ? durationValue[0].split(' ')[0] : "When"}</p>
             {!navbar && (
               <p className="text-primary-gray max-md:hidden">
-                {durationValue || "Duration"}
+                {durationValue.length > 0 ? durationValue[0] : "Duration"}
               </p>
             )}
           </section>
@@ -202,10 +212,10 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
             className={`${currStep == STEPS.GUESTS ? 'border-2 border-white bg-black/50' : currStep !== STEPS.ACTIVITIES && 'after:content-[""] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
         flex flex-col justify-center gap-1 text-center relative
        `}>
-            <p>{guestsValue ? guestsValue.split(' ')[0] : "Who"}</p>
+            <p>{guestsValue.length > 0 ? guestsValue[0].split(' ')[0] : "Who"}</p>
             {!navbar && (
               <p className="text-primary-gray max-md:hidden">
-                {guestsValue || "Add Guests"}
+                {guestsValue.length > 0 ? guestsValue[0] : "Add Guests"}
               </p>
             )}
           </section>
@@ -235,10 +245,10 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
             <SearchBoxes
               step={currStep}
               updateSearchValue={updateSearchValue}
-              locationValue={locationValue}
-              durationValue={durationValue}
-              guestsValue={guestsValue}
-              activitiesValue={activitiesValue}
+              locationValue={locationValue.length > 0 ? locationValue[0] : ""}
+              durationValue={durationValue.length > 0 ? durationValue[0] : ""}
+              guestsValue={guestsValue.length > 0 ? guestsValue[0] : ""}
+              activitiesValue={activitiesValue.length > 0 ? activitiesValue.join(", ") : ""}
             />
           </div>
         )}

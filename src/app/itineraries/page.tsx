@@ -23,47 +23,44 @@ const Itineraries = () => {
     const [showFilter, setShowFilter] = useState(false)
     const [advanceFilter, setAdvanceFilter] = useState(false)
     const searchParams = useSearchParams();
-    
-    // Get search parameters from URL
-    const searchLocation = searchParams.get('location') || '';
-    const searchDuration = searchParams.get('duration') || '';
-    const searchGuests = searchParams.get('guests') || '';
-    const searchActivities = searchParams.get('activities') || '';
-    
+
+    // Get search parameters from URL as arrays
+    const searchLocation = searchParams.getAll('location') || [];
+    const searchDuration = searchParams.getAll('duration') || [];
+    const searchGuests = searchParams.getAll('guests') || [];
+    const searchActivities = searchParams.getAll('activities') || [];
+
     // Determine if we're in search mode
-    const isSearchMode = !!(searchLocation || searchDuration || searchGuests || searchActivities);
-    
+    const isSearchMode = !!(searchLocation.length || searchDuration.length || searchGuests.length || searchActivities.length);
+
     // Use the appropriate query based on whether we're searching or not
-    const { 
-      data: itineraries, 
-      isLoading: itinerariesLoading, 
-      error: itinerariesError 
-    } = isSearchMode 
-      ? useSearchItineraries({
-          location: searchLocation,
-          duration: searchDuration,
-          guests: searchGuests,
-          activities: searchActivities
-        })
-      : useItineraries();
-      
+    const {
+        data: itineraries,
+        isLoading: itinerariesLoading,
+        error: itinerariesError
+    } = isSearchMode
+            ? useSearchItineraries({
+                locations: searchLocation,
+                duration: searchDuration,
+                guests: searchGuests,
+                activities: searchActivities
+            })
+            : useItineraries();
+
     const { data: favorites, isLoading: favoritesLoading, error: favoritesError } = useFavorites();
-    
+
     const pageTitle = isSearchMode ? 'Search Results' : 'Itineraries for You';
 
     useEffect(() => {
-        console.log('Itineraries data:', itineraries);
-        
         if (itineraries && itineraries.data) {
-            console.log('Itineraries.data structure:', JSON.stringify(itineraries.data).slice(0, 200));
-            
+
             // Check if data is an array or nested in another property
-            let dataToUse = Array.isArray(itineraries.data) 
-                ? itineraries.data 
-                : itineraries.data.results || itineraries.data.data || [];
-                
+            let dataToUse = Array.isArray(itineraries.data)
+                ? itineraries.data
+                : itineraries.data || itineraries.data || [];
+
             console.log('Data to use length:', dataToUse.length);
-            
+
             try {
                 const filteredListings = dataToUse.map((listing: any) =>
                     favorites?.some((favorite: any) => favorite._id?.$oid === listing._id?.$oid)
@@ -123,15 +120,15 @@ const Itineraries = () => {
 
                     </div>
                     <div className='max-sm:hidden'>
-                        {itinerariesLoading && 
+                        {itinerariesLoading &&
                             <div className="text-white text-center py-10">Loading itineraries...</div>
                         }
-                        {itinerariesError && 
+                        {itinerariesError &&
                             <div className="text-red-500 text-center py-10">Error: {itinerariesError.message}</div>
                         }
                         {!itinerariesLoading && !itinerariesError && listings.length === 0 && (
                             <div className="text-white text-center py-10">
-                                {isSearchMode 
+                                {isSearchMode
                                     ? "No itineraries found matching your search criteria. Try adjusting your filters."
                                     : "No itineraries available at the moment."}
                             </div>
@@ -141,15 +138,15 @@ const Itineraries = () => {
                         ))}
                     </div>
                     <div className='sm:hidden flex flex-col'>
-                        {itinerariesLoading && 
+                        {itinerariesLoading &&
                             <div className="text-white text-center py-5">Loading itineraries...</div>
                         }
-                        {itinerariesError && 
+                        {itinerariesError &&
                             <div className="text-red-500 text-center py-5">Error: {itinerariesError.message}</div>
                         }
                         {!itinerariesLoading && !itinerariesError && listings.length === 0 && (
                             <div className="text-white text-center py-5">
-                                {isSearchMode 
+                                {isSearchMode
                                     ? "No itineraries found matching your search criteria."
                                     : "No itineraries available."}
                             </div>
@@ -184,13 +181,13 @@ const Itineraries = () => {
 
 // Wrap in a safe server component for initial render
 const ItinerariesPage = () => {
-  return (
-    <>
-      <ClientOnly>
-        <Itineraries />
-      </ClientOnly>
-    </>
-  )
+    return (
+        <>
+            <ClientOnly>
+                <Itineraries />
+            </ClientOnly>
+        </>
+    )
 }
 
 export default ItinerariesPage
