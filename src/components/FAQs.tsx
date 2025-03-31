@@ -9,18 +9,15 @@ const FAQs = () => {
     const faqs = [
         {
             question: "✨ What is ACTOTA?",
-            answer:
-                "ACTOTA is your portal to the infinite—an online travel agency that is the key to your personal gateway.  We curate immersive journeys—handpicked experiences designed for those who seek meaning in motion and luxury in the natural world. ACTOTA is not a marketplace. It’s a sanctuary for refined exploration.",
+            answer: "ACTOTA is your portal to the infinite—an online travel agency that is the key to your personal gateway.  We curate immersive journeys—handpicked experiences designed for those who seek meaning in motion and luxury in the natural world. ACTOTA is not a marketplace. It’s a sanctuary for refined exploration.",
         },
         {
             question: "🧭 How does ACTOTA work?",
-            answer:
-                "ACTOTA is your private concierge—powered by intelligent design. Whether you're planning a once-in-a-lifetime expedition or an impromptu escape, our platform builds bespoke itineraries in seconds. Every detail—lodging, flights, exclusive experiences, private guides—is seamlessly aligned and entirely customizable.",
+            answer: "ACTOTA is your private concierge—powered by intelligent design. Whether you're planning a once-in-a-lifetime expedition or an impromptu escape, our platform builds bespoke itineraries in seconds. Every detail—lodging, flights, exclusive experiences, private guides—is seamlessly aligned and entirely customizable.",
         },
         {
             question: "🌐 What kind of journeys can I expect?",
-            answer:
-                "Private heli-skiing over alpine silence. Restorative retreats tucked into ancient forests. Culinary immersions guided by artisans. Whether you're in pursuit of awe or stillness, ACTOTA offers elevated experiences that honor your pace, privacy, and purpose.",
+            answer: "Private heli-skiing over alpine silence. Restorative retreats tucked into ancient forests. Culinary immersions guided by artisans. Whether you're in pursuit of awe or stillness, ACTOTA offers elevated experiences that honor your pace, privacy, and purpose.",
         },
         {
             question: "🌟 What sets ACTOTA apart from other luxury travel services?",

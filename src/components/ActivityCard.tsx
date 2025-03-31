@@ -9,6 +9,12 @@ import { AiFillStar } from 'react-icons/ai';
 import { LuRoute } from 'react-icons/lu';
 import Button from './figma/Button';
 
+export enum CardType {
+  ACTIVITY = 'activity',
+  TRANSPORTATION = 'transportation',
+  LODGING = 'lodging'
+}
+
 export interface ActivityCardProps {
     activity: {
         name: string;
@@ -22,9 +28,24 @@ export interface ActivityCardProps {
     formatTime: (time: string) => string;
     getActivityIcon: (type: string) => JSX.Element;
     setIsFeedbackDrawerOpen?: (isFeedbackDrawerOpen: boolean) => void;
+    cardType?: CardType;
 }
 
-const ActivityCard = ({ activity, formatTime, getActivityIcon, setIsFeedbackDrawerOpen }: ActivityCardProps) => {
+const ActivityCard = ({ activity, formatTime, getActivityIcon, setIsFeedbackDrawerOpen, cardType = CardType.ACTIVITY }: ActivityCardProps) => {
+    
+    const getBorderGradient = () => {
+        switch (cardType) {
+            case CardType.LODGING:
+                return "from-red-500 via-red-500/70 to-red-500/50";
+            case CardType.ACTIVITY:
+                return "from-blue-500 via-blue-500/70 to-blue-500/50";
+            case CardType.TRANSPORTATION:
+                return "from-[#FEDB25] via-border-primary to-border-primary";
+            default:
+                return "from-[#FEDB25] via-border-primary to-border-primary";
+        }
+    };
+    
     return (
         <div className="flex flex-col gap-4 border-border-primary">
             {/* Time Column */}
@@ -33,7 +54,7 @@ const ActivityCard = ({ activity, formatTime, getActivityIcon, setIsFeedbackDraw
             </div>
 
             {/* Activity Card */}
-            <div className="flex-1 bg-gradient-to-br from-[#FEDB25] via-border-primary to-border-primary rounded-xl p-[2px]">
+            <div className={`flex-1 bg-gradient-to-br ${getBorderGradient()} rounded-xl p-[2px]`}>
                 <div className="flex-1 bg-black rounded-xl">
 
                     <div className="flex-1 bg-gradient-to-br from-white/20 to-white/5 rounded-xl p-4 relative">

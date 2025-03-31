@@ -4,7 +4,7 @@ import Button from './figma/Button'
 import { ArrowLeftIcon, XMarkIcon } from '@heroicons/react/20/solid'
 import Image from 'next/image'
 import Input from './figma/Input'
-import ActivityCard from '@/src/components/ActivityCard';
+import ActivityCard, { CardType } from '@/src/components/ActivityCard';
 import { BiSolidMap } from 'react-icons/bi'
 import { MdOutlineExplore } from 'react-icons/md'
 import FeedbackCard from './FeedbackCard'
@@ -85,7 +85,10 @@ const FeedbackDrawer = ({ setIsDrawerOpen, activityCompleted = false }: { setIsD
 
 
 
-          <FeedbackCard activity={{ name: "Yellowstone Adventure", type: "sightseeing", time: "08:00:00", date: "2024-06-15", location: { name: "Old Faithful", coordinates: [44.4605, -110.8281] }, image: "/images/hero-bg.jpg" }} />
+          <FeedbackCard 
+            activity={{ name: "Yellowstone Adventure", type: "sightseeing", time: "08:00:00", date: "2024-06-15", location: { name: "Old Faithful", coordinates: [44.4605, -110.8281] }, image: "/images/hero-bg.jpg" }} 
+            cardType={CardType.ACTIVITY}
+          />
           <div className='flex justify-between items-center mt-4'>
             <p className='text-white'>Overall Rating</p>
 
