@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BiSolidMap } from 'react-icons/bi';
 import { FaRegClock } from 'react-icons/fa';
 import { MdOutlineDirections, MdOutlineDirectionsCarFilled, MdOutlineExplore } from 'react-icons/md';
@@ -10,9 +10,9 @@ import { LuRoute } from 'react-icons/lu';
 import Button from './figma/Button';
 
 export enum CardType {
-  ACTIVITY = 'activity',
-  TRANSPORTATION = 'transportation',
-  LODGING = 'lodging'
+    ACTIVITY = 'activity',
+    TRANSPORTATION = 'transportation',
+    LODGING = 'lodging'
 }
 
 export interface ActivityCardProps {
@@ -32,7 +32,7 @@ export interface ActivityCardProps {
 }
 
 const ActivityCard = ({ activity, formatTime, getActivityIcon, setIsFeedbackDrawerOpen, cardType = CardType.ACTIVITY }: ActivityCardProps) => {
-    
+
     const getBorderGradient = () => {
         switch (cardType) {
             case CardType.LODGING:
@@ -45,7 +45,12 @@ const ActivityCard = ({ activity, formatTime, getActivityIcon, setIsFeedbackDraw
                 return "from-[#FEDB25] via-border-primary to-border-primary";
         }
     };
-    
+
+    useEffect(() => {
+        console.log('ActivityCard Type:', cardType);
+        console.log('ActivityCard:', activity);
+    }, []);
+
     return (
         <div className="flex flex-col gap-4 border-border-primary">
             {/* Time Column */}
