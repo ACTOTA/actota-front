@@ -262,15 +262,6 @@ export default function DayView({ listing }: DayViewProps) {
 					<div className="flex-1">
 						{isApiKeyValid ? (
 							<>
-								{/* Debugging information (hidden in production) */}
-								<div
-									className="mb-2 p-2 bg-[#141414] rounded-xl text-white text-xs"
-								>
-									<p>API Key: {GOOGLE_MAPS_API_KEY ? "✓ Present" : "✗ Missing"} (Length: {GOOGLE_MAPS_API_KEY.length})</p>
-									<p>Coordinates: {pathCoordinates.length} points</p>
-									<p>Directions: {directions ? "✓ Loaded" : "Pending"} {directionsError ? `(Error: ${directionsError})` : ""}</p>
-								</div>
-
 								{/* Main map container */}
 								<div className="w-full h-[750px] rounded-xl overflow-hidden">
 									{pathCoordinates.length > 0 ? (
