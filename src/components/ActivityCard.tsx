@@ -36,9 +36,9 @@ const ActivityCard = ({ activity, formatTime, getActivityIcon, setIsFeedbackDraw
     const getBorderGradient = () => {
         switch (cardType) {
             case CardType.LODGING:
-                return "from-red-500 via-red-500/70 to-red-500/50";
+                return "from-[#F10E3B] via-border-primary to-border-primary";
             case CardType.ACTIVITY:
-                return "from-blue-500 via-blue-500/70 to-blue-500/50";
+                return "from-[#0553CE] via-border-primary to-border-primary";
             case CardType.TRANSPORTATION:
                 return "from-[#FEDB25] via-border-primary to-border-primary";
             default:
@@ -130,9 +130,9 @@ const ActivityCard = ({ activity, formatTime, getActivityIcon, setIsFeedbackDraw
 
                             {/* Navigation */}
                             <div className=" flex flex-col items-end">
-                                {setIsFeedbackDrawerOpen && (
+                                {/*{setIsFeedbackDrawerOpen && (
                                     <Button variant='primary' onClick={() => setIsFeedbackDrawerOpen(true)} className='absolute top-4 right-4'> Give Feedback</Button>
-                                )}
+                                )}*/}
 
                                 <p className='text-white'>$0.2</p>
                                 <span className="text-primary-gray text-sm">per person</span>
