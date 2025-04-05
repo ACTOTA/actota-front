@@ -23,7 +23,6 @@ export default function FeaturedItineraries() {
           : listing
       );
 
-      // Apply sorting based on selected sort option
       if (sortOption) {
         filteredListings = sortListingsByPrice(filteredListings, sortOption);
       }
