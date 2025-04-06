@@ -32,6 +32,7 @@ export interface ItineraryData {
       coordinates: number[];
     };
     name: string;
+    type: string;
   }>>;
   activities: Activity[];
   activity_cost: number;

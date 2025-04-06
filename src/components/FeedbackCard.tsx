@@ -9,6 +9,7 @@ import { AiFillStar } from 'react-icons/ai';
 import { LuRoute } from 'react-icons/lu';
 import Button from '@/src/components/figma/Button';
 import { RxArrowTopRight } from 'react-icons/rx';
+import { CardType } from '@/src/components/ActivityCard';
 interface FeedbackCardProps {
     activity: {
         name: string;
@@ -20,17 +21,31 @@ interface FeedbackCardProps {
             coordinates: number[];
         };
         image: string;
-
     };
+    cardType?: CardType;
 }
 
-const FeedbackCard = ({ activity }: FeedbackCardProps) => {
+const FeedbackCard = ({ activity, cardType = CardType.ACTIVITY }: FeedbackCardProps) => {
+    
+    const getBorderGradient = () => {
+        switch (cardType) {
+            case CardType.LODGING:
+                return "from-red-500 via-red-500/70 to-red-500/50";
+            case CardType.ACTIVITY:
+                return "from-blue-500 via-blue-500/70 to-blue-500/50";
+            case CardType.TRANSPORTATION:
+                return "from-[#FEDB25] via-border-primary to-border-primary";
+            default:
+                return "from-[#FEDB25] via-border-primary to-border-primary";
+        }
+    };
+    
     return (
         <div className="flex flex-col gap-4 border-border-primary">
 
 
             {/* Activity Card */}
-            <div className="flex-1 bg-gradient-to-br from-[#FEDB25] via-border-primary to-border-primary rounded-xl p-[2px]">
+            <div className={`flex-1 bg-gradient-to-br ${getBorderGradient()} rounded-xl p-[2px]`}>
                 <div className="flex-1 bg-black rounded-xl">
 
                     <div className="flex-1 flex max-sm:flex-col gap-4 bg-gradient-to-br from-white/20 to-white/5 rounded-xl p-2 relative">

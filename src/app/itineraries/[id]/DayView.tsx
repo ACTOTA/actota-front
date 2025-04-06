@@ -1,11 +1,11 @@
 'use client';
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { BiSolidMap } from 'react-icons/bi';
-import { GoogleMap, Polyline, Marker, LoadScript } from '@react-google-maps/api';
+import { GoogleMap, DirectionsService, DirectionsRenderer, Marker, LoadScript, Polyline } from '@react-google-maps/api';
 import { BsCalendar4 } from 'react-icons/bs';
 import { MdOutlineExplore } from 'react-icons/md';
 import Button from '@/src/components/figma/Button';
-import ActivityCard from '@/src/components/ActivityCard';
+import ActivityCard, { CardType } from '@/src/components/ActivityCard';
 import FeedbackDrawer from '@/src/components/FeedbackDrawer';
 import DrawerModal from '@/src/components/DrawerModal';
 import { ItineraryData } from '@/src/types/itineraries';
@@ -45,9 +45,57 @@ export default function DayView({ listing }: DayViewProps) {
 	const [selectedDay, setSelectedDay] = useState(1);
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const [map, setMap] = useState<google.maps.Map | null>(null);
+	const [isMapLoaded, setIsMapLoaded] = useState(false);
+	const [isApiKeyValid, setIsApiKeyValid] = useState(!!GOOGLE_MAPS_API_KEY);
+	const [loadingState, setLoadingState] = useState('initializing');
+	const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
+	const [directionsError, setDirectionsError] = useState<string | null>(null);
+
+	// Log API key for debugging (only first and last few characters)
+	useEffect(() => {
+		if (GOOGLE_MAPS_API_KEY) {
+			const keyLength = GOOGLE_MAPS_API_KEY.length;
+			const maskedKey = keyLength > 8
+				? `${GOOGLE_MAPS_API_KEY.substring(0, 4)}...${GOOGLE_MAPS_API_KEY.substring(keyLength - 4)}`
+				: '****';
+			console.log(`Google Maps API Key available (masked): ${maskedKey}, length: ${keyLength}`);
+		} else {
+			console.error('Google Maps API Key is missing');
+		}
+	}, []);
+
+	// Reset directions when day changes
+	useEffect(() => {
+		setDirections(null);
+		setDirectionsError(null);
+	}, [selectedDay]);
 
 	const onLoad = useCallback((map: google.maps.Map) => {
+		console.log('Google Map loaded successfully');
 		setMap(map);
+		setIsMapLoaded(true);
+		setLoadingState('loaded');
+	}, []);
+
+	const onLoadError = useCallback((error: Error) => {
+		console.error("Google Maps API failed to load:", error);
+		setIsApiKeyValid(false);
+		setLoadingState('error');
+	}, []);
+
+	// Handle directions response
+	const directionsCallback = useCallback((
+		result: google.maps.DirectionsResult | null,
+		status: google.maps.DirectionsStatus
+	) => {
+		if (status === 'OK' && result) {
+			setDirections(result);
+			setDirectionsError(null);
+			console.log('Directions service successful');
+		} else {
+			setDirectionsError(`Directions request failed: ${status}`);
+			console.error('Directions service failed:', status);
+		}
 	}, []);
 
 	const formatTime = (time: string) => {
@@ -88,34 +136,41 @@ export default function DayView({ listing }: DayViewProps) {
 
 	// Get coordinates for the selected day's activities
 	const getDayCoordinates = () => {
-		const dayActivities = listing.days[selectedDay.toString()] || [];
-		const coordinates = [];
+		try {
+			const dayActivities = listing.days[selectedDay.toString()] || [];
+			const coordinates = [];
 
-		// Add start location if it's day 1
-		if (selectedDay === 1) {
-			coordinates.push({
-				lat: listing.start_location.coordinates[1],
-				lng: listing.start_location.coordinates[0]
+			// Add start location if it's day 1
+			if (selectedDay === 1 && listing.start_location?.coordinates) {
+				coordinates.push({
+					lat: listing.start_location.coordinates[1],
+					lng: listing.start_location.coordinates[0]
+				});
+			}
+
+			// Add activity locations
+			dayActivities.forEach(activity => {
+				if (activity.location?.coordinates) {
+					coordinates.push({
+						lat: activity.location.coordinates[1],
+						lng: activity.location.coordinates[0]
+					});
+				}
 			});
+
+			// Add end location if it's the last day
+			if (selectedDay === listing.length_days && listing.end_location?.coordinates) {
+				coordinates.push({
+					lat: listing.end_location.coordinates[1],
+					lng: listing.end_location.coordinates[0]
+				});
+			}
+
+			return coordinates;
+		} catch (error) {
+			console.error("Error getting coordinates:", error);
+			return [];
 		}
-
-		// Add activity locations
-		dayActivities.forEach(activity => {
-			coordinates.push({
-				lat: activity.location.coordinates[1],
-				lng: activity.location.coordinates[0]
-			});
-		});
-
-		// Add end location if it's the last day
-		if (selectedDay === listing.length_days) {
-			coordinates.push({
-				lat: listing.end_location.coordinates[1],
-				lng: listing.end_location.coordinates[0]
-			});
-		}
-
-		return coordinates;
 	};
 
 	const pathCoordinates = getDayCoordinates();
@@ -205,36 +260,90 @@ export default function DayView({ listing }: DayViewProps) {
 
 					{/* Right Side - Map */}
 					<div className="flex-1">
-						<LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY}>
-							<div className="w-full h-[800px] rounded-xl overflow-hidden">
-								<GoogleMap
-									mapContainerStyle={{
-										width: '100%',
-										height: '100%',
-										borderRadius: '12px'
-									}}
-									center={getMapCenter()}
-									zoom={10}
-									options={mapOptions}
-									onLoad={onLoad}
-								>
-									<Polyline
-										path={pathCoordinates}
-										options={{
-											strokeColor: '#FEDB25',
-											strokeOpacity: 1,
-											strokeWeight: 3,
-										}}
-									/>
-									{pathCoordinates.map((position, index) => (
-										<Marker
-											key={index}
-											position={position}
-										/>
-									))}
-								</GoogleMap>
+						{isApiKeyValid ? (
+							<>
+								{/* Main map container */}
+								<div className="w-full h-[750px] rounded-xl overflow-hidden">
+									{pathCoordinates.length > 0 ? (
+										<GoogleMap
+											mapContainerStyle={{
+												width: '100%',
+												height: '100%',
+												borderRadius: '12px'
+											}}
+											center={getMapCenter()}
+											zoom={10}
+											options={mapOptions}
+											onLoad={onLoad}
+										>
+											{pathCoordinates.length >= 2 && !directions && (
+												<DirectionsService
+													options={{
+														origin: pathCoordinates[0],
+														destination: pathCoordinates[pathCoordinates.length - 1],
+														waypoints: pathCoordinates.slice(1, pathCoordinates.length - 1).map(coord => ({
+															location: coord,
+															stopover: true
+														})),
+														travelMode: google.maps.TravelMode.DRIVING,
+														optimizeWaypoints: false
+													}}
+													callback={directionsCallback}
+												/>
+											)}
+
+											{directions && (
+												<DirectionsRenderer
+													options={{
+														directions: directions,
+														suppressMarkers: false,
+														polylineOptions: {
+															strokeColor: '#FEDB25',
+															strokeOpacity: 1,
+															strokeWeight: 4
+														}
+													}}
+												/>
+											)}
+
+											{!directions && (
+												<>
+													{/* Fallback to simple polyline if directions fail */}
+													<Polyline
+														path={pathCoordinates}
+														options={{
+															strokeColor: '#FEDB25',
+															strokeOpacity: 1,
+															strokeWeight: 3,
+														}}
+													/>
+													{pathCoordinates.map((position, index) => (
+														<Marker
+															key={index}
+															position={position}
+														/>
+													))}
+												</>
+											)}
+
+											{directionsError && (
+												<div className="absolute top-2 left-2 bg-red-500/80 text-white p-2 rounded">
+													Error: {directionsError}
+												</div>
+											)}
+										</GoogleMap>
+									) : (
+										<div className="w-full h-[750px] flex items-center justify-center bg-[#141414] rounded-xl">
+											<div className="text-white">No route coordinates available for this day</div>
+										</div>
+									)}
+								</div>
+							</>
+						) : (
+							<div className="w-full h-[800px] flex items-center justify-center bg-[#141414] rounded-xl">
+								<div className="text-white">Google Maps API key not found or invalid. Please check your environment configuration.</div>
 							</div>
-						</LoadScript>
+						)}
 					</div>
 				</div>
 			) : (
@@ -243,6 +352,13 @@ export default function DayView({ listing }: DayViewProps) {
 						<ActivityCard
 							key={index}
 							activity={activity}
+							cardType={
+								activity.type === 'lodging'
+									? CardType.LODGING
+									: activity.type === 'activity'
+										? CardType.ACTIVITY
+										: CardType.TRANSPORTATION
+							}
 							formatTime={formatTime}
 							getActivityIcon={getActivityIcon}
 							setIsFeedbackDrawerOpen={setIsDrawerOpen}
