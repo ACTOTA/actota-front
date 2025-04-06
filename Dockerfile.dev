@@ -1,0 +1,29 @@
+# Development Dockerfile
+FROM node:18-slim
+
+# Set working directory
+WORKDIR /app
+
+# Set build arguments for API URL
+ARG API_URL=http://localhost:8080
+ENV NEXT_PUBLIC_API_URL=${API_URL}
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install ALL dependencies including dev dependencies
+RUN npm ci
+
+# Explicitly install Stripe packages to ensure they're available
+RUN npm install @stripe/stripe-js @stripe/react-stripe-js
+
+# We don't copy the source code here because we'll use volumes for hot reloading
+
+# Create a .env.local file explicitly for development
+RUN echo "NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}" > .env.local
+
+# Expose the port your Next.js app runs on
+EXPOSE 3000
+
+# The command will be provided by docker-compose
+CMD ["npm", "run", "dev"]
