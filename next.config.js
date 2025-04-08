@@ -19,10 +19,15 @@ module.exports = {
   // Disable static optimization for all pages since we need dynamic functionality
   staticPageGenerationTimeout: 120,
   async rewrites() {
+    // Get the API URL from environment variables, with a fallback
+    const apiUrl = process.env.API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+
+    console.log(`Using API URL for rewrites: ${apiUrl}`);
+
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
+        destination: `${apiUrl}/:path*`, // Remove the /api prefix from destination
       },
     ]
   },
