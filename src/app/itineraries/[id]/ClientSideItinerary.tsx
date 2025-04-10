@@ -96,7 +96,7 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
 
           {itineraryData?.images?.length <= 1 ? <div className='w-full aspect-[926/640] relative'>
             <Image
-              src={itineraryData?.images[0]}
+              src={itineraryData?.images[0] ? itineraryData?.images[0] : '/images/default-itinerary.jpeg'}
               alt={`${itineraryData.trip_name} - Image ${1}`}
               fill
               priority
