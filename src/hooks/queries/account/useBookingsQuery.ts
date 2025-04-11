@@ -4,9 +4,16 @@ import { useQuery } from '@tanstack/react-query';
 
 async function getBookings(): Promise<BookingType[]> {
   try {
+    // Check if we're in the browser environment
+    if (typeof window === 'undefined') {
+      // Server-side, return empty array to avoid localStorage errors
+      return [];
+    }
+    
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if(!user.user_id){
-      throw new Error("Please login to view bookings");
+      console.warn("User not logged in");
+      return [];
     }
 
     const response = await actotaApi.get(`/api/account/${user?.user_id}/bookings`);
@@ -14,7 +21,7 @@ async function getBookings(): Promise<BookingType[]> {
    
   } catch (error) {
     console.error('Fetch Error:', error);
-    throw error;
+    return []; // Return empty array instead of throwing to avoid hydration errors
   }
 }
 
