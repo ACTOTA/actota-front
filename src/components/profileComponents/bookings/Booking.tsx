@@ -6,79 +6,96 @@ import Input from "@/src/components/figma/Input";
 import { FiSearch } from "react-icons/fi";
 import BookingCard from "./BookingCard";
 import Dropdown from "../../figma/Dropdown";
+import { useBookings } from "@/src/hooks/queries/account/useBookingsQuery";
+import { useItineraryById } from "@/src/hooks/queries/itinerarieById/useItineraryByIdQuery";
+import { BookingType}  from "../../models/Itinerary";
+
 const Booking = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [search, setSearch] = useState("");
-  const [bookings, setBookings] = React.useState<any[]>([{
-    id: 1,
-    status: "upcoming",
-    delay_insurance: true,
-    trip_name: "Lahore",
-    fareharbor_id: 1,
-    person_cost: 100,
-    min_age: 18,
-    min_guests: 1,
-    max_guests: 10,
-    length_days: 1,
-    length_hours: 1,
-    start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    description: "Lahore is a city in Pakistan",
-    days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
-    activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
-    images: ["/images/hero-bg.jpg"],
-    start_date: new Date(),
-    end_date: new Date(),
-    created_at: new Date(),
-    updated_at: new Date()
-  },
-  {
-    id: 2,
-    status: "ongoing",
-    delay_insurance: true,
-    trip_name: "Lahore",
-    fareharbor_id: 1,
-    person_cost: 100,
-    min_age: 18,
-    min_guests: 1,
-    max_guests: 10,
-    length_days: 1,
-    length_hours: 1,
-    start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    description: "Lahore is a city in Pakistan",
-    days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
-    activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
-    images: ["/images/hero-bg.jpg"],
-    start_date: new Date(),
-    end_date: new Date(),
-    created_at: new Date(),
-    updated_at: new Date()
-  },
-  {
-    id: 3,
-    status: "completed",
-    delay_insurance: true,
-    trip_name: "Lahore",
-    fareharbor_id: 1,
-    person_cost: 100,
-    min_age: 18,
-    min_guests: 1,
-    max_guests: 10,
-    length_days: 1,
-    length_hours: 1,
-    start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    description: "Lahore is a city in Pakistan",
-    days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
-    activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
-    images: ["/images/hero-bg.jpg"],
-    start_date: new Date(),
-    end_date: new Date(),
-    created_at: new Date(),
-    updated_at: new Date()
-  },
-  ]);
+  // const [bookings, setBookings] = React.useState<any[]>([{
+  //   id: 1,
+  //   status: "upcoming",
+  //   delay_insurance: true,
+  //   trip_name: "Lahore",
+  //   fareharbor_id: 1,
+  //   person_cost: 100,
+  //   min_age: 18,
+  //   min_guests: 1,
+  //   max_guests: 10,
+  //   length_days: 1,
+  //   length_hours: 1,
+  //   start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
+  //   end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
+  //   description: "Lahore is a city in Pakistan",
+  //   days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
+  //   activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
+  //   images: ["/images/hero-bg.jpg"],
+  //   start_date: new Date(),
+  //   end_date: new Date(),
+  //   created_at: new Date(),
+  //   updated_at: new Date()
+  // },
+  // {
+  //   id: 2,
+  //   status: "ongoing",
+  //   delay_insurance: true,
+  //   trip_name: "Lahore",
+  //   fareharbor_id: 1,
+  //   person_cost: 100,
+  //   min_age: 18,
+  //   min_guests: 1,
+  //   max_guests: 10,
+  //   length_days: 1,
+  //   length_hours: 1,
+  //   start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
+  //   end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
+  //   description: "Lahore is a city in Pakistan",
+  //   days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
+  //   activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
+  //   images: ["/images/hero-bg.jpg"],
+  //   start_date: new Date(),
+  //   end_date: new Date(),
+  //   created_at: new Date(),
+  //   updated_at: new Date()
+  // },
+  // {
+  //   id: 3,
+  //   status: "completed",
+  //   delay_insurance: true,
+  //   trip_name: "Lahore",
+  //   fareharbor_id: 1,
+  //   person_cost: 100,
+  //   min_age: 18,
+  //   min_guests: 1,
+  //   max_guests: 10,
+  //   length_days: 1,
+  //   length_hours: 1,
+  //   start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
+  //   end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
+  //   description: "Lahore is a city in Pakistan",
+  //   days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
+  //   activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
+  //   images: ["/images/hero-bg.jpg"],
+  //   start_date: new Date(),
+  //   end_date: new Date(),
+  //   created_at: new Date(),
+  //   updated_at: new Date()
+  // },
+  // ]);
+  const { data: bookings } = useBookings();
+
+  bookings?.map((booking: BookingType) => {
+    console.log('booking', booking);
+    console.log('booking status', booking.status);
+
+    const { data: Itineraries, isLoading, error } = useItineraryById((booking._id as {$oid: string}).$oid);
+
+  });
+
+
+
+  
   const tabs = [
     {
       id: "all",
@@ -100,14 +117,27 @@ const Booking = () => {
 
   const renderContent = () => {
     const tab = tabs.find((tab) => tab.id === activeTab);
-    return (
-      <div>
-        {bookings.filter((booking) => booking.status === activeTab || activeTab === "all").map((booking) => (
-          <BookingCard  key={booking.id} data={booking} />
-        ))}
-      </div>
-    )
+
+
+    const result = bookings?.filter((booking) => booking.status === activeTab || activeTab === "all").map((booking) => {
+
+      const { data: itinerary, isLoading, error } = useItineraryById((booking.itinerary_id as {$oid: string}).$oid);
+
+      return ( <BookingCard  key={(booking?._id as {$oid: string}).$oid} dataBooking={booking}  dataItinerary={itinerary} />)
+
+
+    })
+
+    return result
+    // return (
+    //   <div>
+    //     {bookings?.filter((booking) => booking.status === activeTab || activeTab === "all").map((booking) => (
+    //       <BookingCard  key={(booking?._id as {$oid: string}).$oid} dataBooking={booking}  dataItinerary={Itineraries[0]} />
+    //     ))}
+    //   </div>
+    // )
   };
+
   return (
     <div className="flex flex-col gap-8">
       {/* header section */}

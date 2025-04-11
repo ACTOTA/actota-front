@@ -25,6 +25,7 @@ export interface ItineraryData {
   description: string;
   start_date: string;
   end_date: string;
+  delay_insurance: boolean | null;
   days: Record<string, Array<{
     time: string;
     location: {

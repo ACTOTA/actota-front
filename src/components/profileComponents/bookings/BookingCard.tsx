@@ -12,8 +12,12 @@ import { CgArrowTopRight } from "react-icons/cg";
 import { CiCalendar } from 'react-icons/ci';
 import { MdOutlineDirectionsCarFilled } from 'react-icons/md';
 import moment from 'moment';
+import { BookingType } from '../../models/Itinerary';
+import { ItineraryData } from '@/src/types/itineraries';
+
 interface ListingCardProps {
-    data: any;
+    dataBooking: BookingType;
+    dataItinerary:  ItineraryData;
     onAction?: (id: string) => void;
     disabled?: boolean;
     actionLabel?: string;
@@ -23,7 +27,8 @@ interface ListingCardProps {
 }
 
 const BookingCard: React.FC<ListingCardProps> = ({
-    data,
+    dataBooking,
+    dataItinerary,
     onAction,
     disabled = false,
     actionLabel,
@@ -52,19 +57,19 @@ const BookingCard: React.FC<ListingCardProps> = ({
             <div className='flex justify-between items-center'>
                 <div className='flex items-center gap-2'>
 
-                    <Button variant='primary' size='sm' className='!bg-[#215CBA] text-white flex items-center gap-1'> {data.status === "upcoming" ? <CiCalendar className='text-white size-5' /> : data.status === "ongoing" ? <Image src="/svg-icons/ongoing-icon.svg" alt="clock" width={16} height={16} /> : <FaCheck className='text-white size-5' />} {data?.status === "upcoming" ? "in 98 days" : data?.status.charAt(0).toUpperCase() + data?.status.slice(1)}</Button>
-                    {bookingConfirmedModal && <p className='text-sm text-primary-gray flex items-center gap-1'><Image src="/svg-icons/airplane.svg" alt="points" width={20} height={20} /> Booking no. <span className='text-white'>{data?.id}</span></p>}
+                    <Button variant='primary' size='sm' className='!bg-[#215CBA] text-white flex items-center gap-1'> {dataBooking?.status === "upcoming" ? <CiCalendar className='text-white size-5' /> : dataBooking?.status === "ongoing" ? <Image src="/svg-icons/ongoing-icon.svg" alt="clock" width={16} height={16} /> : <FaCheck className='text-white size-5' />} {dataBooking?.status === "upcoming" ? "in 98 days" : dataBooking?.status.charAt(0).toUpperCase() + dataBooking?.status.slice(1)}</Button>
+                    {bookingConfirmedModal && <p className='text-sm text-primary-gray flex items-center gap-1'><Image src="/svg-icons/airplane.svg" alt="points" width={20} height={20} /> Booking no. <span className='text-white'>{(dataItinerary?._id as {$oid: string}).$oid}</span></p>}
                 </div>
-                {/* <p className='text-sm text-primary-gray'>Booked  <span className='text-white'> {moment(data?.created_at).format("DD MMM YYYY")}</span> </p> */}
+                {/* <p className='text-sm text-primary-gray'>Booked  <span className='text-white'> {moment(dataItinerary?.created_at).format("DD MMM YYYY")}</span> </p> */}
             </div>
             <div className="h-[1px] my-2 w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
 
             <div className='flex justify-between relative gap-4 h-full w-full'>
                 <div className='w-full'>
                     <div className='flex justify-between items-center text-white'>
-                        <p className='text-2xl font-bold'>{data?.trip_name}</p>
+                        <p className='text-2xl font-bold'>{dataItinerary?.trip_name}</p>
 
-                        {!bookingConfirmedModal && <p className='text-2xl font-bold'>${data.person_cost}</p>}
+                        {!bookingConfirmedModal && <p className='text-2xl font-bold'>${dataItinerary?.person_cost}</p>}
                     </div>
                     <div className='flex  items-center gap-3 my-3 text-white' >
 
@@ -74,7 +79,7 @@ const BookingCard: React.FC<ListingCardProps> = ({
                         </div>
                         <div className='flex flex-1 flex-col gap-1'>
                             <p className='flex items-center gap-1 text-xs text-primary-gray'><LuUsers className='h-[17px] w-[17px] text-white' /> Guests</p>
-                            <p className='text-white text-sm ml-5'>{data?.min_guests} - {data?.max_guests}</p>
+                            <p className='text-white text-sm ml-5'>{dataItinerary?.min_group} - {dataItinerary?.max_group}</p>
                         </div>
                         <div className='flex-1' />
 
@@ -98,11 +103,11 @@ const BookingCard: React.FC<ListingCardProps> = ({
 
                 </div>
 
-                {!bookingConfirmedModal && !bookingDetailsPage && <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={204} className='rounded-lg object-cover max-md:hidden' />}
+                {!bookingConfirmedModal && !bookingDetailsPage && <Image src={dataItinerary.images[0] || ""} alt="Vacation Picture" height={200} width={204} className='rounded-lg object-cover max-md:hidden' />}
 
             </div>
 
-            {data?.delay_insurance ?
+            {dataItinerary?.delay_insurance ?
                 bookingConfirmedModal ?
                     <div className='mt-2'></div> :
 
@@ -138,8 +143,8 @@ const BookingCard: React.FC<ListingCardProps> = ({
                     <p className='text-sm text-primary-gray ml-7'>You’ll earn the points once you complete the trip.</p>
                 </div>
                 <div className='flex max-md:w-full gap-2'>
-                    {data?.status !== "completed" && <Button variant={bookingDetailsPage ? "simple" : "primary"} className={`  ${bookingDetailsPage ? "!bg-transparent text-[#C10B2F] "  : "!bg-[#C10B2F]"}  text-white w-full`}> <span className={`${bookingDetailsPage ? "border-b border-b-[#C10B2F] whitespace-nowrap " : "text-white whitespace-nowrap"}`}> Cancel Trip</span></Button>}
-                    {!bookingDetailsPage && <Button onClick={() => router.push(`/booking-details`)} variant='outline' className=' text-white gap-2 w-full'> View {data?.status === "completed" && !bookingConfirmedModal ? "Details" : ""} <CgArrowTopRight className='size-6' /></Button>}
+                    {dataBooking?.status !== "completed" && <Button variant={bookingDetailsPage ? "simple" : "primary"} className={`  ${bookingDetailsPage ? "!bg-transparent text-[#C10B2F] "  : "!bg-[#C10B2F]"}  text-white w-full`}> <span className={`${bookingDetailsPage ? "border-b border-b-[#C10B2F] whitespace-nowrap " : "text-white whitespace-nowrap"}`}> Cancel Trip</span></Button>}
+                    {!bookingDetailsPage && <Button onClick={() => router.push(`/booking-details`)} variant='outline' className=' text-white gap-2 w-full'> View {dataBooking?.status === "completed" && !bookingConfirmedModal ? "Details" : ""} <CgArrowTopRight className='size-6' /></Button>}
 
                 </div>
             </div>
