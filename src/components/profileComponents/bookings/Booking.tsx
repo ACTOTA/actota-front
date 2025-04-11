@@ -85,13 +85,13 @@ const Booking = () => {
   // ]);
   const { data: bookings } = useBookings();
 
-  bookings?.map((booking: BookingType) => {
-    console.log('booking', booking);
-    console.log('booking status', booking.status);
+  // bookings?.map((booking: BookingType) => {
+  //   console.log('booking', booking);
+  //   console.log('booking status', booking.status);
 
-    const { data: Itineraries, isLoading, error } = useItineraryById((booking._id as {$oid: string}).$oid);
+  //   const { data: Itineraries, isLoading, error } = useItineraryById((booking._id as {$oid: string}).$oid);
 
-  });
+  // });
 
 
 
@@ -127,16 +127,16 @@ const Booking = () => {
 
 
     })
-
     return result
-    // return (
+  };
+
+      // return (
     //   <div>
     //     {bookings?.filter((booking) => booking.status === activeTab || activeTab === "all").map((booking) => (
     //       <BookingCard  key={(booking?._id as {$oid: string}).$oid} dataBooking={booking}  dataItinerary={Itineraries[0]} />
     //     ))}
     //   </div>
     // )
-  };
 
   return (
     <div className="flex flex-col gap-8">
