@@ -20,6 +20,7 @@ export interface ActivityCardProps {
         name: string;
         type?: string;
         time: string;
+        image?: string;
         location: {
             name: string;
             coordinates: number[];
@@ -105,7 +106,14 @@ const ActivityCard = ({ activity, formatTime, getActivityIcon, setIsFeedbackDraw
                                 <div className="flex items-start gap-10">
 
                                     {/* Image Goes Here */}
-                                    <div className="bg-black/30 rounded-lg w-[150px] h-[116px] -m-2">
+                                    <div className="bg-black/30 rounded-lg w-[150px] h-[116px] -m-2 relative">
+                                        <Image
+                                            src={activity?.image || '/images/default-activity.jpeg'}
+                                            alt="Activity Picture"
+                                            layout="fill"
+                                            objectFit="cover"
+                                            className="rounded-lg"
+                                        />
                                     </div>
 
                                     {/* Duration */}
