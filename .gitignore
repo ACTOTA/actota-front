@@ -28,9 +28,11 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
+.env.asc
 
 # service account
 service-account.json
+package-lock.json
 
 # vercel
 .vercel
