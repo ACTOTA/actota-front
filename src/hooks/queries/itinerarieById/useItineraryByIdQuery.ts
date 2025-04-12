@@ -11,17 +11,20 @@ interface Itinerary {
 
 export async function fetchItineraryById(id: string): Promise<any> {
   try {
-    // const user = JSON.parse(localStorage.getItem('user') || '{}');
-    //     if(!user.user_id){
-    //       toast.error("Please login to view itinerary details");
-    //       throw new Error("Please login to view itinerary details");
-    //     }
+
+    console.log('Fetching itinerary with ID:', id);
+
+    if (!id) {
+      return null;
+    }
+
     const response = await actotaApi.get(`/api/itineraries/${id}`);
+    console.log('Response:', response);
     return response.data;
-   
+
   } catch (error) {
     console.error('Fetch Error:', error);
-    throw error;
+    return null; // Return null instead of throwing to avoid hydration errors
   }
 }
 
@@ -29,7 +32,5 @@ export function useItineraryById(id: string) {
   return useQuery({
     queryKey: ['itineraryById', id],
     queryFn: () => fetchItineraryById(id),
-    enabled: !!id,
-   
   });
 }
