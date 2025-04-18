@@ -254,16 +254,14 @@ export const useDeletePaymentMethod = () => {
 
         console.log(`Deleting payment method ${paymentMethodId} for customer: ${customerId}`);
 
-        // Get current payment methods
+        // Make the actual API call to delete the payment method
+        await actotaApi.delete(`/api/account/${userId}/payment-methods/${paymentMethodId}`);
+        
+        // For local state management (this can be removed if the backend handles everything)
         const paymentMethods = JSON.parse(localStorage.getItem('paymentMethods') || '[]');
-
-        // Filter out the specified payment method
-        // In a real implementation, this would make API calls to Stripe
         const updatedPaymentMethods = paymentMethods.filter(
           (method: any) => method.id !== paymentMethodId
         );
-
-        // Save back to localStorage
         localStorage.setItem('paymentMethods', JSON.stringify(updatedPaymentMethods));
 
         return { success: true, customerId };

@@ -35,7 +35,16 @@ interface CardFormData {
 
 const Payment = () => {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("bookingsHistory");
+  // Check URL for active tab parameter on component mount
+  const getInitialActiveTab = () => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('activeTab') || "bookingsHistory";
+    }
+    return "bookingsHistory";
+  };
+  
+  const [activeTab, setActiveTab] = useState(getInitialActiveTab);
   const [search, setSearch] = useState("");
 
   const { data: paymentMethods } = usePaymentMethods();
@@ -238,9 +247,12 @@ const Payment = () => {
 
   // Delete card
   const handleDeleteCard = (cardId: string | number) => {
-    router.push("?modal=deletePaymentCard");
-    // Implementation to actually delete the card would go here
-    // This would typically involve an API call to delete the payment method
+    // Preserve the current tab state when opening the modal
+    const query = new URLSearchParams(window.location.search);
+    query.set('modal', 'deletePaymentCard');
+    query.set('paymentMethodId', cardId.toString());
+    query.set('activeTab', 'paymentMethods'); // Set or preserve the active tab
+    router.push(`?${query.toString()}`);
   };
 
   // Set card as default
@@ -281,7 +293,14 @@ const Payment = () => {
                     ? "!border-white !text-white"
                     : "!border-border-primary !text-border-primary"
                 }
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  // Update URL to reflect tab change without full navigation
+                  const query = new URLSearchParams(window.location.search);
+                  query.set('activeTab', tab.id);
+                  const newUrl = `${window.location.pathname}?${query.toString()}`;
+                  window.history.pushState({ path: newUrl }, '', newUrl);
+                }}
               >
                 {tab.label}
               </Button>
