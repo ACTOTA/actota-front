@@ -50,6 +50,13 @@ const BookingCard: React.FC<ListingCardProps> = ({
         router.push('/booking-details');
       };
 
+    const handleCancelClick = () => {
+        // Store booking and itinerary in localStorage
+        // console.log('Setting localStorage:', { dataBooking, dataItinerary }); // Log here
+        // localStorage.setItem('bookingDetails', JSON.stringify({ dataBooking, dataItinerary }));
+        router.push('/profile/cancellation');
+      };
+
     const handleCancel = useCallback(
         (e: React.MouseEvent<HTMLButtonElement>) => {
             e.stopPropagation();
@@ -190,7 +197,7 @@ const BookingCard: React.FC<ListingCardProps> = ({
                     <p className='text-sm text-primary-gray ml-7'>You’ll earn the points once you complete the trip.</p>
                 </div>
                 <div className='flex max-md:w-full gap-2'>
-                    {dataBooking?.status !== "completed" && <Button variant={bookingDetailsPage ? "simple" : "primary"} className={`  ${bookingDetailsPage ? "!bg-transparent text-[#C10B2F] " : "!bg-[#C10B2F]"}  text-white w-full`}> <span className={`${bookingDetailsPage ? "border-b border-b-[#C10B2F] whitespace-nowrap " : "text-white whitespace-nowrap"}`}> Cancel Trip</span></Button>}
+                    {dataBooking?.status !== "completed" && <Button onClick={handleCancelClick} variant={bookingDetailsPage ? "simple" : "primary"} className={`  ${bookingDetailsPage ? "!bg-transparent text-[#C10B2F] " : "!bg-[#C10B2F]"}  text-white w-full`}> <span className={`${bookingDetailsPage ? "border-b border-b-[#C10B2F] whitespace-nowrap " : "text-white whitespace-nowrap"}`}> Cancel Trip</span></Button>}
                     {!bookingDetailsPage && <Button onClick={handleDetailsClick} variant='outline' className=' text-white gap-2 w-full'> View {dataBooking?.status === "completed" && !bookingConfirmedModal ? "Details" : ""} <CgArrowTopRight className='size-6' /></Button>}
 
                 </div>

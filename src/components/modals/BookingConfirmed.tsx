@@ -49,7 +49,7 @@ const BookingConfirmed = () => {
                 <div className='w-full lg:w-[707px]'>
                     <p className='text-white font-bold mb-2'>Booking Details</p>
 
-                    <BookingCard data={bookings} bookingConfirmedModal={true} />
+                    <BookingCard dataBooking={bookings} dataItinerary={null} bookingConfirmedModal={true} />
 
                 </div>
 
