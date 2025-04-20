@@ -96,8 +96,23 @@ const Payment = () => {
             )
         );
     };
-    const confirmBooking = () => {
-        router.push("?modal=guestCheckoutLoading")
+
+    const confirmBooking = async () => {
+        try {
+            router.push("?modal=guestCheckoutLoading")
+
+            const paymentData = {
+
+            }
+        }
+        catch (error) {
+            console.error('Error confirming booking:', error);
+        }
+
+        // Process the transaction
+
+        // If successful, redirect to the booking confirmation page
+        // Else, show modal with correct reason the transaction failed
         setTimeout(() => {
             router.push("?modal=bookingConfirmed")
         }, 3000)

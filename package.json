@@ -49,6 +49,7 @@
     "sharp": "^0.33.3",
     "slick-carousel": "^1.8.1",
     "sonner": "^1.7.4",
+    "stripe": "^18.0.0",
     "world-countries": "^5.0.0",
     "zustand": "^4.5.2"
   },
