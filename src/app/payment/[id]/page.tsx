@@ -149,19 +149,52 @@ const Payment = () => {
             const session = getClientSession();
             if (session.isLoggedIn && session.user) {
                 user = session.user;
+                console.log('Using user from session:', JSON.stringify(user, null, 2));
             } else {
                 // Fall back to localStorage for compatibility
                 user = JSON.parse(localStorage.getItem('user') || '{}');
+                console.log('Using user from localStorage:', JSON.stringify(user, null, 2));
             }
 
             console.log('User:', user);
 
+            // If we don't have a customer_id, fetch it now
+            if (!user.customer_id && user.user_id) {
+                try {
+                    console.log('No customer_id found, fetching from API...');
+                    const customerResponse = await fetch(`/api/account/${user.user_id}/customer`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+
+                    if (customerResponse.ok) {
+                        const customerData = await customerResponse.json();
+                        if (customerData.customer_id) {
+                            console.log('Fetched customer_id:', customerData.customer_id);
+                            user.customer_id = customerData.customer_id;
+
+                            // Update in localStorage
+                            localStorage.setItem('user', JSON.stringify(user));
+                            console.log('Updated user in localStorage with customer_id');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error fetching customer ID:', error);
+                }
+            }
+
+            if (!user.customer_id) {
+                console.error('No customer_id available, payment may fail');
+            }
+
             const paymentData = {
-                itineraryId: objectId,
+                itinerary_id: objectId,
                 amount: totalAmount,
-                paymentMethodId: selectedCard,
-                customerId: user.customer_id,
-                userId: user.user_id,
+                payment_method_id: selectedCard,
+                customer_id: user.customer_id,
+                user_id: user.user_id,
             }
 
             const response = await fetch('/api/stripe/payment/payment-intent', {
