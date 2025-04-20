@@ -21,6 +21,10 @@ import { usePaymentMethods } from '@/src/hooks/queries/account/usePaymentMethods
 import { useAttachPaymentMethod } from '@/src/hooks/mutations/payment.mutation'
 import StripeCardElement from '@/src/components/stripe/StripeCardElement'
 import { getClientSession } from '@/src/lib/session'
+import { loadStripe } from '@stripe/stripe-js';
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+
 const Payment = () => {
     const pathname = usePathname() as string;
     const router = useRouter();
@@ -145,6 +149,7 @@ const Payment = () => {
         try {
             router.push("?modal=guestCheckoutLoading")
 
+            // Check if the user is logged in
             let user;
             const session = getClientSession();
             if (session.isLoggedIn && session.user) {
@@ -191,13 +196,14 @@ const Payment = () => {
 
             const paymentData = {
                 itinerary_id: objectId,
-                amount: totalAmount,
+                amount: totalAmount * 100, // Convert to cents
                 payment_method_id: selectedCard,
                 customer_id: user.customer_id,
                 user_id: user.user_id,
             }
 
-            const response = await fetch('/api/stripe/payment/payment-intent', {
+            // Create a PaymentIntent
+            let response = await fetch('/api/stripe/payment/payment-intent', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -208,11 +214,50 @@ const Payment = () => {
             if (!response.ok) {
                 throw new Error('Failed to confirm booking');
             }
-            const responseData = await response.json();
-            console.log('Booking confirmed:', responseData);
+            const paymentIntentData = await response.json();
+            const clientSecret = paymentIntentData.client_secret;
 
-            // Future implementation: Call API to process payment
-            // const response = await actotaApi.post('/api/stripe/create-payment', paymentData);
+            const stripe = await stripePromise;
+            if (!stripe) {
+                throw new Error('Stripe not loaded');
+            }
+
+            const { error: confirmError, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: selectedCard!,
+            });
+
+            if (confirmError) {
+                console.error('Confirm error:', confirmError);
+                throw new Error(confirmError.message);
+            }
+
+            if (paymentIntent.status === 'requires_capture') {
+                // Capture the payment
+                response = await fetch('/api/stripe/payment/capture-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: user.user_id,
+                        payment_intent_id: paymentIntent.id
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to capture payment');
+                }
+
+                const captureData = await response.json();
+                console.log('Payment captured successfully:', captureData);
+
+                // If successful, redirect to the booking confirmation page
+                setTimeout(() => {
+                    router.push("?modal=bookingConfirmed")
+                }, 3000)
+            } else {
+                throw new Error(`Unexpected payment intent status: ${paymentIntent.status}`);
+            }
         }
         catch (error) {
             console.error('Error confirming booking:', error);
@@ -299,8 +344,6 @@ const Payment = () => {
         console.error('Error details:', error);
         return <div className='text-white flex justify-center items-center h-screen'>{user ? 'Error: ' + error.message : 'Please login to view itinerary details'}</div>;
     }
-
-    console.log('Rendering with data:', { apiResponse, itineraryData });
 
     if (!itineraryData) {
         return <div className='text-white flex justify-center items-center h-screen'>Loading itinerary data...</div>;

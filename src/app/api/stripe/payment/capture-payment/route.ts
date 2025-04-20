@@ -6,12 +6,11 @@ export async function POST(request: NextRequest) {
 	try {
 
 		const requestData = await request.json();
-		const { user_id, amount, customer_id, payment_method_id } = requestData;;
-		console.log("Request Data:", requestData);
+		const { user_id, payment_intent_id } = requestData;;
 
-		if (!user_id || !amount || !customer_id || !payment_method_id) {
+		if (!payment_intent_id || !user_id) {
 			return NextResponse.json(
-				{ error: "Amount, Customer ID and Payment Method ID are required" },
+				{ error: "Payment Intent ID and User ID are required" },
 				{ status: 400 }
 			);
 		}
@@ -25,12 +24,10 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		const response = await actotaApi.post("/api/payment/payment-intent",
+		const response = await actotaApi.post("/api/payment/capture-payment",
 			{
 				user_id,
-				amount,
-				customer_id,
-				payment_method_id,
+				payment_intent_id,
 			},
 			{
 				headers: {

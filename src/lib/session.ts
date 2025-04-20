@@ -17,14 +17,13 @@ export const getClientSession = (): Session => {
     }
 
     const user = JSON.parse(userStr);
-    console.log('Got user from localStorage:', JSON.stringify(user, null, 2));
-    
+
     if (!user || !user.user_id) {
       return { user: null, isLoggedIn: false };
     }
 
     const token = getLocalStorageItem('token');
-    
+
     // If user exists but doesn't have customer_id, let's try to fetch it
     if (user.user_id && !user.customer_id) {
       console.log('No customer_id found, will fetch from API');
@@ -39,7 +38,7 @@ export const getClientSession = (): Session => {
             }
           });
           const responseData = await response.json();
-          
+
           if (responseData && responseData.customer_id) {
             console.log('Fetched customer_id:', responseData.customer_id);
             user.customer_id = responseData.customer_id;
