@@ -17,15 +17,20 @@ import { LuRoute, LuUser } from 'react-icons/lu'
 import { usePathname, useRouter } from 'next/navigation';
 import { IoAlertCircleOutline } from 'react-icons/io5'
 import { useItineraryById } from '@/src/hooks/queries/itinerarieById/useItineraryByIdQuery'
+import { usePaymentMethods } from '@/src/hooks/queries/account/usePaymentMethodsQuery'
+import { useAttachPaymentMethod } from '@/src/hooks/mutations/payment.mutation'
+import StripeCardElement from '@/src/components/stripe/StripeCardElement'
+import { getClientSession } from '@/src/lib/session'
 const Payment = () => {
     const pathname = usePathname() as string;
     const router = useRouter();
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
     const [currentIndex, setCurrentIndex] = useState(0);
     const objectId = pathname.substring(pathname.lastIndexOf('/') + 1);
     const { data: apiResponse, isLoading, error } = useItineraryById(objectId);
     const [itineraryData, setItineraryData] = useState<any | null>(null);
     const [showPaymentReview, setShowPaymentReview] = useState(false);
+    const user = getClientSession();
+
     const [paymentMethod, setPaymentMethod] = useState([{
         id: 1,
         name: "Card",
@@ -52,6 +57,12 @@ const Payment = () => {
         selected: false
     }
     ]);
+
+    // State for saved payment methods
+    const [savedCards, setSavedCards] = useState<any[]>([]);
+    const [selectedCard, setSelectedCard] = useState<string | null>(null);
+    const [cardHolderName, setCardHolderName] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [paymentInsurance, setPaymentInsurance] = useState([
         {
             id: 1,
@@ -84,6 +95,39 @@ const Payment = () => {
     ]);
 
 
+    // Initialize the attachment mutation
+    const { mutate: attachPaymentMethod } = useAttachPaymentMethod();
+
+    const cardAddSuccess = (paymentMethodId: string) => {
+        console.log('Card added successfully:', paymentMethodId);
+        // Call the mutation to attach the payment method to the customer
+        attachPaymentMethod({
+            paymentMethodId,
+            setAsDefault: true
+        }, {
+            onSuccess: () => {
+                console.log('Payment method attached successfully');
+                // Reset form state
+                setCardHolderName('');
+                setIsSubmitting(false);
+            },
+            onError: (error) => {
+                console.error('Error attaching payment method:', error);
+                setIsSubmitting(false);
+            }
+        });
+    }
+
+    const cardAddError = (error: any) => {
+        console.error('Error adding card:', error);
+        setIsSubmitting(false);
+        // You could add a toast notification here
+    }
+
+    // Handle card holder name change
+    const handleCardHolderNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setCardHolderName(e.target.value);
+    }
 
 
 
@@ -101,9 +145,41 @@ const Payment = () => {
         try {
             router.push("?modal=guestCheckoutLoading")
 
-            const paymentData = {
-
+            let user;
+            const session = getClientSession();
+            if (session.isLoggedIn && session.user) {
+                user = session.user;
+            } else {
+                // Fall back to localStorage for compatibility
+                user = JSON.parse(localStorage.getItem('user') || '{}');
             }
+
+            console.log('User:', user);
+
+            const paymentData = {
+                itineraryId: objectId,
+                amount: totalAmount,
+                paymentMethodId: selectedCard,
+                customerId: user.customer_id,
+                userId: user.user_id,
+            }
+
+            const response = await fetch('/api/stripe/payment/payment-intent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(paymentData),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to confirm booking');
+            }
+            const responseData = await response.json();
+            console.log('Booking confirmed:', responseData);
+
+            // Future implementation: Call API to process payment
+            // const response = await actotaApi.post('/api/stripe/create-payment', paymentData);
         }
         catch (error) {
             console.error('Error confirming booking:', error);
@@ -120,12 +196,59 @@ const Payment = () => {
 
 
 
+    // Fetch saved payment methods
+    const { data: paymentMethods } = usePaymentMethods();
+
     useEffect(() => {
         if (apiResponse) {
             console.log('Setting itinerary data:', apiResponse);
             setItineraryData(apiResponse);
         }
     }, [apiResponse]);
+
+    // Helper function to get the appropriate card brand image
+    const getCardBrandImage = (brand: string) => {
+        switch (brand.toLowerCase()) {
+            case 'visa':
+                return "/svg-icons/visa-logo.svg";
+            case 'mastercard':
+                return "/svg-icons/mastercard-logo.svg";
+            default:
+                return "/svg-icons/credit-card.svg"; // Default fallback
+        }
+    };
+
+    // Process payment methods when data is available
+    useEffect(() => {
+        if (paymentMethods && paymentMethods.length > 0) {
+            const formattedCards = paymentMethods.map((method: any) => ({
+                id: method.id,
+                brand: method.card.brand,
+                last4: method.card.last4,
+                expiryMonth: String(method.card.exp_month).padStart(2, '0'),
+                expiryYear: String(method.card.exp_year).slice(-2),
+                cardholderName: method.billing_details.name || 'Card Holder',
+                image: getCardBrandImage(method.card.brand)
+            }));
+
+            setSavedCards(formattedCards);
+
+            // Select the first card by default
+            if (formattedCards.length > 0 && !selectedCard) {
+                setSelectedCard(formattedCards[0].id);
+            }
+        }
+    }, [paymentMethods, selectedCard]);
+
+    // Handle selecting a saved card
+    const handleSelectCard = (cardId: string) => {
+        setSelectedCard(cardId);
+        // Also set paymentMethod to "Card" when a saved card is selected
+        setPaymentMethod(paymentMethod.map(method => ({
+            ...method,
+            selected: method.name === "Card"
+        })));
+    };
 
     const basePrice = itineraryData?.person_cost * (itineraryData?.min_group || 1);
     const selectedInsurance = paymentInsurance
@@ -215,29 +338,56 @@ const Payment = () => {
                         <div className='flex-1 flex flex-col gap-2'>
 
                             <p className='text-white text-xl font-bold mt-10 flex items-center gap-2'><Image src={"/svg-icons/atm-card.svg"} alt="add card" width={24} height={24} /> Add a new card</p>
+
                             <div>
-                                <p className="text-primary-gray w-96 text-left mb-1 mt-[10px]">Card Holder Name</p>
-                                <Input type="text" name="fullName" placeholder="Card Holder Name" />
+                                <p className="text-primary-gray text-left mb-1 mt-[10px]">Card Holder Name</p>
+                                <Input
+                                    type="text"
+                                    name="cardHolderName"
+                                    value={cardHolderName}
+                                    onChange={handleCardHolderNameChange}
+                                    placeholder="Card Holder Name"
+                                />
                             </div>
-                            <div>
-                                <p className="text-primary-gray w-96 text-left mb-1 mt-[10px]">Card Number</p>
-                                <Input type="text" name="fullName" placeholder="Card Number" />
-                            </div>
-                            <div className='flex gap-2'>
-                                <div className='flex-1'>
-                                    <p className="text-primary-gray text-left mb-1 mt-[10px]">Expiry Date</p>
-                                    <Input type="text" name="fullName" placeholder="MM/YY" />
-                                </div>
-                                <div className='flex-1'>
-                                    <p className="text-primary-gray  text-left mb-1 mt-[10px]">CVV</p>
-                                    <Input type="text" name="fullName" placeholder="***" />
-                                </div>
-                            </div>
+
+                            {/* Stripe Card Element */}
+                            <StripeCardElement
+                                onSuccess={cardAddSuccess}
+                                onError={cardAddError}
+                                setAsDefault={true}
+                                cardHolderName={cardHolderName}
+                                isSubmitting={isSubmitting}
+                                setIsSubmitting={setIsSubmitting}
+                            />
 
                         </div>
                         <div className='flex-1 flex flex-col gap-2 '>
                             <p className='text-white text-xl font-bold mt-10 flex items-center gap-2 lg:ml-10'><Image src={"/svg-icons/atm-card.svg"} alt="add card" width={24} height={24} /> My Saved Card(s)</p>
-                            <p className='text-primary-gray text-sm lg:ml-[70px]'>You haven't added any cards yet.</p>
+
+                            {savedCards.length > 0 ? (
+                                <div className='lg:ml-[70px] flex flex-col gap-2'>
+                                    {savedCards.map((card) => (
+                                        <div key={card.id} className='flex items-center justify-between bg-[#1A1A1A] rounded-xl border border-primary-gray p-3'>
+                                            <div className='flex items-center gap-2'>
+                                                <Image src={card.image} alt={card.brand} width={32} height={20} />
+                                                <div>
+                                                    <p className='text-white'>**** **** **** {card.last4}</p>
+                                                    <p className='text-primary-gray text-xs'>Exp: {card.expiryMonth}/{card.expiryYear}</p>
+                                                </div>
+                                            </div>
+                                            <input
+                                                type="radio"
+                                                name="savedCard"
+                                                className='h-4 w-4 accent-[#BBD4FB]'
+                                                checked={selectedCard === card.id}
+                                                onChange={() => handleSelectCard(card.id)}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className='text-primary-gray text-sm lg:ml-[70px]'>You haven't added any cards yet.</p>
+                            )}
                         </div>
                     </div>
                     <div>
