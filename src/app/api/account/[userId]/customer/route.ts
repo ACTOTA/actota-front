@@ -8,6 +8,8 @@ export async function POST(
 ) {
   try {
     const { userId } = params;
+
+    console.log('User: ', userId);
     
     // Get the auth token
     const token = cookies().get('auth_token')?.value;
@@ -22,7 +24,7 @@ export async function POST(
     console.log(`Fetching/creating Stripe customer for user ${userId}`);
     const response = await actotaApi.post(
       `/api/account/${userId}/customer`,
-      {},
+      {}, // Empty body
       {
         headers: {
           Authorization: `Bearer ${token}`,
