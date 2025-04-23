@@ -22,6 +22,7 @@ import { useAttachPaymentMethod } from '@/src/hooks/mutations/payment.mutation'
 import StripeCardElement from '@/src/components/stripe/StripeCardElement'
 import { getClientSession } from '@/src/lib/session'
 import { loadStripe } from '@stripe/stripe-js';
+import { setLocalStorageItem } from '@/src/utils/browserStorage'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -149,6 +150,10 @@ const Payment = () => {
   const confirmBooking = async () => {
     try {
       router.push("?modal=guestCheckoutLoading");
+
+      // Save itinerary data to local storage (for reference in modal)
+      // We should replace this with Modal Context in the future
+      localStorage.setItem('itineraryData', JSON.stringify(itineraryData));
 
       // Check if the user is logged in
       let user;

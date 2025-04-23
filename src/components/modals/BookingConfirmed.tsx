@@ -1,13 +1,20 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Button from '../figma/Button'
 import { FaCheck } from 'react-icons/fa6'
 import Image from 'next/image'
 import BookingCard from '../profileComponents/bookings/BookingCard'
 import { ArrowLeftIcon } from '@heroicons/react/20/solid'
 import { useRouter } from 'next/navigation';
+import { getLocalStorageItem } from '@/src/utils/browserStorage'
 const BookingConfirmed = () => {
     const router = useRouter();
-    const [bookings, setBookings] = React.useState<any>({
+
+    let itineraryData = getLocalStorageItem('itineraryData');
+    if (itineraryData) {
+        itineraryData = JSON.parse(itineraryData);
+    }
+    
+    const [itinerary, setItinerary] = React.useState<any>(itineraryData ?? {
         id: 1,
         status: "upcoming",
         delay_insurance: true,
@@ -31,6 +38,7 @@ const BookingConfirmed = () => {
         updated_at: new Date()
     }
     );
+
     return (
         <div className='flex flex-col items-center justify-center overflow-y-auto !h-full '>
             <div className='w-full md:hidden'>
@@ -49,7 +57,7 @@ const BookingConfirmed = () => {
                 <div className='w-full lg:w-[707px]'>
                     <p className='text-white font-bold mb-2'>Booking Details</p>
 
-                    <BookingCard dataBooking={bookings} dataItinerary={null} bookingConfirmedModal={true} />
+                    <BookingCard dataBooking={itinerary} dataItinerary={itinerary} bookingConfirmedModal={true} />
 
                 </div>
 
