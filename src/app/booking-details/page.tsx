@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic';
 
 import { usePathname, useRouter } from 'next/navigation'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ClientOnly from '@/src/components/ClientOnly';
 import { ArrowLeftIcon, XMarkIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
@@ -22,52 +22,60 @@ import DrawerModal from '@/src/components/DrawerModal';
 import Input from '@/src/components/figma/Input';
 import ItineraryCalendar from '@/src/components/calendar/ItineraryCalendar';
 import LikeDislike from '@/src/components/LikeDislike';
+import { BookingType } from '@/src/components/models/Itinerary';
+import { ItineraryData } from '@/src/types/itineraries';
 
 function BookingDetails() {
   const pathname = usePathname() as string;
   const router = useRouter();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [bookings, setBookings] = React.useState<any>({
-    id: 1,
-    status: "upcoming",
-    delay_insurance: true,
-    trip_name: "Lahore",
-    fareharbor_id: 1,
-    person_cost: 100,
-    min_age: 18,
-    min_guests: 1,
-    max_guests: 10,
-    length_days: 1,
-    length_hours: 1,
-    start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    description: "Lahore is a city in Pakistan",
-    days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
-    activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
-    images: ["/images/hero-bg.jpg"],
-    start_date: new Date(),
-    end_date: new Date(),
-    created_at: new Date(),
-    updated_at: new Date()
+  const [dataBooking, setDataBooking] = useState<BookingType | null>(null);
+  const [dataItinerary, setDataItinerary] = useState<ItineraryData | null>(null);
+
+  useEffect(() => {
+    // Retrieve data from localStorage
+    console.log('BookingDetails component mounted'); // Log here
+    const data = localStorage.getItem('bookingDetails');
+    console.log('localStorage bookingDetails:', data); // Log here
+    if (data) {
+      try {
+        const parsed = JSON.parse(data);
+        console.log('Full parsed object:', parsed); // Log entire object
+        console.log('Parsed dataBooking:', parsed.dataBooking); // Debug log
+        console.log('Parsed dataItinerary:', parsed.dataItinerary); // Debug log
+        setDataBooking(parsed.dataBooking);
+        setDataItinerary(parsed.dataItinerary);
+      } catch (error) {
+        console.error('Error parsing localStorage data:', error);
+      }
+    } else {
+      console.warn('No bookingDetails found in localStorage'); // Log here
+    }
+
+    // // Cleanup function: runs when component unmounts (user leaves page)
+    // return () => {
+    //   localStorage.removeItem('bookingDetails');
+    // };
+  }, []); // Empty dependency array ensures effect runs once on mount
+
+  console.log('Current state - Booking:', dataBooking, 'Itinerary:', dataItinerary); // Log here
+
+  if (!dataBooking || !dataItinerary) {
+    return <div>No dataBooking details available.</div>;
   }
-  );
-  const objectId = pathname.substring(pathname.lastIndexOf('/') + 1);
 
 
 
 
 
-
-
-
-  return (
+   return (
     <section className='w-full !h-full text-white  gap-4'>
       <div className='flex items-center gap-2  px-[64px] pt-[80px] max-sm:px-6 max-lg:px-10'>
         <ArrowLeftIcon className="h-6 w-6 hover:cursor-pointer" onClick={() => router.push("/")} />
         <p className='text-primary-gray text-sm'>My Bookings / <span className='text-white'>Denver Tour</span></p>
       </div>
       <div className='flex gap-4 max-sm:mt-4 md:items-center px-[64px] max-sm:px-6 max-lg:px-10'>
-        <h1 className='text-4xl max-sm:text-2xl font-bold me-auto'>{bookings.trip_name}</h1>
+        <h1 className='text-4xl max-sm:text-2xl font-bold me-auto'>{dataItinerary.trip_name}</h1>
         <div className='flex items-center md:flex-nowrap flex-wrap gap-2'>
 
           <Button variant="outline" size='sm' className='gap-1' onClick={() => { }}>
@@ -78,10 +86,10 @@ function BookingDetails() {
       </div>
       <div className='grid md:grid-cols-12 lg:grid-cols-7 gap-6 mt-4 px-[80px] max-sm:px-6 max-lg:px-10 '>
         <div className='md:col-span-8 lg:col-span-5 -mt-4 '>
-          <BookingCard data={bookings} bookingDetailsPage={true} />
+          <BookingCard dataBooking={dataBooking} dataItinerary={dataItinerary} bookingDetailsPage={true} />
 
           <div className='md:hidden max-md:mt-4'>
-            <PricesCard bookings={bookings} />
+            <PricesCard dataItinerary={dataItinerary} />
 
           </div>
           <div className='mt-8'>
@@ -190,7 +198,7 @@ function BookingDetails() {
 
           <div className='mt-8'>
             <p className='text-white text-2xl font-bold'>About</p>
-            <p className='text-primary-gray text-sm mt-2'>Experience the ultimate Colorado vacation with a 6-day itinerary that takes you to Idaho Springs, Glenwood Springs, and Denver. Enjoy the adrenaline rush of white water rafting, the tranquility of camping, the intrigue of gold mines, and the challenge of hiking the Rockies.</p>
+            <p className='text-primary-gray text-sm mt-2'>Experience the ultimate Colorado vacation with a 6-day dataItinerary that takes you to Idaho Springs, Glenwood Springs, and Denver. Enjoy the adrenaline rush of white water rafting, the tranquility of camping, the intrigue of gold mines, and the challenge of hiking the Rockies.</p>
           </div>
 
 
@@ -198,7 +206,7 @@ function BookingDetails() {
         </div>
 
         <div className='md:col-span-4 lg:col-span-2 max-md:hidden'>
-          <PricesCard bookings={bookings} />
+          <PricesCard dataItinerary={dataItinerary} />
         </div>
 
 
