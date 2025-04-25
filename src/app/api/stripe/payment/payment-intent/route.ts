@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
 	try {
 
 		const requestData = await request.json();
-		const { user_id, amount, customer_id, payment_method_id } = requestData;;
+		const { user_id, amount, customer_id, payment_method_id, description } = requestData;;
 		console.log("Request Data:", requestData);
 
 		if (!user_id || !amount || !customer_id || !payment_method_id) {
@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
 				amount,
 				customer_id,
 				payment_method_id,
+				description
 			},
 			{
 				headers: {

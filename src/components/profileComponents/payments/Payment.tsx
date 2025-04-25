@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { usePaymentMethods } from "@/src/hooks/queries/account/usePaymentMethodsQuery";
 import { useAttachPaymentMethod } from "@/src/hooks/mutations/payment.mutation";
 import StripeCardElement from "../../stripe/StripeCardElement";
+import { getClientSession } from "@/src/lib/session";
 
 interface Card {
   id: string | number;
@@ -43,7 +44,8 @@ const Payment = () => {
     }
     return "bookingsHistory";
   };
-  
+
+  const user = getClientSession().user;
   const [activeTab, setActiveTab] = useState(getInitialActiveTab);
   const [search, setSearch] = useState("");
 
@@ -83,35 +85,89 @@ const Payment = () => {
     expiryDate: '',
     cvv: ''
   });
-  const [purchaseHistory, setPurchaseHistory] = useState([
-    {
-      id: 1,
-      purchase: "Denver 6 Days Trip",
-      transactionId: "09187-2344422092",
-      transactionDate: "Jun 21, 2024",
-      paymentDate: "Jun 21, 2024",
-      amount: "$100",
-      status: "paid",
-    },
-    {
-      id: 2,
-      purchase: "Denver 6 Days Trip",
-      transactionId: "09187-2344422092",
-      transactionDate: "Jun 21, 2024",
-      paymentDate: "Jun 21, 2024",
-      amount: "$100",
-      status: "pending",
-    },
-    {
-      id: 3,
-      purchase: "Denver 6 Days Trip",
-      transactionId: "09187-2344422092",
-      transactionDate: "Jun 21, 2024",
-      paymentDate: "Jun 21, 2024",
-      amount: "$100",
-      status: "paid",
-    }
-  ]);
+
+  // const [purchaseHistory, setPurchaseHistory] = useState([
+  //   {
+  //     id: 1,
+  //     purchase: "Denver 6 Days Trip",
+  //     transactionId: "09187-2344422092",
+  //     transactionDate: "Jun 21, 2024",
+  //     paymentDate: "Jun 21, 2024",
+  //     amount: "$100",
+  //     status: "paid",
+  //   },
+  //   {
+  //     id: 2,
+  //     purchase: "Denver 6 Days Trip",
+  //     transactionId: "09187-2344422092",
+  //     transactionDate: "Jun 21, 2024",
+  //     paymentDate: "Jun 21, 2024",
+  //     amount: "$100",
+  //     status: "pending",
+  //   },
+  //   {
+  //     id: 3,
+  //     purchase: "Denver 6 Days Trip",
+  //     transactionId: "09187-2344422092",
+  //     transactionDate: "Jun 21, 2024",
+  //     paymentDate: "Jun 21, 2024",
+  //     amount: "$100",
+  //     status: "paid",
+  //   }
+  // ]);
+
+  const [purchaseHistory, setPurchaseHistory] = useState([]);
+
+  useEffect(() => {
+    // Skip the fetch if user ID is not available
+    if (!user?.user_id) return;
+
+    const fetchTransactions = async () => {
+      try {
+        const userId = user.user_id;
+        console.log("Fetching transactions for user ID:", userId);
+        
+        // Next.js is rewriting all /api/* URLs to the backend API
+        // We need to use the internal Next.js API route structure to bypass the rewrite
+        // Using _next/data path to access our internal API route
+        const url = `/api/account/${userId}/transactions`;
+        console.log("Requesting URL:", url);
+        console.log("User object:", user);
+
+        // Match the exact pattern of your working request
+        // Use the API client from the same place used in the route handlers
+        const apiClient = (await import("@/src/lib/apiClient")).default;
+        const response = await apiClient.get(`/api/account/${userId}/transactions`, {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        console.log("Response status:", response.status);
+        console.log("Response headers:", response.headers);
+        console.log("Raw response:", response.data);
+        
+        if (response.status < 200 || response.status >= 300) {
+          console.error("Response not OK:", response.status, response.data);
+          throw new Error(`HTTP error! Status: ${response.status}, Response: ${JSON.stringify(response.data)}`);
+        }
+
+        const data = response.data;
+        console.log("Transactions data:", data);
+        
+        if (data) {
+          setPurchaseHistory(Array.isArray(data) ? data : []);
+        }
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+
+
+    fetchTransactions();
+
+  }, [user?.user_id]);
+
   const tabs = [
     {
       id: "bookingsHistory",
@@ -239,7 +295,7 @@ const Payment = () => {
     if (!validateCardForm()) {
       return;
     }
-    
+
     // This function is kept for reference but is no longer used
     // Now we use the Stripe Card Element to create payment methods
     console.log("This method is deprecated. Using Stripe Card Element instead.");
@@ -312,7 +368,7 @@ const Payment = () => {
       <div>
         {activeTab === "bookingsHistory" ?
           <div className="mb-4">
-            <p className="font-bold text-2xl mb-8">Purchase History(23)</p>
+            <p className="font-bold text-2xl mb-8">Purchase History ({purchaseHistory.length})</p>
 
             <div className="mb-4 flex gap-2">
               <div className="w-full">
@@ -458,9 +514,9 @@ const Payment = () => {
                     />
                     <p className="text-primary-gray text-sm">Set as default</p>
                   </div>
-                  
+
                   {/* Stripe Card Element */}
-                  <StripeCardElement 
+                  <StripeCardElement
                     onSuccess={(paymentMethodId) => {
                       // Call the mutation to attach the payment method to customer
                       attachPaymentMethod({

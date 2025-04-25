@@ -211,6 +211,7 @@ const Payment = () => {
         payment_method_id: selectedCard,
         customer_id: user.customer_id || "TEST",
         user_id: user.user_id,
+        description: itineraryData.trip_name
       }
 
       // Create a PaymentIntent
