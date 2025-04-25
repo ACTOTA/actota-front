@@ -14,6 +14,8 @@ import { useRouter } from "next/navigation";
 import { usePaymentMethods } from "@/src/hooks/queries/account/usePaymentMethodsQuery";
 import { useAttachPaymentMethod } from "@/src/hooks/mutations/payment.mutation";
 import StripeCardElement from "../../stripe/StripeCardElement";
+import { getClientSession } from "@/src/lib/session";
+
 
 interface Card {
   id: string | number;
@@ -35,7 +37,17 @@ interface CardFormData {
 
 const Payment = () => {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("bookingsHistory");
+  // Check URL for active tab parameter on component mount
+  const getInitialActiveTab = () => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('activeTab') || "bookingsHistory";
+    }
+    return "bookingsHistory";
+  };
+
+  const user = getClientSession().user;
+  const [activeTab, setActiveTab] = useState(getInitialActiveTab);
   const [search, setSearch] = useState("");
 
   const { data: paymentMethods } = usePaymentMethods();
@@ -74,35 +86,75 @@ const Payment = () => {
     expiryDate: '',
     cvv: ''
   });
-  const [purchaseHistory, setPurchaseHistory] = useState([
-    {
-      id: 1,
-      purchase: "Denver 6 Days Trip",
-      transactionId: "09187-2344422092",
-      transactionDate: "Jun 21, 2024",
-      paymentDate: "Jun 21, 2024",
-      amount: "$100",
-      status: "paid",
-    },
-    {
-      id: 2,
-      purchase: "Denver 6 Days Trip",
-      transactionId: "09187-2344422092",
-      transactionDate: "Jun 21, 2024",
-      paymentDate: "Jun 21, 2024",
-      amount: "$100",
-      status: "pending",
-    },
-    {
-      id: 3,
-      purchase: "Denver 6 Days Trip",
-      transactionId: "09187-2344422092",
-      transactionDate: "Jun 21, 2024",
-      paymentDate: "Jun 21, 2024",
-      amount: "$100",
-      status: "paid",
-    }
-  ]);
+
+  const [purchaseHistory, setPurchaseHistory] = useState([]);
+
+  useEffect(() => {
+    // Skip the fetch if user ID is not available
+    if (!user?.user_id) return;
+
+    const fetchTransactions = async () => {
+      try {
+        const userId = user.user_id;
+        console.log("Fetching transactions for user ID:", userId);
+        
+        // Next.js is rewriting all /api/* URLs to the backend API
+        // We need to use the internal Next.js API route structure to bypass the rewrite
+        // Using _next/data path to access our internal API route
+        const url = `/api/account/${userId}/transactions`;
+        console.log("Requesting URL:", url);
+        console.log("User object:", user);
+
+        // Match the exact pattern of your working request
+        // Use the API client from the same place used in the route handlers
+        const apiClient = (await import("@/src/lib/apiClient")).default;
+        const response = await apiClient.get(`/api/account/${userId}/transactions`, {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        console.log("Response status:", response.status);
+        console.log("Response headers:", response.headers);
+        console.log("Raw response:", response.data);
+        
+        if (response.status < 200 || response.status >= 300) {
+          console.error("Response not OK:", response.status, response.data);
+          throw new Error(`HTTP error! Status: ${response.status}, Response: ${JSON.stringify(response.data)}`);
+        }
+
+        const data = response.data;
+        console.log("Transactions data:", data);
+        
+        if (data && data.data) {
+          // Handle Stripe charges data structure
+          const stripeCharges = data.data;
+          // Transform Stripe charges to match purchaseHistory format
+          const formattedTransactions = stripeCharges.map((charge: any) => ({
+            id: charge.id,
+            purchase: charge.description || "Vacation",
+            transactionId: charge.id,
+            transactionDate: new Date(charge.created * 1000).toLocaleDateString(),
+            paymentDate: new Date(charge.created * 1000).toLocaleDateString(),
+            amount: `$${(charge.amount / 100).toFixed(2)}`,
+            status: charge.status === "succeeded" ? "paid" : charge.status
+          }));
+          
+          console.log("Formatted transactions:", formattedTransactions);
+          setPurchaseHistory(formattedTransactions);
+        } else {
+          console.error("Invalid data format received:", data);
+        }
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+
+
+    fetchTransactions();
+
+  }, [user?.user_id]);
+
   const tabs = [
     {
       id: "bookingsHistory",
@@ -225,22 +277,21 @@ const Payment = () => {
     }
   };
 
-  // Add new card - this method is no longer used as the Stripe integration replaced it
   const handleAddCard = () => {
     if (!validateCardForm()) {
       return;
     }
-    
-    // This function is kept for reference but is no longer used
-    // Now we use the Stripe Card Element to create payment methods
-    console.log("This method is deprecated. Using Stripe Card Element instead.");
-  };
+
+    };
 
   // Delete card
   const handleDeleteCard = (cardId: string | number) => {
-    router.push("?modal=deletePaymentCard");
-    // Implementation to actually delete the card would go here
-    // This would typically involve an API call to delete the payment method
+    // Preserve the current tab state when opening the modal
+    const query = new URLSearchParams(window.location.search);
+    query.set('modal', 'deletePaymentCard');
+    query.set('paymentMethodId', cardId.toString());
+    query.set('activeTab', 'paymentMethods'); // Set or preserve the active tab
+    router.push(`?${query.toString()}`);
   };
 
   // Set card as default
@@ -281,7 +332,14 @@ const Payment = () => {
                     ? "!border-white !text-white"
                     : "!border-border-primary !text-border-primary"
                 }
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  // Update URL to reflect tab change without full navigation
+                  const query = new URLSearchParams(window.location.search);
+                  query.set('activeTab', tab.id);
+                  const newUrl = `${window.location.pathname}?${query.toString()}`;
+                  window.history.pushState({ path: newUrl }, '', newUrl);
+                }}
               >
                 {tab.label}
               </Button>
@@ -293,7 +351,7 @@ const Payment = () => {
       <div>
         {activeTab === "bookingsHistory" ?
           <div className="mb-4">
-            <p className="font-bold text-2xl mb-8">Purchase History(23)</p>
+            <p className="font-bold text-2xl mb-8">Purchase History ({purchaseHistory.length})</p>
 
             <div className="mb-4 flex gap-2">
               <div className="w-full">
@@ -321,27 +379,24 @@ const Payment = () => {
                 <tr>
                   <th className="py-5">Purchase </th>
                   <th className="py-5">Transaction Date</th>
-                  <th className="py-5">Payment Date</th>
                   <th className="py-5">Amount</th>
                   <th className="py-5 text-center">Status</th>
                 </tr>
               </thead>
 
               <tbody className="w-full ">
-                {purchaseHistory.map((item, i) => (
-                  <React.Fragment key={item.id}>
+                {purchaseHistory.map((item: any, i) => (
+                  <React.Fragment key={i}>
                     <tr className="w-full">
                       <td colSpan={5}>
                         <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent" />
                       </td>
                     </tr>
-                    <tr key={item.id} className="w-full">
+                    <tr key={i} className="w-full">
                       <td className="py-5">
                         <p className="text-white text-sm">{item.purchase}   </p>
-                        <p className="text-primary-gray text-xs">{item.transactionId}</p>
                       </td>
-                      <td className="py-5">{item.transactionDate} <span className="text-xs text-primary-gray">08.15</span></td>
-                      <td className="py-5">{item.paymentDate} <span className="text-xs text-primary-gray">08.15</span></td>
+                      <td className="py-5">{item.transactionDate}</td>
                       <td className="py-5">{item.amount}</td>
                       <td className="py-5 text-center ">
                         <Button variant="primary" size="sm" className={`mx-auto ${item.status === "paid" ? "!bg-[#215CBA]" : "!bg-[#FFC107]"} text-white`}>{item.status === "paid" ? "Paid" : "Pending"}</Button>
@@ -439,9 +494,9 @@ const Payment = () => {
                     />
                     <p className="text-primary-gray text-sm">Set as default</p>
                   </div>
-                  
+
                   {/* Stripe Card Element */}
-                  <StripeCardElement 
+                  <StripeCardElement
                     onSuccess={(paymentMethodId) => {
                       // Call the mutation to attach the payment method to customer
                       attachPaymentMethod({

@@ -7,8 +7,7 @@ export type SessionUser = {
   first_name?: string;
   last_name?: string;
   name?: string;
-  firstName?: string;
-  lastName?: string;
+  customer_id?: string;
   created_at?: string;
 }
 

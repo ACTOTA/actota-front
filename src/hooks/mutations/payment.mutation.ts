@@ -49,12 +49,25 @@ export const useAttachPaymentMethod = () => {
         }
       }
 
-      // Step 1: Call the backend API to get or create a Stripe customer ID
-      const customerResponse = await actotaApi.post(`/api/account/${userId}/customer`);
-      const { customer_id: customerId } = customerResponse.data;
+      // First check if we already have a customer_id in the session
+      let customerId = '';
+      if (session && session.user && session.user.customer_id) {
+        customerId = session.user.customer_id;
+      } else {
+        // If not, call the backend API to get or create a Stripe customer ID
+        const customerResponse = await actotaApi.post(`/api/account/${userId}/customer`);
+        customerId = customerResponse.data.customer_id;
 
-      if (!customerId) {
-        throw new Error("Failed to get customer ID from server");
+        if (!customerId) {
+          throw new Error("Failed to get customer ID from server");
+        }
+        
+        // Update the local session with the new customer_id if possible
+        if (session && session.user) {
+          session.user.customer_id = customerId;
+          // Update localStorage for client-side persistence
+          localStorage.setItem('user', JSON.stringify(session.user));
+        }
       }
 
       console.log(`Attaching payment method ${values.paymentMethodId} to customer: ${customerId}`);
@@ -63,10 +76,10 @@ export const useAttachPaymentMethod = () => {
       try {
         // Make an API call to attach the payment method to the customer on Stripe's servers
         // This goes through our Next.js API route which then calls the backend service
-        const response = await actotaApi.post(`/api/account/${values.paymentMethodId}/attach-payment-method`, {
-          customer_id: customerId,
-          payment_id: values.paymentMethodId,
-          default: values.setAsDefault
+        const response = await actotaApi.post(`/api/stripe/attach-payment-method`, {
+          customerId: customerId,
+          paymentMethodId: values.paymentMethodId,
+          setAsDefault: values.setAsDefault
         });
 
         console.log('Payment method attached to customer', response.data);
@@ -178,12 +191,25 @@ export const useSetDefaultPaymentMethod = () => {
           throw new Error("Please login");
         }
 
-        // Step 1: Call the backend API to get the Stripe customer ID
-        const customerResponse = await actotaApi.post(`/api/account/${userId}/customer`);
-        const { customer_id: customerId } = customerResponse.data;
+        // First check if we already have a customer_id in the session
+        let customerId = '';
+        if (session && session.user && session.user.customer_id) {
+          customerId = session.user.customer_id;
+        } else {
+          // If not, call the backend API to get or create a Stripe customer ID
+          const customerResponse = await actotaApi.post(`/api/account/${userId}/customer`);
+          customerId = customerResponse.data.customer_id;
 
-        if (!customerId) {
-          throw new Error("Failed to get customer ID from server");
+          if (!customerId) {
+            throw new Error("Failed to get customer ID from server");
+          }
+          
+          // Update the local session with the new customer_id if possible
+          if (session && session.user) {
+            session.user.customer_id = customerId;
+            // Update localStorage for client-side persistence
+            localStorage.setItem('user', JSON.stringify(session.user));
+          }
         }
 
         console.log(`Setting default payment method ${paymentMethodId} for customer: ${customerId}`);
@@ -244,26 +270,37 @@ export const useDeletePaymentMethod = () => {
           throw new Error("Please login");
         }
 
-        // Step 1: Call the backend API to get the Stripe customer ID
-        const customerResponse = await actotaApi.post(`/api/account/${userId}/customer`);
-        const { customer_id: customerId } = customerResponse.data;
+        // First check if we already have a customer_id in the session
+        let customerId = '';
+        if (session && session.user && session.user.customer_id) {
+          customerId = session.user.customer_id;
+        } else {
+          // If not, call the backend API to get or create a Stripe customer ID
+          const customerResponse = await actotaApi.post(`/api/account/${userId}/customer`);
+          customerId = customerResponse.data.customer_id;
 
-        if (!customerId) {
-          throw new Error("Failed to get customer ID from server");
+          if (!customerId) {
+            throw new Error("Failed to get customer ID from server");
+          }
+          
+          // Update the local session with the new customer_id if possible
+          if (session && session.user) {
+            session.user.customer_id = customerId;
+            // Update localStorage for client-side persistence
+            localStorage.setItem('user', JSON.stringify(session.user));
+          }
         }
 
         console.log(`Deleting payment method ${paymentMethodId} for customer: ${customerId}`);
 
-        // Get current payment methods
+        // Make the actual API call to delete the payment method
+        await actotaApi.delete(`/api/account/${userId}/payment-methods/${paymentMethodId}`);
+        
+        // For local state management (this can be removed if the backend handles everything)
         const paymentMethods = JSON.parse(localStorage.getItem('paymentMethods') || '[]');
-
-        // Filter out the specified payment method
-        // In a real implementation, this would make API calls to Stripe
         const updatedPaymentMethods = paymentMethods.filter(
           (method: any) => method.id !== paymentMethodId
         );
-
-        // Save back to localStorage
         localStorage.setItem('paymentMethods', JSON.stringify(updatedPaymentMethods));
 
         return { success: true, customerId };

@@ -14,8 +14,9 @@ export async function POST(request: Request) {
     );
 
     if (response.data.auth_token) {
-
       setAuthCookie(response.data.auth_token);
+      
+      // Get the session data
       const sessionResponse = await actotaApi.get(
         "/api/auth/session",
         {
@@ -24,8 +25,36 @@ export async function POST(request: Request) {
           }
         },
       );
+      
+      // Log the session response data to see its structure
+      console.log('Session response data:', JSON.stringify(sessionResponse.data, null, 2));
+      
+      // Get or create a Stripe customer ID for this user
+      let userData = sessionResponse.data;
+      
+      if (!userData.customer_id && userData.user_id) {
+        try {
+          const customerResponse = await actotaApi.post(
+            `/api/account/${userData.user_id}/customer`,
+            {},
+            {
+              headers: {
+                'Authorization': `Bearer ${response.data.auth_token}`,
+              }
+            }
+          );
+          
+          if (customerResponse.data && customerResponse.data.customer_id) {
+            userData.customer_id = customerResponse.data.customer_id;
+          }
+        } catch (customerError) {
+          console.error('Failed to get/create customer ID:', customerError);
+          // Continue without customer_id - we'll try again later
+        }
+      }
+
       return NextResponse.json(
-        { success: true, message: 'Login successful', data: sessionResponse.data },
+        { success: true, message: 'Login successful', data: userData },
         { status: 200 }
       );
     }

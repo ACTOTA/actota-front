@@ -17,6 +17,7 @@ export const getClientSession = (): Session => {
     }
 
     const user = JSON.parse(userStr);
+
     if (!user || !user.user_id) {
       return { user: null, isLoggedIn: false };
     }

@@ -4,31 +4,46 @@ import { useQuery } from '@tanstack/react-query';
 
 async function getBookings(): Promise<BookingType[]> {
   try {
-    // Check if we're in the browser environment
-    if (typeof window === 'undefined') {
-      // Server-side, return empty array to avoid localStorage errors
-      return [];
-    }
-    
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if(!user.user_id){
+    if (!user.user_id) {
       console.warn("User not logged in");
       return [];
     }
-
-    const response = await actotaApi.get(`/api/account/${user?.user_id}/bookings`);
+    const response = await actotaApi.get(`/api/account/${user.user_id}/bookings`);
     return response.data;
-   
   } catch (error) {
     console.error('Fetch Error:', error);
-    return []; // Return empty array instead of throwing to avoid hydration errors
+    return [];
+  }
+}
+
+async function getBookingById(id: string): Promise<BookingType | null> {
+  try {
+    if (!id) return null;
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (!user.user_id) {
+      console.warn("User not logged in");
+      return null;
+    }
+    const response = await actotaApi.get(`/api/account/${user.user_id}/bookings/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Fetch Error:', error);
+    return null;
   }
 }
 
 export function useBookings() {
-  return useQuery({
+  return useQuery<BookingType[]>({
     queryKey: ['bookings'],
     queryFn: () => getBookings(),
-   
+  });
+}
+
+export function useBookingById(id: string) {
+  return useQuery<BookingType | null>({
+    queryKey: ['bookingsById', id],
+    queryFn: () => getBookingById(id),
+    enabled: !!id, // Only fetch if id is provided
   });
 }

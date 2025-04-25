@@ -28,8 +28,31 @@ export const getServerSession = async (): Promise<Session> => {
         return { user: null, isLoggedIn: false };
       }
       
+      // If customer_id is not in session data, try to get it
+      let userData = response.data;
+      if (!userData.customer_id) {
+        try {
+          const customerResponse = await actotaApi.post(
+            `/api/account/${userData.user_id}/customer`,
+            {},
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+              }
+            }
+          );
+          
+          if (customerResponse.data && customerResponse.data.customer_id) {
+            userData.customer_id = customerResponse.data.customer_id;
+          }
+        } catch (customerError) {
+          console.error('Failed to get/create customer ID in server session:', customerError);
+          // Continue without customer_id
+        }
+      }
+      
       return { 
-        user: response.data, 
+        user: userData, 
         isLoggedIn: true,
         accessToken: token
       };
