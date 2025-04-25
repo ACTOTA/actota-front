@@ -16,6 +16,7 @@ import { useAttachPaymentMethod } from "@/src/hooks/mutations/payment.mutation";
 import StripeCardElement from "../../stripe/StripeCardElement";
 import { getClientSession } from "@/src/lib/session";
 
+
 interface Card {
   id: string | number;
   cardType: string;
@@ -86,36 +87,6 @@ const Payment = () => {
     cvv: ''
   });
 
-  // const [purchaseHistory, setPurchaseHistory] = useState([
-  //   {
-  //     id: 1,
-  //     purchase: "Denver 6 Days Trip",
-  //     transactionId: "09187-2344422092",
-  //     transactionDate: "Jun 21, 2024",
-  //     paymentDate: "Jun 21, 2024",
-  //     amount: "$100",
-  //     status: "paid",
-  //   },
-  //   {
-  //     id: 2,
-  //     purchase: "Denver 6 Days Trip",
-  //     transactionId: "09187-2344422092",
-  //     transactionDate: "Jun 21, 2024",
-  //     paymentDate: "Jun 21, 2024",
-  //     amount: "$100",
-  //     status: "pending",
-  //   },
-  //   {
-  //     id: 3,
-  //     purchase: "Denver 6 Days Trip",
-  //     transactionId: "09187-2344422092",
-  //     transactionDate: "Jun 21, 2024",
-  //     paymentDate: "Jun 21, 2024",
-  //     amount: "$100",
-  //     status: "paid",
-  //   }
-  // ]);
-
   const [purchaseHistory, setPurchaseHistory] = useState([]);
 
   useEffect(() => {
@@ -155,8 +126,24 @@ const Payment = () => {
         const data = response.data;
         console.log("Transactions data:", data);
         
-        if (data) {
-          setPurchaseHistory(Array.isArray(data) ? data : []);
+        if (data && data.data) {
+          // Handle Stripe charges data structure
+          const stripeCharges = data.data;
+          // Transform Stripe charges to match purchaseHistory format
+          const formattedTransactions = stripeCharges.map((charge: any) => ({
+            id: charge.id,
+            purchase: charge.description || "Vacation",
+            transactionId: charge.id,
+            transactionDate: new Date(charge.created * 1000).toLocaleDateString(),
+            paymentDate: new Date(charge.created * 1000).toLocaleDateString(),
+            amount: `$${(charge.amount / 100).toFixed(2)}`,
+            status: charge.status === "succeeded" ? "paid" : charge.status
+          }));
+          
+          console.log("Formatted transactions:", formattedTransactions);
+          setPurchaseHistory(formattedTransactions);
+        } else {
+          console.error("Invalid data format received:", data);
         }
       } catch (error) {
         console.error("Error fetching transactions:", error);
@@ -290,16 +277,12 @@ const Payment = () => {
     }
   };
 
-  // Add new card - this method is no longer used as the Stripe integration replaced it
   const handleAddCard = () => {
     if (!validateCardForm()) {
       return;
     }
 
-    // This function is kept for reference but is no longer used
-    // Now we use the Stripe Card Element to create payment methods
-    console.log("This method is deprecated. Using Stripe Card Element instead.");
-  };
+    };
 
   // Delete card
   const handleDeleteCard = (cardId: string | number) => {
@@ -396,27 +379,24 @@ const Payment = () => {
                 <tr>
                   <th className="py-5">Purchase </th>
                   <th className="py-5">Transaction Date</th>
-                  <th className="py-5">Payment Date</th>
                   <th className="py-5">Amount</th>
                   <th className="py-5 text-center">Status</th>
                 </tr>
               </thead>
 
               <tbody className="w-full ">
-                {purchaseHistory.map((item, i) => (
-                  <React.Fragment key={item.id}>
+                {purchaseHistory.map((item: any, i) => (
+                  <React.Fragment key={i}>
                     <tr className="w-full">
                       <td colSpan={5}>
                         <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent" />
                       </td>
                     </tr>
-                    <tr key={item.id} className="w-full">
+                    <tr key={i} className="w-full">
                       <td className="py-5">
                         <p className="text-white text-sm">{item.purchase}   </p>
-                        <p className="text-primary-gray text-xs">{item.transactionId}</p>
                       </td>
-                      <td className="py-5">{item.transactionDate} <span className="text-xs text-primary-gray">08.15</span></td>
-                      <td className="py-5">{item.paymentDate} <span className="text-xs text-primary-gray">08.15</span></td>
+                      <td className="py-5">{item.transactionDate}</td>
                       <td className="py-5">{item.amount}</td>
                       <td className="py-5 text-center ">
                         <Button variant="primary" size="sm" className={`mx-auto ${item.status === "paid" ? "!bg-[#215CBA]" : "!bg-[#FFC107]"} text-white`}>{item.status === "paid" ? "Paid" : "Pending"}</Button>
