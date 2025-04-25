@@ -6,8 +6,11 @@ import BookingCard from '../profileComponents/bookings/BookingCard'
 import { ArrowLeftIcon } from '@heroicons/react/20/solid'
 import { useRouter } from 'next/navigation';
 import { getLocalStorageItem } from '@/src/utils/browserStorage'
+import { getClientSession } from '@/src/lib/session'
 const BookingConfirmed = () => {
     const router = useRouter();
+
+    const user = getClientSession().user;
 
     let itineraryData = getLocalStorageItem('itineraryData');
     if (itineraryData) {
@@ -51,7 +54,7 @@ const BookingConfirmed = () => {
                 <FaCheck className='text-white size-6' />
             </div>
             <p className='text-white text-2xl font-bold mt-4'>Your booking is confirmed!</p>
-            <p className='text-white  text-center py-2 '>We’ve sent a confirmation email to <b>test@gmail.com</b></p>
+            <p className='text-white  text-center py-2 '>We’ve sent a confirmation email to <b>{user?.email || "your email!"}</b></p>
             <div className='flex flex-col lg:flex-row w-full gap-4 mt-2'>
 
                 <div className='w-full lg:w-[707px]'>
