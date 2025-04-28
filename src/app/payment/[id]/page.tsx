@@ -152,21 +152,21 @@ const Payment = () => {
   const confirmBooking = async () => {
     try {
       // Check if a payment method is selected
-    if (!selectedCard && !paymentMethod.some(method => method.selected && method.name !== "Card")) {
-      // Show an error message
-      toast.error("Please add or select a payment method to continue");
-      
-      // Scroll to payment method section
-      if (paymentMethodRef.current) {
-        paymentMethodRef.current.scrollIntoView({ 
-          behavior: 'smooth',
-          block: 'center'
-        });
+      if (!selectedCard && !paymentMethod.some(method => method.selected && method.name !== "Card")) {
+        // Show an error message
+        toast.error("Please add or select a payment method to continue");
+
+        // Scroll to payment method section
+        if (paymentMethodRef.current) {
+          paymentMethodRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
+        }
+        return; // Stop the booking process
       }
-      return; // Stop the booking process
-    }
-      
-      
+
+
       router.push("?modal=guestCheckoutLoading");
 
       // Save itinerary data to local storage (for reference in modal)
