@@ -33,7 +33,7 @@ export default function SignIn() {
       }
     };
     checkAuth();
-  }, [ router]);
+  }, [router]);
 
   const validateForm = () => {
     let tempErrors = {
@@ -71,15 +71,33 @@ export default function SignIn() {
     router.push("?modal=signinLoading");
 
     login(
-      { email, password }, 
+      { email, password },
       {
-        onSuccess: (data:any) => {
+        onSuccess: (data: any) => {
           router.back()
-          localStorage.setItem('user', JSON.stringify(
-            {user_id: data.data._id.$oid, first_name: data.data.first_name, last_name: data.data.last_name, email: data.data.email,}
-          ));
-    
-         window.location.href = '/';
+          
+          // Log the data structure to debug
+          console.log('Login successful data:', JSON.stringify(data, null, 2));
+          
+          const userData = data.data;
+          localStorage.setItem('user', JSON.stringify({
+            user_id: userData._id.$oid,
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            email: userData.email,
+            customer_id: userData.customer_id
+          }));
+          
+          // Log what's being stored in localStorage
+          console.log('Storing in localStorage:', JSON.stringify({
+            user_id: userData._id.$oid,
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            email: userData.email,
+            customer_id: userData.customer_id
+          }, null, 2));
+
+          window.location.href = '/';
         },
         onError: (error) => {
           router.back()
@@ -94,7 +112,7 @@ export default function SignIn() {
   };
 
   const handleGoogleLogin = async () => {
-    router.push("?modal=signinLoading");
+    // Don't show loading modal for Google login, just redirect directly
     try {
       window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`;
     } catch (error) {
@@ -190,19 +208,19 @@ export default function SignIn() {
         <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
       </div>
       <div className="flex justify-center items-center gap-[8px] my-[16px] pb-[16px]">
-        <button 
+        <button
           onClick={handleGoogleLogin}
           className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer hover:bg-[#363636] transition-colors'
         >
           <Image src="/svg-icons/google.svg" alt="google" width={20} height={20} />
         </button>
-        <button 
+        <button
           onClick={handleAppleLogin}
           className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer hover:bg-[#363636] transition-colors'
         >
           <Image src="/svg-icons/apple.svg" alt="apple" width={20} height={20} />
         </button>
-        <button 
+        <button
           onClick={handleFacebookLogin}
           className='bg-[#262626] rounded-[8px] h-[56px] w-[180px] flex justify-center items-center max-sm:w-[130px] hover:cursor-pointer hover:bg-[#363636] transition-colors'
         >

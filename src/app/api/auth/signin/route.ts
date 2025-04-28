@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
-import { getSession } from '@/src/lib/session';
 import actotaApi from '@/src/lib/apiClient';
 import axios from 'axios';
 import { setAuthCookie } from '@/src/helpers/auth';
+
+export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   try {
     const payload = (await request.json()) as { email: string; password: string };
@@ -12,21 +13,52 @@ export async function POST(request: Request) {
       { email: payload.email, password: payload.password },
     );
 
-    if(response.data.auth_token){
-
+    if (response.data.auth_token) {
       setAuthCookie(response.data.auth_token);
+      
+      // Get the session data
       const sessionResponse = await actotaApi.get(
         "/api/auth/session",
-        { headers: {
-          'Authorization': `Bearer ${response.data.auth_token}`,
-        }},
+        {
+          headers: {
+            'Authorization': `Bearer ${response.data.auth_token}`,
+          }
+        },
       );
+      
+      // Log the session response data to see its structure
+      console.log('Session response data:', JSON.stringify(sessionResponse.data, null, 2));
+      
+      // Get or create a Stripe customer ID for this user
+      let userData = sessionResponse.data;
+      
+      if (!userData.customer_id && userData.user_id) {
+        try {
+          const customerResponse = await actotaApi.post(
+            `/api/account/${userData.user_id}/customer`,
+            {},
+            {
+              headers: {
+                'Authorization': `Bearer ${response.data.auth_token}`,
+              }
+            }
+          );
+          
+          if (customerResponse.data && customerResponse.data.customer_id) {
+            userData.customer_id = customerResponse.data.customer_id;
+          }
+        } catch (customerError) {
+          console.error('Failed to get/create customer ID:', customerError);
+          // Continue without customer_id - we'll try again later
+        }
+      }
+
       return NextResponse.json(
-        { success: true, message: 'Login successful', data: sessionResponse.data },
+        { success: true, message: 'Login successful', data: userData },
         { status: 200 }
       );
     }
-  } catch (error:any) {
+  } catch (error: any) {
     return NextResponse.json(
       { success: false, message: error.message || 'An error occurred' },
       { status: 500 }

@@ -81,7 +81,7 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
                     </div>
                 </div>
 
-                <Image src={data.images[0] || ""} alt="Vacation Picture" height={200} width={300} className='rounded-lg max-2xl:w-full' />
+                <Image src={data.images[0] || '/images/default-itinerary.jpeg'} alt="Vacation Picture" height={200} width={300} className='rounded-lg max-2xl:w-full' />
                 <div className='flex gap-2 absolute top-2 right-2'>
                     <button
                         onClick={(e) => {

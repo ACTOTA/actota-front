@@ -7,6 +7,12 @@ import { MdOutlineDirectionsCarFilled } from "react-icons/md";
 import { FaPersonWalking } from "react-icons/fa6";
 import ActivityDropdown from './ActivityDropdown';
 
+interface ActivitiesMenuProps {
+    updateSearchValue?: (value: string) => void;
+    activitiesValue?: string;
+    className?: string;
+}
+
 
 // activity icons
 import ATVing from "@/public/activity-icons/atVing.svg";
@@ -50,74 +56,154 @@ import { useActivities } from '@/src/hooks/queries/activity/useActivityQuery';
 import { useLodging } from '@/src/hooks/queries/lodging/useLodgingQuery';
 
 
-export default function ActivitiesMenu() {
+export default function ActivitiesMenu({ updateSearchValue, activitiesValue, className }: ActivitiesMenuProps) {
 
-     const { data: lodgings } = useLodging();
-  const { data: activity, isLoading, error } = useActivities();
-    const [selectedActivity, setSelectedActivity] = useState('Select preferred activities');
+    const lodgings = useLodging();
+    const activity = useActivities();
+    const [selectedActivity, setSelectedActivity] = useState(activitiesValue || 'Select preferred activities');
     const [selectedLodging, setSelectedLodging] = useState('Select preferred lodging');
     const [selectedTransportation, setSelectedTransportation] = useState('Select preferred transportation');
     const [lodgingEnabled, setLodgingEnabled] = useState(true);
     const [transportationEnabled, setTransportationEnabled] = useState(false);
 
-const staticActivities = [
-    { id: 'atving', label: 'ATVing', icon: ATVing },
-    { id: 'backpacking', label: 'Backpacking', icon: Backpacking },
-    { id: 'camping', label: 'Camping', icon: Camping },
-    { id: 'campfire', label: 'Campfire', icon: Campfire },
-    { id: 'caveExploring', label: 'Cave Exploring', icon: CaveExploring },
-    { id: 'fishing', label: 'Fishing', icon: Fishing },
-    { id: 'goldMineTours', label: 'Gold Mine Tours', icon: GoldMineTours },
-    { id: 'hiking', label: 'Hiking', icon: Hiking },
-    { id: 'hotSprings', label: 'Hot Springs', icon: HotSprings },
-    { id: 'horsebackRiding', label: 'Horseback Riding', icon: HorsebackRiding },
-    { id: 'mountainBiking', label: 'Mountain Biking', icon: MountainBiking },
-    { id: 'paddleBoarding', label: 'Paddle Boarding', icon: PaddleBoarding },
-    { id: 'privateChef', label: 'Private Chef', icon: PrivateChef },
-    { id: 'ropesCourse', label: 'Ropes Course', icon: RopesCourse },
-    { id: 'sightSeeing', label: 'Sight Seeing', icon: SightSeeing },
-    { id: 'trainRiding', label: 'Train Riding', icon: TrainRiding },
-    { id: 'whiteWaterRafting', label: 'White Water Rafting', icon: WhiteWaterRafting },
-    { id: 'ziplining', label: 'Ziplining', icon: Ziplining },
-    { id: 'skiing', label: 'Skiing', icon: Skiing, unavailable: true },
-    { id: 'snowmobiling', label: 'Snowmobiling', icon: Snowmobiling, unavailable: true },
-    { id: 'snowshoeing', label: 'Snowshoeing', icon: Snowshoeing, unavailable: true },
-  ];
+    // Update parent component when selections change
+    useEffect(() => {
+        updateSummary();
+    }, [selectedActivity, selectedLodging, selectedTransportation, lodgingEnabled, transportationEnabled]);
 
-const activities = activity?.data?.length > 0 ? activity?.data?.map((item: any) => ({
-    id: item.label.toLowerCase().replace(/\s+/g, ''),
-    label: item.label,
-    icon: item.label === "ATV'ing" ? ATVing : item.label === 'Backpacking' ? Backpacking : item.label === 'Camping' ? Camping : item.label === 'Campfire Experience' ? Campfire : item.label === 'Cave Exploring' ? CaveExploring : item.label === 'Fishing' ? Fishing : item.label === 'Fly Over the Rockies' ? FlyOverTheRockies : item.label === 'Gold Mine Tour' ? GoldMineTours : item.label === 'Hiking' ? Hiking : item.label === 'Hot Springs' ? HotSprings : item.label === 'Horseback Riding' ? HorsebackRiding : item.label === 'Mountain Biking' ? MountainBiking: item.label ==="Museum Tours" ?ATVing : item.label === 'Paddle Boarding' ? PaddleBoarding : item.label === 'Private Chef' ? PrivateChef : item.label === 'Ropes Course' ? RopesCourse : item.label === 'Sight Seeing' ? SightSeeing : item.label === 'Train Rides' ? TrainRiding : item.label === 'White Water Rafting' ? WhiteWaterRafting : item.label === 'Ziplining' ? Ziplining : item.label === 'Skiing/Snowboarding' ? Skiing : item.label === 'Snowmobiling' ? Snowmobiling : item.label === 'Snowshoeing' ? Snowshoeing : Snowshoeing,
-    tags: item.tags
-})) : [];
+    const updateSummary = () => {
+        const activities = [];
 
-const staticLodging = [
-    {id:"airbnb", label:"Airbnb", icon: Airbnb, },
-    {id:"cabin", label:"Cabin", icon: Cabin, },
-    {id:"hotel", label:"Hotel", icon: Hotel, },
-    {id:"glamping", label:"Glamping", icon: Glamping,},
-    {id:"rv", label:"RV", icon: RV,     },
-    {id:"camp", label:"Camp", icon: Camp, },
-]
+        if (selectedActivity && selectedActivity !== 'Select preferred activities') {
+            activities.push(selectedActivity);
+        }
 
-const lodging = lodgings?.data?.length > 0 ? lodgings?.data?.map((item: any) => ({
-    id: item.label.toLowerCase().replace(/\s+/g, ''),
-    label: item.label,
-    icon: item.label === 'Airbnb' ? Airbnb : item.label === 'Cabin' ? Cabin : item.label === 'Hotel' ? Hotel : item.label === 'Glamping' ? Glamping : item.label === 'RV' ? RV : item.label === 'Camp' ? Camp : Airbnb,
-    tags: item.tags
-})) : [];
+        if (lodgingEnabled && selectedLodging && selectedLodging !== 'Select preferred lodging') {
+            activities.push(selectedLodging);
+        }
+
+        if (transportationEnabled && selectedTransportation && selectedTransportation !== 'Select preferred transportation') {
+            activities.push(selectedTransportation);
+        }
+
+        // Join with commas for proper parsing when counting in the Search component
+        const summary = activities.join(', ');
+        updateSearchValue?.(summary);
+    };
+
+    const staticActivities = [
+        { id: 'atving', label: 'ATVing', icon: ATVing },
+        { id: 'backpacking', label: 'Backpacking', icon: Backpacking },
+        { id: 'camping', label: 'Camping', icon: Camping },
+        { id: 'campfire', label: 'Campfire', icon: Campfire },
+        { id: 'caveExploring', label: 'Cave Exploring', icon: CaveExploring },
+        { id: 'fishing', label: 'Fishing', icon: Fishing },
+        { id: 'goldMineTours', label: 'Gold Mine Tours', icon: GoldMineTours },
+        { id: 'hiking', label: 'Hiking', icon: Hiking },
+        { id: 'hotSprings', label: 'Hot Springs', icon: HotSprings },
+        { id: 'horsebackRiding', label: 'Horseback Riding', icon: HorsebackRiding },
+        { id: 'mountainBiking', label: 'Mountain Biking', icon: MountainBiking },
+        { id: 'paddleBoarding', label: 'Paddle Boarding', icon: PaddleBoarding },
+        { id: 'privateChef', label: 'Private Chef', icon: PrivateChef },
+        { id: 'ropesCourse', label: 'Ropes Course', icon: RopesCourse },
+        { id: 'sightSeeing', label: 'Sight Seeing', icon: SightSeeing },
+        { id: 'trainRiding', label: 'Train Riding', icon: TrainRiding },
+        { id: 'whiteWaterRafting', label: 'White Water Rafting', icon: WhiteWaterRafting },
+        { id: 'ziplining', label: 'Ziplining', icon: Ziplining },
+        { id: 'skiing', label: 'Skiing', icon: Skiing, unavailable: true },
+        { id: 'snowmobiling', label: 'Snowmobiling', icon: Snowmobiling, unavailable: true },
+        { id: 'snowshoeing', label: 'Snowshoeing', icon: Snowshoeing, unavailable: true },
+    ];
+
+    console.log('Activity:', activity?.data);
+
+    function getIconForActivity(label: string) {
+        switch (label) {
+            case "ATV'ing":
+                return ATVing;
+            case "Backpacking":
+                return Backpacking;
+            case "Camping":
+                return Camping;
+            case "Campfire Experience":
+                return Campfire;
+            case "Cave Exploring":
+                return CaveExploring;
+            case "Fishing":
+                return Fishing;
+            case "Fly Over the Rockies":
+                return FlyOverTheRockies;
+            case "Gold Mine Tour":
+                return GoldMineTours;
+            case "Hiking":
+                return Hiking;
+            case "Hot Springs":
+                return HotSprings;
+            case "Horseback Riding":
+                return HorsebackRiding;
+            case "Mountain Biking":
+                return MountainBiking;
+            case "Museum Tours":
+                return ATVing; // Using ATVing as fallback for Museum Tours
+            case "Paddle Boarding":
+                return PaddleBoarding;
+            case "Private Chef":
+                return PrivateChef;
+            case "Ropes Course":
+                return RopesCourse;
+            case "Sight Seeing":
+                return SightSeeing;
+            case "Train Rides":
+                return TrainRiding;
+            case "White Water Rafting":
+                return WhiteWaterRafting;
+            case "Ziplining":
+                return Ziplining;
+            case "Skiing/Snowboarding":
+                return Skiing;
+            case "Snowmobiling":
+                return Snowmobiling;
+            case "Snowshoeing":
+                return Snowshoeing;
+            default:
+                return Snowshoeing; // Default fallback icon
+        }
+    }
+
+    const activities = activity?.data?.length != undefined ? activity?.data?.map((item: any) => ({
+        id: item.label.toLowerCase().replace(/\s+/g, ''),
+        label: item.label,
+        icon: getIconForActivity(item.label),
+        tags: item.tags
+    })) : [];
+
+    const staticLodging = [
+        { id: "airbnb", label: "Airbnb", icon: Airbnb, },
+        { id: "cabin", label: "Cabin", icon: Cabin, },
+        { id: "hotel", label: "Hotel", icon: Hotel, },
+        { id: "glamping", label: "Glamping", icon: Glamping, },
+        { id: "rv", label: "RV", icon: RV, },
+        { id: "camp", label: "Camp", icon: Camp, },
+    ]
+
+    const lodging = lodgings?.data?.length != undefined ? lodgings?.data?.map((item: any) => ({
+        id: item.label.toLowerCase().replace(/\s+/g, ''),
+        label: item.label,
+        icon: item.label === 'Airbnb' ? Airbnb : item.label === 'Cabin' ? Cabin : item.label === 'Hotel' ? Hotel : item.label === 'Glamping' ? Glamping : item.label === 'RV' ? RV : item.label === 'Camp' ? Camp : Airbnb,
+        tags: item.tags
+    })) : [];
 
 
-const transportation = [
-    { id: 'sedan', label: 'Sedan', icon: Sedan },
-    { id: 'suv', label: 'SUV', icon: SUV },
-    { id: 'luxury', label: 'Luxury', icon: Luxury },
-    { id: 'partyBus', label: 'Party Bus', icon: PartyBus },
-    { id: 'van', label: '15 Passenger Van', icon: Van },
-    
-];
+    const transportation = [
+        { id: 'sedan', label: 'Sedan', icon: Sedan },
+        { id: 'suv', label: 'SUV', icon: SUV },
+        { id: 'luxury', label: 'Luxury', icon: Luxury },
+        { id: 'partyBus', label: 'Party Bus', icon: PartyBus },
+        { id: 'van', label: '15 Passenger Van', icon: Van },
+
+    ];
     return (
-        <section className="flex flex-col    backdrop-blur-md text-white border-2 border-border-primary rounded-3xl gap-4 h-full w-[520px] max-md:w-full z-20 text-lg p-4">
+        <section className={`flex flex-col backdrop-blur-md text-white border-2 border-border-primary rounded-3xl gap-4 h-full w-full max-w-[520px] mx-auto z-20 text-lg p-4 ${className}`}>
             <div className='mb-2'>
                 <p className='flex items-center gap-2 mb-2'><FaPersonWalking className='h-6 w-6 ' /> Activities</p>
 
@@ -132,13 +218,13 @@ const transportation = [
                 <div className='flex items-center justify-between gap-2 mb-2'>
 
                     <p className='flex items-center gap-2'><GoHome className='h-6 w-6' /> Lodging</p>
-                    <Toggle enabled={lodgingEnabled} setEnabled={() => { setLodgingEnabled(!lodgingEnabled) }}  />
+                    <Toggle enabled={lodgingEnabled} setEnabled={() => { setLodgingEnabled(!lodgingEnabled) }} />
 
                 </div>
                 {lodgingEnabled && (
-                <ActivityDropdown
-                    onSelect={(value) => setSelectedLodging(value.toString())}
-                    activities={lodging.length > 0 ? lodging : staticLodging}
+                    <ActivityDropdown
+                        onSelect={(value) => setSelectedLodging(value.toString())}
+                        activities={lodging.length > 0 ? lodging : staticLodging}
                         title="Lodging"
                     />
                 )}
@@ -148,7 +234,7 @@ const transportation = [
                 <div className='flex items-center justify-between mb-2'>
 
                     <p className='flex items-center gap-2'><MdOutlineDirectionsCarFilled className='h-6 w-6' /> Transportation</p>
-                    <Toggle enabled={transportationEnabled} setEnabled={() => { setTransportationEnabled(!transportationEnabled) }}  />
+                    <Toggle enabled={transportationEnabled} setEnabled={() => { setTransportationEnabled(!transportationEnabled) }} />
                 </div>
                 {transportationEnabled && (
                     <ActivityDropdown

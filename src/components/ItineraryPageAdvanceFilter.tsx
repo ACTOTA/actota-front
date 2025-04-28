@@ -150,30 +150,30 @@ const ItineraryPageAdvanceFilter = ({ setShowFilter, advanceFilter, setAdvanceFi
                 </div>
                 <div className='overflow-auto scrollbar-hide'>
 
-                <div className=" inline-flex justify-start  my-5 border border-border-primary rounded-full p-1">
-                    <Button
-                        onClick={() => setSelectedView('activities')}
-                        className={` border-white  !py-2 ${selectedView === 'activities' ? 'bg-gradient-to-r from-white/20 to-white/5' : ''}`}
+                    <div className=" inline-flex justify-start  my-5 border border-border-primary rounded-full p-1">
+                        <Button
+                            onClick={() => setSelectedView('activities')}
+                            className={` border-white  !py-2 ${selectedView === 'activities' ? 'bg-gradient-to-r from-white/20 to-white/5' : ''}`}
 
-                        variant={selectedView === 'activities' ? 'outline' : 'simple'}
-                    >
-                        Activities
-                    </Button>
-                    <Button
-                        onClick={() => setSelectedView('lodging')}
-                        className={` border-white !py-2 ${selectedView === 'lodging' ? 'bg-gradient-to-r from-white/20 to-white/5' : ''}`}
-                        variant={selectedView === 'lodging' ? 'outline' : 'simple'}
-                    >
-                        Lodging
-                    </Button>
-                    <Button
-                        onClick={() => setSelectedView('transport')}
-                        className={` border-white  !py-2 ${selectedView === 'transport' ? 'bg-gradient-to-r from-white/20 to-white/5' : ''}`}
-                        variant={selectedView === 'transport' ? 'outline' : 'simple'}
-                    >
-                        Transport
-                    </Button>
-                </div>
+                            variant={selectedView === 'activities' ? 'outline' : 'simple'}
+                        >
+                            Activities
+                        </Button>
+                        <Button
+                            onClick={() => setSelectedView('lodging')}
+                            className={` border-white !py-2 ${selectedView === 'lodging' ? 'bg-gradient-to-r from-white/20 to-white/5' : ''}`}
+                            variant={selectedView === 'lodging' ? 'outline' : 'simple'}
+                        >
+                            Lodging
+                        </Button>
+                        <Button
+                            onClick={() => setSelectedView('transport')}
+                            className={` border-white  !py-2 ${selectedView === 'transport' ? 'bg-gradient-to-r from-white/20 to-white/5' : ''}`}
+                            variant={selectedView === 'transport' ? 'outline' : 'simple'}
+                        >
+                            Transport
+                        </Button>
+                    </div>
                 </div>
 
                 {selectedView === 'transport' && <div className='flex items-center justify-between '>

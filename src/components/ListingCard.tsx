@@ -39,12 +39,12 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
 
     return (
-        <div onClick={() => router.push(`/itineraries`)}
+        <div onClick={() => router.push(`/itineraries/${data._id.$oid}`)}
             className='hover:cursor-pointer group min-w-[308px] h-[400px] bg-white rounded-2xl text-white
              border border-border-primary max-sm:border-none flex-col justify-between items-end inline-flex overflow-hidden'>
 
             <div className='relative h-full w-full'>
-                <Image src={data.images[0] || ""} alt="Vacation Picture" layout='fill' objectFit='cover' className='rounded-lg' />
+                <Image src={data.images[0] || '/images/default-itinerary.jpeg'} alt="Vacation Picture" layout='fill' objectFit='cover' className='rounded-lg' />
 
                 < div className="flex flex-col w-full p-2 bg-red-500">
                     <div className='flex justify-between items-start absolute top-0 right-0 w-full m-2'>
@@ -97,7 +97,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
                 </div>
             </div>
 
-           
+
         </div>
     );
 }

@@ -34,7 +34,7 @@ export default function SignUp() {
       }
     };
     checkAuth();
-  }, [ router]);
+  }, [router]);
 
   const validateForm = () => {
     let tempErrors = {
@@ -97,20 +97,28 @@ export default function SignUp() {
     if (!validateForm()) return;
 
     signUp(
-      { 
+      {
         firstName: formData.firstName,
         lastName: formData.lastName,
-        email: formData.email, 
-        password: formData.password 
+        email: formData.email,
+        password: formData.password
       },
       {
-        onSuccess: (data:any) => {
+        onSuccess: (data: any) => {
           router.back()
-          localStorage.setItem('user', JSON.stringify(
-            {user_id: data.data._id.$oid, first_name: data.data.first_name, last_name: data.data.last_name, email: data.data.email,}
-          ));
-    
-         window.location.href = '/';
+          // Log the data structure to debug
+          console.log('Signup success data:', JSON.stringify(data, null, 2));
+          
+          const userData = data.data;
+          localStorage.setItem('user', JSON.stringify({
+            user_id: userData._id.$oid,
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            email: userData.email,
+            customer_id: userData.customer_id
+          }));
+
+          window.location.href = '/';
         },
         onError: (error) => {
           router.back()
@@ -125,7 +133,7 @@ export default function SignUp() {
 
 
   const handleGoogleLogin = async () => {
-    router.push("?modal=signinLoading");
+    // Don't show loading modal for Google login, just redirect directly
     try {
       window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`;
     } catch (error) {
@@ -231,9 +239,9 @@ export default function SignUp() {
           )}
         </div>
 
-        <Button 
-          type="submit" 
-          variant="primary" 
+        <Button
+          type="submit"
+          variant="primary"
           className="bg-white text-black w-full my-[10px]"
           disabled={isPending}
         >

@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DateMenuCalendar from '../figma/DateMenuCalendar';
 
+interface DateMenuProps {
+    updateSearchValue?: (value: string) => void;
+    durationValue?: string;
+    className?: string;
+}
 
-
-export default function DateMenu() {
+export default function DateMenu({ updateSearchValue, durationValue, className }: DateMenuProps) {
+    const [startDate, setStartDate] = useState<string | null>(null);
+    const [endDate, setEndDate] = useState<string | null>(null);
     const [startTime, setStartTime] = useState('09:00');
     const [endTime, setEndTime] = useState('17:00');
     const [dateSettings, setDateSettings] = useState([
@@ -17,7 +23,6 @@ export default function DateMenu() {
         { label: "3 days", selected: false },
         { label: "7 days", selected: false }
     ]);
-
 
     const [estimatedStay, setEstimatedStay] = useState([
         { label: "A Weekend", selected: true },
@@ -38,12 +43,55 @@ export default function DateMenu() {
             selected: month === "January" ? true : false
         }));
 
-        return [
-            ...months
-        ];
+        return [...months];
     });
 
-    const handleDateRangeChange = (startDate: string | null, endDate: string | null) => {
+    useEffect(() => {
+        // Initialize with existing value if available
+        if (durationValue) {
+            // Handle initialization from durationValue if needed
+        }
+
+        updateDurationSummary();
+    }, [startDate, endDate, startTime, endTime,
+        dateSettings, rangeSettings, estimatedStay, whenToGo]);
+
+    const updateDurationSummary = () => {
+        let summary = '';
+
+        if (dateSettings[0].selected) {
+            // Exact dates mode
+            if (startDate && endDate) {
+                summary = `${startDate} - ${endDate}`;
+            } else if (startDate) {
+                summary = startDate;
+            }
+
+            // Add selected range if available
+            const selectedRange = rangeSettings.find(r => r.selected);
+            if (selectedRange && selectedRange.label !== "Exact dates") {
+                summary += summary ? ` (${selectedRange.label})` : selectedRange.label;
+            }
+        } else {
+            // Flexible mode
+            const selectedStay = estimatedStay.find(s => s.selected);
+            const selectedWhen = whenToGo.find(w => w.selected);
+
+            if (selectedStay) {
+                summary = selectedStay.label;
+            }
+
+            if (selectedWhen) {
+                summary += summary ? ` in ${selectedWhen.label}` : selectedWhen.label;
+            }
+        }
+
+        updateSearchValue?.(summary);
+    };
+
+    const handleDateRangeChange = (start: string | null, end: string | null) => {
+        setStartDate(start);
+        setEndDate(end);
     }
 
     const handleStartTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -62,6 +110,7 @@ export default function DateMenu() {
             }))
         );
     }
+
     // Generate time options from 00:00 to 23:45 in 15-minute increments
     const timeOptions = Array.from({ length: 96 }, (_, i) => {
         const hours = Math.floor(i / 4).toString().padStart(2, '0');
@@ -95,8 +144,9 @@ export default function DateMenu() {
             }))
         );
     }
+
     return (
-        <section className="w-full h-full text-white backdrop-blur-md border-2 border-border-primary rounded-3xl flex-col justify-center items-center gap-2 pl-4 pr-4 pt-6 pb-4">
+        <section className={`w-full max-w-[720px] mx-auto h-full text-white backdrop-blur-md border-2 border-border-primary rounded-3xl flex-col justify-center items-center gap-2 pl-4 pr-4 pt-6 pb-4 ${className}`}>
             <div className="h-9 gap-2 w-full flex justify-center">
                 {dateSettings.map((item, i) => (
                     <div key={i} className={`px-3 py-2 h-full bg-black/50 rounded-[200px] border border-white hover:cursor-pointer hover:bg-black/70 hover:border-[#FFF]
@@ -107,42 +157,40 @@ export default function DateMenu() {
                 ))}
             </div>
 
-
             {dateSettings[0].selected === true ? (
                 <>
-
                     <DateMenuCalendar onDateRangeChange={handleDateRangeChange} />
-                    <div className='w-full  gap-4 '>
-                <div className='flex justify-between items-center flex-wrap'>
-                        <div className="flex justify-center items-center gap-4 ">
-                            <div className="text-white text-base font-bold  leading-normal text-center">Start Time</div>
-                            <div className="flex-col justify-start items-end gap-2 inline-flex">
-                                <select
-                                    value={startTime}
-                                    onChange={handleStartTimeChange}
-                                    className="h-12  bg-transparent border-none text-[#f7f7f7] text-base font-normal  leading-normal z-10"
-                                >
-                                    {timeOptions.map(time => (
-                                        <option key={time} value={time} className=''>{time}</option>
-                                    ))}
-                                </select>
+                    <div className='w-full gap-4'>
+                        <div className='flex justify-between items-center flex-wrap'>
+                            <div className="flex justify-center items-center gap-4">
+                                <div className="text-white text-base font-bold leading-normal text-center">Start Time</div>
+                                <div className="flex-col justify-start items-end gap-2 inline-flex">
+                                    <select
+                                        value={startTime}
+                                        onChange={handleStartTimeChange}
+                                        className="h-12 bg-transparent border-none text-[#f7f7f7] text-base font-normal leading-normal z-10"
+                                    >
+                                        {timeOptions.map(time => (
+                                            <option key={time} value={time} className=''>{time}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="justify-center items-center gap-4 flex">
+                                <div className="text-white text-base font-bold leading-normal">End Time</div>
+                                <div className="flex-col justify-start items-end gap-2 inline-flex">
+                                    <select
+                                        value={endTime}
+                                        onChange={handleEndTimeChange}
+                                        className="h-12 bg-transparent border-none text-[#f7f7f7] text-base font-normal leading-normal z-10"
+                                    >
+                                        {timeOptions.map(time => (
+                                            <option key={time} value={time} className=''>{time}</option>
+                                        ))}
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                        <div className="justify-center items-center gap-4 flex">
-                            <div className="text-white text-base font-bold  leading-normal">End Time</div>
-                            <div className="flex-col justify-start items-end gap-2 inline-flex ">
-                                <select
-                                    value={endTime}
-                                    onChange={handleEndTimeChange}
-                                    className="h-12  bg-transparent border-none text-[#f7f7f7] text-base font-normal  leading-normal z-10"
-                                >
-                                    {timeOptions.map(time => (
-                                        <option key={time} value={time} className=''>{time}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                </div>
 
                         <div className="h-8 gap-2 w-full flex overflow-x-scroll">
                             {rangeSettings.map((item, i) => (
@@ -169,7 +217,7 @@ export default function DateMenu() {
                     </div>
 
                     <p className='text-white text-xl font-bold mt-8'>When do you want to go?</p>
-                    <div className=" gap-2 w-[90%] flex flex-wrap  ">
+                    <div className="gap-2 w-[90%] flex flex-wrap">
                         {whenToGo.map((item, i) => (
                             <div key={i} className={`px-3 py-1.5 h-full mt-4 bg-black/50 rounded-[200px] border border-white hover:cursor-pointer hover:bg-black/70 hover:border-[#FFF]
                             ${item.selected ? "px-3 py-1.5 h-full bg-black/50 rounded-[200px] border border-white" : "neutral-03 opacity-50"}`}
@@ -178,9 +226,8 @@ export default function DateMenu() {
                             </div>
                         ))}
                     </div>
-
                 </div>
             )}
         </section>
-    )
+    );
 }

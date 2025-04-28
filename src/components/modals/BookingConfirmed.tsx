@@ -1,13 +1,23 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Button from '../figma/Button'
 import { FaCheck } from 'react-icons/fa6'
 import Image from 'next/image'
 import BookingCard from '../profileComponents/bookings/BookingCard'
 import { ArrowLeftIcon } from '@heroicons/react/20/solid'
 import { useRouter } from 'next/navigation';
+import { getLocalStorageItem } from '@/src/utils/browserStorage'
+import { getClientSession } from '@/src/lib/session'
 const BookingConfirmed = () => {
     const router = useRouter();
-    const [bookings, setBookings] = React.useState<any>({
+
+    const user = getClientSession().user;
+
+    let itineraryData = getLocalStorageItem('itineraryData');
+    if (itineraryData) {
+        itineraryData = JSON.parse(itineraryData);
+    }
+    
+    const [itinerary, setItinerary] = React.useState<any>(itineraryData ?? {
         id: 1,
         status: "upcoming",
         delay_insurance: true,
@@ -31,6 +41,7 @@ const BookingConfirmed = () => {
         updated_at: new Date()
     }
     );
+
     return (
         <div className='flex flex-col items-center justify-center overflow-y-auto !h-full '>
             <div className='w-full md:hidden'>
@@ -43,13 +54,13 @@ const BookingConfirmed = () => {
                 <FaCheck className='text-white size-6' />
             </div>
             <p className='text-white text-2xl font-bold mt-4'>Your booking is confirmed!</p>
-            <p className='text-white  text-center py-2 '>We’ve sent a confirmation email to <b>test@gmail.com</b></p>
+            <p className='text-white  text-center py-2 '>We’ve sent a confirmation email to <b>{user?.email || "your email!"}</b></p>
             <div className='flex flex-col lg:flex-row w-full gap-4 mt-2'>
 
                 <div className='w-full lg:w-[707px]'>
                     <p className='text-white font-bold mb-2'>Booking Details</p>
 
-                    <BookingCard data={bookings} bookingConfirmedModal={true} />
+                    <BookingCard dataBooking={itinerary} dataItinerary={itinerary} bookingConfirmedModal={true} />
 
                 </div>
 

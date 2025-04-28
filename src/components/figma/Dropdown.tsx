@@ -1,6 +1,6 @@
 // components/Dropdown.js
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/20/solid";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface DropdownProps {
   label?: any;
@@ -25,6 +25,21 @@ export default function Dropdown({
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState<string[] | string | null>(multiSelect ? [] : null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node) && isOpen) {
+        setIsOpen(false);
+        setIsOpend(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen, setIsOpend]);
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -50,7 +65,7 @@ export default function Dropdown({
     multiSelect ? (selected as string[])?.includes(option) : selected === option;
 
   return (
-    <div className={`relative  w-full `}>
+    <div className={`relative w-full`} ref={dropdownRef}>
       <button
         type="button"
         className={`w-full px-4 py-3 text-left bg-black/20 text-white rounded-lg  hover:bg-[#262626] focus:outline-none border border-primary-gray whitespace-nowrap flex items-center justify-between gap-2 ${className}`}

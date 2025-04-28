@@ -12,11 +12,17 @@ module.exports = {
       'storage.googleapis.com'
     ]
   },
+  output: 'standalone', // Added for Docker deployment
+  experimental: {
+    // Server Actions are now enabled by default
+  },
+  // Disable static optimization for all pages since we need dynamic functionality
+  staticPageGenerationTimeout: 120,
   async rewrites() {
     return [
       {
         source: '/api/:path*',
-        destination: process.env.NEXT_PUBLIC_API_URL + '/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
       },
     ]
   },
@@ -28,4 +34,3 @@ module.exports = {
     return config;
   },
 }
-

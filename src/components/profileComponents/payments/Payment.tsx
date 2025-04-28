@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../../figma/Button";
 import Link from "next/link";
 import Input from "@/src/components/figma/Input";
@@ -11,9 +11,14 @@ import TrashIcon from "@/public/svg-icons/trash.svg";
 import { RiVisaLine } from "react-icons/ri";
 import Dropdown from "../../figma/Dropdown";
 import { useRouter } from "next/navigation";
+import { usePaymentMethods } from "@/src/hooks/queries/account/usePaymentMethodsQuery";
+import { useAttachPaymentMethod } from "@/src/hooks/mutations/payment.mutation";
+import StripeCardElement from "../../stripe/StripeCardElement";
+import { getClientSession } from "@/src/lib/session";
+
 
 interface Card {
-  id: number;
+  id: string | number;
   cardType: string;
   cardNumber: string;
   expiryDate: string;
@@ -32,26 +37,41 @@ interface CardFormData {
 
 const Payment = () => {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("bookingsHistory");
+  // Check URL for active tab parameter on component mount
+  const getInitialActiveTab = () => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('activeTab') || "bookingsHistory";
+    }
+    return "bookingsHistory";
+  };
+
+  const user = getClientSession().user;
+  const [activeTab, setActiveTab] = useState(getInitialActiveTab);
   const [search, setSearch] = useState("");
-  const [savedCards, setSavedCards] = useState<Card[]>([
-    {
-      id: 1,
-      cardType: "Visa",
-      cardNumber: "1234567890123456",
-      expiryDate: "01/25",
-      cvv: "123",
-      isDefault: true,
-    },
-    {
-      id: 2,
-      cardType: "MasterCard",
-      cardNumber: "1234567890123456",
-      expiryDate: "01/25",
-      cvv: "123",
-      isDefault: false,
-    },
-  ]);
+
+  const { data: paymentMethods } = usePaymentMethods();
+  const [savedCards, setSavedCards] = useState<Card[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { mutate: attachPaymentMethod } = useAttachPaymentMethod();
+
+  // Convert payment methods data to card format when data is available
+  useEffect(() => {
+    if (paymentMethods && paymentMethods.length > 0) {
+      const formattedCards: Card[] = paymentMethods.map((method: any, index: number) => ({
+        id: method.id,
+        cardType: method.card.brand.charAt(0).toUpperCase() + method.card.brand.slice(1), // Capitalize brand name
+        cardNumber: `**** **** **** ${method.card.last4}`,
+        expiryDate: `${String(method.card.exp_month).padStart(2, '0')}/${String(method.card.exp_year).slice(-2)}`,
+        cvv: "***",
+        isDefault: index === 0, // Set first card as default
+        cardHolderName: method.billing_details.name || 'Card Holder'
+      }));
+
+      setSavedCards(formattedCards);
+    }
+  }, [paymentMethods]);
+
   const [addNewCard, setAddNewCard] = useState(false);
   const [cardFormData, setCardFormData] = useState<CardFormData>({
     cardHolderName: '',
@@ -66,35 +86,75 @@ const Payment = () => {
     expiryDate: '',
     cvv: ''
   });
-  const [purchaseHistory, setPurchaseHistory] = useState([
-    {
-      id: 1,
-      purchase: "Denver 6 Days Trip",
-      transactionId: "09187-2344422092",
-      transactionDate: "Jun 21, 2024",
-      paymentDate: "Jun 21, 2024",
-      amount: "$100",
-      status: "paid",
-    },
-    {
-      id: 2,
-      purchase: "Denver 6 Days Trip",
-      transactionId: "09187-2344422092",
-      transactionDate: "Jun 21, 2024",
-      paymentDate: "Jun 21, 2024",
-      amount: "$100",
-      status: "pending",
-    },
-    {
-      id: 3,
-      purchase: "Denver 6 Days Trip",
-      transactionId: "09187-2344422092",
-      transactionDate: "Jun 21, 2024",
-      paymentDate: "Jun 21, 2024",
-      amount: "$100",
-      status: "paid",
-    }
-  ]);
+
+  const [purchaseHistory, setPurchaseHistory] = useState([]);
+
+  useEffect(() => {
+    // Skip the fetch if user ID is not available
+    if (!user?.user_id) return;
+
+    const fetchTransactions = async () => {
+      try {
+        const userId = user.user_id;
+        console.log("Fetching transactions for user ID:", userId);
+        
+        // Next.js is rewriting all /api/* URLs to the backend API
+        // We need to use the internal Next.js API route structure to bypass the rewrite
+        // Using _next/data path to access our internal API route
+        const url = `/api/account/${userId}/transactions`;
+        console.log("Requesting URL:", url);
+        console.log("User object:", user);
+
+        // Match the exact pattern of your working request
+        // Use the API client from the same place used in the route handlers
+        const apiClient = (await import("@/src/lib/apiClient")).default;
+        const response = await apiClient.get(`/api/account/${userId}/transactions`, {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        console.log("Response status:", response.status);
+        console.log("Response headers:", response.headers);
+        console.log("Raw response:", response.data);
+        
+        if (response.status < 200 || response.status >= 300) {
+          console.error("Response not OK:", response.status, response.data);
+          throw new Error(`HTTP error! Status: ${response.status}, Response: ${JSON.stringify(response.data)}`);
+        }
+
+        const data = response.data;
+        console.log("Transactions data:", data);
+        
+        if (data && data.data) {
+          // Handle Stripe charges data structure
+          const stripeCharges = data.data;
+          // Transform Stripe charges to match purchaseHistory format
+          const formattedTransactions = stripeCharges.map((charge: any) => ({
+            id: charge.id,
+            purchase: charge.description || "Vacation",
+            transactionId: charge.id,
+            transactionDate: new Date(charge.created * 1000).toLocaleDateString(),
+            paymentDate: new Date(charge.created * 1000).toLocaleDateString(),
+            amount: `$${(charge.amount / 100).toFixed(2)}`,
+            status: charge.status === "succeeded" ? "paid" : charge.status
+          }));
+          
+          console.log("Formatted transactions:", formattedTransactions);
+          setPurchaseHistory(formattedTransactions);
+        } else {
+          console.error("Invalid data format received:", data);
+        }
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+
+
+    fetchTransactions();
+
+  }, [user?.user_id]);
+
   const tabs = [
     {
       id: "bookingsHistory",
@@ -107,6 +167,22 @@ const Payment = () => {
       component: <>Payment Methods</>,
     },
   ];
+
+  // Helper function to get the appropriate card brand image
+  const getCardBrandImage = (brand: string) => {
+    switch (brand.toLowerCase()) {
+      case 'visa':
+        return "/svg-icons/visa-logo.svg";
+      case 'mastercard':
+        return "/svg-icons/mastercard-logo.svg";
+      case 'amex':
+        return "/svg-icons/amex-logo.svg"; // If you have this asset
+      case 'discover':
+        return "/svg-icons/discover-logo.svg"; // If you have this asset
+      default:
+        return "/svg-icons/credit-card.svg"; // Default fallback
+    }
+  };
 
   // Validation function for card details
   const validateCardForm = () => {
@@ -184,64 +260,59 @@ const Payment = () => {
     }));
   };
 
-  // Add new card
+  // Detect card type based on the card number
+  const detectCardType = (cardNumber: string): string => {
+    const cleanNumber = cardNumber.replace(/\s+/g, '');
+
+    if (/^4/.test(cleanNumber)) {
+      return 'Visa';
+    } else if (/^5[1-5]/.test(cleanNumber)) {
+      return 'MasterCard';
+    } else if (/^3[47]/.test(cleanNumber)) {
+      return 'Amex';
+    } else if (/^6(?:011|5)/.test(cleanNumber)) {
+      return 'Discover';
+    } else {
+      return 'Unknown';
+    }
+  };
+
   const handleAddCard = () => {
     if (!validateCardForm()) {
       return;
     }
 
-    const newCard: Card = {
-      id: Date.now(),
-      cardType: cardFormData.cardNumber.startsWith('4') ? 'Visa' : 'MasterCard',
-      cardNumber: cardFormData.cardNumber,
-      expiryDate: cardFormData.expiryDate,
-      cvv: cardFormData.cvv,
-      cardHolderName: cardFormData.cardHolderName,
-      isDefault: cardFormData.setAsDefault
     };
 
-    setSavedCards(prev => {
-      let newCards = [...prev];
-      if (cardFormData.setAsDefault) {
-        newCards = newCards.map(card => ({ ...card, isDefault: false }));
-      }
-      return [...newCards, newCard];
-    });
-
-    setAddNewCard(false);
-    setCardFormData({
-      cardHolderName: '',
-      cardNumber: '',
-      expiryDate: '',
-      cvv: '',
-      setAsDefault: false
-    });
-  };
-
   // Delete card
-  const handleDeleteCard = (cardId: number) => {
-    router.push("?modal=deletePaymentCard");
-    // setSavedCards(prev => {
-    //   const deletedCard = prev.find(card => card.id === cardId);
-    //   const remainingCards = prev.filter(card => card.id !== cardId);
-
-    //   // If deleted card was default, set first remaining card as default
-    //   if (deletedCard?.isDefault && remainingCards.length > 0) {
-    //     remainingCards[0].isDefault = true;
-    //   }
-
-    //   return remainingCards;
-    // });
+  const handleDeleteCard = (cardId: string | number) => {
+    // Preserve the current tab state when opening the modal
+    const query = new URLSearchParams(window.location.search);
+    query.set('modal', 'deletePaymentCard');
+    query.set('paymentMethodId', cardId.toString());
+    query.set('activeTab', 'paymentMethods'); // Set or preserve the active tab
+    router.push(`?${query.toString()}`);
   };
 
   // Set card as default
-  const handleSetDefaultCard = (cardId: number) => {
+  const handleSetDefaultCard = (cardId: string | number) => {
     setSavedCards(prev =>
       prev.map(card => ({
         ...card,
         isDefault: card.id === cardId
       }))
     );
+    // In a real implementation, you would also make an API call to update the default payment method
+  };
+
+  // Function to format and mask card number for display
+  const formatCardNumberForDisplay = (cardNumber: string) => {
+    if (cardNumber.includes('****')) {
+      return cardNumber; // Already masked
+    }
+
+    const last4 = cardNumber.replace(/\s+/g, '').slice(-4);
+    return `**** **** **** ${last4}`;
   };
 
   return (
@@ -261,7 +332,14 @@ const Payment = () => {
                     ? "!border-white !text-white"
                     : "!border-border-primary !text-border-primary"
                 }
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  // Update URL to reflect tab change without full navigation
+                  const query = new URLSearchParams(window.location.search);
+                  query.set('activeTab', tab.id);
+                  const newUrl = `${window.location.pathname}?${query.toString()}`;
+                  window.history.pushState({ path: newUrl }, '', newUrl);
+                }}
               >
                 {tab.label}
               </Button>
@@ -273,7 +351,7 @@ const Payment = () => {
       <div>
         {activeTab === "bookingsHistory" ?
           <div className="mb-4">
-            <p className="font-bold text-2xl mb-8">Purchase History(23)</p>
+            <p className="font-bold text-2xl mb-8">Purchase History ({purchaseHistory.length})</p>
 
             <div className="mb-4 flex gap-2">
               <div className="w-full">
@@ -301,27 +379,24 @@ const Payment = () => {
                 <tr>
                   <th className="py-5">Purchase </th>
                   <th className="py-5">Transaction Date</th>
-                  <th className="py-5">Payment Date</th>
                   <th className="py-5">Amount</th>
                   <th className="py-5 text-center">Status</th>
                 </tr>
               </thead>
 
               <tbody className="w-full ">
-                {purchaseHistory.map((item, i) => (
-                  <React.Fragment key={item.id}>
+                {purchaseHistory.map((item: any, i) => (
+                  <React.Fragment key={i}>
                     <tr className="w-full">
                       <td colSpan={5}>
                         <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent" />
                       </td>
                     </tr>
-                    <tr key={item.id} className="w-full">
+                    <tr key={i} className="w-full">
                       <td className="py-5">
                         <p className="text-white text-sm">{item.purchase}   </p>
-                        <p className="text-primary-gray text-xs">{item.transactionId}</p>
                       </td>
-                      <td className="py-5">{item.transactionDate} <span className="text-xs text-primary-gray">08.15</span></td>
-                      <td className="py-5">{item.paymentDate} <span className="text-xs text-primary-gray">08.15</span></td>
+                      <td className="py-5">{item.transactionDate}</td>
                       <td className="py-5">{item.amount}</td>
                       <td className="py-5 text-center ">
                         <Button variant="primary" size="sm" className={`mx-auto ${item.status === "paid" ? "!bg-[#215CBA]" : "!bg-[#FFC107]"} text-white`}>{item.status === "paid" ? "Paid" : "Pending"}</Button>
@@ -334,41 +409,48 @@ const Payment = () => {
             </table>
           </div> :
           <div>
-            <p className="font-bold text-2xl mb-8">Saved Cards</p>
+            <p className="font-bold text-2xl mb-8">Saved Cards {savedCards.length > 0 && `(${savedCards.length})`}</p>
 
-            {savedCards.map((item) => (
-              <div key={item.id} className="">
-                <div className="flex items-center justify-between bg-[#666666]/10 rounded-2xl border max-sm:border-none border-primary-gray p-4 mb-2">
-                  <div className="text-white  text-xl font-bold flex items-center max-sm:flex-col max-sm:items-start justify-start gap-2">
-                    <div className="flex items-center justify-center max-sm:justify-start sm:bg-black rounded-lg sm:h-[50px] w-[80px] max-sm:w-full">
-                      <Image src={item.cardType === "Visa" ? "/svg-icons/visa-logo.svg" : "/svg-icons/mastercard-logo.svg"} alt="card" height={24} width={38} />
-                    </div>
+            {savedCards.length > 0 ? (
+              savedCards.map((item) => (
+                <div key={item.id} className="">
+                  <div className="flex items-center justify-between bg-[#666666]/10 rounded-2xl border max-sm:border-none border-primary-gray p-4 mb-2">
+                    <div className="text-white text-xl font-bold flex items-center max-sm:flex-col max-sm:items-start justify-start gap-2">
+                      <div className="flex items-center justify-center max-sm:justify-start sm:bg-black rounded-lg sm:h-[50px] w-[80px] max-sm:w-full">
+                        <Image src={getCardBrandImage(item.cardType)} alt={item.cardType} height={24} width={38} />
+                      </div>
 
-                    <div className=" gap-1">
-                      <p className="text-white font-bold">{item.cardNumber}</p>
-                      <p className="text-primary-gray text-sm"> Exp. Date  <span className="text-white"> {item.expiryDate}</span></p>
+                      <div className="gap-1">
+                        <p className="text-white font-bold">{formatCardNumberForDisplay(item.cardNumber)}</p>
+                        <p className="text-primary-gray text-sm"> Exp. Date <span className="text-white">{item.expiryDate}</span></p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center max-sm:flex-col max-sm:items-end  gap-2">
-                    {item.isDefault ?
-                      <Button variant="primary" size="sm" className={`mx-auto !bg-[#215CBA] !text-white`}>Default</Button> :
-                      <Button
-                        variant="simple"
-                        size="sm"
-                        className={`!p-0 !text-[#BBD4FB] border-b border-[#BBD4FB] !rounded-none`}
-                        onClick={() => handleSetDefaultCard(item.id)}
-                      >
-                        Set as default
-                      </Button>
-                    }
-                    <button onClick={() => handleDeleteCard(item.id)}>
-                      <TrashIcon className="text-white" />
-                    </button>
+                    <div className="flex items-center max-sm:flex-col max-sm:items-end gap-2">
+                      {item.isDefault ?
+                        <Button variant="primary" size="sm" className={`mx-auto !bg-[#215CBA] !text-white`}>Default</Button> :
+                        <Button
+                          variant="simple"
+                          size="sm"
+                          className={`!p-0 !text-[#BBD4FB] border-b border-[#BBD4FB] !rounded-none`}
+                          onClick={() => handleSetDefaultCard(item.id)}
+                        >
+                          Set as default
+                        </Button>
+                      }
+                      <button onClick={() => handleDeleteCard(item.id)}>
+                        <TrashIcon className="text-white" />
+                      </button>
+                    </div>
                   </div>
                 </div>
-
+              ))
+            ) : (
+              <div className="text-center py-8 text-primary-gray">
+                <p>No saved cards found.</p>
+                <p className="mt-2">Add a new card to get started.</p>
               </div>
-            ))}
+            )}
+
             {!addNewCard && (
               <div className="flex justify-end w-full items-end mt-8">
                 <Button variant="primary" size="md" onClick={() => setAddNewCard(true)}>Add New Card</Button>
@@ -376,7 +458,7 @@ const Payment = () => {
             )}
             {addNewCard && (
               <div className='flex gap-2 mt-8 w-full'>
-                <div className='sm:flex-1 flex flex-col gap-2  max-sm:w-full'>
+                <div className='sm:flex-1 flex flex-col gap-2 max-sm:w-full'>
                   <div className="flex items-center justify-between">
                     <p className='text-white text-xl font-bold flex items-center gap-2'>
                       <MdOutlineAddCard className="text-white size-6" /> Add a new card
@@ -402,56 +484,6 @@ const Payment = () => {
                       </div>
                     )}
                   </div>
-                  <div>
-                    <p className="text-primary-gray w-96 text-left mb-1 mt-[10px]">Card Number</p>
-                    <Input
-                      type="text"
-                      name="cardNumber"
-                      value={cardFormData.cardNumber}
-                      onChange={handleCardNumberChange}
-                      placeholder="Card Number"
-                      className={cardErrors.cardNumber ? 'border-[#79071D] ring-1 ring-[#79071D]' : ''}
-                    />
-                    {cardErrors.cardNumber && (
-                      <div className="mt-1 px-2 py-1 text-sm text-white bg-[#79071D] rounded">
-                        {cardErrors.cardNumber}
-                      </div>
-                    )}
-                  </div>
-                  <div className='flex gap-2'>
-                    <div className='flex-1'>
-                      <p className="text-primary-gray text-left mb-1 mt-[10px]">Expiry Date</p>
-                      <Input
-                        type="text"
-                        name="expiryDate"
-                        value={cardFormData.expiryDate}
-                        onChange={handleCardInputChange}
-                        placeholder="MM/YY"
-                        className={cardErrors.expiryDate ? 'border-[#79071D] ring-1 ring-[#79071D]' : ''}
-                      />
-                      {cardErrors.expiryDate && (
-                        <div className="mt-1 px-2 py-1 text-sm text-white bg-[#79071D] rounded">
-                          {cardErrors.expiryDate}
-                        </div>
-                      )}
-                    </div>
-                    <div className='flex-1'>
-                      <p className="text-primary-gray text-left mb-1 mt-[10px]">CVV</p>
-                      <Input
-                        type="text"
-                        name="cvv"
-                        value={cardFormData.cvv}
-                        onChange={handleCardInputChange}
-                        placeholder="***"
-                        className={cardErrors.cvv ? 'border-[#79071D] ring-1 ring-[#79071D]' : ''}
-                      />
-                      {cardErrors.cvv && (
-                        <div className="mt-1 px-2 py-1 text-sm text-white bg-[#79071D] rounded">
-                          {cardErrors.cvv}
-                        </div>
-                      )}
-                    </div>
-                  </div>
                   <div className="flex items-center gap-2 mt-[10px]">
                     <input
                       type="checkbox"
@@ -462,16 +494,29 @@ const Payment = () => {
                     />
                     <p className="text-primary-gray text-sm">Set as default</p>
                   </div>
-                  <div className="flex justify-end mt-[10px]">
-                    <Button
-                      variant="primary"
-                      onClick={handleAddCard}
-                    >
-                      Save Card
-                    </Button>
-                  </div>
+
+                  {/* Stripe Card Element */}
+                  <StripeCardElement
+                    onSuccess={(paymentMethodId) => {
+                      // Call the mutation to attach the payment method to customer
+                      attachPaymentMethod({
+                        paymentMethodId,
+                        setAsDefault: cardFormData.setAsDefault
+                      });
+                      // Close the form
+                      setAddNewCard(false);
+                    }}
+                    onError={(error) => {
+                      console.error("Stripe error:", error);
+                      // Handle error (could set an error state here)
+                    }}
+                    setAsDefault={cardFormData.setAsDefault}
+                    cardHolderName={cardFormData.cardHolderName}
+                    isSubmitting={isSubmitting}
+                    setIsSubmitting={setIsSubmitting}
+                  />
                 </div>
-                <div className="flex-1 max-sm:hidden"/>
+                <div className="flex-1 max-sm:hidden" />
               </div>
             )}
           </div>

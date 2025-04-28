@@ -1,5 +1,9 @@
 "use client"
+
+export const dynamic = 'force-dynamic';
+
 import Button from '@/src/components/figma/Button'
+import ClientOnly from '@/src/components/ClientOnly'
 import Footer from '@/src/components/Footer'
 import ListingCard from '@/src/components/ListingCard'
 import Newsletter from '@/src/components/Newsletter'
@@ -12,7 +16,7 @@ import { FaStar } from 'react-icons/fa6'
 import { GrLocation } from 'react-icons/gr'
 import { MdOutlineDirectionsCarFilled } from 'react-icons/md'
 import { RxArrowTopRight } from "react-icons/rx";
-const Location = () => {
+function Location() {
   const [listings, setListings] = React.useState<any[]>([{
     trip_name: "Lahore",
     fareharbor_id: 1,
@@ -310,4 +314,11 @@ const Location = () => {
   )
 }
 
-export default Location
+// Wrap in a safe server component
+export default function LocationPage() {
+  return (
+    <ClientOnly>
+      <Location />
+    </ClientOnly>
+  );
+}

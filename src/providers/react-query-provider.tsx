@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+
 import React, { ReactNode, useState } from "react";
 
 const cacheTime = 3600 * 1000 * 24; // 1 day
@@ -37,7 +38,7 @@ const ReactQueryProvider = ({ children }: { children: ReactNode }) => {
         persister,
         maxAge: cacheTime,
         dehydrateOptions: {
-          shouldDehydrateQuery: (query) => {
+          shouldDehydrateQuery: (query: any) => {
             return (
               defaultShouldDehydrateQuery(query) &&
               !doNotPersistQueries.includes(query.queryKey[0])

@@ -6,7 +6,13 @@ interface Itinerary {
   // ... other fields
 }
 
-async function fetchItineraries(): Promise<any[]> {
+interface ItinerariesResponse {
+  success: boolean;
+  message: string;
+  data: any[];
+}
+
+async function fetchItineraries(): Promise<ItinerariesResponse> {
   const response = await fetch('/api/itineraries', {
     headers: {
       'Content-Type': 'application/json',

@@ -1,11 +1,14 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { usePathname, useRouter } from 'next/navigation'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import ClientOnly from '@/src/components/ClientOnly';
 import { ArrowLeftIcon, XMarkIcon } from '@heroicons/react/20/solid';
 import Image from 'next/image';
 import Button from '@/src/components/figma/Button';
-import {  FaStar } from 'react-icons/fa6';
+import { FaStar } from 'react-icons/fa6';
 import { CgSoftwareUpload } from 'react-icons/cg';
 import { LuArrowRight, LuUser } from 'react-icons/lu';
 import BookingCard from '@/src/components/profileComponents/bookings/BookingCard';
@@ -19,54 +22,61 @@ import DrawerModal from '@/src/components/DrawerModal';
 import Input from '@/src/components/figma/Input';
 import ItineraryCalendar from '@/src/components/calendar/ItineraryCalendar';
 import LikeDislike from '@/src/components/LikeDislike';
+import { BookingType } from '@/src/components/models/Itinerary';
+import { ItineraryData } from '@/src/types/itineraries';
 
-export default function BookingDetails() {
+function BookingDetails() {
   const pathname = usePathname() as string;
   const router = useRouter();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [bookings, setBookings] = React.useState<any>({
-    id: 1,
-    status: "upcoming",
-    delay_insurance: true,
-    trip_name: "Lahore",
-    fareharbor_id: 1,
-    person_cost: 100,
-    min_age: 18,
-    min_guests: 1,
-    max_guests: 10,
-    length_days: 1,
-    length_hours: 1,
-    start_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    end_location: { city: "Lahore", state: "UK", coordinates: [1, 1] },
-    description: "Lahore is a city in Pakistan",
-    days: { "1": [{ time: "10:00:00", location: { name: "Lahore", coordinates: [1, 1] }, name: "Lahore", type: "Lahore is a city in Pakistan" }] },
-    activities: [{ label: "Lahore", description: "Lahore is a city in Pakistan", tags: ["Lahore"] }],
-    images: ["/images/hero-bg.jpg"],
-    start_date: new Date(),
-    end_date: new Date(),
-    created_at: new Date(),
-    updated_at: new Date()
+  const [dataBooking, setDataBooking] = useState<BookingType | null>(null);
+  const [dataItinerary, setDataItinerary] = useState<ItineraryData | null>(null);
+
+  useEffect(() => {
+    // Retrieve data from localStorage
+    console.log('BookingDetails component mounted'); // Log here
+    const data = localStorage.getItem('bookingDetails');
+    console.log('localStorage bookingDetails:', data); // Log here
+    if (data) {
+      try {
+        const parsed = JSON.parse(data);
+        console.log('Full parsed object:', parsed); // Log entire object
+        console.log('Parsed dataBooking:', parsed.dataBooking); // Debug log
+        console.log('Parsed dataItinerary:', parsed.dataItinerary); // Debug log
+        setDataBooking(parsed.dataBooking);
+        setDataItinerary(parsed.dataItinerary);
+      } catch (error) {
+        console.error('Error parsing localStorage data:', error);
+      }
+    } else {
+      console.warn('No bookingDetails found in localStorage'); // Log here
+    }
+
+    // // Cleanup function: runs when component unmounts (user leaves page)
+    // return () => {
+    //   localStorage.removeItem('bookingDetails');
+    // };
+  }, []); // Empty dependency array ensures effect runs once on mount
+
+  console.log('Current state - Booking:', dataBooking, 'Itinerary:', dataItinerary); // Log here
+
+  if (!dataBooking || !dataItinerary) {
+    return <div>No dataBooking details available.</div>;
   }
-  );
-  const objectId = pathname.substring(pathname.lastIndexOf('/') + 1);
 
 
 
 
 
-
-
-
-  return (
+   return (
     <section className='w-full !h-full text-white  gap-4'>
       <div className='flex items-center gap-2  px-[64px] pt-[80px] max-sm:px-6 max-lg:px-10'>
         <ArrowLeftIcon className="h-6 w-6 hover:cursor-pointer" onClick={() => router.push("/")} />
         <p className='text-primary-gray text-sm'>My Bookings / <span className='text-white'>Denver Tour</span></p>
       </div>
       <div className='flex gap-4 max-sm:mt-4 md:items-center px-[64px] max-sm:px-6 max-lg:px-10'>
-        <h1 className='text-4xl max-sm:text-2xl font-bold me-auto'>{bookings.trip_name}</h1>
+        <h1 className='text-4xl max-sm:text-2xl font-bold me-auto'>{dataItinerary.trip_name}</h1>
         <div className='flex items-center md:flex-nowrap flex-wrap gap-2'>
-          <LikeDislike bookings={bookings} />
 
           <Button variant="outline" size='sm' className='gap-1' onClick={() => { }}>
             <CgSoftwareUpload className='h-6 w-6 text-white' />
@@ -76,10 +86,10 @@ export default function BookingDetails() {
       </div>
       <div className='grid md:grid-cols-12 lg:grid-cols-7 gap-6 mt-4 px-[80px] max-sm:px-6 max-lg:px-10 '>
         <div className='md:col-span-8 lg:col-span-5 -mt-4 '>
-          <BookingCard data={bookings}  bookingDetailsPage={true} />
+          <BookingCard dataBooking={dataBooking} dataItinerary={dataItinerary} bookingDetailsPage={true} />
 
           <div className='md:hidden max-md:mt-4'>
-            <PricesCard bookings={bookings} />
+            <PricesCard dataItinerary={dataItinerary} />
 
           </div>
           <div className='mt-8'>
@@ -188,7 +198,7 @@ export default function BookingDetails() {
 
           <div className='mt-8'>
             <p className='text-white text-2xl font-bold'>About</p>
-            <p className='text-primary-gray text-sm mt-2'>Experience the ultimate Colorado vacation with a 6-day itinerary that takes you to Idaho Springs, Glenwood Springs, and Denver. Enjoy the adrenaline rush of white water rafting, the tranquility of camping, the intrigue of gold mines, and the challenge of hiking the Rockies.</p>
+            <p className='text-primary-gray text-sm mt-2'>Experience the ultimate Colorado vacation with a 6-day dataItinerary that takes you to Idaho Springs, Glenwood Springs, and Denver. Enjoy the adrenaline rush of white water rafting, the tranquility of camping, the intrigue of gold mines, and the challenge of hiking the Rockies.</p>
           </div>
 
 
@@ -196,7 +206,7 @@ export default function BookingDetails() {
         </div>
 
         <div className='md:col-span-4 lg:col-span-2 max-md:hidden'>
-          <PricesCard bookings={bookings} />
+          <PricesCard dataItinerary={dataItinerary} />
         </div>
 
 
@@ -307,57 +317,65 @@ export default function BookingDetails() {
   );
 }
 
+export default function BookingDetailsPage() {
+  return (
+    <ClientOnly>
+      <BookingDetails />
+    </ClientOnly>
+  );
+}
+
 
 const PricesCard = (bookings: any) => {
   return (
     <div className=' bg-[#141414] rounded-2xl border border-primary-gray'>
-    <div className=' rounded-lg p-4 flex flex-col  gap-1 '>
-      <div className='flex justify-between  mb-2'>
-        <p className='text-white font-bold'> Total amount</p><p className='text-white font-bold'>${bookings.person_cost}</p></div>
+      <div className=' rounded-lg p-4 flex flex-col  gap-1 '>
+        <div className='flex justify-between  mb-2'>
+          <p className='text-white font-bold'> Total amount</p><p className='text-white font-bold'>${bookings.person_cost}</p></div>
 
-      <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent my-2"></div>
+        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent my-2"></div>
 
-      <div className='flex justify-between mt-2' >
-        <p className='text-sm text-primary-gray'>Activity Cost</p>
-        <p className='text-sm text-white'> $1000</p>
-      </div>
-      <div className='flex justify-between mt-2' >
-        <p className='text-sm text-primary-gray'>Lodging Cost</p>
-        <p className='text-sm text-white'> $1000</p>
-      </div>
-      <div className='flex justify-between mt-2' >
-        <p className='text-sm text-primary-gray'>Transport Cost</p>
-        <p className='text-sm text-white'> $1000</p>
-      </div>
-      <div className='flex justify-between mt-2' >
-        <p className='text-sm text-primary-gray'>Travel agent fee</p>
-        <p className='text-sm text-white'> $1000</p>
-      </div>
-      <div className='flex justify-between mt-2' >
-        <p className='text-sm text-primary-gray'>Service fee</p>
-        <p className='text-sm text-white'> $1000</p>
-      </div>
-      <div className='flex justify-between mt-2' >
-        <p className='text-sm text-primary-gray'>Promo Code</p>
-        <p className='text-sm text-[#5389DF]'> -$45</p>
-      </div>
+        <div className='flex justify-between mt-2' >
+          <p className='text-sm text-primary-gray'>Activity Cost</p>
+          <p className='text-sm text-white'> $1000</p>
+        </div>
+        <div className='flex justify-between mt-2' >
+          <p className='text-sm text-primary-gray'>Lodging Cost</p>
+          <p className='text-sm text-white'> $1000</p>
+        </div>
+        <div className='flex justify-between mt-2' >
+          <p className='text-sm text-primary-gray'>Transport Cost</p>
+          <p className='text-sm text-white'> $1000</p>
+        </div>
+        <div className='flex justify-between mt-2' >
+          <p className='text-sm text-primary-gray'>Travel agent fee</p>
+          <p className='text-sm text-white'> $1000</p>
+        </div>
+        <div className='flex justify-between mt-2' >
+          <p className='text-sm text-primary-gray'>Service fee</p>
+          <p className='text-sm text-white'> $1000</p>
+        </div>
+        <div className='flex justify-between mt-2' >
+          <p className='text-sm text-primary-gray'>Promo Code</p>
+          <p className='text-sm text-[#5389DF]'> -$45</p>
+        </div>
 
 
 
-      <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent my-2"></div>
+        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent my-2"></div>
 
-      <div className='mt-2 flex justify-between gap-2'>
+        <div className='mt-2 flex justify-between gap-2'>
 
-        <Button size='md' variant='outline' className=' !bg-black text-sm font-bold gap-2 flex-1' >
-          <Image src={"/svg-icons/printer.svg"} alt="print" width={20} height={20} />
-          <p>Print</p>
-        </Button>
-        <Button size='md' variant='outline' className=' !bg-black text-sm font-bold gap-2 flex-1' >
-          <Image src={"/svg-icons/download.svg"} alt="print" width={20} height={20} />
-          <p>Download</p>
-        </Button>
+          <Button size='md' variant='outline' className=' !bg-black text-sm font-bold gap-2 flex-1' >
+            <Image src={"/svg-icons/printer.svg"} alt="print" width={20} height={20} />
+            <p>Print</p>
+          </Button>
+          <Button size='md' variant='outline' className=' !bg-black text-sm font-bold gap-2 flex-1' >
+            <Image src={"/svg-icons/download.svg"} alt="print" width={20} height={20} />
+            <p>Download</p>
+          </Button>
+        </div>
       </div>
     </div>
-  </div>
   )
 }

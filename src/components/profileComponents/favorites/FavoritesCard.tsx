@@ -11,34 +11,35 @@ import { MdAccessTime } from 'react-icons/md';
 import LikeDislike from '../../LikeDislike';
 
 interface Location {
-  city: string;
-  state: string;
-  coordinates: number[];
+    city: string;
+    state: string;
+    coordinates: number[];
 }
 
 interface Activity {
-  label: string;
-  description: string;
-  tags: string[];
+    label: string;
+    description: string;
+    tags: string[];
 }
 
 interface FavoriteData {
-  _id: { $oid: string };
-  trip_name: string;
-  person_cost: number;
-  min_group: number;
-  max_group: number;
-  length_days: number;
-  length_hours: number;
-  start_location: Location;
-  end_location: Location;
-  description: string;
-  activities: Activity[];
-  days: Record<string, any[]>;
+    _id: { $oid: string };
+    trip_name: string;
+    person_cost: number;
+    min_group: number;
+    max_group: number;
+    length_days: number;
+    length_hours: number;
+    start_location: Location;
+    end_location: Location;
+    description: string;
+    activities: Activity[];
+    days: Record<string, any[]>;
+    images: string[];
 }
 
 interface FavoritesCardProps {
-  data: FavoriteData;
+    data: FavoriteData;
 }
 
 const FavoritesCard: React.FC<FavoritesCardProps> = ({ data }) => {
@@ -50,13 +51,13 @@ const FavoritesCard: React.FC<FavoritesCardProps> = ({ data }) => {
         ...Object.values(data.days)
             .flat()
             .map(day => day.location.name)
-            .filter((loc, index, self) => 
-                self.indexOf(loc) === index && 
+            .filter((loc, index, self) =>
+                self.indexOf(loc) === index &&
                 loc !== data.start_location.city
             )
     ];
-    
-    const locationString = locations.length > 3 
+
+    const locationString = locations.length > 3
         ? `${locations.slice(0, 2).join(', ')}, ${locations.length - 2} More`
         : locations.join(', ');
 
@@ -106,8 +107,8 @@ const FavoritesCard: React.FC<FavoritesCardProps> = ({ data }) => {
                     </div>
                 </div>
 
-                <Image 
-                    src={"/images/hero-bg.jpg"} // Fallback image since data.images is null
+                <Image
+                    src={data.images[0] || "/images/hero-bg.jpg"} // Fallback image since data.images is null
                     alt={data.trip_name}
                     height={200}
                     width={300}
@@ -115,11 +116,11 @@ const FavoritesCard: React.FC<FavoritesCardProps> = ({ data }) => {
                     className='rounded-lg max-lg:w-full'
                 />
                 <div className='flex gap-2 absolute top-2 right-2'>
-                    <div 
+                    <div
                         onClick={(e) => {
                             e.stopPropagation();
                             router.push(`?modal=shareModal&itineraryId=${data._id.$oid}`)
-                        }} 
+                        }}
                         className='bg-[#05080D] rounded-full h-10 w-10 flex items-center justify-center'
                     >
                         <Image src="/svg-icons/share.svg" alt="share" height={20} width={20} />

@@ -1,6 +1,8 @@
 import actotaApi from '@/src/lib/apiClient';
 import { NextResponse } from 'next/server';
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
 

@@ -15,15 +15,17 @@ const Favorites = () => {
   const [search, setSearch] = useState("");
   const { data: favoriteItineraries, isLoading, error } = useFavorites();
 
+  console.log('favoriteItineraries', favoriteItineraries);
+
   const filteredFavorites = React.useMemo(() => {
     if (!favoriteItineraries) return [];
-    
+
     return favoriteItineraries.filter((favorite: any) => {
       const matchesSearch = favorite.trip_name.toLowerCase().includes(search.toLowerCase());
-      const matchesTab = activeTab === "all" || 
+      const matchesTab = activeTab === "all" ||
         (activeTab === "dayItineraries" && favorite.length_days === 1) ||
         (activeTab === "fullItineraries" && favorite.length_days > 1);
-      
+
       return matchesSearch && matchesTab;
     });
   }, [favoriteItineraries, search, activeTab]);
