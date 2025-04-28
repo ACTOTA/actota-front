@@ -5,7 +5,7 @@ import { toast } from 'react-hot-toast';
 
 // Subscribe mutation
 const useAddFavorites = () => {
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: async (favoriteId: string) => {
       try {
         const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -27,11 +27,13 @@ const useAddFavorites = () => {
       console.error('use add favorites error:', error);
     },
   });
+
+  return { ...mutation, isLoading: mutation.isPending };
 };
 
 
 const useRemoveFavorites = () => {
-    return useMutation({
+    const mutation = useMutation({
       mutationFn: async (favoriteId: string) => {
         try {
           const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -52,6 +54,8 @@ const useRemoveFavorites = () => {
         console.error('use remove favorites error:', error);
       },
     });
+
+    return { ...mutation, isLoading: mutation.isPending };
   };
 
 export { useAddFavorites, useRemoveFavorites };
