@@ -12,7 +12,7 @@ interface StripeCardElementProps {
   setAsDefault: boolean;
   cardHolderName: string;
   isSubmitting: boolean;
-  setIsSubmitting: (value: boolean) => void;
+  setIsSubmitting: (value: boolean) => void; // Keeping for backward compatibility
 }
 
 const StripeCardForm = ({

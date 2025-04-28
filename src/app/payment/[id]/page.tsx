@@ -103,7 +103,7 @@ const Payment = () => {
 
 
   // Initialize the attachment mutation
-  const { mutate: attachPaymentMethod } = useAttachPaymentMethod();
+  const { mutate: attachPaymentMethod, isLoading: isPaymentMethodLoading } = useAttachPaymentMethod();
 
   const cardAddSuccess = (paymentMethodId: string) => {
     console.log('Card added successfully:', paymentMethodId);
@@ -116,18 +116,15 @@ const Payment = () => {
         console.log('Payment method attached successfully');
         // Reset form state
         setCardHolderName('');
-        setIsSubmitting(false);
       },
       onError: (error) => {
         console.error('Error attaching payment method:', error);
-        setIsSubmitting(false);
       }
     });
   }
 
   const cardAddError = (error: any) => {
     console.error('Error adding card:', error);
-    setIsSubmitting(false);
     // You could add a toast notification here
   }
 
@@ -465,7 +462,7 @@ const Payment = () => {
                 onError={cardAddError}
                 setAsDefault={true}
                 cardHolderName={cardHolderName}
-                isSubmitting={isSubmitting}
+                isSubmitting={isPaymentMethodLoading}
                 setIsSubmitting={setIsSubmitting}
               />
 
