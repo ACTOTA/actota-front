@@ -8,7 +8,7 @@ import SplitPaymentCard from '@/src/components/SplitPaymentCard'
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/20/solid'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { CgArrowTopRight } from 'react-icons/cg'
 import { FaStar } from 'react-icons/fa6'
 import { GoArrowRight } from 'react-icons/go'
@@ -23,6 +23,7 @@ import StripeCardElement from '@/src/components/stripe/StripeCardElement'
 import { getClientSession } from '@/src/lib/session'
 import { loadStripe } from '@stripe/stripe-js';
 import { setLocalStorageItem } from '@/src/utils/browserStorage'
+import toast from 'react-hot-toast'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -35,6 +36,7 @@ const Payment = () => {
   const [itineraryData, setItineraryData] = useState<any | null>(null);
   const [showPaymentReview, setShowPaymentReview] = useState(false);
   const user = getClientSession();
+  const paymentMethodRef = useRef<HTMLParagraphElement>(null);
 
   const [paymentMethod, setPaymentMethod] = useState([{
     id: 1,
@@ -149,6 +151,22 @@ const Payment = () => {
 
   const confirmBooking = async () => {
     try {
+      // Check if a payment method is selected
+      if (!selectedCard && !paymentMethod.some(method => method.selected && method.name !== "Card")) {
+        // Show an error message
+        toast.error("Please add or select a payment method to continue");
+
+        // Scroll to payment method section
+        if (paymentMethodRef.current) {
+          paymentMethodRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
+        }
+        return; // Stop the booking process
+      }
+
+
       router.push("?modal=guestCheckoutLoading");
 
       // Save itinerary data to local storage (for reference in modal)
@@ -415,7 +433,7 @@ const Payment = () => {
               </div>
             </div>
           </div>
-          <p className='text-white text-2xl font-bold mt-10'>Payment Method</p>
+          <p className='text-white text-2xl font-bold mt-10' ref={paymentMethodRef}>Payment Method</p>
           <div className='flex gap-2 max-sm:flex-wrap'>
             {paymentMethod.map((item) => (
               <div onClick={() => setPaymentMethod(paymentMethod.map(method => ({ ...method, selected: method.id === item.id })))} key={item.id} className={`relative sm:flex-1 max-sm:w-[48%]  flex sm:flex-col  sm:justify-between max-sm:items-center gap-2 p-4 border  rounded-xl ${item.selected ? 'border-[#BBD4FB]' : 'border-primary-gray'}`}>
