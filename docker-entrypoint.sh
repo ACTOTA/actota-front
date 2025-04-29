@@ -3,6 +3,25 @@ set -e
 
 echo "=== Docker Entrypoint Script ==="
 
+# Create a runtime environment file for NEXT_PUBLIC variables
+echo "Creating runtime environment configuration..."
+
+# Create directory for runtime configuration
+mkdir -p public/runtime-config
+
+# Generate runtime config JS file with current environment variables
+cat > public/runtime-config/env.js << EOF
+// This file is generated at runtime by docker-entrypoint.sh
+window.__NEXT_PUBLIC_RUNTIME_CONFIG = {
+  NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL}",
+  NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: "${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}",
+  NEXT_PUBLIC_GOOGLE_MAPS_KEY: "${NEXT_PUBLIC_GOOGLE_MAPS_KEY}",
+  // Add other NEXT_PUBLIC_ variables here as needed
+};
+EOF
+
+echo "Runtime environment variables configured!"
+
 # Check for .next directory
 if [ ! -d ".next" ]; then
   echo "Warning: .next directory not found. Attempting to build the application..."

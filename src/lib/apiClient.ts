@@ -1,13 +1,26 @@
 import axios from "axios";
 import { getAuthCookie, signOut } from "@/src/helpers/auth";
 import { useLogout } from "../hooks/mutations/auth.mutation";
+import { clientEnv } from "./config/client-env";
+
 const headers = {
   Accept: "application/json",
   "Content-Type": "application/json",
 };
 
+// Get API URL from runtime config on client-side or env on server-side
+const getApiUrl = () => {
+  // Server-side rendering - use process.env
+  if (typeof window === 'undefined') {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  
+  // Client-side rendering - use runtime config
+  return clientEnv.NEXT_PUBLIC_API_URL;
+};
+
 const actotaApi = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: getApiUrl(),
   headers,
 });
 
