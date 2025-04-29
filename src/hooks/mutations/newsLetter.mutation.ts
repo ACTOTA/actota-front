@@ -9,14 +9,9 @@ interface NewsletterResponse {
 
 // Subscribe mutation
 const useNewsLetterSubscribe = () => {
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: async (email: string) => {
       try {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        if(!user.user_id){
-          toast.error("Please login to subscribe to newsletter");
-          throw new Error("Please login to subscribe to newsletter");
-        }
         const response = await actotaApi.post<NewsletterResponse>(
           '/api/newsletter/subscribe',
           { email }
@@ -30,18 +25,15 @@ const useNewsLetterSubscribe = () => {
       console.error('Newsletter subscription error:', error);
     },
   });
+
+  return { ...mutation, isLoading: mutation.isPending };
 };
 
 // Unsubscribe mutation
 const useNewsLetterUnsubscribe = () => {
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: async (email: string) => {
       try {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        if(!user.user_id){
-          toast.error("Please login to unsubscribe from newsletter");
-          throw new Error("Please login to unsubscribe from newsletter");
-        }
         const response = await actotaApi.put<NewsletterResponse>(
           '/api/newsletter/unsubscribe',
           { email }
@@ -55,6 +47,8 @@ const useNewsLetterUnsubscribe = () => {
       console.error('Newsletter unsubscription error:', error);
     },
   });
+
+  return { ...mutation, isLoading: mutation.isPending };
 };
 
 export { useNewsLetterSubscribe, useNewsLetterUnsubscribe };

@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, UseMutationResult } from '@tanstack/react-query';
 import { getErrorMessage } from '@/src/utils/getErrorMessage';
 import actotaApi from '@/src/lib/apiClient';
 import toast from 'react-hot-toast';
@@ -9,29 +9,51 @@ export interface AttachPaymentMethodParams {
   setAsDefault: boolean;
 }
 
-export const useAttachPaymentMethod = () => {
+// Define response types for better type safety
+interface PaymentMethodResponse {
+  success: boolean;
+  paymentMethodId: string;
+  customerId: string;
+}
+
+interface DefaultPaymentMethodResponse {
+  success: boolean;
+  customerId: string;
+}
+
+interface DeletePaymentMethodResponse {
+  success: boolean;
+  customerId: string;
+}
+
+export const useAttachPaymentMethod = (): UseMutationResult<
+  PaymentMethodResponse,
+  Error,
+  AttachPaymentMethodParams,
+  unknown
+> & { isLoading: boolean } => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  const mutation = useMutation({
+    // Rest of implementation unchanged
     mutationFn: async (values: AttachPaymentMethodParams) => {
       // Get user information from the client session
       let userId = '';
       let userEmail = '';
       let userName = '';
 
+      const session = getClientSession();
+
       if (typeof window !== 'undefined') {
         try {
           // First try to get from session
-          const session = getClientSession();
           if (session.isLoggedIn && session.user) {
             userId = session.user.user_id;
             userEmail = session.user.email || '';
             userName = session.user.name ||
-              (session.user.firstName && session.user.lastName ?
-                `${session.user.firstName} ${session.user.lastName}` :
-                (session.user.first_name && session.user.last_name ?
-                  `${session.user.first_name} ${session.user.last_name}` :
-                  'Customer'));
+              (session.user.first_name && session.user.last_name ?
+                `${session.user.first_name} ${session.user.last_name}` :
+                'Customer');
           } else {
             // Fall back to localStorage for compatibility
             const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -61,7 +83,7 @@ export const useAttachPaymentMethod = () => {
         if (!customerId) {
           throw new Error("Failed to get customer ID from server");
         }
-        
+
         // Update the local session with the new customer_id if possible
         if (session && session.user) {
           session.user.customer_id = customerId;
@@ -162,19 +184,26 @@ export const useAttachPaymentMethod = () => {
       toast.error(message);
     },
   });
+  
+  return { ...mutation, isLoading: mutation.isPending };
 };
 
-export const useSetDefaultPaymentMethod = () => {
+export const useSetDefaultPaymentMethod = (): UseMutationResult<
+  DefaultPaymentMethodResponse,
+  Error,
+  string,
+  unknown
+> & { isLoading: boolean } => {
   const queryClient = useQueryClient();
+  const session = getClientSession();
 
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: async (paymentMethodId: string) => {
-      // Get user information from the client session
+      // Existing implementation...
       let userId = '';
       if (typeof window !== 'undefined') {
         try {
           // First try to get from session
-          const session = getClientSession();
           if (session.isLoggedIn && session.user) {
             userId = session.user.user_id;
           } else {
@@ -203,7 +232,7 @@ export const useSetDefaultPaymentMethod = () => {
           if (!customerId) {
             throw new Error("Failed to get customer ID from server");
           }
-          
+
           // Update the local session with the new customer_id if possible
           if (session && session.user) {
             session.user.customer_id = customerId;
@@ -241,19 +270,27 @@ export const useSetDefaultPaymentMethod = () => {
       toast.error(message);
     },
   });
+  
+  return { ...mutation, isLoading: mutation.isPending };
 };
 
-export const useDeletePaymentMethod = () => {
+export const useDeletePaymentMethod = (): UseMutationResult<
+  DeletePaymentMethodResponse,
+  Error,
+  string,
+  unknown
+> & { isLoading: boolean } => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: async (paymentMethodId: string) => {
-      // Get user information from the client session
+      // Existing implementation...
       let userId = '';
+      const session = getClientSession();
+
       if (typeof window !== 'undefined') {
         try {
           // First try to get from session
-          const session = getClientSession();
           if (session.isLoggedIn && session.user) {
             userId = session.user.user_id;
           } else {
@@ -282,7 +319,7 @@ export const useDeletePaymentMethod = () => {
           if (!customerId) {
             throw new Error("Failed to get customer ID from server");
           }
-          
+
           // Update the local session with the new customer_id if possible
           if (session && session.user) {
             session.user.customer_id = customerId;
@@ -295,7 +332,7 @@ export const useDeletePaymentMethod = () => {
 
         // Make the actual API call to delete the payment method
         await actotaApi.delete(`/api/account/${userId}/payment-methods/${paymentMethodId}`);
-        
+
         // For local state management (this can be removed if the backend handles everything)
         const paymentMethods = JSON.parse(localStorage.getItem('paymentMethods') || '[]');
         const updatedPaymentMethods = paymentMethods.filter(
@@ -317,4 +354,6 @@ export const useDeletePaymentMethod = () => {
       toast.error(message);
     },
   });
+  
+  return { ...mutation, isLoading: mutation.isPending };
 };

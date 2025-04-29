@@ -133,7 +133,7 @@ export default function SignUp() {
 
 
   const handleGoogleLogin = async () => {
-    router.push("?modal=signinLoading");
+    // Don't show loading modal for Google login, just redirect directly
     try {
       window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`;
     } catch (error) {

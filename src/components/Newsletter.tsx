@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { CiMail } from "react-icons/ci";
 import Image from 'next/image';
@@ -10,10 +10,16 @@ import { toast } from 'react-hot-toast';
 
 export default function Newsletter() {
   const [email, setEmail] = useState('');
+  const [newsletter, setNewsletter] = useState<string | null>(null);
   const { mutate: subscribe, isPending } = useNewsLetterSubscribe();
   const { mutate: unsubscribe, isPending: isUnsubscribing } = useNewsLetterUnsubscribe();
 
-  const newsletter = localStorage.getItem('newsletter');
+  useEffect(() => {
+    // Check localStorage after component mounts (client-side only)
+    const savedEmail = localStorage.getItem('newsletter');
+    setNewsletter(savedEmail);
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -27,6 +33,7 @@ export default function Newsletter() {
         onSuccess: (data) => {
           toast.success('Successfully unsubscribed from newsletter!');
           localStorage.removeItem('newsletter');
+          setNewsletter(null);
         },
         onError: (error) => {
           toast.error(error instanceof Error ? error.message : 'Failed to unsubscribe');
@@ -36,13 +43,15 @@ export default function Newsletter() {
       subscribe(email, {
         onSuccess: (data) => {
           toast.success('Successfully subscribed to newsletter!');
-        setEmail(''); // Clear the input
-        localStorage.setItem('newsletter', email);
-      },
-      onError: (error) => {
-        toast.error(error instanceof Error ? error.message : 'Failed to subscribe');
-      }
-    });}
+          setEmail(''); // Clear the input
+          localStorage.setItem('newsletter', email);
+          setNewsletter(email);
+        },
+        onError: (error) => {
+          toast.error(error instanceof Error ? error.message : 'Failed to subscribe');
+        }
+      });
+    }
   };
 
   return (
