@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const { publicRuntimeConfig } = require('./src/lib/config/public-runtime');
+
 module.exports = {
   eslint: {
     ignoreDuringBuilds: true,
@@ -18,6 +20,10 @@ module.exports = {
   },
   // Disable static optimization for all pages since we need dynamic functionality
   staticPageGenerationTimeout: 120,
+  // Make environment variables available at runtime
+  publicRuntimeConfig,
+  // Ensure environment variables are available during build and runtime
+  env: publicRuntimeConfig,
   async rewrites() {
     return [
       {

@@ -1,25 +1,45 @@
-# Development image (no separate build stage needed)
-FROM node:18-slim
+# Use multi-stage build for production
+FROM node:18-slim AS builder
 # Set working directory
 WORKDIR /app
-# Set build arguments for API URL (with default value)
-ARG API_URL=http://localhost:8080
-ENV NEXT_PUBLIC_API_URL=${API_URL}
+
 # Copy package.json and package-lock.json first (for better caching)
 COPY package*.json ./
-# Install ALL dependencies including dev dependencies
+# Install dependencies
 RUN npm ci
-# Explicitly install Stripe packages to ensure they're available
-RUN npm install @stripe/stripe-js @stripe/react-stripe-js
+
 # Copy the rest of your Next.js project
 COPY . .
-# Create a .env.local file explicitly for the build
+
+# Build arguments for API URL and other NEXT_PUBLIC_ vars
+ARG API_URL=http://localhost:8080
+ENV NEXT_PUBLIC_API_URL=${API_URL}
+
+# Create a .env.local file for the build
 RUN echo "NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}" > .env.local
-# Diagnostic: Print the installed packages to verify Stripe is there
-RUN npm list @stripe/stripe-js @stripe/react-stripe-js
-# Set environment to development
-ENV NODE_ENV=development
-# Expose the port your Next.js app runs on
+
+# Build the Next.js application
+ENV NODE_ENV=production
+RUN npm run build
+
+# Production image
+FROM node:18-slim AS runner
+WORKDIR /app
+
+# Copy built app from builder stage
+COPY --from=builder /app/next.config.js ./
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/src/lib/config ./src/lib/config
+
+# Add environment variable runtime handling
+COPY --from=builder /app/docker-entrypoint.sh ./
+RUN chmod +x docker-entrypoint.sh
+
+# Expose port
 EXPOSE 3000
-# Start the Next.js application in development mode
-CMD ["npm", "run", "dev"]
+
+# Command to run the application with environment variable support
+ENTRYPOINT ["./docker-entrypoint.sh"]
+CMD ["node", "server.js"]
