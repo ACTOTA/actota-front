@@ -11,8 +11,8 @@ import Button from './figma/Button';
 
 export enum CardType {
     ACTIVITY = 'activity',
-    TRANSPORTATION = 'transportation',
-    LODGING = 'lodging'
+    ACCOMODATION = 'accomodation',
+    TRANSPORTATION = 'transportation'
 }
 
 export interface ActivityCardProps {
@@ -36,7 +36,7 @@ const ActivityCard = ({ activity, formatTime, getActivityIcon, setIsFeedbackDraw
 
     const getBorderGradient = () => {
         switch (cardType) {
-            case CardType.LODGING:
+            case CardType.ACCOMODATION:
                 return "from-[#F10E3B] via-border-primary to-border-primary";
             case CardType.ACTIVITY:
                 return "from-[#0553CE] via-border-primary to-border-primary";
@@ -48,8 +48,8 @@ const ActivityCard = ({ activity, formatTime, getActivityIcon, setIsFeedbackDraw
     };
 
     useEffect(() => {
-        console.log('ActivityCard Type:', cardType);
         console.log('ActivityCard:', activity);
+        console.log("CardType: ", cardType);
     }, []);
 
     return (
@@ -64,7 +64,7 @@ const ActivityCard = ({ activity, formatTime, getActivityIcon, setIsFeedbackDraw
                 <div className="flex-1 bg-black rounded-xl">
 
                     <div className="flex-1 bg-gradient-to-br from-white/20 to-white/5 rounded-xl p-4 relative">
-                        {CardType.TRANSPORTATION === cardType && (
+                        {CardType.ACCOMODATION === cardType && (
                             <div className="flex justify-between items-start mb-4">
                                 <div className="flex items-center gap-2">
                                     <h3 className="text-white font-bold">{activity.name}</h3>

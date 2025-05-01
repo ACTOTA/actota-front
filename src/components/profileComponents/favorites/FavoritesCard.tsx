@@ -9,48 +9,20 @@ import { LuUsers } from "react-icons/lu";
 import { IoLeafOutline } from "react-icons/io5";
 import { MdAccessTime } from 'react-icons/md';
 import LikeDislike from '../../LikeDislike';
-
-interface Location {
-    city: string;
-    state: string;
-    coordinates: number[];
-}
-
-interface Activity {
-    label: string;
-    description: string;
-    tags: string[];
-}
-
-interface FavoriteData {
-    _id: { $oid: string };
-    trip_name: string;
-    person_cost: number;
-    min_group: number;
-    max_group: number;
-    length_days: number;
-    length_hours: number;
-    start_location: Location;
-    end_location: Location;
-    description: string;
-    activities: Activity[];
-    days: Record<string, any[]>;
-    images: string[];
-}
+import { ItineraryData } from '@/src/types/itineraries';
 
 interface FavoritesCardProps {
-    data: FavoriteData;
+    data: ItineraryData;
 }
 
 const FavoritesCard: React.FC<FavoritesCardProps> = ({ data }) => {
     const router = useRouter();
 
-    // Create a string of locations
     const locations = [
-        data.start_location.city,
+        data.start_location?.city,
         ...Object.values(data.days)
             .flat()
-            .map(day => day.location.name)
+            .map(day => day.location?.name)
             .filter((loc, index, self) =>
                 self.indexOf(loc) === index &&
                 loc !== data.start_location.city
@@ -66,7 +38,7 @@ const FavoritesCard: React.FC<FavoritesCardProps> = ({ data }) => {
             <div onClick={() => router.push(`/itineraries/${data._id.$oid}`)} className='flex justify-between max-lg:flex-col-reverse relative gap-4 h-full w-full'>
                 <div>
                     <div className='flex justify-start items-center flex-wrap gap-1 max-w-[70%] text-white max-md:absolute max-md:top-2 max-md:left-2'>
-                        {data.activities.slice(0, 2).map((activity, index) => (
+                        {data.activities?.slice(0, 2).map((activity, index) => (
                             <div key={index} className='bg-[#05080D] rounded-full px-3 py-1 flex items-center justify-center gap-1'>
                                 <IoLeafOutline className='h-5 w-5 text-white' />
                                 {activity.label}
@@ -76,7 +48,7 @@ const FavoritesCard: React.FC<FavoritesCardProps> = ({ data }) => {
                     <div className='max-md:flex w-full justify-between'>
                         <div>
                             <p className='text-2xl font-bold mt-3 max-md:mt-0 flex items-start gap-1'>
-                                {data.trip_name.length > 30 ? data.trip_name.slice(0, 30) + "..." : data.trip_name}
+                                {data.trip_name?.length > 30 ? data.trip_name?.slice(0, 30) + "..." : data.trip_name}
                                 {data.length_days === 1 && (
                                     <Button variant='primary' size='sm' className='!bg-[#215CBA] text-white text-xs font-normal whitespace-nowrap'>
                                         Day 1/1
@@ -96,7 +68,7 @@ const FavoritesCard: React.FC<FavoritesCardProps> = ({ data }) => {
                                 </div>
                                 <div className='flex gap-1 text-xs my-2'>
                                     <FaPersonWalking className='h-[17px] w-[17px] text-white' />
-                                    <p>{data.activities.length} {data.activities.length === 1 ? "Activity" : "Activities"}</p>
+                                    <p>{data.activities?.length} {data.activities?.length === 1 ? "Activity" : "Activities"}</p>
                                 </div>
                             </div>
                         </div>

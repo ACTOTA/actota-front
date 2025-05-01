@@ -353,8 +353,8 @@ export default function DayView({ listing }: DayViewProps) {
 							key={index}
 							activity={activity}
 							cardType={
-								activity.type === 'lodging'
-									? CardType.LODGING
+								activity.type === 'accomodation'
+									? CardType.ACCOMODATION
 									: activity.type === 'activity'
 										? CardType.ACTIVITY
 										: CardType.TRANSPORTATION

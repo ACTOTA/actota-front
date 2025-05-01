@@ -147,7 +147,7 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
                 </p>
                 <p className='flex items-center gap-2 text-sm mb-3'>Activities</p>
                 <div className='flex flex-wrap gap-2'>
-                  {itineraryData.activities.map((activity, i) => (
+                  {itineraryData?.activities.map((activity, i) => (
                     <ActivityTag key={i} activity={activity.label} />
                   ))}
                 </div>
