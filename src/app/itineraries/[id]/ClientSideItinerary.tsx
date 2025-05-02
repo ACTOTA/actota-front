@@ -129,11 +129,11 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
                 <p className='flex items-center gap-2 text-sm mb-3'>Destination</p>
                 <div className='flex items-center flex-wrap gap-2 text-sm mb-3'>
                   <button type="button" className="inline-flex items-center px-2 py-1 rounded-lg text-sm font-medium bg-[#262626]">
-                    {itineraryData.start_location.city}, {itineraryData.start_location.state}
+                    {itineraryData.start_location?.city}, {itineraryData.start_location?.state}
                   </button>
-                  {itineraryData.end_location.city !== itineraryData.start_location.city && (
+                  {itineraryData.end_location?.city !== itineraryData.start_location?.city && (
                     <button type="button" className="inline-flex items-center px-2 py-1 rounded-lg text-sm font-medium bg-[#262626]">
-                      {itineraryData.end_location.city}, {itineraryData.end_location.state}
+                      {itineraryData.end_location?.city}, {itineraryData.end_location?.state}
                     </button>
                   )}
                 </div>
@@ -147,7 +147,7 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
                 </p>
                 <p className='flex items-center gap-2 text-sm mb-3'>Activities</p>
                 <div className='flex flex-wrap gap-2'>
-                  {itineraryData?.activities.map((activity, i) => (
+                  {itineraryData?.activities?.map((activity, i) => (
                     <ActivityTag key={i} activity={activity.label} />
                   ))}
                 </div>

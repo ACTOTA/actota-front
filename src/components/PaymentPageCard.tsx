@@ -131,7 +131,7 @@ const PaymentPageCard = ({ itineraryData }: PaymentPageCardProps) => {
                                     width={20} 
                                     height={20} 
                                 />
-                                <span>{activities.length} Activities</span>
+                                <span>{activities?.length} Activities</span>
                             </div>
                         </div>
                     </div>
