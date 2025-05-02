@@ -122,6 +122,8 @@ export interface ItineraryData {
   transport_cost: number;
   service_fee: number;
   activities: Activity[];
+  start_date: string;
+  delay_insurance: string;
 
   created_at: string;
   updated_at: string;
