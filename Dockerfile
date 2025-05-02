@@ -1,45 +1,56 @@
-# Use multi-stage build for production
+# Production image with build stage
 FROM node:18-slim AS builder
+
 # Set working directory
 WORKDIR /app
 
+# Set build arguments for API URL
+ENV NEXT_PUBLIC_API_URL=https://actota-api-324035621794.us-central1.run.app
+
 # Copy package.json and package-lock.json first (for better caching)
 COPY package*.json ./
+
 # Install dependencies
 RUN npm ci
+
+# Explicitly install Stripe packages to ensure they're available
+RUN npm install @stripe/stripe-js @stripe/react-stripe-js
 
 # Copy the rest of your Next.js project
 COPY . .
 
-# Build arguments for API URL and other NEXT_PUBLIC_ vars
-ARG API_URL=http://localhost:8080
-ENV NEXT_PUBLIC_API_URL=${API_URL}
-
-# Create a .env.local file for the build
+# Create a .env.local file explicitly for the build
 RUN echo "NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}" > .env.local
 
-# Build the Next.js application
-ENV NODE_ENV=production
+# Fix server components issue (if needed)
+RUN if [ -f ./fix-server-components.sh ]; then chmod +x ./fix-server-components.sh && ./fix-server-components.sh; fi
+
+# Set environment for build
+ENV NODE_ENV=test
+
+# Build the application
 RUN npm run build
 
-# Production image
-FROM node:18-slim AS runner
+# Production runtime stage
+FROM node:18-slim
+
 WORKDIR /app
 
-# Copy built app from builder stage
+# Set environment to test
+ENV NODE_ENV=test
+
+# Copy only the necessary files from the builder stage
 COPY --from=builder /app/next.config.js ./
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/src/lib/config ./src/lib/config
 
-# Add environment variable runtime handling
-COPY --from=builder /app/docker-entrypoint.sh ./
-RUN chmod +x docker-entrypoint.sh
+# Set API URL for runtime
+ENV NEXT_PUBLIC_API_URL=https://actota-api-324035621794.us-central1.run.app
 
-# Expose port
-EXPOSE 3000
+# Expose the port your Next.js app runs on
+EXPOSE 8080
+ENV PORT=8080
 
-# Command to run the application with environment variable support
-ENTRYPOINT ["./docker-entrypoint.sh"]
+# Start the Next.js application in production mode
 CMD ["node", "server.js"]

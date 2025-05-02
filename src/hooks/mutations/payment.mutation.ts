@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, UseMutationResult } from '@tanstack/react-query';
 import { getErrorMessage } from '@/src/utils/getErrorMessage';
 import actotaApi from '@/src/lib/apiClient';
 import toast from 'react-hot-toast';
@@ -9,10 +9,33 @@ export interface AttachPaymentMethodParams {
   setAsDefault: boolean;
 }
 
-export const useAttachPaymentMethod = () => {
+// Define response types for better type safety
+interface PaymentMethodResponse {
+  success: boolean;
+  paymentMethodId: string;
+  customerId: string;
+}
+
+interface DefaultPaymentMethodResponse {
+  success: boolean;
+  customerId: string;
+}
+
+interface DeletePaymentMethodResponse {
+  success: boolean;
+  customerId: string;
+}
+
+export const useAttachPaymentMethod = (): UseMutationResult<
+  PaymentMethodResponse,
+  Error,
+  AttachPaymentMethodParams,
+  unknown
+> & { isLoading: boolean } => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  const mutation = useMutation({
+    // Rest of implementation unchanged
     mutationFn: async (values: AttachPaymentMethodParams) => {
       // Get user information from the client session
       let userId = '';
@@ -161,14 +184,22 @@ export const useAttachPaymentMethod = () => {
       toast.error(message);
     },
   });
+  
+  return { ...mutation, isLoading: mutation.isPending };
 };
 
-export const useSetDefaultPaymentMethod = () => {
+export const useSetDefaultPaymentMethod = (): UseMutationResult<
+  DefaultPaymentMethodResponse,
+  Error,
+  string,
+  unknown
+> & { isLoading: boolean } => {
   const queryClient = useQueryClient();
+  const session = getClientSession();
 
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: async (paymentMethodId: string) => {
-      // Get user information from the client session
+      // Existing implementation...
       let userId = '';
       const session = getClientSession();
 
@@ -241,14 +272,21 @@ export const useSetDefaultPaymentMethod = () => {
       toast.error(message);
     },
   });
+  
+  return { ...mutation, isLoading: mutation.isPending };
 };
 
-export const useDeletePaymentMethod = () => {
+export const useDeletePaymentMethod = (): UseMutationResult<
+  DeletePaymentMethodResponse,
+  Error,
+  string,
+  unknown
+> & { isLoading: boolean } => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  const mutation = useMutation({
     mutationFn: async (paymentMethodId: string) => {
-      // Get user information from the client session
+      // Existing implementation...
       let userId = '';
       const session = getClientSession();
 
@@ -321,4 +359,6 @@ export const useDeletePaymentMethod = () => {
       toast.error(message);
     },
   });
+  
+  return { ...mutation, isLoading: mutation.isPending };
 };
