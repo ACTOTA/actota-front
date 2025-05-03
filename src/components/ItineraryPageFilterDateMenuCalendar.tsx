@@ -136,7 +136,7 @@ export default function ItineraryPageFilterDateMenuCalendar({ onDateRangeChange 
                     day.isCurrentMonth && 'hover:bg-red-500 hover:bg-opacity-15 hover:rounded-lg focus:z-10',
                     isStart(day.date, day.isCurrentMonth) && 'bg-white text-black rounded-l-lg',
                     isEnd(day.date, day.isCurrentMonth) && 'bg-white text-black rounded-r-lg',
-                    isInRange(day.date, day.isCurrentMonth) && 'translucent-white20 text-white'
+                    isInRange(day.date, day.isCurrentMonth) && 'bg-gray-200 text-black'
                   )}
                 >
                   <time
@@ -159,4 +159,3 @@ export default function ItineraryPageFilterDateMenuCalendar({ onDateRangeChange 
     </div>
   )
 }
-
