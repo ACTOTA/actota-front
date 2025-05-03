@@ -96,7 +96,7 @@ export default function DateMenuCalendar({ onDateRangeChange }: DateMenuCalendar
 
   return (
     <div className="w-full">
-      <div className="relative grid grid-cols-1 gap-x-14 md:grid-cols-2">
+      <div className="relative grid grid-cols-1 gap-x-8 md:grid-cols-2">
         <button
           type="button"
           className="absolute -left-1.5 -top-1 flex items-center justify-center p-1.5 text-gray-400 hover:text-gray-500"
