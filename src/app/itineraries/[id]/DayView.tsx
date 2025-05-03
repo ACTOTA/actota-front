@@ -1,14 +1,20 @@
 'use client';
 import React, { useState, useCallback, useEffect } from 'react';
 import { BiSolidMap } from 'react-icons/bi';
-import { GoogleMap, DirectionsService, DirectionsRenderer, Marker, LoadScript, Polyline } from '@react-google-maps/api';
+import { GoogleMap, DirectionsService, DirectionsRenderer, Marker, Polyline } from '@react-google-maps/api';
 import { BsCalendar4 } from 'react-icons/bs';
 import { MdOutlineExplore } from 'react-icons/md';
 import Button from '@/src/components/figma/Button';
 import ActivityCard, { CardType } from '@/src/components/ActivityCard';
 import FeedbackDrawer from '@/src/components/FeedbackDrawer';
 import DrawerModal from '@/src/components/DrawerModal';
-import { ItineraryData } from '@/src/types/itineraries';
+import { 
+  ItineraryData, 
+  PopulatedDayItem, 
+  isActivity, 
+  isAccommodation, 
+  isTransportation 
+} from '@/src/types/itineraries';
 
 // Add this constant for the API key
 const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
@@ -121,8 +127,13 @@ export default function DayView({ listing }: DayViewProps) {
 	};
 
 	// Get icon for activity type
-	const getActivityIcon = (type: string) => {
-		switch (type.toLowerCase()) {
+	const getActivityIcon = (item: PopulatedDayItem) => {
+	    // Get display name based on item type
+	    const displayName = isActivity(item) ? item.title.toLowerCase() : 
+	                        (isAccommodation(item) || isTransportation(item)) ? 
+	                        item.name.toLowerCase() : '';
+	                        
+		switch (displayName) {
 			case 'hiking':
 				return <MdOutlineExplore className="w-5 h-5 text-white" />;
 			case 'sightseeing':
@@ -132,6 +143,16 @@ export default function DayView({ listing }: DayViewProps) {
 			default:
 				return <BiSolidMap className="w-5 h-5 text-white" />;
 		}
+	};
+
+	// Helper function to get the display name for any day item
+	const getItemDisplayName = (item: PopulatedDayItem): string => {
+		if (isActivity(item)) {
+			return item.title;
+		} else if (isAccommodation(item) || isTransportation(item)) {
+			return item.name;
+		}
+		return "Unknown";
 	};
 
 	// Get coordinates for the selected day's activities
@@ -233,7 +254,7 @@ export default function DayView({ listing }: DayViewProps) {
 					<div className="w-[320px] bg-[#141414] rounded-2xl p-6">
 						<div className="flex items-center gap-2 mb-4">
 							<BsCalendar4 className="text-white" />
-							<span className="text-white">{formatDate(listing?.start_date)}</span>
+							<span className="text-white">UPDATE THIS</span>
 							<span className="text-gray-400 ml-auto">Day {selectedDay}</span>
 						</div>
 
@@ -242,11 +263,11 @@ export default function DayView({ listing }: DayViewProps) {
 								<React.Fragment key={index}>
 									<div className="flex gap-3">
 										<div className="rounded-full bg-[#262626] p-2">
-											{getActivityIcon(activity.name)}
+											{getActivityIcon(activity)}
 										</div>
 										<div className="flex-1">
-											<h3 className="text-white text-sm">{activity.name}</h3>
-											<p className="text-gray-400 text-sm">{activity.location.name}</p>
+											<h3 className="text-white text-sm">{getItemDisplayName(activity)}</h3>
+											<p className="text-gray-400 text-sm">{activity.location?.name}</p>
 											<p className="text-gray-400 text-sm">{formatTime(activity.time)}</p>
 										</div>
 									</div>
@@ -348,22 +369,25 @@ export default function DayView({ listing }: DayViewProps) {
 				</div>
 			) : (
 				<div className="space-y-4 border-l-2 border-dashed border-border-primary ps-6 ms-6">
-					{currentDayActivities.map((activity, index) => (
-						<ActivityCard
-							key={index}
-							activity={activity}
-							cardType={
-								activity.type === 'lodging'
-									? CardType.LODGING
-									: activity.type === 'activity'
-										? CardType.ACTIVITY
-										: CardType.TRANSPORTATION
-							}
-							formatTime={formatTime}
-							getActivityIcon={getActivityIcon}
-							setIsFeedbackDrawerOpen={setIsDrawerOpen}
-						/>
-					))}
+					{currentDayActivities.map((activity, index) => {
+						// Use type guards to determine the card type
+						const cardType = isAccommodation(activity) 
+							? CardType.ACCOMMODATION 
+							: isActivity(activity) 
+								? CardType.ACTIVITY 
+								: CardType.TRANSPORTATION;
+						
+						return (
+							<ActivityCard
+								key={index}
+								activity={activity}
+								cardType={cardType}
+								formatTime={formatTime}
+								getActivityIcon={() => getActivityIcon(activity)}
+								setIsFeedbackDrawerOpen={setIsDrawerOpen}
+							/>
+						);
+					})}
 				</div>
 			)}
 

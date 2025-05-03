@@ -3,47 +3,10 @@ import Image from "next/image";
 import GlassPanel from "./figma/GlassPanel";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import Slider from "react-slick";
-
-interface Location {
-  city: string;
-  state: string;
-  coordinates: number[];
-}
-
-interface Activity {
-  label: string;
-  description: string;
-  tags: string[];
-}
-
-interface ListingData {
-  _id: { $oid: string };
-  trip_name: string;
-  person_cost: number;
-  min_group: number;
-  max_group: number;
-  length_days: number;
-  length_hours: number;
-  start_location: Location;
-  end_location: Location;
-  description: string;
-  days: Record<string, Array<{
-    time: string;
-    location: {
-      name: string;
-      coordinates: number[];
-    };
-    name: string;
-    type?: string;
-  }>>;
-  activities: Activity[];
-  images: string[];
-  created_at: string;
-  updated_at: string;
-}
+import { ItineraryData } from "../types/itineraries";
 
 interface ListingsSliderProps {
-  listing: ListingData;
+  listing: ItineraryData;
   currentIndex: number;
   onSlideClick: (index: number) => void;
 }

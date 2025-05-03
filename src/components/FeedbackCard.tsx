@@ -29,7 +29,7 @@ const FeedbackCard = ({ activity, cardType = CardType.ACTIVITY }: FeedbackCardPr
     
     const getBorderGradient = () => {
         switch (cardType) {
-            case CardType.LODGING:
+            case CardType.ACCOMMODATION:
                 return "from-red-500 via-red-500/70 to-red-500/50";
             case CardType.ACTIVITY:
                 return "from-blue-500 via-blue-500/70 to-blue-500/50";

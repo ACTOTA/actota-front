@@ -98,10 +98,10 @@ export const useAttachPaymentMethod = (): UseMutationResult<
       try {
         // Make an API call to attach the payment method to the customer on Stripe's servers
         // This goes through our Next.js API route which then calls the backend service
-        const response = await actotaApi.post(`/api/stripe/attach-payment-method`, {
-          customerId: customerId,
-          paymentMethodId: values.paymentMethodId,
-          setAsDefault: values.setAsDefault
+        const response = await actotaApi.post(`/api/account/${userId}/payment-methods/attach`, {
+          customer_id: customerId,
+          payment_id: values.paymentMethodId,
+          default: values.setAsDefault
         });
 
         console.log('Payment method attached to customer', response.data);
@@ -201,6 +201,8 @@ export const useSetDefaultPaymentMethod = (): UseMutationResult<
     mutationFn: async (paymentMethodId: string) => {
       // Existing implementation...
       let userId = '';
+      const session = getClientSession();
+
       if (typeof window !== 'undefined') {
         try {
           // First try to get from session
@@ -331,7 +333,10 @@ export const useDeletePaymentMethod = (): UseMutationResult<
         console.log(`Deleting payment method ${paymentMethodId} for customer: ${customerId}`);
 
         // Make the actual API call to delete the payment method
-        await actotaApi.delete(`/api/account/${userId}/payment-methods/${paymentMethodId}`);
+        await actotaApi.post(`/api/account/${userId}/payment-methods/detach`, {
+          customer_id: customerId,
+          payment_method_id: paymentMethodId
+        });
 
         // For local state management (this can be removed if the backend handles everything)
         const paymentMethods = JSON.parse(localStorage.getItem('paymentMethods') || '[]');

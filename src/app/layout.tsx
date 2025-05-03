@@ -9,6 +9,8 @@ import ModalContainer from "../components/ModalContainer";
 import DrawerModal from "../components/DrawerModal";
 import { Providers } from "./providers";
 import { Toaster } from "react-hot-toast";
+import Script from 'next/script';
+
 export const metadata = {
   title: "ACTOTA!",
   description: "Personalized Tours Made Easy",
@@ -35,6 +37,13 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        {/* Load runtime environment variables dynamically */}
+        <Script 
+          src="/runtime-config/env.js"
+          strategy="beforeInteractive"
+        />
+      </head>
       <body className={`${font.className}`}>
         <Providers>
           <ClientOnly>
