@@ -96,7 +96,7 @@ export default function DateMenuCalendar({ onDateRangeChange }: DateMenuCalendar
 
   return (
     <div className="w-full">
-      <div className="relative grid grid-cols-1 gap-x-14 md:grid-cols-2">
+      <div className="relative grid grid-cols-1 gap-x-8 md:grid-cols-2">
         <button
           type="button"
           className="absolute -left-1.5 -top-1 flex items-center justify-center p-1.5 text-gray-400 hover:text-gray-500"
@@ -145,7 +145,7 @@ export default function DateMenuCalendar({ onDateRangeChange }: DateMenuCalendar
                     day.isCurrentMonth && 'hover:bg-red-500 hover:bg-opacity-15 hover:rounded-lg focus:z-10',
                     isStart(day.date, day.isCurrentMonth) && 'bg-white text-black rounded-l-lg',
                     isEnd(day.date, day.isCurrentMonth) && 'bg-white text-black rounded-r-lg',
-                    isInRange(day.date, day.isCurrentMonth) && 'translucent-white20 text-white'
+                    isInRange(day.date, day.isCurrentMonth) && 'bg-gray-300 text-black'
                   )}
                 >
                   <time

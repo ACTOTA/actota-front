@@ -17,8 +17,8 @@ import Search from "./Search";
 import { useLogout } from "@/src/hooks/mutations/auth.mutation";
 import { useRouter } from "next/navigation";
 import { LoadScript } from "@react-google-maps/api";
-import { getAuthCookie, signOut } from "@/src/helpers/auth";
-import { getLocalStorageItem } from "@/src/utils/browserStorage";
+import { getAuthCookie, isTokenExpired, signOut } from "@/src/helpers/auth";
+import { getLocalStorageItem, removeLocalStorageItem } from "@/src/utils/browserStorage";
 
 const Navbar = () => {
     const user = JSON.parse(getLocalStorageItem('user') || '{}');
@@ -65,17 +65,41 @@ const Navbar = () => {
 
     useEffect(() => {
         const checkAuth = async () => {
-            const authStatus = await getAuthCookie();
-            if (authStatus) {
-                const user = JSON.parse(getLocalStorageItem('user') || '{}');
-                setCurrentUser(user);
-            }
-            else {
+            const token = await getAuthCookie();
+            
+            try {
+                // Check if token exists and is not expired
+                const isExpired = token ? await isTokenExpired(token) : true;
+                
+                if (token && !isExpired) {
+                    const user = JSON.parse(getLocalStorageItem('user') || '{}');
+                    setCurrentUser(user);
+                } else if (token && isExpired) {
+                    // Token exists but is expired - handle logout
+                    await signOut();
+                    removeLocalStorageItem('user');
+                    removeLocalStorageItem('token');
+                    setCurrentUser(null);
+                    
+                    // Redirect to login if not already there
+                    if (!pathname?.includes('/auth/signin')) {
+                        router.push('/auth/signin?expired=true');
+                    }
+                } else {
+                    // No token
+                    setCurrentUser(null);
+                }
+            } catch (error) {
+                console.error('Error checking authentication:', error);
                 setCurrentUser(null);
+            } finally {
+                // Set loading to false after authentication check
+                setLoading(false);
             }
-        }
+        };
+        
         checkAuth();
-    }, []);
+    }, [pathname, router]);
 
     async function handleSignout() {
         signOut();

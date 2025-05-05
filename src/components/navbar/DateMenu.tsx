@@ -192,15 +192,6 @@ export default function DateMenu({ updateSearchValue, durationValue, className }
                             </div>
                         </div>
 
-                        <div className="h-8 gap-2 w-full flex overflow-x-scroll">
-                            {rangeSettings.map((item, i) => (
-                                <div key={i} className={`px-3 py-1.5 h-full bg-black/50 rounded-[200px] border border-white hover:cursor-pointer hover:bg-black/70 hover:border-[#FFF]
-                            ${item.selected ? "px-3 py-1.5 h-full bg-black/50 rounded-[200px] border border-white" : "neutral-03 opacity-50"}`}
-                                    onClick={() => handleSelect(item.label)}>
-                                    <div className="text-white text-sm font-normal leading-tight whitespace-nowrap">{item.label}</div>
-                                </div>
-                            ))}
-                        </div>
                     </div>
                 </>
             ) : (
