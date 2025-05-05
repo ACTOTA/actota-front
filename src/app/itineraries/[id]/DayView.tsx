@@ -129,7 +129,7 @@ export default function DayView({ listing }: DayViewProps) {
 	// Get icon for activity type
 	const getActivityIcon = (item: PopulatedDayItem) => {
 	    // Get display name based on item type
-	    const displayName = isActivity(item) ? item.title.toLowerCase() : 
+	    const displayName = isActivity(item) ? item?.title.toLowerCase() : 
 	                        (isAccommodation(item) || isTransportation(item)) ? 
 	                        item.name.toLowerCase() : '';
 	                        
