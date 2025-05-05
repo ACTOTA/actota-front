@@ -44,10 +44,21 @@ actotaApi.interceptors.response.use(
   },
   (error) => {
     if (error.response && error.response.status === 401) {
-      signOut();
-      // useLogout();
+      // Handle unauthorized error (expired token)
       if (typeof window !== 'undefined') {
-        window.location.href = '/login';
+        // Clear user data from localStorage
+        const { removeLocalStorageItem } = require('@/src/utils/browserStorage');
+        removeLocalStorageItem('user');
+        removeLocalStorageItem('token');
+        
+        // Clear cookies
+        signOut();
+        
+        // Redirect to sign in page if not already there
+        const currentPath = window.location.pathname;
+        if (!currentPath.includes('/auth/signin')) {
+          window.location.href = '/auth/signin?expired=true';
+        }
       }
     }
     return Promise.reject(error);

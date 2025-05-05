@@ -22,17 +22,26 @@ export default function SignIn() {
   const [rememberMe, setRememberMe] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [sessionExpired, setSessionExpired] = useState(false);
 
-  // Redirect if already authenticated
+  // Check for URL parameters and authentication status
   React.useEffect(() => {
-    const checkAuth = async () => {
+    const checkAuthAndParams = async () => {
+      // Check if redirected due to expired session
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('expired') === 'true') {
+          setSessionExpired(true);
+        }
+      }
 
+      // Check if user is already authenticated
       const authStatus = await getAuthCookie();
       if (authStatus) {
         router.push('/');
       }
     };
-    checkAuth();
+    checkAuthAndParams();
   }, [router]);
 
   const validateForm = () => {
@@ -148,6 +157,14 @@ export default function SignIn() {
         <Image src="/images/actota-logo.png" alt="logo" width={110} height={20} />
       </div>
       <p className='text-light-gray text-[16px] leading-[24px] mt-1'>Sign in to your account to continue.</p>
+      
+      {sessionExpired && (
+        <div className="mt-4 px-4 py-3 bg-red-500/20 border border-red-500 rounded-md">
+          <p className="text-white text-sm">
+            Your session has expired. Please sign in again to continue.
+          </p>
+        </div>
+      )}
       <form onSubmit={(e) => handleSubmit(e)} className="m-auto flex flex-col gap-4 w-full mt-[16px]">
         <div>
           <p className="text-primary-gray text-left mb-1 mt-[16px]">Email Address</p>

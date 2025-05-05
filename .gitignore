@@ -27,7 +27,6 @@ yarn-error.log*
 
 # local env files
 .env*.local
-.env
 .env.asc
 
 # service account
@@ -41,3 +40,4 @@ package-lock.json
 *.tsbuildinfo
 next-env.d.ts
 
+config.bat
