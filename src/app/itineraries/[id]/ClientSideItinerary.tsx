@@ -17,6 +17,7 @@ import { useItineraryById } from '@/src/hooks/queries/itinerarieById/useItinerar
 import { useFavorites } from '@/src/hooks/queries/account/useFavoritesQuery';
 import Image from 'next/image';
 import { ItineraryData } from '@/src/types/itineraries';
+import DateMenu from '@/src/components/navbar/DateMenu';
 
 interface ClientSideItineraryProps {
   initialData: ItineraryData;
@@ -30,6 +31,10 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [itineraryData, setItineraryData] = useState<ItineraryData>(initialData);
+  const [dateRange, setDateRange] = useState<string>('');
+  const [showCalendar, setShowCalendar] = useState<boolean>(false);
+  const [tripStartDate, setTripStartDate] = useState<string | null>(null);
+  const [tripEndDate, setTripEndDate] = useState<string | null>(null);
 
   const { data: apiResponse, isLoading, error } = useItineraryById(objectId);
 
@@ -53,10 +58,48 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
 
 
   const handleBooking = () => {
+    // Parse dates from the dateRange string
+    let arrivalDate, departureDate;
+    
+    if (dateRange.includes('-')) {
+      const [start, end] = dateRange.split('-').map(d => d.trim());
+      arrivalDate = start;
+      departureDate = end;
+    } else {
+      arrivalDate = dateRange.trim();
+      
+      // If only arrival date is selected, use itinerary length to calculate departure
+      if (itineraryData.length_days) {
+        // Convert arrival date to Date object
+        try {
+          const arrivalDateObj = new Date(arrivalDate);
+          // Add length_days to arrival date
+          const departureDateObj = new Date(arrivalDateObj);
+          departureDateObj.setDate(arrivalDateObj.getDate() + itineraryData.length_days);
+          
+          // Format departure date
+          departureDate = departureDateObj.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+          });
+        } catch (e) {
+          console.error('Error calculating departure date:', e);
+          departureDate = ''; // Set empty if calculation fails
+        }
+      }
+    }
+    
+    // Store selected dates in localStorage to use in payment flow
+    if (arrivalDate && departureDate) {
+      localStorage.setItem('tripDates', JSON.stringify({ 
+        arrival_datetime: arrivalDate,
+        departure_datetime: departureDate
+      }));
+    }
+    
+    // Navigate to payment page
     router.push(`/payment/${itineraryData._id.$oid}`);
-    // if (!itineraryData.fareharbor_id) return;
-    // const timestamp = new Date().getTime() / 1000;
-    // window.location.href = `https://fareharbor.com/embeds/book/adventurecoloradotours/items/${itineraryData.fareharbor_id}/availability/${timestamp}/book/?full-items=yes&flow=345668`;
   };
 
   const formatDate = (date: string) => {
@@ -65,6 +108,20 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
       month: 'long',
       year: 'numeric'
     });
+  };
+  
+  // Handle date selection from DateMenu component
+  const handleDateRangeSelect = (startDate: string | null, endDate: string | null) => {
+    setTripStartDate(startDate);
+    setTripEndDate(endDate);
+    
+    if (startDate && endDate) {
+      setDateRange(`${startDate} - ${endDate}`);
+    } else if (startDate) {
+      setDateRange(startDate);
+    } else {
+      setDateRange('');
+    }
   };
 
   return (
@@ -164,6 +221,34 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
           <div className='bg-[#141414] rounded-2xl'>
             <div className='rounded-lg p-4 flex flex-col gap-1'>
               <b className='text-white text-lg mb-4'>Reservation Details</b>
+              
+              {/* Trip date selection section */}
+              <div className="mb-4">
+                <p className='text-white font-medium mb-2'>Select Trip Dates</p>
+                
+                {/* Date display area */}
+                <div 
+                  onClick={() => setShowCalendar(!showCalendar)}
+                  className="w-full cursor-pointer border border-border-primary bg-black text-white rounded-lg p-3 flex items-center justify-between mb-2"
+                >
+                  <div className="flex items-center gap-2">
+                    <CalendarIcon className="h-5 w-5" />
+                    <span>{dateRange || 'Select dates for your trip'}</span>
+                  </div>
+                  <ArrowRightIcon className={`h-5 w-5 transform transition-transform ${showCalendar ? 'rotate-90' : ''}`} />
+                </div>
+                
+                {/* Calendar component */}
+                {showCalendar && (
+                  <div className="mt-2 mb-4 border border-border-primary rounded-lg overflow-hidden">
+                    <DateMenu 
+                      updateSearchValue={(value) => setDateRange(value)}
+                      className="!border-0 !rounded-none !p-2"
+                    />
+                  </div>
+                )}
+              </div>
+              
               <div className='flex justify-between mb-2'>
                 <p className='text-primary-gray'>Activity costs</p>
                 <p>${itineraryData?.activity_cost || 0}</p>
@@ -185,10 +270,18 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
                 <p>Total amount</p>
                 <p>${basePrice}</p>
               </div>
-              <Button onClick={handleBooking} variant='primary' className='text-black text-sm font-bold'>
+              <Button 
+                onClick={handleBooking} 
+                variant='primary' 
+                className='text-black text-sm font-bold'
+                disabled={!dateRange} // Disable button if no dates selected
+              >
                 <p>Proceed to Payment</p>
                 <ArrowRightIcon className='h-6 w-6' />
               </Button>
+              {!dateRange && (
+                <p className="text-yellow-500 text-xs mt-2 text-center">Please select trip dates to continue</p>
+              )}
             </div>
           </div>
         </div>

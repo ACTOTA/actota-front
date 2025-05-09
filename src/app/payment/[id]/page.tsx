@@ -5,7 +5,8 @@ import ListingCard from '@/src/components/ListingCard'
 import PaymentInsuranceCard from '@/src/components/PaymentInsuranceCard'
 import PaymentPageCard from '@/src/components/PaymentPageCard'
 import SplitPaymentCard from '@/src/components/SplitPaymentCard'
-import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/20/solid'
+import DateMenuCalendar from '@/src/components/figma/DateMenuCalendar'
+import { ArrowLeftIcon, ArrowRightIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useRef, useState } from 'react'
@@ -37,6 +38,12 @@ const Payment = () => {
   const [showPaymentReview, setShowPaymentReview] = useState(false);
   const user = getClientSession();
   const paymentMethodRef = useRef<HTMLParagraphElement>(null);
+  
+  // Add state for arrival and departure dates
+  const [arrivalDate, setArrivalDate] = useState<Date | null>(null);
+  const [departureDate, setDepartureDate] = useState<Date | null>(null);
+  const [showArrivalCalendar, setShowArrivalCalendar] = useState(false);
+  const [showDepartureCalendar, setShowDepartureCalendar] = useState(false);
 
   const [paymentMethod, setPaymentMethod] = useState([{
     id: 1,
@@ -133,6 +140,21 @@ const Payment = () => {
     setCardHolderName(e.target.value);
   }
 
+  // Handle date range selection for arrival
+  const handleArrivalDateRangeChange = (startDate: string | null, endDate: string | null) => {
+    if (startDate) {
+      setArrivalDate(new Date(startDate));
+      setShowArrivalCalendar(false);
+    }
+  }
+  
+  // Handle date range selection for departure
+  const handleDepartureDateRangeChange = (startDate: string | null, endDate: string | null) => {
+    if (startDate) {
+      setDepartureDate(new Date(startDate));
+      setShowDepartureCalendar(false);
+    }
+  }
 
 
   const handleInsuranceToggle = (id: number) => {
@@ -162,7 +184,18 @@ const Payment = () => {
         }
         return; // Stop the booking process
       }
-
+      
+      // Validate arrival and departure dates
+      if (!arrivalDate || !departureDate) {
+        toast.error("Please select both arrival and departure dates");
+        return; // Stop the booking process
+      }
+      
+      // Validate that departure date is after arrival date
+      if (departureDate <= arrivalDate) {
+        toast.error("Departure date must be after arrival date");
+        return; // Stop the booking process
+      }
 
       router.push("?modal=guestCheckoutLoading");
 
@@ -282,6 +315,57 @@ const Payment = () => {
         const captureData = await response.json();
         console.log('Payment captured successfully:', captureData);
 
+        // After payment is captured, update booking with arrival and departure datetimes
+        try {
+          // Get dates from state or localStorage
+          let arrival_datetime, departure_datetime;
+          
+          // First try to use dates from state
+          if (arrivalDate && departureDate) {
+            arrival_datetime = arrivalDate.toISOString();
+            departure_datetime = departureDate.toISOString();
+          }
+          // If not available, try to get from localStorage
+          else {
+            const savedTripDates = localStorage.getItem('tripDates');
+            if (savedTripDates) {
+              const parsedDates = JSON.parse(savedTripDates);
+              // Convert string dates to Date objects and then to ISO string
+              try {
+                arrival_datetime = new Date(parsedDates.arrival_datetime).toISOString();
+                departure_datetime = new Date(parsedDates.departure_datetime).toISOString();
+              } catch (e) {
+                console.error('Error parsing saved dates:', e);
+              }
+            }
+          }
+          
+          // Only proceed if we have valid dates
+          if (arrival_datetime && departure_datetime) {
+            const bookingResponse = await fetch(`/api/account/${user.user_id}/bookings/${captureData.booking_id}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${user.token}`
+              },
+              body: JSON.stringify({
+                arrival_datetime,
+                departure_datetime
+              }),
+            });
+          
+            if (!bookingResponse.ok) {
+              console.error('Failed to update booking with arrival/departure dates, but payment was successful');
+            } else {
+              console.log('Successfully updated booking with arrival/departure dates');
+            }
+          } else {
+            console.error('No valid dates available for booking');
+          }
+        } catch (error) {
+          console.error('Error updating booking with dates:', error);
+        }
+
         // Check capture data for success
         if (captureData.status === 'succeeded') {
           console.log('Payment succeeded!');
@@ -294,6 +378,75 @@ const Payment = () => {
       } else if (paymentIntent.status === 'succeeded') {
         // Payment already succeeded (rare case)
         console.log('Payment already succeeded!');
+        
+        // Need to get booking ID in this case
+        try {
+          // We assume the most recent booking is the one we just created
+          const bookingsResponse = await fetch(`/api/account/${user.user_id}/bookings`, {
+            headers: {
+              'Authorization': `Bearer ${user.token}`
+            }
+          });
+          
+          if (bookingsResponse.ok) {
+            const bookings = await bookingsResponse.json();
+            if (bookings && bookings.length > 0) {
+              // Get most recent booking
+              const mostRecentBooking = bookings[0];
+              const bookingId = (mostRecentBooking._id as { $oid: string }).$oid;
+              
+              // Get dates from state or localStorage
+              let arrival_datetime, departure_datetime;
+              
+              // First try to use dates from state
+              if (arrivalDate && departureDate) {
+                arrival_datetime = arrivalDate.toISOString();
+                departure_datetime = departureDate.toISOString();
+              }
+              // If not available, try to get from localStorage
+              else {
+                const savedTripDates = localStorage.getItem('tripDates');
+                if (savedTripDates) {
+                  const parsedDates = JSON.parse(savedTripDates);
+                  // Convert string dates to Date objects and then to ISO string
+                  try {
+                    arrival_datetime = new Date(parsedDates.arrival_datetime).toISOString();
+                    departure_datetime = new Date(parsedDates.departure_datetime).toISOString();
+                  } catch (e) {
+                    console.error('Error parsing saved dates:', e);
+                  }
+                }
+              }
+              
+              // Only proceed if we have valid dates
+              if (arrival_datetime && departure_datetime) {
+                // Update the booking with arrival/departure dates
+                const updateResponse = await fetch(`/api/account/${user.user_id}/bookings/${bookingId}`, {
+                  method: 'PUT',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${user.token}`
+                  },
+                  body: JSON.stringify({
+                    arrival_datetime,
+                    departure_datetime
+                  }),
+                });
+              
+                if (!updateResponse.ok) {
+                  console.error('Failed to update booking with arrival/departure dates');
+                } else {
+                  console.log('Successfully updated booking with arrival/departure dates');
+                }
+              } else {
+                console.error('No valid dates available for booking');
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error updating booking with dates:', error);
+        }
+        
         router.push("?modal=bookingConfirmed");
       } else {
         throw new Error(`Unexpected payment intent status: ${paymentIntent.status}`);
@@ -311,6 +464,22 @@ const Payment = () => {
     if (apiResponse) {
       console.log('Setting itinerary data:', apiResponse);
       setItineraryData(apiResponse);
+      
+      // Load saved trip dates from localStorage
+      try {
+        const savedTripDates = localStorage.getItem('tripDates');
+        if (savedTripDates) {
+          const { arrival_datetime, departure_datetime } = JSON.parse(savedTripDates);
+          if (arrival_datetime) {
+            setArrivalDate(new Date(arrival_datetime));
+          }
+          if (departure_datetime) {
+            setDepartureDate(new Date(departure_datetime));
+          }
+        }
+      } catch (e) {
+        console.error('Error loading saved trip dates:', e);
+      }
     }
   }, [apiResponse]);
 
@@ -391,6 +560,7 @@ const Payment = () => {
           </div>
           <h1 className='text-4xl font-bold'>Confirm your Reservation</h1>
           <PaymentPageCard itineraryData={itineraryData} />
+
           <p className='text-white text-2xl font-bold mt-12'>Insurance</p>
           {paymentInsurance.map((insurance) => (
             <PaymentInsuranceCard

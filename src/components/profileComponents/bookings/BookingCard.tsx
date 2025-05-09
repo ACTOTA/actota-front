@@ -44,10 +44,18 @@ const BookingCard: React.FC<ListingCardProps> = ({
   }, [])
 
   const handleDetailsClick = () => {
-    // Store booking and itinerary in localStorage
-    console.log('Setting localStorage:', { dataBooking, dataItinerary }); // Log here
-    localStorage.setItem('bookingDetails', JSON.stringify({ dataBooking, dataItinerary }));
-    router.push('/booking-details');
+    if (!dataBooking || !dataBooking._id) {
+      console.error('No booking ID available');
+      return;
+    }
+    
+    // Extract booking ID
+    const bookingId = typeof dataBooking._id === 'object' && dataBooking._id.$oid 
+      ? dataBooking._id.$oid 
+      : dataBooking._id.toString();
+      
+    // Navigate to the booking details page with the ID
+    router.push(`/bookings/${bookingId}`);
   };
 
   const handleCancelClick = () => {
