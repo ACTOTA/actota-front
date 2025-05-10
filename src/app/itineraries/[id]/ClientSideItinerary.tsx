@@ -217,7 +217,7 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
           </div>
         </div>
         {/* reservation details */}
-        <div className='w-[33%] max-sm:w-full'>
+        <div className='w-[33%] max-xl:w-full'>
           <div className='bg-[#141414] rounded-2xl'>
             <div className='rounded-lg p-4 flex flex-col gap-1'>
               <b className='text-white text-lg mb-4'>Reservation Details</b>
@@ -243,7 +243,7 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
                   <div className="mt-2 mb-4 border border-border-primary rounded-lg overflow-hidden">
                     <DateMenu
                       updateSearchValue={(value) => setDateRange(value)}
-                      className="!border-0 !rounded-none !p-2 !max-w-full"
+                      className="!border-0 !rounded-none !px-3 !py-3 !max-w-full"
                     />
                   </div>
                 )}

@@ -95,8 +95,8 @@ export default function DateMenuCalendar({ onDateRangeChange }: DateMenuCalendar
   }
 
   return (
-    <div className="w-full">
-      <div className="relative grid grid-cols-1 gap-x-4 md:gap-x-8 xl:grid-cols-2">
+    <div className="w-full px-1 py-2">
+      <div className="relative grid grid-cols-1 gap-x-4 md:gap-x-8 2xl:grid-cols-2">
         <button
           type="button"
           className="absolute -left-1.5 -top-1 flex items-center justify-center p-1.5 text-gray-400 hover:text-gray-500"
@@ -116,7 +116,7 @@ export default function DateMenuCalendar({ onDateRangeChange }: DateMenuCalendar
         {months.map((month, monthIdx) => (
           <section
             key={monthIdx}
-            className={classNames(monthIdx === months.length - 1 && 'hidden xl:block', 'text-center')}
+            className={classNames(monthIdx === months.length - 1 && 'hidden 2xl:block', 'text-center')}
           >
             <h2 className="text-sm font-semibold text-neutral-06">{month.name} {month.days[15].date.split("-")[0]}</h2>
             <div className="mt-6 grid grid-cols-7 text-xs/6 text-gray-500">
