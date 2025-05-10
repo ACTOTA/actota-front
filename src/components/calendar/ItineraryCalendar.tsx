@@ -383,31 +383,96 @@ export default function ItineraryCalendar() {
     };
 
     return (
-        <div className="h-screen bg-black ">
-            <Calendar
-                localizer={localizer}
-                events={events}
+        <div className="md:h-screen h-auto bg-black">
+            <div className="hidden 3xl:block">
+                <Calendar
+                    localizer={localizer}
+                    events={events}
+                    startAccessor="start"
+                    endAccessor="end"
+                    defaultView="week"
+                    views={['week']}
+                    step={60}
+                    timeslots={1}
+                    slotPropGetter={() => ({
+                        className: 'custom-time-slot'
+                    })}
+                    // min={new Date(2024, 2, 1, 1, 0)} // Start at 8 AM
+                    // max={new Date(2024, 2, 1, 24, 0)} // End at 8 PM
+                    eventPropGetter={eventStyleGetter}
+                    components={{
+                        toolbar: CustomToolbar,
+                        header: CustomHeader,
+                        event: CustomEvent,
+                        timeGutterHeader: CustomTimeGutterHeader
+                    }}
+                    className="bg-black text-white"
+                />
+            </div>
 
-                startAccessor="start"
-                endAccessor="end"
-                defaultView="week"
-                views={['week']}
-                step={60}
-                timeslots={1}
-                slotPropGetter={() => ({
-                    className: 'custom-time-slot'
-                })}
-                // min={new Date(2024, 2, 1, 1, 0)} // Start at 8 AM
-                // max={new Date(2024, 2, 1, 24, 0)} // End at 8 PM
-                eventPropGetter={eventStyleGetter}
-                components={{
-                    toolbar: CustomToolbar,
-                    header: CustomHeader,
-                    event: CustomEvent,
-                    timeGutterHeader: CustomTimeGutterHeader
-                }}
-                className="bg-black text-white"
-            />
+            {/* Mobile/tablet/desktop view - simplified calendar list (shown on all except 3xl screens) */}
+            <div className="3xl:hidden p-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {Array.from(new Set(events.map(event => {
+                        const date = new Date(event.start);
+                        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                    }))).sort().map((dateString) => {
+                        const eventsOnDate = events.filter(event => {
+                            const date = new Date(event.start);
+                            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}` === dateString;
+                        });
+
+                        const date = new Date(dateString);
+                        const formattedDate = date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+
+                        return (
+                            <div key={dateString} className="border border-primary-gray rounded-lg p-4">
+                                <h3 className="text-white text-lg font-semibold mb-2">{formattedDate}</h3>
+                                <div className="space-y-3">
+                                    {eventsOnDate.sort((a, b) => a.start.getTime() - b.start.getTime()).map(event => {
+                                        const startTime = event.start.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+                                        const endTime = event.end.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+                                        const getIcon = (type: string) => {
+                                            switch (type) {
+                                                case 'hiking':
+                                                    return <FaHiking className="size-5" />;
+                                                case 'lunch':
+                                                case 'dinner':
+                                                    return <FaUtensils className="size-5" />;
+                                                case 'atv':
+                                                    return <FaCar className="size-5" />;
+                                                case 'hotel':
+                                                    return <FaBed className="size-5" />;
+                                                case 'pickup':
+                                                    return <FaShuttleVan className="size-5" />;
+                                                default:
+                                                    return <FaClock className="size-5" />;
+                                            }
+                                        };
+
+                                        return (
+                                            <div
+                                                key={event.id}
+                                                className="flex items-center p-2 rounded-md"
+                                                style={{ borderLeft: `4px solid ${event.color}` }}
+                                            >
+                                                <div className="text-white mr-3">
+                                                    {getIcon(event.type)}
+                                                </div>
+                                                <div>
+                                                    <div className="text-white font-medium">{event.title}</div>
+                                                    <div className="text-primary-gray text-sm">{startTime} - {endTime}</div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
 
             <style jsx global>{`
         .rbc-calendar {

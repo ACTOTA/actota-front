@@ -241,9 +241,9 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
                 {/* Calendar component */}
                 {showCalendar && (
                   <div className="mt-2 mb-4 border border-border-primary rounded-lg overflow-hidden">
-                    <DateMenu 
+                    <DateMenu
                       updateSearchValue={(value) => setDateRange(value)}
-                      className="!border-0 !rounded-none !p-2"
+                      className="!border-0 !rounded-none !p-2 !max-w-full"
                     />
                   </div>
                 )}
