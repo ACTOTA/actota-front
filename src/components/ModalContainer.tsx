@@ -14,13 +14,17 @@ import GuestCheckout from "./modals/GuestCheckout";
 import Signin from "./modals/Signin";
 import Signup from "./modals/Signup";
 import BookingConfirmed from "./modals/BookingConfirmed";
+import PaymentError from "./modals/PaymentError";
+import BookingFailure from "./modals/BookingFailure";
+import ProcessingPayment from "./modals/ProcessingPayment";
+import PaymentPartial from "./modals/PaymentPartial";
 
 export default function ModalContainer() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const openModal = searchParams.get("modal");
     const paymentMethodId = searchParams.get("paymentMethodId") || "";
-    
+
     const MODALS: { [key: string]: React.ReactNode } = {
         success: <Success />,
         signinLoading: <Loading text="Signing you in..." />,
@@ -37,6 +41,12 @@ export default function ModalContainer() {
         signin: <Signin />,
         signup: <Signup />,
         bookingConfirmed: <BookingConfirmed />,
+        // New modals for payment and booking errors
+        paymentError: <PaymentError />,
+        bookingFailure: <BookingFailure />,
+        processingPayment: <ProcessingPayment />,
+        paymentFailure: <PaymentError />, // Reuse PaymentError for paymentFailure as well
+        paymentPartial: <PaymentPartial />
     };
 
     if (!openModal) return null; // No modal is open
@@ -46,8 +56,25 @@ export default function ModalContainer() {
         // router.back();
         router.push(window.location.pathname);
     };
+    // Determine if this is a loading modal
+    const isLoadingModal = openModal === "loading" ||
+                          openModal === "signinLoading" ||
+                          openModal === "signupLoading" ||
+                          openModal === "guestCheckoutLoading" ||
+                          openModal === "processingPayment";
+
+    // Determine if this is an error modal that shouldn't auto-close
+    const isErrorModal = openModal === "paymentError" ||
+                        openModal === "bookingFailure" ||
+                        openModal === "paymentFailure" ||
+                        openModal === "paymentPartial";
+
     return (
-        <Modal onClose={handleClose} isLoading={openModal === "loading" || openModal === "signinLoading" || openModal === "signupLoading" || openModal === "guestCheckoutLoading"} >
+        <Modal
+            onClose={handleClose}
+            isLoading={isLoadingModal}
+            persistent={isErrorModal} // Don't allow auto-close for error modals
+        >
             {ModalComponent}
         </Modal>
     );

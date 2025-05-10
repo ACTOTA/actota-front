@@ -170,10 +170,20 @@ const Payment = () => {
 
   const confirmBooking = async () => {
     try {
+      // Add a backup timeout that will clear any stuck processing UI after 30 seconds
+      const timeoutId = setTimeout(() => {
+        if (window.location.href.includes('modal=processingPayment') ||
+            window.location.href.includes('modal=guestCheckoutLoading')) {
+          console.error('Payment processing timeout triggered');
+          window.location.href = `${window.location.pathname}?modal=bookingFailure&message=${encodeURIComponent('The payment process timed out. Please try again later.')}`;
+        }
+      }, 30000);
+
       // Check if a payment method is selected
       if (!selectedCard && !paymentMethod.some(method => method.selected && method.name !== "Card")) {
         // Show an error message
         toast.error("Please add or select a payment method to continue");
+        clearTimeout(timeoutId);
 
         // Scroll to payment method section
         if (paymentMethodRef.current) {
@@ -184,16 +194,18 @@ const Payment = () => {
         }
         return; // Stop the booking process
       }
-      
+
       // Validate arrival and departure dates
       if (!arrivalDate || !departureDate) {
         toast.error("Please select both arrival and departure dates");
+        clearTimeout(timeoutId);
         return; // Stop the booking process
       }
-      
+
       // Validate that departure date is after arrival date
       if (departureDate <= arrivalDate) {
         toast.error("Departure date must be after arrival date");
+        clearTimeout(timeoutId);
         return; // Stop the booking process
       }
 
@@ -294,32 +306,204 @@ const Payment = () => {
       }
 
       if (paymentIntent.status === 'requires_capture') {
-        // Capture the payment
-        response = await fetch('/api/stripe/payment/capture-payment', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            user_id: user.user_id,
-            payment_intent_id: paymentIntent.id
-          }),
-        });
+        // Before capturing payment, first create/verify booking
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          const errorMessage = errorData.error || 'Failed to capture payment';
-          throw new Error(errorMessage);
+        // Get dates from state or localStorage
+        let arrival_datetime, departure_datetime;
+
+        // First try to use dates from state
+        if (arrivalDate && departureDate) {
+          arrival_datetime = arrivalDate.toISOString();
+          departure_datetime = departureDate.toISOString();
+        }
+        // If not available, try to get from localStorage
+        else {
+          const savedTripDates = localStorage.getItem('tripDates');
+          if (savedTripDates) {
+            const parsedDates = JSON.parse(savedTripDates);
+            // Convert string dates to Date objects and then to ISO string
+            try {
+              arrival_datetime = new Date(parsedDates.arrival_datetime).toISOString();
+              departure_datetime = new Date(parsedDates.departure_datetime).toISOString();
+            } catch (e) {
+              console.error('Error parsing saved dates:', e);
+            }
+          }
         }
 
-        const captureData = await response.json();
-        console.log('Payment captured successfully:', captureData);
+        // Create or verify booking with backend
+        try {
+          // Clear any previous loading modal first
+          router.replace(pathname);
 
-        // After payment is captured, update booking with arrival and departure datetimes
+          // Show a loading indicator
+          router.push("?modal=processingPayment");
+
+          // We will use the payment intent's metadata to pass the itinerary ID
+          // and have the backend create a pending booking
+          console.log('Creating booking with payment intent ID:', paymentIntent.id);
+
+          let createBookingResponse;
+          try {
+            createBookingResponse = await fetch(`/api/account/${user.user_id}/bookings`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${user.token}`
+              },
+              body: JSON.stringify({
+                itinerary_id: objectId,
+                status: 'pending',
+                arrival_datetime,
+                departure_datetime,
+                payment_intent_id: paymentIntent.id
+              }),
+            });
+          } catch (fetchError) {
+            console.error('Network error during booking creation:', fetchError);
+            router.push(`?modal=bookingFailure&message=${encodeURIComponent('Network error while creating booking. Please try again.')}`);
+            throw new Error('Network error while creating booking');
+          }
+
+          if (!createBookingResponse || !createBookingResponse.ok) {
+            let bookingErrorMessage = 'Failed to create booking';
+
+            // Handle specific status codes
+            if (createBookingResponse.status === 404) {
+              bookingErrorMessage = 'Booking endpoint not found. The API endpoint for creating bookings does not exist.';
+              console.error('Booking endpoint not found (404):', createBookingResponse.url);
+
+              // Use direct window.location for more reliable navigation during errors
+              window.location.href = `${window.location.pathname}?modal=bookingFailure&message=${encodeURIComponent(bookingErrorMessage)}`;
+              throw new Error(bookingErrorMessage);
+            }
+
+            try {
+              const bookingErrorData = await createBookingResponse.json();
+              if (bookingErrorData && bookingErrorData.error) {
+                bookingErrorMessage = bookingErrorData.error;
+              }
+            } catch (e) {
+              // For 404s with empty response bodies, the JSON parsing will fail
+              console.error('Error parsing booking error response:', e);
+              if (createBookingResponse.status === 404) {
+                bookingErrorMessage = 'Booking API endpoint not found (404)';
+              }
+            }
+
+            console.error(`Booking creation failed with status ${createBookingResponse.status}:`, bookingErrorMessage);
+            // Show booking failure modal
+            router.push(`?modal=bookingFailure&message=${encodeURIComponent(bookingErrorMessage)}`);
+            throw new Error(bookingErrorMessage);
+          }
+
+          let bookingData;
+          try {
+            bookingData = await createBookingResponse.json();
+            console.log('Booking created successfully:', bookingData);
+          } catch (jsonError) {
+            console.error('Error parsing booking response:', jsonError);
+            router.push(`?modal=bookingFailure&message=${encodeURIComponent('Invalid response from booking service')}`);
+            throw new Error('Invalid response from booking service');
+          }
+
+          if (!bookingData || !bookingData._id) {
+            console.error('Booking data is missing ID:', bookingData);
+            // Show booking failure modal for missing ID
+            router.push(`?modal=bookingFailure&message=${encodeURIComponent('Booking was not created properly, missing booking ID')}`);
+            throw new Error('Booking was not created properly, missing booking ID');
+          }
+
+          // Only after booking is successfully created, capture the payment
+          console.log('Attempting to capture payment for booking ID:', bookingData._id);
+          let captureResponse;
+          try {
+            captureResponse = await fetch('/api/stripe/payment/capture-payment', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                user_id: user.user_id,
+                payment_intent_id: paymentIntent.id,
+                booking_id: bookingData._id
+              }),
+            });
+          } catch (captureError) {
+            console.error('Network error during payment capture:', captureError);
+            router.push(`?modal=paymentFailure&message=${encodeURIComponent('Network error while capturing payment. Your booking was created but payment was not processed.')}`);
+            throw new Error('Network error while capturing payment');
+          }
+
+          if (!captureResponse || !captureResponse.ok) {
+            let errorMessage = 'Failed to capture payment';
+            try {
+              const errorData = await captureResponse.json();
+              if (errorData && errorData.error) {
+                errorMessage = errorData.error;
+              }
+            } catch (e) {
+              console.error('Error parsing payment capture error response:', e);
+            }
+            console.error('Payment capture failed:', errorMessage);
+            // Show payment failure modal
+            router.push(`?modal=paymentFailure&message=${encodeURIComponent(errorMessage)}`);
+            throw new Error(errorMessage);
+          }
+
+          let captureData;
+          try {
+            captureData = await captureResponse.json();
+            console.log('Payment captured successfully:', captureData);
+          } catch (jsonError) {
+            console.error('Error parsing payment capture response:', jsonError);
+            router.push(`?modal=paymentFailure&message=${encodeURIComponent('Invalid response from payment service')}`);
+            throw new Error('Invalid response from payment service');
+          }
+
+        } catch (error) {
+          console.error('Error in booking or payment process:', error);
+
+          // Force-close any loading modals that might be stuck
+          if (window.location.href.includes('modal=processingPayment') ||
+              window.location.href.includes('modal=guestCheckoutLoading')) {
+
+            // If the error is a 404, show a special message
+            if (error.message.includes('404')) {
+              router.push(`?modal=bookingFailure&message=${encodeURIComponent('The booking API endpoint is unavailable (404). Please contact support.')}`);
+            }
+            // If we haven't already shown a specific error modal, show a generic one
+            else if (!error.message.includes('modal=')) {
+              router.push(`?modal=paymentError&message=${encodeURIComponent(error.message || 'An unknown error occurred during payment processing')}`);
+            }
+          }
+
+          // Don't rethrow the error - this allows the component to stay mounted
+          // and the router navigation to complete
+          console.error('Payment process failed:', error);
+        }
+
+        // Check capture data for success
+        if (captureData && captureData.status === 'succeeded') {
+          console.log('Payment succeeded!');
+          router.push("?modal=bookingConfirmed");
+        } else if (captureData) {
+          console.warn('Payment capture completed but status is not succeeded:', captureData.status);
+          // Show partial success but with warning
+          router.push(`?modal=paymentPartial&message=${encodeURIComponent('Your booking was created, but the payment status is still pending. Please contact customer support if you see this message.')}`);
+        } else {
+          console.error('No valid capture data available');
+          router.push(`?modal=paymentFailure&message=${encodeURIComponent('Payment process completed but with an uncertain status. Please contact customer support.')}`);
+        }
+      } else if (paymentIntent.status === 'succeeded') {
+        // Payment already succeeded (rare case)
+        console.log('Payment already succeeded!');
+
+        // In this case, we still need to create the booking first
         try {
           // Get dates from state or localStorage
           let arrival_datetime, departure_datetime;
-          
+
           // First try to use dates from state
           if (arrivalDate && departureDate) {
             arrival_datetime = arrivalDate.toISOString();
@@ -339,121 +523,49 @@ const Payment = () => {
               }
             }
           }
-          
-          // Only proceed if we have valid dates
-          if (arrival_datetime && departure_datetime) {
-            const bookingResponse = await fetch(`/api/account/${user.user_id}/bookings/${captureData.booking_id}`, {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${user.token}`
-              },
-              body: JSON.stringify({
-                arrival_datetime,
-                departure_datetime
-              }),
-            });
-          
-            if (!bookingResponse.ok) {
-              console.error('Failed to update booking with arrival/departure dates, but payment was successful');
-            } else {
-              console.log('Successfully updated booking with arrival/departure dates');
-            }
-          } else {
-            console.error('No valid dates available for booking');
+
+          // Create booking with backend
+          const createBookingResponse = await fetch(`/api/account/${user.user_id}/bookings`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${user.token}`
+            },
+            body: JSON.stringify({
+              itinerary_id: objectId,
+              status: 'confirmed', // Since payment already succeeded
+              arrival_datetime,
+              departure_datetime,
+              payment_intent_id: paymentIntent.id
+            }),
+          });
+
+          if (!createBookingResponse.ok) {
+            const bookingErrorData = await createBookingResponse.json().catch(() => ({}));
+            const bookingErrorMessage = bookingErrorData.error || 'Failed to create booking';
+            throw new Error(bookingErrorMessage);
+          }
+
+          const bookingData = await createBookingResponse.json();
+          console.log('Booking created successfully:', bookingData);
+
+          if (!bookingData._id) {
+            console.error('Booking was created but no booking ID was returned');
           }
         } catch (error) {
-          console.error('Error updating booking with dates:', error);
+          console.error('Error creating booking:', error);
+          throw error;
         }
 
-        // Check capture data for success
-        if (captureData.status === 'succeeded') {
-          console.log('Payment succeeded!');
-          router.push("?modal=bookingConfirmed");
-        } else {
-          console.warn('Payment capture completed but status is not succeeded:', captureData.status);
-          // Still redirect to success for now, but log the unusual state
-          router.push("?modal=bookingConfirmed");
-        }
-      } else if (paymentIntent.status === 'succeeded') {
-        // Payment already succeeded (rare case)
-        console.log('Payment already succeeded!');
-        
-        // Need to get booking ID in this case
-        try {
-          // We assume the most recent booking is the one we just created
-          const bookingsResponse = await fetch(`/api/account/${user.user_id}/bookings`, {
-            headers: {
-              'Authorization': `Bearer ${user.token}`
-            }
-          });
-          
-          if (bookingsResponse.ok) {
-            const bookings = await bookingsResponse.json();
-            if (bookings && bookings.length > 0) {
-              // Get most recent booking
-              const mostRecentBooking = bookings[0];
-              const bookingId = (mostRecentBooking._id as { $oid: string }).$oid;
-              
-              // Get dates from state or localStorage
-              let arrival_datetime, departure_datetime;
-              
-              // First try to use dates from state
-              if (arrivalDate && departureDate) {
-                arrival_datetime = arrivalDate.toISOString();
-                departure_datetime = departureDate.toISOString();
-              }
-              // If not available, try to get from localStorage
-              else {
-                const savedTripDates = localStorage.getItem('tripDates');
-                if (savedTripDates) {
-                  const parsedDates = JSON.parse(savedTripDates);
-                  // Convert string dates to Date objects and then to ISO string
-                  try {
-                    arrival_datetime = new Date(parsedDates.arrival_datetime).toISOString();
-                    departure_datetime = new Date(parsedDates.departure_datetime).toISOString();
-                  } catch (e) {
-                    console.error('Error parsing saved dates:', e);
-                  }
-                }
-              }
-              
-              // Only proceed if we have valid dates
-              if (arrival_datetime && departure_datetime) {
-                // Update the booking with arrival/departure dates
-                const updateResponse = await fetch(`/api/account/${user.user_id}/bookings/${bookingId}`, {
-                  method: 'PUT',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${user.token}`
-                  },
-                  body: JSON.stringify({
-                    arrival_datetime,
-                    departure_datetime
-                  }),
-                });
-              
-                if (!updateResponse.ok) {
-                  console.error('Failed to update booking with arrival/departure dates');
-                } else {
-                  console.log('Successfully updated booking with arrival/departure dates');
-                }
-              } else {
-                console.error('No valid dates available for booking');
-              }
-            }
-          }
-        } catch (error) {
-          console.error('Error updating booking with dates:', error);
-        }
-        
         router.push("?modal=bookingConfirmed");
       } else {
         throw new Error(`Unexpected payment intent status: ${paymentIntent.status}`);
       }
     } catch (error: any) {
       console.error('Error confirming booking:', error);
-      router.push(`?modal=paymentError&message=${encodeURIComponent(error.message || 'An unknown error occurred')}`);
+
+      // Use window.location for more reliable navigation during errors
+      window.location.href = `${window.location.pathname}?modal=paymentError&message=${encodeURIComponent(error.message || 'An unknown error occurred')}`;
     }
   };
 
