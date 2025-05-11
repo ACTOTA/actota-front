@@ -89,6 +89,17 @@ export const useAttachPaymentMethod = (): UseMutationResult<
           session.user.customer_id = customerId;
           // Update localStorage for client-side persistence
           localStorage.setItem('user', JSON.stringify(session.user));
+
+          // Also update the server-side session
+          try {
+            await actotaApi.post('/api/account/update-session', {
+              customerId
+            });
+            console.log('Server-side session updated with customer_id');
+          } catch (sessionError) {
+            console.error('Error updating server-side session:', sessionError);
+            // Continue even if server-side session update fails
+          }
         }
       }
 
