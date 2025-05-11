@@ -4,7 +4,8 @@ import { XCircleIcon } from '@heroicons/react/20/solid';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React from 'react';
 import Button from '../figma/Button';
-import ModalContainer from '../ModalContainer';
+import Modal from '../Modal';
+import { useModal } from '../../context/ModalContext';
 
 interface BookingFailureProps {
   message?: string;
@@ -13,6 +14,7 @@ interface BookingFailureProps {
 const BookingFailure: React.FC<BookingFailureProps> = ({ message: propMessage }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { hideModal } = useModal();
   const urlMessage = searchParams.get('message');
   const message = propMessage || urlMessage || 'Unable to create your booking at this time';
 
@@ -22,7 +24,7 @@ const BookingFailure: React.FC<BookingFailureProps> = ({ message: propMessage })
                            message.includes('API');
 
   return (
-    <ModalContainer>
+    <Modal onClose={hideModal} isLoading={false}>
       <div className="bg-black w-[556px] max-sm:w-[95vw] rounded-2xl border border-border-primary px-8 py-10">
         <div className="flex flex-col items-center justify-center gap-4">
           <XCircleIcon className="h-20 w-20 text-red-500" />
@@ -66,7 +68,7 @@ const BookingFailure: React.FC<BookingFailureProps> = ({ message: propMessage })
           </div>
         </div>
       </div>
-    </ModalContainer>
+    </Modal>
   );
 };
 

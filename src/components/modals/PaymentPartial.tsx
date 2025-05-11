@@ -4,15 +4,21 @@ import { ExclamationTriangleIcon } from '@heroicons/react/20/solid';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React from 'react';
 import Button from '../figma/Button';
-import ModalContainer from '../ModalContainer';
+import Modal from '../Modal';
+import { useModal } from '../../context/ModalContext';
 
-const PaymentPartial: React.FC = () => {
+interface PaymentPartialProps {
+  message?: string;
+}
+
+const PaymentPartial: React.FC<PaymentPartialProps> = ({ message: propMessage }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const message = searchParams.get('message') || 'Your booking was created, but payment status is pending';
+  const { hideModal } = useModal();
+  const message = propMessage || searchParams.get('message') || 'Your booking was created, but payment status is pending';
 
   return (
-    <ModalContainer>
+    <Modal onClose={hideModal} isLoading={false}>
       <div className="bg-black w-[556px] max-sm:w-[95vw] rounded-2xl border border-border-primary px-8 py-10">
         <div className="flex flex-col items-center justify-center gap-4">
           <ExclamationTriangleIcon className="h-20 w-20 text-yellow-500" />
@@ -38,7 +44,7 @@ const PaymentPartial: React.FC = () => {
           </div>
         </div>
       </div>
-    </ModalContainer>
+    </Modal>
   );
 };
 

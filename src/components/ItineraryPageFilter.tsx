@@ -55,7 +55,6 @@ import ActivityDropdown from './navbar/ActivityDropdown'
 import DateMenu from './navbar/DateMenu'
 import GuestMenu from './navbar/GuestMenu'
 import { ArrowLeftIcon } from '@heroicons/react/20/solid'
-import ItineraryPageFilterDateMenuCalendar from './ItineraryPageFilterDateMenuCalendar'
 import ItineraryPageDateMenu from './ItineraryPageDateMenu'
 
 

@@ -1,13 +1,15 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
-import ModalContainer from '../ModalContainer';
+import Modal from '../Modal';
 import Loader from '../Loader';
 import { useRouter } from 'next/navigation';
 import Button from '../figma/Button';
+import { useModal } from '../../context/ModalContext';
 
 const ProcessingPayment: React.FC = () => {
   const router = useRouter();
+  const { hideModal } = useModal();
   const [processingTime, setProcessingTime] = useState(0);
   const [isTimeout, setIsTimeout] = useState(false);
 
@@ -33,7 +35,7 @@ const ProcessingPayment: React.FC = () => {
   };
 
   return (
-    <ModalContainer>
+    <Modal onClose={hideModal} isLoading={true}>
       <div className="bg-black w-[556px] max-sm:w-[95vw] rounded-2xl border border-border-primary px-8 py-10">
         <div className="flex flex-col items-center justify-center gap-4">
           <Loader />
@@ -61,7 +63,7 @@ const ProcessingPayment: React.FC = () => {
           )}
         </div>
       </div>
-    </ModalContainer>
+    </Modal>
   );
 };
 

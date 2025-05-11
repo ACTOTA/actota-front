@@ -50,8 +50,8 @@ const BookingCard: React.FC<ListingCardProps> = ({
     }
     
     // Extract booking ID
-    const bookingId = typeof dataBooking._id === 'object' && dataBooking._id.$oid 
-      ? dataBooking._id.$oid 
+    const bookingId = typeof dataBooking._id === 'object' && (dataBooking._id as { "$oid": string }).$oid 
+      ? (dataBooking._id as { "$oid": string }).$oid 
       : dataBooking._id.toString();
       
     // Navigate to the booking details page with the ID

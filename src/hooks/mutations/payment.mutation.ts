@@ -437,12 +437,7 @@ export const useBookingWithPayment = (): UseMutationResult<
         }
 
         const result = await response.json();
-        
-        // If there's a warning, show it but still return success
-        if (result.warning) {
-          toast.warning(result.warning);
-        }
-        
+                
         return result;
       }
 

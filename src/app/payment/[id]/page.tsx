@@ -545,7 +545,7 @@ const Payment = () => {
     })));
   };
 
-  const basePrice = itineraryData?.person_cost * (itineraryData?.min_group || 1);
+  const basePrice = itineraryData?.person_cost ? itineraryData.person_cost * (itineraryData?.min_group || 1) : 0;
   const selectedInsurance = paymentInsurance
     .filter(insurance => insurance.selected)
     .reduce((total, insurance) => total + insurance.price, 0);
@@ -786,7 +786,7 @@ const Payment = () => {
           </div>
           <div className='flex justify-between mt-2' >
             <p className='text-sm text-primary-gray'>Travel agent fee</p>
-            <p className='text-sm text-white'> ${itineraryData.travel_agent_fee || 0}</p>
+            <p className='text-sm text-white'> ${itineraryData.service_fee || 0}</p>
           </div>
           <div className='flex justify-between mt-2' >
             <p className='text-sm text-primary-gray'>Service fee</p>
@@ -798,10 +798,6 @@ const Payment = () => {
               <p className='text-sm text-white'>${insurance.price}</p>
             </div>
           ))}
-          <div className='flex justify-between mt-2' >
-            <p className='text-sm text-primary-gray'>Promo Code</p>
-            <p className='text-sm text-[#5389DF]'> ${itineraryData.promo_code || 0}</p>
-          </div>
           <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent mt-4"></div>
           <div className='flex justify-between my-3' >
             <p className=' font-bold text-white'>Total Amount</p>
