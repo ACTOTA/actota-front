@@ -6,10 +6,15 @@ import React from 'react';
 import Button from '../figma/Button';
 import ModalContainer from '../ModalContainer';
 
-const BookingFailure: React.FC = () => {
+interface BookingFailureProps {
+  message?: string;
+}
+
+const BookingFailure: React.FC<BookingFailureProps> = ({ message: propMessage }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const message = searchParams.get('message') || 'Unable to create your booking at this time';
+  const urlMessage = searchParams.get('message');
+  const message = propMessage || urlMessage || 'Unable to create your booking at this time';
 
   // Determine if this is a technical error message
   const isTechnicalError = message.includes('404') ||
