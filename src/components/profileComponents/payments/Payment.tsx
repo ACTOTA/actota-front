@@ -133,7 +133,7 @@ const Payment = () => {
           const formattedTransactions = stripeCharges.map((charge: any) => ({
             id: charge.id,
             purchase: charge.description || "Vacation",
-            transactionId: charge.id,
+            bookingId: charge.booking_id,
             transactionDate: new Date(charge.created * 1000).toLocaleDateString(),
             paymentDate: new Date(charge.created * 1000).toLocaleDateString(),
             amount: `$${(charge.amount / 100).toFixed(2)}`,
@@ -251,40 +251,11 @@ const Payment = () => {
     }
   };
 
-  // Handle card number input with formatting
-  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formattedValue = formatCardNumber(e.target.value);
-    setCardFormData(prev => ({
-      ...prev,
-      cardNumber: formattedValue
-    }));
-  };
-
-  // Detect card type based on the card number
-  const detectCardType = (cardNumber: string): string => {
-    const cleanNumber = cardNumber.replace(/\s+/g, '');
-
-    if (/^4/.test(cleanNumber)) {
-      return 'Visa';
-    } else if (/^5[1-5]/.test(cleanNumber)) {
-      return 'MasterCard';
-    } else if (/^3[47]/.test(cleanNumber)) {
-      return 'Amex';
-    } else if (/^6(?:011|5)/.test(cleanNumber)) {
-      return 'Discover';
-    } else {
-      return 'Unknown';
-    }
-  };
-
-  const handleAddCard = () => {
-    if (!validateCardForm()) {
-      return;
-    }
-
-    };
-
-  // Delete card
+  const navigateToBooking = (id: string) => {
+    console.log("ID: ", id);
+    router.push(`/bookings/${id}`);
+  }
+  
   const handleDeleteCard = (cardId: string | number) => {
     // Preserve the current tab state when opening the modal
     const query = new URLSearchParams(window.location.search);
@@ -392,7 +363,7 @@ const Payment = () => {
                         <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent" />
                       </td>
                     </tr>
-                    <tr key={i} className="w-full">
+                    <tr key={i} className="w-full cursor-pointer" onClick={() => navigateToBooking(item.bookingId)}>
                       <td className="py-5">
                         <p className="text-white text-sm">{item.purchase}   </p>
                       </td>
