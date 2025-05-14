@@ -38,10 +38,7 @@ const BookingCard: React.FC<ListingCardProps> = ({
 }) => {
   const router = useRouter();
 
-  useEffect(() => {
-    console.log("BookingCard dataBooking:", dataBooking);
-    console.log("BookingCard dataItinerary:", dataItinerary);
-  }, [])
+  // Remove console.log statements in useEffect to reduce noise and prevent unnecessary rerenders
 
   const handleDetailsClick = () => {
     if (!dataBooking || !dataBooking._id) {
@@ -76,9 +73,12 @@ const BookingCard: React.FC<ListingCardProps> = ({
       onAction?.(actionId)
     }, [disabled, onAction, actionId]);
 
-  if (!dataBooking || !dataItinerary) {
-    return <div>No booking details available.</div>;
+  if (!dataBooking) {
+    return <div className="text-white p-4">Loading booking details...</div>;
   }
+  
+  // If itinerary data is still loading, show a partial card with loading state
+  const isItineraryLoading = !dataItinerary;
 
 
 
@@ -92,7 +92,9 @@ const BookingCard: React.FC<ListingCardProps> = ({
               dataBooking?.status === "ongoing" ? <Image src="/svg-icons/ongoing-icon.svg" alt="clock" width={16} height={16} /> :
                 <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16.5 5V3m-9 2V3M3.25 8h17.5M3 10.044c0-2.115 0-3.173.436-3.981a3.9 3.9 0 0 1 1.748-1.651C6.04 4 7.16 4 9.4 4h5.2c2.24 0 3.36 0 4.216.412c.753.362 1.364.94 1.748 1.65c.436.81.436 1.868.436 3.983v4.912c0 2.115 0 3.173-.436 3.981a3.9 3.9 0 0 1-1.748 1.651C17.96 21 16.84 21 14.6 21H9.4c-2.24 0-3.36 0-4.216-.412a3.9 3.9 0 0 1-1.748-1.65C3 18.128 3 17.07 3 14.955z"/></svg>
               }
-            {dataBooking?.status === "upcoming" ? "in 98 days" : dataBooking?.status?.charAt(0).toUpperCase() + dataBooking?.status?.slice(1)}
+            {dataBooking?.status === "upcoming" && dataBooking.created_at ? 
+              `in ${Math.max(1, Math.ceil((new Date(dataBooking.start_date || Date.now()).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} days` : 
+              dataBooking?.status?.charAt(0).toUpperCase() + dataBooking?.status?.slice(1)}
           </Button>
           <p className='text-2xl font-bold text-white'>{dataItinerary?.trip_name || 'Adventure Trip'}</p>
         </div>
@@ -139,7 +141,10 @@ const BookingCard: React.FC<ListingCardProps> = ({
                 <GoHome className='h-[17px] w-[17px] text-white' /> Lodging
               </p>
               <p className='text-white text-sm ml-5'>
-                {dataItinerary ? '4 nights' : '- nights'}
+                {isItineraryLoading ? '- nights' : 
+                (dataItinerary?.lodging && dataItinerary.lodging.length > 0 ?
+                  `${dataItinerary.lodging.length} ${dataItinerary.lodging.length === 1 ? 'night' : 'nights'}` :
+                  '0 nights')}
               </p>
             </div>
             <div className='flex flex-1 flex-col gap-1'>
@@ -147,14 +152,25 @@ const BookingCard: React.FC<ListingCardProps> = ({
                 <MdOutlineDirectionsCarFilled className='h-[17px] w-[17px] text-white' /> Transportation
               </p>
               <p className='text-white text-sm ml-5'>
-                {dataItinerary ? '3/6 days' : '- days'}
+                {isItineraryLoading ? '- days' : 
+                (dataItinerary?.transportation && dataItinerary.transportation.length > 0 ?
+                  `${dataItinerary.transportation.length}/${dataItinerary.length_days || 0} days` :
+                  '0 days')}
               </p>
             </div>
           </div>
 
         </div>
 
-        {!bookingConfirmedModal && !bookingDetailsPage && <Image src={(dataItinerary?.images && dataItinerary.images.length > 0) ? dataItinerary.images[0] : "/images/default-itinerary.jpeg"} alt="Vacation Picture" height={200} width={204} className='rounded-lg object-cover max-md:hidden' />}
+        {!bookingConfirmedModal && !bookingDetailsPage && 
+          <Image 
+            src={isItineraryLoading ? "/images/default-itinerary.jpeg" : ((dataItinerary?.images && dataItinerary.images.length > 0) ? dataItinerary.images[0] : "/images/default-itinerary.jpeg")}
+            alt="Vacation Picture" 
+            height={200} 
+            width={204} 
+            className='rounded-lg object-cover max-md:hidden' 
+          />
+        }
 
       </div>
 
