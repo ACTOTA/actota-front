@@ -19,19 +19,19 @@ const Account = () => {
     {
       id: "personal",
       label: "Personal information",
-      component: <Personal data={accountInfo} />
+      component: <Personal key={`personal-${activeTab}`} data={accountInfo} />
     },
     {
       id: "verification",
       label: "Verification & Change Password",
-      component: <VerificationPasswor data={accountInfo} />
+      component: <VerificationPasswor key={`verification-${activeTab}`} data={accountInfo} />
     },
     {
       id: "email",
       label: "Email Notification",
-      component: <EmailNotification data={accountInfo} />
+      component: <EmailNotification key={`email-${activeTab}`} data={accountInfo} />
     }
-  ], [accountInfo]);
+  ], [accountInfo, activeTab]);
 
   const renderContent = () => {
     const tab = tabs.find(tab => tab.id === activeTab);
