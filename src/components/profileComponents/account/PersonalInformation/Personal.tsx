@@ -72,8 +72,27 @@ const Personal = (props: any) => {
   });
   const [profilePicture, setProfilePicture] = useState<string | undefined>();
   const [isSaving, setIsSaving] = useState(false);
-  const session = getClientSession();
-  const userId = session?.user?.id || "";
+  const [userId, setUserId] = useState<string>("");
+  
+  // Get userId from localStorage or session
+  useEffect(() => {
+    try {
+      // First try to get it from localStorage
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      if (user && user.user_id) {
+        setUserId(user.user_id);
+        return;
+      }
+      
+      // If not in localStorage, try session
+      const session = getClientSession();
+      if (session?.user?.id) {
+        setUserId(session.user.id);
+      }
+    } catch (error) {
+      console.error("Error getting user ID:", error);
+    }
+  }, []);
 
   useEffect(() => {
     if (data) {
@@ -115,6 +134,7 @@ const Personal = (props: any) => {
   const validateForm = (): boolean => {
     const newErrors: {[key: string]: string} = {};
     
+    // Required fields: first name, last name, and email
     if (!formData.firstName.trim()) {
       newErrors.firstName = "First name is required";
     }
@@ -129,6 +149,7 @@ const Personal = (props: any) => {
       newErrors.email = "Please enter a valid email";
     }
     
+    // Optional fields: only validate if they contain data
     if (formData.birthDate && !isValidDate(formData.birthDate)) {
       newErrors.birthDate = "Please enter a valid date (MM/DD/YYYY) and ensure you are at least 18 years old";
     }
@@ -146,11 +167,15 @@ const Personal = (props: any) => {
       return;
     }
     
+    if (!userId) {
+      toast.error("User ID not found. Please log in again.");
+      return;
+    }
+    
     setIsSaving(true);
     try {
-      // API call to update user data
-      // This should be replaced with the actual endpoint
-      await actotaApi.put(`/api/account/${userId}/update-customer-id`, {
+      // Use the correct endpoint with the update-customer-id path
+      await actotaApi.put(`/api/account/${userId}`, {
         first_name: formData.firstName,
         last_name: formData.lastName,
         email: formData.email,
@@ -160,6 +185,9 @@ const Personal = (props: any) => {
       
       toast.success("Profile updated successfully");
       setEditMode(false);
+      
+      // Force a refresh of the page data
+      window.location.reload();
     } catch (error) {
       toast.error("Failed to update profile");
       console.error("Failed to update profile:", error);
@@ -210,15 +238,16 @@ const Personal = (props: any) => {
                   setErrors(newErrors);
                 }
               }}
-              className={errors[field] ? "border-red-500" : ""}
+              className={`${errors[field] ? "border-red-500" : "border-[#F43E62]"} focus:border-[#F43E62] bg-[#141414]`}
             />
             {errors[field] && (
               <div className="text-red-500 text-xs mt-1">{errors[field]}</div>
             )}
           </>
         ) : (
-          <div className="p-2.5 border border-primary-gray rounded-lg text-white">
-            {value || "Not provided"}
+          <div className="p-2.5 bg-[#0D0D0D] border border-primary-gray rounded-lg text-white flex justify-between items-center">
+            <span>{value || "Not provided"}</span>
+            <span className="text-xs italic text-gray-400">Read-only</span>
           </div>
         )}
       </div>
@@ -226,40 +255,56 @@ const Personal = (props: any) => {
   };
 
   return (
-    <div className="gap-4 flex flex-col">
+    <div className={`gap-4 flex flex-col ${editMode ? 'border-2 border-[#F43E62] p-5 rounded-xl bg-[#0D0D0D]' : ''}`}>
+      {editMode && (
+        <div className="bg-[#F43E62] text-black py-2 px-4 rounded-t-lg -mt-5 -mx-5 mb-4 flex items-center">
+          <div className="font-bold">Editing Mode</div>
+          <div className="ml-2 text-sm">Make your changes then click Save</div>
+        </div>
+      )}
+      
       <div className="flex justify-between items-center">
         <div className="font-bold text-xl">Personal Information</div>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="flex gap-2 items-center max-md:hidden"
-          onClick={editMode ? handleSave : toggleEditMode}
-          disabled={isSaving}
-        >
-          {editMode ? (
-            <>
-              <FiSave />
-              {isSaving ? "Saving..." : "Save"}
-            </>
-          ) : (
-            <>
+        {!editMode && (
+          <div className="flex items-center gap-4">
+            <div className="text-gray-400 text-sm italic">
+              Click 'Edit' to modify your information
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex gap-2 items-center max-md:hidden hover:bg-[#F43E62] hover:text-white transition-colors"
+              onClick={toggleEditMode}
+            >
               <FiEdit3 />
               Edit
-            </>
-          )}
-        </Button>
+            </Button>
+          </div>
+        )}
       </div>
       
       {editMode && (
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="flex gap-2 items-center max-md:hidden self-end"
-          onClick={toggleEditMode}
-        >
-          <FiX />
-          Cancel
-        </Button>
+        <div className="flex gap-2 justify-end my-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex gap-2 items-center bg-gray-800 hover:bg-gray-700 transition-colors"
+            onClick={toggleEditMode}
+          >
+            <FiX />
+            Cancel
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex gap-2 items-center bg-[#F43E62] text-black hover:bg-[#D32D51] hover:text-white transition-colors font-semibold"
+            onClick={handleSave}
+            disabled={isSaving}
+          >
+            <FiSave />
+            {isSaving ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
       )}
       
       <ProfilePictureUpload
@@ -268,10 +313,10 @@ const Personal = (props: any) => {
       />
       
       <div className="grid grid-cols-2 max-md:flex max-md:flex-col gap-6">
-        {renderField("First Name", formData.firstName, "firstName")}
-        {renderField("Last Name", formData.lastName, "lastName")}
+        {renderField("First Name*", formData.firstName, "firstName")}
+        {renderField("Last Name*", formData.lastName, "lastName")}
         
-        {renderField("Email", formData.email, "email", "email")}
+        {renderField("Email*", formData.email, "email", "email")}
         
         <div className="flex flex-col gap-2">
           <div className="text-sm font-bold">Phone Number</div>
@@ -295,8 +340,8 @@ const Personal = (props: any) => {
                   maxLength={15}
                   international
                   defaultCountry="US"
-                  className={`PhoneInputInput focus-within:border-white px-4 border rounded-lg !bg-transparent ${
-                    errors.phone ? "border-red-500" : "border-primary-gray"
+                  className={`PhoneInputInput px-4 border rounded-lg !bg-[#141414] ${
+                    errors.phone ? "border-red-500" : "border-[#F43E62]"
                   }`}
                   style={{
                     '--PhoneInputCountrySelectArrow-opacity': '1',
@@ -312,48 +357,54 @@ const Personal = (props: any) => {
               )}
             </>
           ) : (
-            <div className="p-2.5 border border-primary-gray rounded-lg text-white">
-              {formData.phone || "Not provided"}
+            <div className="p-2.5 bg-[#0D0D0D] border border-primary-gray rounded-lg text-white flex justify-between items-center">
+              <span>{formData.phone || "Not provided"}</span>
+              <span className="text-xs italic text-gray-400">Read-only</span>
             </div>
           )}
         </div>
         
         {renderField("Date of Birth (MM/DD/YYYY)", formData.birthDate, "birthDate")}
         
-        <div className="flex flex-col gap-2 w-fit">
-          <div className="text-sm font-bold">Emergency Contact</div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex gap-2 items-center py-3.5 !px-5"
-            disabled={!editMode}
-          >
-            Add <PlusIcon className="w-5 h-5" />
-          </Button>
-        </div>
       </div>
 
       <div className="flex flex-col gap-6">
-        <div className=" text-base font-normal text-primary-gray flex flex-wrap items-center gap-2">
+        <div className="text-base font-normal text-primary-gray flex flex-wrap items-center gap-2">
           <span className="border-b-[#F43E62] text-[#F43E62] border-b-2 cursor-pointer">
             Delete my account
           </span>
           Once deleted, your account information will be removed, this action
           cannot be undone.
         </div>
+        
+        <div className="text-sm text-gray-400 italic">
+          * Required fields
+        </div>
       </div>
       
       {editMode && (
-        <div className="flex justify-end mt-4">
-          <Button 
-            variant="primary" 
-            size="lg"
-            className="flex gap-2 items-center"
-            onClick={handleSave}
-            disabled={isSaving}
-          >
-            {isSaving ? "Saving..." : "Save Changes"}
-          </Button>
+        <div className="flex justify-end mt-6 pt-4 border-t border-gray-800">
+          <div className="flex gap-4">
+            <Button 
+              variant="outline" 
+              size="lg"
+              className="flex gap-2 items-center bg-gray-800 hover:bg-gray-700 transition-colors"
+              onClick={toggleEditMode}
+            >
+              <FiX className="w-5 h-5" />
+              Cancel
+            </Button>
+            <Button 
+              variant="primary" 
+              size="lg"
+              className="flex gap-2 items-center bg-[#F43E62] text-black hover:bg-[#D32D51] hover:text-white transition-colors font-semibold"
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              <FiSave className="w-5 h-5" />
+              {isSaving ? "Saving..." : "Save Changes"}
+            </Button>
+          </div>
         </div>
       )}
     </div>

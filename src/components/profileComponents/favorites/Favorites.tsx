@@ -122,8 +122,8 @@ const Favorites = () => {
                   <Image src="/svg-icons/chevron-selector.svg" alt="dropdown-arrow" width={24} height={24} />
                 </div>
               </div>} 
-              options={["Lowest Price", "Highest Price", "Any Duration"]} 
-              onSelect={(option: string) => setSortOption(option)} 
+              options={["Lowest Price", "Highest Price"]} 
+              onSelect={(option: any) => setSortOption(option)} 
               className="border-none !bg-[#141414] rounded-lg" 
             />
           </div>

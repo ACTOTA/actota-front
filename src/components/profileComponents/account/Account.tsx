@@ -7,13 +7,20 @@ import EmailNotification from "./EmailNotification/EmailNotification";
 import { useAccountInfo } from "@/src/hooks/queries/account/useAccountQuery";
 const Account = () => {
   const [activeTab, setActiveTab] = useState("personal");
-  const [user, setUser] = useState<any>(null);
+  const [userId, setUserId] = useState<string>("");
+  
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    setUser(user);
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      if (user && user.user_id) {
+        setUserId(user.user_id);
+      }
+    } catch (error) {
+      console.error("Error parsing user from localStorage:", error);
+    }
   }, []);
   
-  const { data: accountInfo } = useAccountInfo(user?.user_id || '');
+  const { data: accountInfo, isLoading } = useAccountInfo(userId);
   
   const tabs = useMemo(() => [
     {
@@ -62,7 +69,17 @@ const Account = () => {
           </div>
         </div>
       {/* body section */}
-      <div>{renderContent()}</div>
+      <div>
+        {isLoading ? (
+          <div className="text-center py-8">Loading account information...</div>
+        ) : !userId ? (
+          <div className="text-center py-8 text-red-500">
+            Please log in to view your account information
+          </div>
+        ) : (
+          renderContent()
+        )}
+      </div>
     </div>
   );
 };
