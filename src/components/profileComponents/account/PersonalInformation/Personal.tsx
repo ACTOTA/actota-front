@@ -1,5 +1,5 @@
 "use client";
-import React, {  useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "../../../figma/Button";
 import { FiEdit3 } from "react-icons/fi";
 import Image from "next/image";
@@ -14,10 +14,21 @@ import { FcGoogle } from "react-icons/fc";
 import PhoneInput from 'react-phone-number-input'
 import { E164Number } from 'libphonenumber-js'
 import 'react-phone-number-input/style.css'
+import ProfilePictureUpload from "@/src/components/inputs/ProfilePictureUpload";
+import { getClientSession } from "@/src/lib/session";
 
 const Personal = (data: any) => {
   const [firstName, setFirstName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState<E164Number | undefined>();
+  const [profilePicture, setProfilePicture] = useState<string | undefined>();
+  const session = getClientSession();
+
+  useEffect(() => {
+    // Set the profile picture from the user data if available
+    if (data?.data?.profile_picture) {
+      setProfilePicture(data.data.profile_picture);
+    }
+  }, [data?.data?.profile_picture]);
   return (
     <div className="gap-4 flex flex-col">
       <div className="flex justify-between items-center">
@@ -27,26 +38,10 @@ const Personal = (data: any) => {
           Edit
         </Button>
       </div>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Image src={ProfileImage} alt="Profile" width={80} height={80} />
-          <div className="text-white flex flex-col gap-1">
-            <div className="font-bold text-base leading-6">Profile Picture</div>
-            <div className="flex flex-wrap gap-2 items-center text-sm text-primary-gray">
-              <div>JPEG or PNG</div>
-              <GoDotFill />
-              <div>Recommended 500 x 500px, max 500KB.</div>
-            </div>
-          </div>
-        </div>
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex gap-2 items-center py-2.5 !px-4 max-md:hidden"
-        >
-          Upload New Picture <PlusIcon className="w-5 h-5" />
-        </Button>
-      </div>
+      <ProfilePictureUpload
+        currentImageUrl={profilePicture}
+        onSuccess={(imageUrl) => setProfilePicture(imageUrl)}
+      />
       <div className="grid grid-cols-2 max-md:flex max-md:flex-col gap-6">
         <div className="flex flex-col gap-2">
           <div className="text-sm font-bold">Legal Name</div>
@@ -123,7 +118,7 @@ const Personal = (data: any) => {
       </div>
 
       <div className="flex flex-col gap-6">
-        <div className="flex flex-col gap-2">
+        {/*<div className="flex flex-col gap-2">
           <div className="font-bold text-xl mt-2">Linked Accounts</div>
           <div className="font-normal text-base text-primary-gray">
             By linking a third party site, you'll be able to directly sign in
@@ -169,7 +164,7 @@ const Personal = (data: any) => {
             </div>
           </div>
         </div>
-
+        */}
         <div className=" text-base font-normal text-primary-gray flex flex-wrap items-center gap-2">
           <span className="border-b-[#F43E62] text-[#F43E62] border-b-2">
             Delete my account
