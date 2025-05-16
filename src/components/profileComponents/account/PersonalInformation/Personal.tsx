@@ -31,6 +31,7 @@ const isValidEmail = (email: string): boolean => {
   return regex.test(email);
 };
 
+// Validates input date in MM/DD/YYYY format and also checks if user is 18+
 const isValidDate = (date: string): boolean => {
   // Check format MM/DD/YYYY or MM-DD-YYYY
   const regex = /^(0[1-9]|1[0-2])[\/\-](0[1-9]|[12][0-9]|3[01])[\/\-](19|20)\d\d$/;
@@ -57,6 +58,48 @@ const isValidDate = (date: string): boolean => {
   }
   
   return false;
+};
+
+// Convert a date from MM/DD/YYYY to YYYY-MM-DD format for backend
+const formatDateForBackend = (date: string): string => {
+  if (!date) return '';
+  
+  const parts = date.split(/[\/\-]/);
+  if (parts.length !== 3) return '';
+  
+  // Ensure all parts have 2 digits (padding with zero if needed)
+  const month = parts[0].padStart(2, '0');
+  const day = parts[1].padStart(2, '0');
+  const year = parts[2];
+  
+  return `${year}-${month}-${day}`;
+};
+
+// Format a date from backend YYYY-MM-DD to MM/DD/YYYY for display
+const formatDateForDisplay = (date: string | null | undefined): string => {
+  if (!date) return '';
+  
+  // Check if already in MM/DD/YYYY format
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(date)) {
+    return date;
+  }
+  
+  try {
+    // Handle ISO date format or YYYY-MM-DD format
+    const dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) {
+      return date; // Return original if parsing failed
+    }
+    
+    const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+    const day = dateObj.getDate().toString().padStart(2, '0');
+    const year = dateObj.getFullYear();
+    
+    return `${month}/${day}/${year}`;
+  } catch (e) {
+    console.error("Error formatting date:", e);
+    return date; // Return original on error
+  }
 };
 
 const Personal = (props: any) => {
@@ -101,12 +144,14 @@ const Personal = (props: any) => {
       const firstName = nameParts[0] || "";
       const lastName = nameParts.slice(1).join(" ") || data.last_name || "";
       
+      // Set form data from API response
+      // Note: we're handling both field name cases (phone/phone_number) for compatibility
       setFormData({
         firstName,
         lastName: data.last_name || lastName,
         email: data.email || "",
-        phone: data.phone,
-        birthDate: data.birth_date || ""
+        phone: data.phone_number || data.phone, // Handle both field name variations
+        birthDate: data.birth_date ? formatDateForDisplay(data.birth_date) : "" // Format date for display
       });
       
       if (data.profile_picture) {
@@ -174,14 +219,19 @@ const Personal = (props: any) => {
     
     setIsSaving(true);
     try {
-      // Use the correct endpoint with the update-customer-id path
-      await actotaApi.put(`/api/account/${userId}`, {
+      // Prepare the request data
+      const requestData = {
         first_name: formData.firstName,
         last_name: formData.lastName,
         email: formData.email,
-        phone: formData.phone,
-        birth_date: formData.birthDate
-      });
+        phone_number: formData.phone ? String(formData.phone) : null, // Ensure it's a string or null
+        birth_date: formData.birthDate ? formatDateForBackend(formData.birthDate) : null // Format date or null
+      };
+      
+      // Log the payload for debugging
+      console.log("Update profile payload:", JSON.stringify(requestData, null, 2));
+      
+      await actotaApi.put(`/api/account/${userId}`, requestData);
       
       toast.success("Profile updated successfully");
       setEditMode(false);
@@ -191,6 +241,12 @@ const Personal = (props: any) => {
     } catch (error) {
       toast.error("Failed to update profile");
       console.error("Failed to update profile:", error);
+      
+      // Log more details about the error
+      if (error.response) {
+        console.error("Error response data:", error.response.data);
+        console.error("Error response status:", error.response.status);
+      }
     } finally {
       setIsSaving(false);
     }
@@ -208,8 +264,8 @@ const Personal = (props: any) => {
           firstName,
           lastName: data.last_name || lastName,
           email: data.email || "",
-          phone: data.phone,
-          birthDate: data.birth_date || ""
+          phone: data.phone_number || data.phone, // Match backend field name
+          birthDate: data.birth_date ? formatDateForDisplay(data.birth_date) : "" // Format date for display
         });
       }
       setErrors({});
