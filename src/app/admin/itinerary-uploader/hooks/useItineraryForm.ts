@@ -505,6 +505,25 @@ export function useItineraryForm() {
 
   // Update day item fields
   const handleDayItemChange = (dayNumber: string, itemIndex: number, field: string, value: string) => {
+    // If this is a time change, check for conflicts
+    if (field === 'time') {
+      // Import the time conflict checker
+      const { isTimeConflicting } = require('../utils');
+      
+      // Check if the new time conflicts with any other activity
+      const conflicting = isTimeConflicting(
+        value, 
+        formData.days[dayNumber], 
+        itemIndex
+      );
+      
+      // If there's a conflict, warn the user
+      if (conflicting) {
+        console.warn('Selected time conflicts with another activity (including 5% buffer)');
+        // We allow the selection to proceed, as the UI already shows it as conflicting
+      }
+    }
+    
     setFormData(prev => {
       const dayItems = [...prev.days[dayNumber]];
       const item = { ...dayItems[itemIndex] } as any;
@@ -771,14 +790,30 @@ export function useItineraryForm() {
     // Add detailed logging for debugging
     console.log('Submitting form data with payload:', JSON.stringify(finalPayload, null, 2));
 
-    // Get authentication token from cookies
+    // Get authentication token directly from auth_token cookie
     let authToken = '';
     if (typeof document !== 'undefined') {
-      // Client-side: Get token from cookie
-      authToken = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('auth_token='))
-        ?.split('=')[1] || '';
+      // Get the auth_token from browser cookies
+      const match = document.cookie.match(new RegExp('(^| )auth_token=([^;]+)'));
+      if (match) {
+        authToken = decodeURIComponent(match[2]);
+        console.log("auth_token found in cookie");
+      } else {
+        console.log("auth_token not found in cookie, checking localStorage");
+      }
+      
+      // Fallback: try to get token from local storage if cookie is not available
+      if (!authToken && typeof localStorage !== 'undefined') {
+        try {
+          const userData = JSON.parse(localStorage.getItem('user') || '{}');
+          if (userData.auth_token) {
+            authToken = userData.auth_token;
+            console.log("auth_token found in localStorage");
+          }
+        } catch (e) {
+          console.error('Error getting token from localStorage:', e);
+        }
+      }
     }
 
     if (!authToken) {
@@ -794,13 +829,22 @@ export function useItineraryForm() {
     console.log('Using authentication token:', authToken ? `${authToken.substring(0, 10)}...` : 'None');
 
     try {
+      console.log('Making API request to http://localhost:8080/api/itineraries/featured/add');
+      console.log('Using auth token:', authToken ? `${authToken.substring(0, 10)}...` : 'None');
+      
+      // Add additional debugging info to help diagnose issues
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      };
+      console.log('Request headers:', headers);
+      
       const response = await fetch('http://localhost:8080/api/itineraries/featured/add', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`
-        },
+        headers,
         body: JSON.stringify(finalPayload),
+        // Add credentials to include cookies
+        credentials: 'include'
       });
 
       // Log the response details regardless of success/failure

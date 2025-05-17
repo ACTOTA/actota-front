@@ -234,10 +234,12 @@ const DayActivitiesSearch: React.FC<DayActivitiesSearchProps> = ({
                       >
                         {/* Show time slots from activity.available_time_slots if available */}
                         {(() => {
+                          // Import isTimeConflicting function
+                          const { isTimeConflicting } = require('../utils');
+                          
                           if ((item as any).available_time_slots) {
                             try {
                               const timeSlots = JSON.parse((item as any).available_time_slots);
-                              console.log('Parsed time slots:', timeSlots);
 
                               // Filter out null or undefined values and ensure strings
                               return timeSlots
@@ -258,10 +260,20 @@ const DayActivitiesSearch: React.FC<DayActivitiesSearchProps> = ({
                                     // Format for 12-hour clock display
                                     const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
                                     const amPm = hour >= 12 ? 'PM' : 'AM';
+                                    
+                                    // Check if this time conflicts with other activities
+                                    const normalizedTimeSlot = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+                                    const isConflicting = isTimeConflicting(normalizedTimeSlot, dayItems, originalIndex);
 
                                     return (
-                                      <option key={timeSlot} value={timeSlot}>
+                                      <option 
+                                        key={timeSlot} 
+                                        value={timeSlot}
+                                        disabled={isConflicting}
+                                        className={isConflicting ? 'text-gray-500' : ''}
+                                      >
                                         {`${displayHour}:${minute.toString().padStart(2, '0')} ${amPm}`}
+                                        {isConflicting ? ' (Conflicts)' : ''}
                                       </option>
                                     );
                                   } catch (err) {
@@ -282,16 +294,29 @@ const DayActivitiesSearch: React.FC<DayActivitiesSearchProps> = ({
 
                           // Helper function for default time options
                           function defaultTimeOptions() {
-                            return Array.from({ length: 24 }).map((_, hour) => (
-                              <React.Fragment key={hour}>
-                                <option value={`${hour.toString().padStart(2, '0')}:00`}>
-                                  {`${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:00 ${hour >= 12 ? 'PM' : 'AM'}`}
-                                </option>
-                                <option value={`${hour.toString().padStart(2, '0')}:30`}>
-                                  {`${hour === 0 ? 12 : hour > 12 ? hour - 12 : hour}:30 ${hour >= 12 ? 'PM' : 'AM'}`}
-                                </option>
-                              </React.Fragment>
-                            ));
+                            return Array.from({ length: 24 }).flatMap((_, hour) => {
+                              const times = ['00', '30'];
+                              return times.map(minute => {
+                                const timeValue = `${hour.toString().padStart(2, '0')}:${minute}`;
+                                const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+                                const amPm = hour >= 12 ? 'PM' : 'AM';
+                                
+                                // Check if this time conflicts with other activities
+                                const isConflicting = isTimeConflicting(timeValue, dayItems, originalIndex);
+                                
+                                return (
+                                  <option 
+                                    key={timeValue} 
+                                    value={timeValue}
+                                    disabled={isConflicting}
+                                    className={isConflicting ? 'text-gray-500' : ''}
+                                  >
+                                    {`${displayHour}:${minute} ${amPm}`}
+                                    {isConflicting ? ' (Conflicts)' : ''}
+                                  </option>
+                                );
+                              });
+                            });
                           }
                         })()}
                       </select>

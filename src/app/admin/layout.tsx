@@ -5,50 +5,69 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLogout } from '@/src/hooks/mutations/auth.mutation';
-
-// List of admin emails that are allowed to access the admin panel
-const ADMIN_EMAILS = ['test@gmail.com', 'tyler@actota.com'];
+import { useCurrentUserQuery } from '@/src/hooks/queries/auth/useCurrentUserQuery';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const { mutate: logout, isPending: isLoggingOut } = useLogout();
+  const { data: currentUser, isLoading } = useCurrentUserQuery();
 
   useEffect(() => {
     console.log('Checking admin authorization...');
-    // Check if user is logged in and is an admin
-    const checkAuth = async () => {
+    
+    // First check localStorage for faster access
+    const localUser = localStorage.getItem('user');
+    if (localUser) {
       try {
-        // Get user from localStorage (this is how the app currently stores user data after login)
-        const user = localStorage.getItem('user');
+        const userData = JSON.parse(localUser);
+        setUserEmail(userData.email);
         
-        if (user) {
-          const userData = JSON.parse(user);
-          setUserEmail(userData.email);
-          
-          // Check if the user's email is in the list of admin emails
-          if (ADMIN_EMAILS.includes(userData.email)) {
-            setIsAuthorized(true);
-          } else {
-            setIsAuthorized(false);
-            // Redirect to home if not an admin
-            router.push('/');
-          }
-        } else {
-          setIsAuthorized(false);
-          // If not logged in, redirect to login
-          router.push('/auth/signin?redirectTo=/admin');
+        // Check role from localStorage first
+        if (userData.role === 'admin') {
+          setUserRole(userData.role);
+          setIsAuthorized(true);
+          return;
         }
       } catch (error) {
-        console.error('Error checking admin authorization:', error);
+        console.error('Error parsing local user data:', error);
+      }
+    }
+    
+    // If no local data or not admin, check server session
+    if (!isLoading && currentUser) {
+      console.log('Current user from session:', currentUser);
+      setUserEmail(currentUser.email);
+      setUserRole(currentUser.role);
+      
+      if (currentUser.role === 'admin') {
+        setIsAuthorized(true);
+        // Update localStorage with the latest data
+        const localUser = localStorage.getItem('user');
+        if (localUser) {
+          try {
+            const userData = JSON.parse(localUser);
+            localStorage.setItem('user', JSON.stringify({
+              ...userData,
+              role: currentUser.role
+            }));
+          } catch (error) {
+            console.error('Error updating localStorage:', error);
+          }
+        }
+      } else {
+        console.log('User role:', currentUser.role, '- not authorized');
         setIsAuthorized(false);
         router.push('/');
       }
-    };
-
-    checkAuth();
-  }, [router]);
+    } else if (!isLoading && !currentUser) {
+      // No session found, redirect to login
+      setIsAuthorized(false);
+      router.push('/auth/signin?redirectTo=/admin');
+    }
+  }, [currentUser, isLoading, router]);
 
   const handleLogout = () => {
     logout(undefined, {
@@ -58,7 +77,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     });
   };
 
-  if (isAuthorized === null) {
+  if (isAuthorized === null || isLoading) {
     // Loading state
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -73,7 +92,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return (
       <div className="min-h-screen bg-black flex flex-col items-center justify-center text-white">
         <h1 className="text-2xl font-bold mb-4">Unauthorized Access</h1>
-        <p className="mb-6">You do not have permission to access the admin area.</p>
+        <p className="mb-6">You do not have permission to access the admin area. This area requires admin role privileges.</p>
         <Link href="/" className="px-4 py-2 bg-white text-black rounded-full">
           Return to Homepage
         </Link>
@@ -106,9 +125,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           
           <div className="flex items-center space-x-4">
             {userEmail && (
-              <span className="text-gray-400 text-sm">
-                {userEmail}
-              </span>
+              <div className="text-gray-400 text-sm">
+                <span>{userEmail}</span>
+                {userRole && (
+                  <span className="ml-2 text-xs bg-gray-700 px-2 py-1 rounded">
+                    {userRole.toUpperCase()}
+                  </span>
+                )}
+              </div>
             )}
             <Link href="/" className="text-white text-sm hover:underline">
               Return to Site

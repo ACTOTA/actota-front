@@ -130,10 +130,16 @@ export default function ItineraryUploader() {
           />
 
           <Button
-            type="submit"
+            type="button"
             variant="primary"
             className="bg-white text-black w-full mt-4"
             isLoading={isLoading}
+            onClick={() => {
+              console.log("Submit button clicked!");
+              // Create a synthetic form event
+              const event = new Event('submit', {bubbles: true, cancelable: true}) as unknown as React.FormEvent;
+              handleSubmit(event);
+            }}
           >
             <HiOutlineUpload className="mr-2" size={20} />
             Upload Featured Itinerary

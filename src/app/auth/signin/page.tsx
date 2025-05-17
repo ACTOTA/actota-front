@@ -25,24 +25,36 @@ export default function SignIn() {
   const [sessionExpired, setSessionExpired] = useState(false);
 
   // Check for URL parameters and authentication status
+  const [redirectTo, setRedirectTo] = useState<string | null>(null);
+  
   React.useEffect(() => {
     const checkAuthAndParams = async () => {
-      // Check if redirected due to expired session
+      // Check if redirected due to expired session or has redirectTo parameter
       if (typeof window !== 'undefined') {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('expired') === 'true') {
           setSessionExpired(true);
+        }
+        
+        const redirectPath = urlParams.get('redirectTo');
+        if (redirectPath) {
+          setRedirectTo(redirectPath);
         }
       }
 
       // Check if user is already authenticated
       const authStatus = await getAuthCookie();
       if (authStatus) {
-        router.push('/');
+        // If there's a redirect path, go there, otherwise go to home
+        if (redirectTo) {
+          router.push(redirectTo);
+        } else {
+          router.push('/');
+        }
       }
     };
     checkAuthAndParams();
-  }, [router]);
+  }, [router, redirectTo]);
 
   const validateForm = () => {
     let tempErrors = {
@@ -89,13 +101,22 @@ export default function SignIn() {
           console.log('Login successful data:', JSON.stringify(data, null, 2));
           
           const userData = data.data;
-          localStorage.setItem('user', JSON.stringify({
-            user_id: userData._id.$oid,
+          // Store the auth token along with user data for client-side access
+          // Note: the role should come from the UserSession response
+          const userDataToStore = {
+            user_id: userData._id?.$oid || userData.user_id,
             first_name: userData.first_name,
             last_name: userData.last_name,
             email: userData.email,
-            customer_id: userData.customer_id
-          }));
+            customer_id: userData.customer_id,
+            auth_token: data.auth_token, // Include the auth token for client access
+            role: userData.role || 'user' // Include the user role from UserSession (default to 'user')
+          };
+          
+          console.log('userData from API:', userData);
+          console.log('Storing user data with role:', userDataToStore);
+          
+          localStorage.setItem('user', JSON.stringify(userDataToStore));
           
           // Log what's being stored in localStorage
           console.log('Storing in localStorage:', JSON.stringify({
@@ -103,10 +124,19 @@ export default function SignIn() {
             first_name: userData.first_name,
             last_name: userData.last_name,
             email: userData.email,
-            customer_id: userData.customer_id
+            customer_id: userData.customer_id,
+            auth_token: data.auth_token ? `${data.auth_token.substring(0, 10)}...` : 'None' // Log partial token for security
           }, null, 2));
 
-          window.location.href = '/';
+          // Check if there's a redirectTo parameter in the URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const redirectPath = urlParams.get('redirectTo');
+          
+          if (redirectPath) {
+            window.location.href = redirectPath;
+          } else {
+            window.location.href = '/';
+          }
         },
         onError: (error) => {
           router.back()
