@@ -15,7 +15,8 @@ import {
   parseCoordinates, 
   DENVER_COORDINATES,
   getCityCoordinates,
-  sortDayNumbers
+  sortDayNumbers,
+  formatPayloadForBackend
 } from '../utils';
 import { getErrorMessage } from '@/src/utils/getErrorMessage';
 
@@ -752,107 +753,39 @@ export function useItineraryForm() {
     setIsLoading(true);
     setMessage(null);
 
-    // Prepare the data in the format expected by the backend
-    const payload = {
-      ...formData,
-      // Convert days object to the format expected by Rust
-      days: { days: formData.days }
-    };
+    // Use the formatting function to prepare the payload as plain JSON
+    const finalPayload = formatPayloadForBackend(formData);
 
-    // Perform sanity checks on the payload
-    const sanitizedPayload = JSON.parse(JSON.stringify(payload));
-
-    // Make sure day_durations is included (as it's a newer field)
-    if (!sanitizedPayload.day_durations) {
-      console.warn('day_durations missing in payload, adding empty object');
-      sanitizedPayload.day_durations = {};
-
-      // Re-populate from the current formData.days
-      Object.entries(formData.days).forEach(([dayNumber, dayItems]) => {
-        // Sum up activity durations for each day
-        let dayTotal = 0;
-        dayItems.forEach(item => {
-          if (item.type === 'activity' && (item as any).activity_duration) {
-            const duration = parseFloat((item as any).activity_duration);
-            if (!isNaN(duration)) {
-              dayTotal += duration;
-            }
-          }
-        });
-
-        sanitizedPayload.day_durations[dayNumber] = dayTotal > 0 ? dayTotal : 0;
-      });
-    }
-
-    // Use the sanitized payload for submission
-    const finalPayload = sanitizedPayload;
-
-    // Add detailed logging for debugging
-    console.log('Submitting form data with payload:', JSON.stringify(finalPayload, null, 2));
-
-    // Get authentication token directly from auth_token cookie
+    // Get auth token from localStorage
     let authToken = '';
-    if (typeof document !== 'undefined') {
-      // Get the auth_token from browser cookies
-      const match = document.cookie.match(new RegExp('(^| )auth_token=([^;]+)'));
-      if (match) {
-        authToken = decodeURIComponent(match[2]);
-        console.log("auth_token found in cookie");
-      } else {
-        console.log("auth_token not found in cookie, checking localStorage");
-      }
-      
-      // Fallback: try to get token from local storage if cookie is not available
-      if (!authToken && typeof localStorage !== 'undefined') {
-        try {
-          const userData = JSON.parse(localStorage.getItem('user') || '{}');
-          if (userData.auth_token) {
-            authToken = userData.auth_token;
-            console.log("auth_token found in localStorage");
-          }
-        } catch (e) {
-          console.error('Error getting token from localStorage:', e);
+    const userString = localStorage.getItem('user');
+    
+    if (userString) {
+      try {
+        const userData = JSON.parse(userString);
+        if (userData.auth_token) {
+          authToken = userData.auth_token;
         }
+      } catch (e) {
+        console.error('Error parsing user data from localStorage:', e);
       }
     }
-
-    if (!authToken) {
-      setMessage({
-        type: 'error',
-        text: 'Authentication token missing. Please log in again.'
-      });
-      console.error('Cannot submit form: No authentication token found');
-      setIsLoading(false);
-      return;
-    }
-
-    console.log('Using authentication token:', authToken ? `${authToken.substring(0, 10)}...` : 'None');
-
+    
+    // Use the Next.js API route which can access httpOnly cookies
     try {
-      console.log('Making API request to http://localhost:8080/api/itineraries/featured/add');
-      console.log('Using auth token:', authToken ? `${authToken.substring(0, 10)}...` : 'None');
-      
-      // Add additional debugging info to help diagnose issues
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${authToken}`
-      };
-      console.log('Request headers:', headers);
-      
-      const response = await fetch('http://localhost:8080/api/itineraries/featured/add', {
+      const response = await fetch('/api/itineraries/featured/add', {
         method: 'POST',
-        headers,
+        headers: {
+          'Content-Type': 'application/json',
+          // If we found an auth token in localStorage, include it
+          ...(authToken ? { 'X-Auth-Token': authToken } : {})
+        },
         body: JSON.stringify(finalPayload),
-        // Add credentials to include cookies
+        // Include credentials for cookie auth
         credentials: 'include'
       });
 
-      // Log the response details regardless of success/failure
-      console.log('Server response status:', response.status);
-
-      // Get the response text for debugging (works even for non-JSON responses)
       const responseText = await response.text();
-      console.log('Server response text:', responseText);
 
       // If response wasn't ok, throw an error with the details
       if (!response.ok) {
@@ -863,6 +796,19 @@ export function useItineraryForm() {
           const errorJson = JSON.parse(responseText);
           if (errorJson.error || errorJson.message) {
             errorDetails = errorJson.error || errorJson.message;
+          }
+          
+          // Check for authentication errors
+          if (response.status === 401) {
+            setMessage({
+              type: 'error',
+              text: 'Authentication expired. Please log in again.'
+            });
+            // Redirect to login after a short delay
+            setTimeout(() => {
+              window.location.href = '/auth/signin?redirectTo=/admin/itinerary-uploader';
+            }, 2000);
+            return;
           }
         } catch (parseError) {
           // If parsing fails, just use the original response text
@@ -895,14 +841,7 @@ export function useItineraryForm() {
         text: `Failed to add itinerary: ${errorMessage}. Check console for details.`
       });
 
-      // Log the full form data (excluding sensitive fields) for debugging
-      console.log('Form data that failed submission:', {
-        ...finalPayload,
-        // Don't log full details of days to avoid cluttering the console
-        days: `[${Object.keys(formData.days).length} days with ${
-          Object.values(formData.days).reduce((sum, items) => sum + items.length, 0)
-        } total items]`
-      });
+      console.error('Failed to submit itinerary:', errorMessage);
     } finally {
       setIsLoading(false);
     }

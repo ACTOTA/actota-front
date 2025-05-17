@@ -80,6 +80,130 @@ export const sortDayNumbers = (dayNumbers: string[]): string[] => {
 };
 
 /**
+ * Convert a plain JavaScript value to MongoDB BSON format
+ */
+export const toBsonValue = (value: any): any => {
+  if (value === null || value === undefined) {
+    return value;
+  }
+  
+  if (typeof value === 'number') {
+    // Check if it's an integer or float
+    if (Number.isInteger(value)) {
+      return { $numberInt: value.toString() };
+    } else {
+      return { $numberDouble: value.toString() };
+    }
+  }
+  
+  if (typeof value === 'string' && /^[0-9a-fA-F]{24}$/.test(value)) {
+    // MongoDB ObjectId
+    return { $oid: value };
+  }
+  
+  if (value instanceof Date) {
+    return { $date: { $numberLong: value.getTime().toString() } };
+  }
+  
+  if (Array.isArray(value)) {
+    return value.map(toBsonValue);
+  }
+  
+  if (typeof value === 'object') {
+    const result: any = {};
+    for (const key in value) {
+      result[key] = toBsonValue(value[key]);
+    }
+    return result;
+  }
+  
+  return value;
+};
+
+/**
+ * Convert the form data to the expected backend format
+ */
+export const formatPayloadForBackend = (formData: any): any => {
+  // Convert to plain JSON format - the backend expects regular JSON, not BSON
+  // Don't include timestamps - let the backend handle them
+  const result = {
+    trip_name: formData.trip_name,
+    fareharbor_id: formData.fareharbor_id || undefined,
+    min_age: formData.min_age ? Math.round(Number(formData.min_age)) : undefined,
+    min_group: Math.round(Number(formData.min_group)),
+    max_group: Math.round(Number(formData.max_group)),
+    length_days: Math.round(Number(formData.length_days)),
+    length_hours: Math.round(Number(formData.length_hours)),
+    start_location: {
+      city: formData.start_location.city,
+      state: formData.start_location.state,
+      coordinates: formData.start_location.coordinates.map(coord => Number(coord))
+    },
+    end_location: {
+      city: formData.end_location.city,
+      state: formData.end_location.state,
+      coordinates: formData.end_location.coordinates.map(coord => Number(coord))
+    },
+    description: formData.description,
+    days: {},
+    images: formData.images || []
+  };
+  
+  // Format days - ensure we only include expected fields
+  for (const [dayNum, dayItems] of Object.entries(formData.days)) {
+    const formattedItems = (dayItems as any[]).map((item: any) => {
+      // Ensure time has seconds
+      let timeWithSeconds = item.time;
+      if (timeWithSeconds && timeWithSeconds.split(':').length === 2) {
+        timeWithSeconds += ':00';
+      }
+      
+      // Start with minimal structure
+      const formattedItem: any = {
+        time: timeWithSeconds,
+        type: item.type
+      };
+      
+      // Add type-specific fields
+      switch (item.type) {
+        case 'activity':
+          if (item.activity_id) {
+            formattedItem.activity_id = String(item.activity_id);
+          }
+          break;
+          
+        case 'transportation':
+          formattedItem.name = item.name || '';
+          formattedItem.location = {
+            name: item.location?.name || '',
+            coordinates: (item.location?.coordinates || [0, 0]).map(coord => Number(coord))
+          };
+          break;
+          
+        case 'accommodation':
+          if (item.accommodation_id) {
+            formattedItem.accommodation_id = String(item.accommodation_id);
+          }
+          break;
+      }
+      
+      return formattedItem;
+    });
+    
+    result.days[dayNum] = formattedItems;
+  }
+  
+  // Remove any undefined fields
+  Object.keys(result).forEach(key => {
+    if (result[key] === undefined) {
+      delete result[key];
+    }
+  });
+  
+  return result;
+};
+
+/**
  * Convert time string (HH:MM or HH:MM:SS) to minutes since midnight
  */
 export const timeToMinutes = (time: string): number => {
