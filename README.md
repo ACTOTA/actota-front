@@ -15,6 +15,25 @@ NEXT_PUBLIC_API_URL=https://your-api-url.com
 # Add other NEXT_PUBLIC variables here
 ```
 
+### Google Cloud Authentication
+
+For local development, you need to authenticate with Google Cloud to use the image upload feature:
+
+```bash
+gcloud auth application-default login
+```
+
+This command will:
+1. Open your browser for Google authentication
+2. Create application default credentials
+3. Store them locally where the Google Cloud SDK can automatically find them
+
+Make sure you have the Google Cloud CLI installed first:
+```bash
+# Install gcloud CLI (if not already installed)
+# Visit: https://cloud.google.com/sdk/docs/install
+```
+
 ### Development
 
 Run the development server:

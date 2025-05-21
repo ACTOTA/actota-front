@@ -49,9 +49,26 @@ export async function POST(request: NextRequest) {
       }
     );
 
+    console.log('Itinerary created - Backend response:', JSON.stringify(response.data, null, 2));
+    
+    // Get the MongoDB ID from the response if available, and add it directly to the response
+    let mongoId;
+    if (response.data && response.data._id) {
+      if (typeof response.data._id === 'object' && response.data._id.$oid) {
+        mongoId = response.data._id.$oid;
+      } else {
+        mongoId = response.data._id.toString();
+      }
+      console.log('Extracted MongoDB ID:', mongoId);
+    }
 
     return NextResponse.json(
-      { success: true, data: response.data },
+      { 
+        success: true, 
+        data: response.data,
+        // Add the extracted ID as a separate property to make it easier to find
+        itineraryId: mongoId
+      },
       { status: 200 }
     );
   } catch (error: any) {

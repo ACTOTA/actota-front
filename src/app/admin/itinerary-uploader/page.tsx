@@ -13,28 +13,28 @@ import { useItineraryForm } from './hooks/useItineraryForm';
 import BasicInfoSection from './components/BasicInfoSection';
 import LocationsSection from './components/LocationsSection';
 import DescriptionSection from './components/DescriptionSection';
-import ImagesSection from './components/ImagesSection';
+import ImageUploader from './components/ImageUploader';
 import DaysSection from './components/DaysSection';
 
 export default function ItineraryUploader() {
   const {
     formData,
     errors,
-    newImage,
     isLoading,
     message,
     renumberNotification,
+    tempImages,
     activities,
     isLoadingActivities,
     activitySearchQuery,
     filteredActivities,
     activeSearchItem,
-    setNewImage,
     handleChange,
     handleLocationChange,
     handleSelectActivity,
-    handleAddImage,
     handleRemoveImage,
+    handleAddTempImages,
+    handleRemoveTempImage,
     handleAddDay,
     handleRemoveDay,
     handleAddDayItem,
@@ -99,12 +99,10 @@ export default function ItineraryUploader() {
           />
 
           {/* Images Section */}
-          <ImagesSection 
-            images={formData.images || []}
-            newImage={newImage}
-            setNewImage={setNewImage}
-            handleAddImage={handleAddImage}
-            handleRemoveImage={handleRemoveImage}
+          <ImageUploader 
+            tempImages={tempImages}
+            onAddTempImages={handleAddTempImages}
+            onRemoveTempImage={handleRemoveTempImage}
           />
 
           {/* Days and Activities Section */}
