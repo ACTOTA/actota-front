@@ -379,103 +379,27 @@ export function useItineraryForm() {
     });
   };
   
-  // Upload a single image to GCS with a specific itinerary ID
-  const uploadImageToGCS = async (file: File, itineraryId: string): Promise<string> => {
-    console.log(`Uploading image "${file.name}" with itineraryId: "${itineraryId}"`);
+  // Convert image to base64 for sending to backend (no longer uploads to GCS)
+  const convertImageToBase64 = async (file: File): Promise<{data: string, fileName: string, fileType: string, fileSize: number}> => {
+    console.log(`Converting image "${file.name}" to base64`);
     
-    // Clean ID for safety (ensure valid characters for GCS path)
-    const cleanId = String(itineraryId).replace(/[^a-zA-Z0-9_-]/g, '');
-    if (cleanId !== itineraryId) {
-      console.log(`Cleaned itineraryId from "${itineraryId}" to "${cleanId}" for GCS upload`);
-    }
-    
-    // Create form data
-    const uploadForm = new FormData();
-    uploadForm.append('file', file);
-    uploadForm.append('itineraryId', cleanId);
-    
-    // Add metadata to help with troubleshooting
-    uploadForm.append('fileName', file.name);
-    uploadForm.append('fileType', file.type);
-    uploadForm.append('fileSize', file.size.toString());
-    uploadForm.append('timestamp', Date.now().toString());
-    
-    // Add detailed metadata as JSON for better tracking
-    const metadata = {
-      itineraryId: cleanId,
-      originalId: itineraryId,
-      fileName: file.name,
-      fileType: file.type,
-      fileSize: file.size,
-      timestamp: Date.now(),
-      isTemporary: cleanId.startsWith('temp-'),
-      uploadRequestId: `req-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`
-    };
-    uploadForm.append('metadata', JSON.stringify(metadata));
-    
-    // Log form data contents
-    console.log('Form data entries:');
-    for (const [key, value] of uploadForm.entries()) {
-      if (value instanceof File) {
-        console.log(`  ${key}: File "${value.name}" (${value.type}, ${value.size} bytes)`);
-      } else {
-        console.log(`  ${key}: ${value}`);
-      }
-    }
-    
-    // Upload to GCS with retry logic
-    let retryCount = 0;
-    const maxRetries = 2;
-    
-    while (retryCount <= maxRetries) {
-      try {
-        // Upload to GCS
-        console.log(`Upload attempt ${retryCount + 1}/${maxRetries + 1} for "${file.name}"`);
-        const response = await fetch('/api/upload/itinerary-image', {
-          method: 'POST',
-          body: uploadForm,
-        });
-        
-        // Get response text first for debugging
-        const responseText = await response.text();
-        console.log(`Upload response for "${file.name}":`, responseText);
-        
-        if (!response.ok) {
-          try {
-            const error = JSON.parse(responseText);
-            throw new Error(error.error || 'Failed to upload image');
-          } catch (e) {
-            throw new Error(`Upload failed: ${responseText}`);
-          }
-        }
-        
-        // Parse response text as JSON
-        try {
-          const data = JSON.parse(responseText);
-          console.log('Successful upload, image URL:', data.url);
-          return data.url;
-        } catch (e) {
-          console.error('Failed to parse image upload response as JSON:', e);
-          throw new Error('Invalid response from image upload service');
-        }
-      } catch (error) {
-        console.error(`Upload attempt ${retryCount + 1} failed:`, error.message);
-        
-        if (retryCount < maxRetries) {
-          // Wait before retrying (exponential backoff)
-          const delayMs = Math.pow(2, retryCount) * 1000;
-          console.log(`Retrying in ${delayMs}ms...`);
-          await new Promise(resolve => setTimeout(resolve, delayMs));
-          retryCount++;
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (reader.result && typeof reader.result === 'string') {
+          resolve({
+            data: reader.result, // This includes the data:image/...;base64, prefix
+            fileName: file.name,
+            fileType: file.type,
+            fileSize: file.size
+          });
         } else {
-          console.error(`All ${maxRetries + 1} upload attempts failed for "${file.name}"`);  
-          throw error; // Re-throw the last error
+          reject(new Error('Failed to read file'));
         }
-      }
-    }
-    
-    // This line should never be reached due to either return or throw above
-    throw new Error('Unexpected error in image upload logic');
+      };
+      reader.onerror = () => reject(new Error('Error reading file'));
+      reader.readAsDataURL(file);
+    });
   };
   
   // Upload all temporary images after itinerary creation
@@ -963,8 +887,27 @@ export function useItineraryForm() {
     setIsLoading(true);
     setMessage(null);
 
+    // Convert temp images to base64 before sending to backend
+    let imageData: any[] = [];
+    if (tempImages.length > 0) {
+      setMessage({ type: 'info', text: `Converting ${tempImages.length} images...` });
+      try {
+        const imagePromises = tempImages.map(tempImage => convertImageToBase64(tempImage.file));
+        imageData = await Promise.all(imagePromises);
+        console.log(`Successfully converted ${imageData.length} images to base64`);
+      } catch (error) {
+        console.error('Error converting images to base64:', error);
+        setMessage({ type: 'error', text: 'Failed to process images. Please try again.' });
+        setIsLoading(false);
+        return;
+      }
+    }
+
     // Use the formatting function to prepare the payload as plain JSON
     const finalPayload = formatPayloadForBackend(formData);
+    
+    // Add image data to the payload
+    finalPayload.images = imageData;
 
     // Get auth token from localStorage
     let authToken = '';
@@ -983,7 +926,7 @@ export function useItineraryForm() {
     
     // Use the Next.js API route which can access httpOnly cookies
     try {
-      const response = await fetch('/api/itineraries/featured/add', {
+      const response = await fetch('/api/admin/itineraries/featured/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1037,146 +980,15 @@ export function useItineraryForm() {
         data = { message: 'Operation successful, but server did not return valid JSON' };
       }
       
-      // If we have temporary images to upload, do it now with the new itinerary ID
-      if (tempImages.length > 0 && data) {
-        setMessage({ type: 'info', text: `Itinerary created! Uploading ${tempImages.length} images...` });
-        
-        // Log the full response data for debugging
-        console.log('Itinerary created, full response data:', data);
-        
-        try {
-          // Get the MongoDB ID from the response
-          let itineraryId;
-          
-          // First look for the extracted itineraryId property we added in the API route
-          if (data.itineraryId) {
-            itineraryId = data.itineraryId;
-            console.log('Found extracted itineraryId property:', itineraryId);
-          } 
-          // Check all possible formats of ID in the response
-          else if (data._id && typeof data._id === 'object' && data._id.$oid) {
-            itineraryId = data._id.$oid;
-            console.log('Found MongoDB ID in _id.$oid format:', itineraryId);
-          } else if (data._id) {
-            itineraryId = data._id.toString();
-            console.log('Found ID in _id format:', itineraryId);
-          } else if (data.data && data.data._id) {
-            // Sometimes the response is nested under data.data
-            if (typeof data.data._id === 'object' && data.data._id.$oid) {
-              itineraryId = data.data._id.$oid;
-              console.log('Found MongoDB ID in data.data._id.$oid format:', itineraryId);
-            } else {
-              itineraryId = data.data._id.toString();
-              console.log('Found ID in data.data._id format:', itineraryId);
-            }
-          } else if (data.id) {
-            itineraryId = data.id;
-            console.log('Found ID in id property:', itineraryId);
-          } else {
-            // If no ID can be found, generate a UUID for this upload session
-            itineraryId = `temp-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
-            console.warn('No ID found in response, using generated temporary ID:', itineraryId);
-          }
-          
-          // Clean up the ID to make sure it's valid for folder names
-          const cleanId = String(itineraryId).replace(/[^a-zA-Z0-9_-]/g, '');
-          if (cleanId !== itineraryId) {
-            console.log(`Cleaned itineraryId from "${itineraryId}" to "${cleanId}"`);
-            itineraryId = cleanId;
-          }
-          
-          // Upload all temporary images
-          const imageUrls = await uploadTempImages(itineraryId);
-          
-          if (imageUrls.length > 0) {
-            try {
-              // Update the itinerary with the image URLs
-              console.log(`Updating itinerary ${itineraryId} with ${imageUrls.length} image URLs`);
-              
-              // Always use the fallback API endpoint with query parameter since it's the most reliable
-              let updateResponse;
-              const encodedId = encodeURIComponent(itineraryId);
-              const updateUrl = `/api/update-images?id=${encodedId}`;
-              
-              console.log(`Sending request to fallback API: ${updateUrl}`);
-              
-              updateResponse = await fetch(updateUrl, {
-                method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ images: imageUrls }),
-                credentials: 'include'
-              });
-              
-              console.log(`Update response status from ${updateUrl}: ${updateResponse.status}`);
-              
-              // For debugging, also log the content of the response
-              const responseText = await updateResponse.text();
-              console.log(`Update response body: ${responseText}`);
-              
-              // Re-parse the response text since we consumed it above
-              try {
-                updateResponse = {
-                  ...updateResponse,
-                  json: async () => JSON.parse(responseText)
-                };
-              } catch (parseError) {
-                console.error('Error re-parsing response:', parseError);
-              }
-              
-              // Log the full response for debugging
-              const updateResponseText = await updateResponse.text();
-              console.log(`Update response status: ${updateResponse.status}`);
-              console.log(`Update response body: ${updateResponseText}`);
-              
-              if (!updateResponse.ok) {
-                // Try to parse the error response
-                let errorMessage = updateResponseText;
-                try {
-                  const errorJson = JSON.parse(updateResponseText);
-                  errorMessage = errorJson.error || errorJson.message || updateResponseText;
-                } catch (e) {
-                  // If parsing fails, just use the original response text
-                }
-                
-                throw new Error(`Failed to update images: ${errorMessage}`);
-              }
-              
-              // Parse successful response
-              let updateData;
-              try {
-                updateData = JSON.parse(updateResponseText);
-                console.log('Successfully updated images:', updateData);
-              } catch (e) {
-                console.warn('Response wasn\'t valid JSON, but update may have succeeded');
-              }
-            } catch (error) {
-              console.error('Error updating itinerary with images:', error);
-              setMessage({ 
-                type: 'error', 
-                text: `Itinerary created, but failed to link images: ${error instanceof Error ? error.message : 'Unknown error'}`
-              });
-              return; // Return early to avoid showing success message
-            }
-            
-            // Only show success message if we didn't catch an error
-            setMessage({ 
-              type: 'success', 
-              text: `Featured itinerary and ${imageUrls.length} images uploaded successfully!` 
-            });
-          } else {
-            setMessage({ type: 'success', text: 'Featured itinerary added successfully!' });
-          }
-        } catch (imageError) {
-          console.error('Error uploading images:', imageError);
-          setMessage({ 
-            type: 'error', 
-            text: `Itinerary created, but some images failed to upload: ${imageError instanceof Error ? imageError.message : 'Unknown error'}` 
-          });
-        }
+      // Images are now included in the initial request, so just show success message
+      const imageCount = tempImages.length;
+      if (imageCount > 0) {
+        setMessage({ 
+          type: 'success', 
+          text: `Featured itinerary created with ${imageCount} images successfully!` 
+        });
       } else {
-        setMessage({ type: 'success', text: 'Featured itinerary added successfully!' });
+        setMessage({ type: 'success', text: 'Featured itinerary created successfully!' });
       }
 
       // Reset form

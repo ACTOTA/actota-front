@@ -110,10 +110,10 @@ export async function PUT(request: NextRequest) {
     }
 
     // Forward the request to the backend API
-    console.log(`Sending request to backend API: PUT /api/itineraries/${cleanId}/images`);
+    console.log(`Sending request to backend API: PUT /api/admin/itineraries/${cleanId}/images`);
     try {
       const response = await actotaApi.put(
-        `/api/itineraries/${cleanId}/images`,
+        `/api/admin/itineraries/${cleanId}/images`,
         { images: validImages || images }, // Use validated images if available
         {
           headers: {
