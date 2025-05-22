@@ -11,7 +11,7 @@ interface BasicInfoSectionProps {
   maxGroup: number;
   lengthDays: number;
   lengthHours: number;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   errors: {
     trip_name: string;
     min_group: string;

@@ -58,7 +58,7 @@ const ActivityFields: React.FC<ActivityFieldsProps> = ({
         <Input
           type="text"
           value={(item as any).activity_id}
-          onChange={(e) => handleDayItemChange(dayNumber, itemIndex, 'activity_id', e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleDayItemChange(dayNumber, itemIndex, 'activity_id', e.target.value)}
           placeholder="Enter or select activity ID"
           readOnly={(item as any).activity_id !== ''}
           classname={(item as any).activity_id ? 'bg-gray-900/70' : ''}

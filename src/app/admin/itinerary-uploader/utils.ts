@@ -1,5 +1,30 @@
 import { Activity, ObjectId, Location, DayItem } from './types';
 
+// Define interface for the formatted result
+interface FormattedResult {
+  trip_name: string;
+  fareharbor_id?: number;
+  min_age?: number;
+  min_group: number;
+  max_group: number;
+  length_days: number;
+  length_hours: number;
+  start_location: {
+    city: string;
+    state: string;
+    coordinates: number[];
+  };
+  end_location: {
+    city: string;
+    state: string;
+    coordinates: number[];
+  };
+  description: string;
+  days: { [key: string]: any[] };
+  images: any[];
+  [key: string]: any; // Add index signature
+}
+
 // Denver coordinates - used as default
 export const DENVER_COORDINATES: [number, number] = [39.7392, -104.9903];
 
@@ -123,10 +148,10 @@ export const toBsonValue = (value: any): any => {
 /**
  * Convert the form data to the expected backend format
  */
-export const formatPayloadForBackend = (formData: any): any => {
+export const formatPayloadForBackend = (formData: any): FormattedResult => {
   // Convert to plain JSON format - the backend expects regular JSON, not BSON
   // Don't include timestamps - let the backend handle them
-  const result = {
+  const result: FormattedResult = {
     trip_name: formData.trip_name,
     fareharbor_id: formData.fareharbor_id || undefined,
     min_age: formData.min_age ? Math.round(Number(formData.min_age)) : undefined,
@@ -137,12 +162,12 @@ export const formatPayloadForBackend = (formData: any): any => {
     start_location: {
       city: formData.start_location.city,
       state: formData.start_location.state,
-      coordinates: formData.start_location.coordinates.map(coord => Number(coord))
+      coordinates: formData.start_location.coordinates.map((coord: number | string) => Number(coord))
     },
     end_location: {
       city: formData.end_location.city,
       state: formData.end_location.state,
-      coordinates: formData.end_location.coordinates.map(coord => Number(coord))
+      coordinates: formData.end_location.coordinates.map((coord: number | string) => Number(coord))
     },
     description: formData.description,
     days: {},
@@ -176,7 +201,7 @@ export const formatPayloadForBackend = (formData: any): any => {
           formattedItem.name = item.name || '';
           formattedItem.location = {
             name: item.location?.name || '',
-            coordinates: (item.location?.coordinates || [0, 0]).map(coord => Number(coord))
+            coordinates: (item.location?.coordinates || [0, 0]).map((coord: number | string) => Number(coord))
           };
           break;
           

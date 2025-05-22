@@ -37,7 +37,7 @@ const LocationsSection: React.FC<LocationsSectionProps> = ({
               <Input
                 type="text"
                 value={startLocation.city}
-                onChange={(e) => handleLocationChange('start_location', 'city', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleLocationChange('start_location', 'city', e.target.value)}
                 placeholder="City"
                 icon={<BiMap size={20} />}
                 classname={errors.start_location ? 'border-[#79071D] ring-1 ring-[#79071D]' : ''}
@@ -49,7 +49,7 @@ const LocationsSection: React.FC<LocationsSectionProps> = ({
               <Input
                 type="text"
                 value={startLocation.state}
-                onChange={(e) => handleLocationChange('start_location', 'state', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleLocationChange('start_location', 'state', e.target.value)}
                 placeholder="State"
                 classname={errors.start_location ? 'border-[#79071D] ring-1 ring-[#79071D]' : ''}
               />
@@ -60,7 +60,7 @@ const LocationsSection: React.FC<LocationsSectionProps> = ({
               <Input
                 type="text"
                 value={formatCoordinates(startLocation.coordinates)}
-                onChange={(e) => handleLocationChange('start_location', 'coordinates', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleLocationChange('start_location', 'coordinates', e.target.value)}
                 placeholder="e.g. 39.7392, -104.9903"
               />
             </div>
@@ -83,7 +83,7 @@ const LocationsSection: React.FC<LocationsSectionProps> = ({
               <Input
                 type="text"
                 value={endLocation.city}
-                onChange={(e) => handleLocationChange('end_location', 'city', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleLocationChange('end_location', 'city', e.target.value)}
                 placeholder="City"
                 icon={<BiMap size={20} />}
                 classname={errors.end_location ? 'border-[#79071D] ring-1 ring-[#79071D]' : ''}
@@ -95,7 +95,7 @@ const LocationsSection: React.FC<LocationsSectionProps> = ({
               <Input
                 type="text"
                 value={endLocation.state}
-                onChange={(e) => handleLocationChange('end_location', 'state', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleLocationChange('end_location', 'state', e.target.value)}
                 placeholder="State"
                 classname={errors.end_location ? 'border-[#79071D] ring-1 ring-[#79071D]' : ''}
               />
@@ -106,7 +106,7 @@ const LocationsSection: React.FC<LocationsSectionProps> = ({
               <Input
                 type="text"
                 value={formatCoordinates(endLocation.coordinates)}
-                onChange={(e) => handleLocationChange('end_location', 'coordinates', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleLocationChange('end_location', 'coordinates', e.target.value)}
                 placeholder="e.g. 39.7392, -104.9903"
               />
             </div>
