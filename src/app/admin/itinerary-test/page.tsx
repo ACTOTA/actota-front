@@ -80,7 +80,7 @@ export default function TestItineraryUpload() {
       }
     } catch (error) {
       console.error('Fetch error:', error);
-      setStatus('Error: ' + error.message);
+      setStatus('Error: ' + (error instanceof Error ? error.message : 'Unknown error'));
       setResponse(JSON.stringify(error, null, 2));
     }
   };

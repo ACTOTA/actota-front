@@ -22,7 +22,7 @@ const AccommodationFields: React.FC<AccommodationFieldsProps> = ({
       <Input
         type="text"
         value={item.accommodation_id}
-        onChange={(e) => handleDayItemChange(dayNumber, itemIndex, 'accommodation_id', e.target.value)}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleDayItemChange(dayNumber, itemIndex, 'accommodation_id', e.target.value)}
         placeholder="Enter accommodation ID"
       />
     </div>

@@ -31,7 +31,7 @@ const ImagesSection: React.FC<ImagesSectionProps> = ({
           <Input
             type="text"
             value={newImage}
-            onChange={(e) => setNewImage(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewImage(e.target.value)}
             icon={<BiImageAdd size={20} />}
             placeholder="Enter image URL"
           />

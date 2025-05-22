@@ -86,7 +86,7 @@ const DayActivitiesSearch: React.FC<DayActivitiesSearchProps> = ({
             <Input
               type="text"
               value={isActive ? activitySearchQuery : ''}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setActivitySearchQuery(e.target.value);
                 setActiveSearchItem({ dayNumber, itemIndex: -1 }); // -1 indicates day-level search
               }}
@@ -229,7 +229,7 @@ const DayActivitiesSearch: React.FC<DayActivitiesSearchProps> = ({
                       <HiOutlineClock className={`mr-1 ${(item as any).available_time_slots ? 'text-green-400' : 'text-gray-400'}`} />
                       <select
                         value={item.time}
-                        onChange={(e) => handleDayItemChange(dayNumber, originalIndex, 'time', e.target.value)}
+                        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleDayItemChange(dayNumber, originalIndex, 'time', e.target.value)}
                         className="bg-gray-800 border-none focus:ring-0 text-white text-sm py-1 px-2 rounded-md"
                       >
                         {/* Show time slots from activity.available_time_slots if available */}
@@ -243,7 +243,7 @@ const DayActivitiesSearch: React.FC<DayActivitiesSearchProps> = ({
 
                               // Filter out null or undefined values and ensure strings
                               return timeSlots
-                                .filter(timeSlot => timeSlot && typeof timeSlot === 'string')
+                                .filter((timeSlot: string | null | undefined) => timeSlot && typeof timeSlot === 'string')
                                 .map((timeSlot: string) => {
                                   try {
                                     // Parse hour and minute for display, handle both HH:MM and HH:MM:SS formats

@@ -45,7 +45,7 @@ const ActivitySearch: React.FC<ActivitySearchProps> = ({
           <Input
             type="text"
             value={isActive ? activitySearchQuery : ''}
-            onChange={(e) => {
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
               setActivitySearchQuery(e.target.value);
               setActiveSearchItem({ dayNumber, itemIndex });
             }}

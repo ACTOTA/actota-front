@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import actotaApi from '@/src/lib/apiClient';
 import { getAuthCookie } from '@/src/helpers/auth';
 
+interface ValidationError {
+  url?: string;
+  message: string;
+}
+
 export const dynamic = "force-dynamic";
 
 // Add OPTIONS handler for CORS preflight requests
@@ -81,10 +86,12 @@ export async function PUT(request: NextRequest) {
     }
     
     // Validate that all image URLs look valid
-    let validationErrors = [];
+    let validationErrors: ValidationError[] = [];
     const validImages = images.filter((url, index) => {
       if (typeof url !== 'string') {
-        validationErrors.push(`Image at index ${index} is not a string`);
+        validationErrors.push({
+          message: `Image at index ${index} is not a string`
+        });
         return false;
       }
       
@@ -97,7 +104,10 @@ export async function PUT(request: NextRequest) {
         if (url.startsWith('data:')) {
           return true;
         }
-        validationErrors.push(`Image URL at index ${index} is not a valid URL: ${url.substring(0, 30)}...`);
+        validationErrors.push({
+          message: `Image URL at index ${index} is not a valid URL: ${url.substring(0, 30)}...`,
+          url: url
+        });
         return false;
       }
     });

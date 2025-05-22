@@ -298,7 +298,9 @@ export function useItineraryForm() {
           updates['available_time_slots'] = JSON.stringify(availableSlots);
 
           // Set the initial time to the first available slot
-          handleDayItemChange(dayNumber, itemIndex, 'time', availableSlots[0]);
+          if (availableSlots[0]) {
+            handleDayItemChange(dayNumber, itemIndex, 'time', availableSlots[0]);
+          }
         } else {
           console.warn('No valid time slots found in activity.daily_time_slots');
         }
@@ -424,7 +426,17 @@ export function useItineraryForm() {
       const batchResults = await Promise.allSettled(batch.map(async (tempImage) => {
         console.log(`Starting upload for: ${tempImage.file.name}`);
         try {
-          const url = await uploadImageToGCS(tempImage.file, itineraryId);
+          const response = await fetch('/api/upload/itinerary-image', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              itineraryId,
+              image: await convertImageToBase64(tempImage.file)
+            })
+          });
+          const { url } = await response.json();
           console.log(`Successfully uploaded ${tempImage.file.name} to ${url}`);
           return { success: true, url, file: tempImage.file, previewUrl: tempImage.previewUrl };
         } catch (error) {
@@ -441,9 +453,14 @@ export function useItineraryForm() {
           if (data.success) {
             uploadedUrls.push(data.url);
             // Revoke the object URL to prevent memory leaks
-            URL.revokeObjectURL(data.previewUrl);
+            if (data.previewUrl) {
+              URL.revokeObjectURL(data.previewUrl);
+            }
           } else {
-            failedImages.push({ name: data.file.name, error: data.error });
+            failedImages.push({ 
+              name: data.file.name, 
+              error: data.error || 'Unknown error' 
+            });
           }
         } else {
           // This should almost never happen as we catch errors inside the promise
@@ -838,7 +855,7 @@ export function useItineraryForm() {
 
     // Verify at least one day has at least one item
     let hasItems = false;
-    let dayIssues = [];
+    let dayIssues: string[] = [];
 
     Object.entries(formData.days).forEach(([dayNumber, dayItems]) => {
       if (dayItems.length > 0) {
@@ -890,7 +907,7 @@ export function useItineraryForm() {
     // Convert temp images to base64 before sending to backend
     let imageData: any[] = [];
     if (tempImages.length > 0) {
-      setMessage({ type: 'info', text: `Converting ${tempImages.length} images...` });
+      setMessage({ type: 'success', text: `Converting ${tempImages.length} images...` });
       try {
         const imagePromises = tempImages.map(tempImage => convertImageToBase64(tempImage.file));
         imageData = await Promise.all(imagePromises);
