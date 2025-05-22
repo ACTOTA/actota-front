@@ -14,14 +14,18 @@ export async function POST(request: Request) {
     );
 
     if (response.data.auth_token) {
-      setAuthCookie(response.data.auth_token);
+      const authToken = response.data.auth_token;
+      await setAuthCookie(authToken);
+      
+      // Store auth token in user data in localStorage
+      // This gets saved in the onSuccess handler of login
       
       // Get the session data
       const sessionResponse = await actotaApi.get(
         "/api/auth/session",
         {
           headers: {
-            'Authorization': `Bearer ${response.data.auth_token}`,
+            'Authorization': `Bearer ${authToken}`,
           }
         },
       );
@@ -54,7 +58,12 @@ export async function POST(request: Request) {
       }
 
       return NextResponse.json(
-        { success: true, message: 'Login successful', data: userData },
+        { 
+          success: true, 
+          message: 'Login successful', 
+          data: userData,
+          auth_token: authToken  // Include auth token in response
+        },
         { status: 200 }
       );
     }

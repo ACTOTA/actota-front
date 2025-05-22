@@ -1,0 +1,39 @@
+{
+  "trip_name": "Test Colorado Winter Adventure",
+  "fareharbor_id": "12345",
+  "min_age": 18,
+  "min_group": 2,
+  "max_group": 10,
+  "length_days": 3,
+  "length_hours": 8,
+  "start_location": {
+    "city": "Denver",
+    "state": "CO",
+    "coordinates": [-104.9903, 39.7392]
+  },
+  "end_location": {
+    "city": "Aspen",
+    "state": "CO",
+    "coordinates": [-106.8175, 39.1911]
+  },
+  "description": "An exciting winter adventure through Colorado",
+  "days": {
+    "day_1": [
+      {
+        "time": "09:00",
+        "type": "activity",
+        "activity_id": "abc123"
+      },
+      {
+        "time": "12:00",
+        "type": "transportation",
+        "name": "Shuttle to Restaurant",
+        "location": {
+          "name": "Mountain Vista Restaurant",
+          "coordinates": [-105.2755, 40.0150]
+        }
+      }
+    ]
+  },
+  "images": ["https://example.com/image1.jpg"]
+}
