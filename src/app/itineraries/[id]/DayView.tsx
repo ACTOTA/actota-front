@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useCallback, useEffect } from 'react';
 import { BiSolidMap } from 'react-icons/bi';
-import { GoogleMap, DirectionsService, DirectionsRenderer, Marker, Polyline } from '@react-google-maps/api';
+import { GoogleMap, DirectionsService, DirectionsRenderer, Marker, Polyline, useJsApiLoader } from '@react-google-maps/api';
 import { BsCalendar4 } from 'react-icons/bs';
 import { MdOutlineExplore } from 'react-icons/md';
 import Button from '@/src/components/figma/Button';
@@ -51,11 +51,17 @@ export default function DayView({ listing }: DayViewProps) {
 	const [selectedDay, setSelectedDay] = useState(1);
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const [map, setMap] = useState<google.maps.Map | null>(null);
-	const [isMapLoaded, setIsMapLoaded] = useState(false);
-	const [isApiKeyValid, setIsApiKeyValid] = useState(!!GOOGLE_MAPS_API_KEY);
-	const [loadingState, setLoadingState] = useState('initializing');
 	const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
 	const [directionsError, setDirectionsError] = useState<string | null>(null);
+	const [geocodedLocations, setGeocodedLocations] = useState<Record<string, { lat: number, lng: number }>>({}); 
+	const [isGeocodingComplete, setIsGeocodingComplete] = useState(false);
+	const [geocodingProgress, setGeocodingProgress] = useState({ current: 0, total: 0 });
+
+	// Use the hook to load Google Maps
+	const { isLoaded, loadError } = useJsApiLoader({
+		googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+		libraries: ['places', 'geometry'],
+	});
 
 	// Log API key for debugging (only first and last few characters)
 	useEffect(() => {
@@ -74,19 +80,139 @@ export default function DayView({ listing }: DayViewProps) {
 	useEffect(() => {
 		setDirections(null);
 		setDirectionsError(null);
+		setIsGeocodingComplete(false);
 	}, [selectedDay]);
+
+	// Enhanced geocoding function with retry logic and better error handling
+	const geocodeAddress = useCallback(async (address: string, key: string, retries = 2): Promise<{ lat: number, lng: number } | null> => {
+		if (!window.google) return null;
+
+		const geocoder = new window.google.maps.Geocoder();
+		
+		for (let attempt = 0; attempt <= retries; attempt++) {
+			try {
+				const result = await new Promise<{ lat: number, lng: number } | null>((resolve) => {
+					console.log(`Geocoding attempt ${attempt + 1} for ${key}: ${address}`);
+					
+					geocoder.geocode({ address }, (results, status) => {
+						if (status === 'OK' && results && results[0]) {
+							const location = results[0].geometry.location;
+							const coords = { lat: location.lat(), lng: location.lng() };
+							console.log(`✅ Geocoded ${key}: ${address} -> ${coords.lat}, ${coords.lng}`);
+							resolve(coords);
+						} else if (status === 'OVER_QUERY_LIMIT') {
+							console.warn(`⚠️ Query limit exceeded for ${key}, attempt ${attempt + 1}`);
+							resolve(null);
+						} else {
+							console.error(`❌ Geocoding failed for ${key}: ${address} - ${status}`);
+							resolve(null);
+						}
+					});
+				});
+
+				if (result) {
+					return result;
+				}
+
+				// If we hit query limit, wait before retrying
+				if (attempt < retries) {
+					const delay = Math.pow(2, attempt) * 1000; // Exponential backoff
+					console.log(`Waiting ${delay}ms before retry...`);
+					await new Promise(resolve => setTimeout(resolve, delay));
+				}
+			} catch (error) {
+				console.error(`Error during geocoding attempt ${attempt + 1} for ${key}:`, error);
+			}
+		}
+
+		return null;
+	}, []);
+
+	// Improved geocoding effect with progress tracking
+	useEffect(() => {
+		if (!isLoaded || !window.google) return;
+
+		const geocodeAllAddresses = async () => {
+			const dayActivities = listing.days[selectedDay.toString()] || [];
+			const addressesToGeocode: Array<{ address: string, key: string }> = [];
+
+			// Collect all addresses that need geocoding
+			// Check start location
+			if (selectedDay === 1 && listing.start_location) {
+				const hasValidCoords = listing.start_location.coordinates && 
+					(listing.start_location.coordinates[0] !== 0 || listing.start_location.coordinates[1] !== 0);
+				
+				if (!hasValidCoords) {
+					const address = `${listing.start_location.city}, ${listing.start_location.state}`;
+					addressesToGeocode.push({ address, key: 'start' });
+				}
+			}
+
+			// Check activity locations
+			dayActivities.forEach((activity, idx) => {
+				if (activity.type === 'activity' && 'address' in activity && activity.address) {
+					const { street, city, state, zip } = activity.address;
+					const fullAddress = `${street}, ${city}, ${state} ${zip}`;
+					addressesToGeocode.push({ address: fullAddress, key: `activity-${idx}` });
+				} else if (activity.location && !activity.location.coordinates && activity.location.name) {
+					addressesToGeocode.push({ address: activity.location.name, key: `activity-${idx}` });
+				}
+			});
+
+			// Check end location
+			if (selectedDay === listing.length_days && listing.end_location) {
+				const hasValidCoords = listing.end_location.coordinates && 
+					(listing.end_location.coordinates[0] !== 0 || listing.end_location.coordinates[1] !== 0);
+				
+				if (!hasValidCoords) {
+					const address = `${listing.end_location.city}, ${listing.end_location.state}`;
+					addressesToGeocode.push({ address, key: 'end' });
+				}
+			}
+
+			if (addressesToGeocode.length === 0) {
+				console.log('No geocoding needed, all locations have coordinates');
+				setIsGeocodingComplete(true);
+				return;
+			}
+
+			// Set progress tracking
+			setGeocodingProgress({ current: 0, total: addressesToGeocode.length });
+			console.log(`Starting geocoding for ${addressesToGeocode.length} addresses`);
+
+			// Process geocoding with rate limiting (one at a time to avoid quota issues)
+			for (let i = 0; i < addressesToGeocode.length; i++) {
+				const { address, key } = addressesToGeocode[i];
+				setGeocodingProgress({ current: i + 1, total: addressesToGeocode.length });
+
+				const coords = await geocodeAddress(address, key);
+				if (coords) {
+					setGeocodedLocations(prev => {
+						const updated = { ...prev, [key]: coords };
+						console.log('Updated geocodedLocations:', updated);
+						return updated;
+					});
+				}
+
+				// Add a small delay between requests to respect rate limits
+				if (i < addressesToGeocode.length - 1) {
+					await new Promise(resolve => setTimeout(resolve, 100));
+				}
+			}
+
+			console.log('All geocoding completed');
+			setIsGeocodingComplete(true);
+		};
+
+		geocodeAllAddresses().catch(error => {
+			console.error('Error during batch geocoding:', error);
+			setIsGeocodingComplete(true);
+		});
+	}, [selectedDay, isLoaded, listing, geocodeAddress]);
 
 	const onLoad = useCallback((map: google.maps.Map) => {
 		console.log('Google Map loaded successfully');
 		setMap(map);
-		setIsMapLoaded(true);
-		setLoadingState('loaded');
-	}, []);
-
-	const onLoadError = useCallback((error: Error) => {
-		console.error("Google Maps API failed to load:", error);
-		setIsApiKeyValid(false);
-		setLoadingState('error');
 	}, []);
 
 	// Handle directions response
@@ -99,8 +225,14 @@ export default function DayView({ listing }: DayViewProps) {
 			setDirectionsError(null);
 			console.log('Directions service successful');
 		} else {
-			setDirectionsError(`Directions request failed: ${status}`);
-			console.error('Directions service failed:', status);
+			// Don't set error for ZERO_RESULTS since we have a fallback
+			if (status === 'ZERO_RESULTS') {
+				console.log('No driving route found, using straight lines');
+				setDirectionsError(null);
+			} else {
+				setDirectionsError(`Directions request failed: ${status}`);
+				console.error('Directions service failed:', status);
+			}
 		}
 	}, []);
 
@@ -155,38 +287,109 @@ export default function DayView({ listing }: DayViewProps) {
 		return "Unknown";
 	};
 
-	// Get coordinates for the selected day's activities
+	// Helper function to validate and fix coordinates
+	const validateAndFixCoordinates = (lat: number, lng: number, source: string) => {
+		// Reasonable bounds for US (adjust as needed for your use case)
+		const isValidLat = lat >= 24 && lat <= 49;
+		const isValidLng = lng >= -125 && lng <= -66;
+		
+		if (isValidLat && isValidLng) {
+			console.log(`✅ Valid coordinates for ${source}:`, { lat, lng });
+			return { lat, lng };
+		}
+		
+		// Try swapping lat/lng
+		const swappedIsValidLat = lng >= 24 && lng <= 49;
+		const swappedIsValidLng = lat >= -125 && lat <= -66;
+		
+		if (swappedIsValidLat && swappedIsValidLng) {
+			console.log(`🔄 Swapped coordinates for ${source}:`, { lat: lng, lng: lat });
+			return { lat: lng, lng: lat };
+		}
+		
+		console.warn(`❌ Invalid coordinates for ${source}:`, { lat, lng });
+		return null;
+	};
+
+	// Get coordinates for the selected day's activities - FIXED VERSION
 	const getDayCoordinates = () => {
 		try {
 			const dayActivities = listing.days[selectedDay.toString()] || [];
 			const coordinates = [];
 
+			console.log('getDayCoordinates called, geocodedLocations:', geocodedLocations);
+
 			// Add start location if it's day 1
-			if (selectedDay === 1 && listing.start_location?.coordinates) {
-				coordinates.push({
-					lat: listing.start_location.coordinates[1],
-					lng: listing.start_location.coordinates[0]
-				});
+			if (selectedDay === 1 && listing.start_location) {
+				const hasValidCoords = listing.start_location.coordinates && 
+					(listing.start_location.coordinates[0] !== 0 || listing.start_location.coordinates[1] !== 0);
+				
+				if (hasValidCoords) {
+					// GeoJSON format: [longitude, latitude] -> convert to { lat, lng }
+					const rawCoords = {
+						lat: listing.start_location.coordinates[1], // latitude is second in GeoJSON
+						lng: listing.start_location.coordinates[0]  // longitude is first in GeoJSON
+					};
+					
+					const validCoords = validateAndFixCoordinates(rawCoords.lat, rawCoords.lng, 'start location');
+					if (validCoords) {
+						coordinates.push(validCoords);
+						console.log('Added start location from coordinates:', validCoords);
+					}
+				} else if (geocodedLocations['start']) {
+					coordinates.push(geocodedLocations['start']);
+					console.log('Added start location from geocoding');
+				}
 			}
 
 			// Add activity locations
-			dayActivities.forEach(activity => {
+			dayActivities.forEach((activity, idx) => {
+				// Check if activity has location with coordinates (accommodation/transportation)
 				if (activity.location?.coordinates) {
-					coordinates.push({
-						lat: activity.location.coordinates[1],
-						lng: activity.location.coordinates[0]
-					});
+					// GeoJSON format: [longitude, latitude] -> convert to { lat, lng }
+					const rawCoords = {
+						lat: activity.location.coordinates[1], // latitude is second in GeoJSON
+						lng: activity.location.coordinates[0]  // longitude is first in GeoJSON
+					};
+					
+					const validCoords = validateAndFixCoordinates(rawCoords.lat, rawCoords.lng, `activity ${idx}`);
+					if (validCoords) {
+						coordinates.push(validCoords);
+						console.log(`Added activity ${idx} from location.coordinates:`, validCoords);
+					}
+				} else if (geocodedLocations[`activity-${idx}`]) {
+					// Use geocoded coordinates for activities with addresses (these are already in correct format)
+					coordinates.push(geocodedLocations[`activity-${idx}`]);
+					console.log(`Added activity ${idx} from geocoding:`, geocodedLocations[`activity-${idx}`]);
+				} else {
+					console.log(`No coordinates for activity ${idx}`, activity);
 				}
 			});
 
 			// Add end location if it's the last day
-			if (selectedDay === listing.length_days && listing.end_location?.coordinates) {
-				coordinates.push({
-					lat: listing.end_location.coordinates[1],
-					lng: listing.end_location.coordinates[0]
-				});
+			if (selectedDay === listing.length_days && listing.end_location) {
+				const hasValidCoords = listing.end_location.coordinates && 
+					(listing.end_location.coordinates[0] !== 0 || listing.end_location.coordinates[1] !== 0);
+				
+				if (hasValidCoords) {
+					// GeoJSON format: [longitude, latitude] -> convert to { lat, lng }
+					const rawCoords = {
+						lat: listing.end_location.coordinates[1], // latitude is second in GeoJSON
+						lng: listing.end_location.coordinates[0]  // longitude is first in GeoJSON
+					};
+					
+					const validCoords = validateAndFixCoordinates(rawCoords.lat, rawCoords.lng, 'end location');
+					if (validCoords) {
+						coordinates.push(validCoords);
+						console.log('Added end location from coordinates:', validCoords);
+					}
+				} else if (geocodedLocations['end']) {
+					coordinates.push(geocodedLocations['end']);
+					console.log('Added end location from geocoding');
+				}
 			}
 
+			console.log('Final coordinates array:', coordinates);
 			return coordinates;
 		} catch (error) {
 			console.error("Error getting coordinates:", error);
@@ -194,7 +397,12 @@ export default function DayView({ listing }: DayViewProps) {
 		}
 	};
 
-	const pathCoordinates = getDayCoordinates();
+	// Recalculate coordinates when geocoding changes
+	const pathCoordinates = React.useMemo(() => {
+		const coords = getDayCoordinates();
+		console.log('pathCoordinates recalculated:', coords);
+		return coords;
+	}, [selectedDay, geocodedLocations]);
 
 	// Calculate map center based on coordinates
 	const getMapCenter = () => {
@@ -208,6 +416,61 @@ export default function DayView({ listing }: DayViewProps) {
 			lng: (Math.max(...lngs) + Math.min(...lngs)) / 2
 		};
 	};
+
+	// Test function to try simplified directions
+	const testDirections = () => {
+		if (!window.google || pathCoordinates.length < 2) return;
+		
+		const service = new google.maps.DirectionsService();
+		
+		// Test with just first two points
+		const testRequest = {
+			origin: pathCoordinates[0],
+			destination: pathCoordinates[1],
+			travelMode: google.maps.TravelMode.DRIVING,
+		};
+		
+		console.log('=== Testing simplified directions ===');
+		console.log('Test request:', testRequest);
+		
+		service.route(testRequest, (result, status) => {
+			console.log('Test status:', status);
+			if (status === 'OK') {
+				console.log('✅ Test successful! Route found between first two points');
+			} else {
+				console.log('❌ Test failed:', status);
+				
+				// Try with lat/lng objects
+				const testRequest2 = {
+					origin: new google.maps.LatLng(pathCoordinates[0].lat, pathCoordinates[0].lng),
+					destination: new google.maps.LatLng(pathCoordinates[1].lat, pathCoordinates[1].lng),
+					travelMode: google.maps.TravelMode.DRIVING,
+				};
+				
+				console.log('Testing with LatLng objects:', testRequest2);
+				service.route(testRequest2, (result2, status2) => {
+					console.log('LatLng test status:', status2);
+				});
+			}
+		});
+	};
+
+	// Run test when coordinates are ready
+	useEffect(() => {
+		if (pathCoordinates.length >= 2 && isLoaded) {
+			// Log all coordinates to verify they're valid
+			console.log('=== All Path Coordinates ===');
+			pathCoordinates.forEach((coord, idx) => {
+				console.log(`Point ${idx + 1}:`, coord);
+				// Check if coordinates are in valid range
+				if (Math.abs(coord.lat) > 90 || Math.abs(coord.lng) > 180) {
+					console.error(`⚠️ Invalid coordinates at point ${idx + 1}`);
+				}
+			});
+			
+			testDirections();
+		}
+	}, [pathCoordinates, isLoaded]);
 
 	const currentDayActivities = listing.days[selectedDay.toString()] || [];
 
@@ -267,7 +530,11 @@ export default function DayView({ listing }: DayViewProps) {
 										</div>
 										<div className="flex-1">
 											<h3 className="text-white text-sm">{getItemDisplayName(activity)}</h3>
-											<p className="text-gray-400 text-sm">{activity.location?.name}</p>
+											<p className="text-gray-400 text-sm">
+												{activity.type === 'activity' && 'address' in activity && activity.address
+													? `${activity.address.street}, ${activity.address.city}`
+													: activity.location?.name}
+											</p>
 											<p className="text-gray-400 text-sm">{formatTime(activity.time)}</p>
 										</div>
 									</div>
@@ -281,11 +548,40 @@ export default function DayView({ listing }: DayViewProps) {
 
 					{/* Right Side - Map */}
 					<div className="flex-1">
-						{isApiKeyValid ? (
+						{loadError ? (
+							<div className="w-full h-[750px] flex items-center justify-center bg-[#141414] rounded-xl">
+								<div className="text-white">Error loading Google Maps</div>
+							</div>
+						) : !isLoaded ? (
+							<div className="w-full h-[750px] flex items-center justify-center bg-[#141414] rounded-xl">
+								<div className="text-white">Loading map...</div>
+							</div>
+						) : (
 							<>
 								{/* Main map container */}
-								<div className="w-full h-[750px] rounded-xl overflow-hidden">
-									{pathCoordinates.length > 0 ? (
+								<div className="w-full h-[750px] rounded-xl overflow-hidden relative">
+									{!isGeocodingComplete ? (
+										<div className="w-full h-full flex items-center justify-center bg-[#141414] rounded-xl">
+											<div className="text-white">
+												<div className="text-center">
+													<div className="text-lg mb-2">Geocoding addresses...</div>
+													<div className="text-sm text-gray-400">
+														{geocodingProgress.total > 0 && 
+															`Processing ${geocodingProgress.current} of ${geocodingProgress.total} locations`
+														}
+													</div>
+													{geocodingProgress.total > 0 && (
+														<div className="w-64 bg-gray-700 rounded-full h-2 mt-3">
+															<div 
+																className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
+																style={{ width: `${(geocodingProgress.current / geocodingProgress.total) * 100}%` }}
+															></div>
+														</div>
+													)}
+												</div>
+											</div>
+										</div>
+									) : pathCoordinates.length > 0 ? (
 										<GoogleMap
 											mapContainerStyle={{
 												width: '100%',
@@ -297,6 +593,16 @@ export default function DayView({ listing }: DayViewProps) {
 											options={mapOptions}
 											onLoad={onLoad}
 										>
+											{/* Always show markers for all coordinates */}
+											{pathCoordinates.map((position, index) => (
+												<Marker
+													key={`marker-${index}`}
+													position={position}
+													label={`${index + 1}`}
+												/>
+											))}
+
+											{/* Try to get directions if we have 2+ points */}
 											{pathCoordinates.length >= 2 && !directions && (
 												<DirectionsService
 													options={{
@@ -309,7 +615,17 @@ export default function DayView({ listing }: DayViewProps) {
 														travelMode: google.maps.TravelMode.DRIVING,
 														optimizeWaypoints: false
 													}}
-													callback={directionsCallback}
+													callback={(result, status) => {
+														console.log('=== Directions API Request ===');
+														console.log('Origin:', pathCoordinates[0]);
+														console.log('Destination:', pathCoordinates[pathCoordinates.length - 1]);
+														console.log('Waypoints:', pathCoordinates.slice(1, pathCoordinates.length - 1));
+														console.log('Status:', status);
+														if (result) {
+															console.log('Result:', result);
+														}
+														directionsCallback(result, status);
+													}}
 												/>
 											)}
 
@@ -327,23 +643,27 @@ export default function DayView({ listing }: DayViewProps) {
 												/>
 											)}
 
-											{!directions && (
+											{!directions && pathCoordinates.length >= 2 && (
 												<>
-													{/* Fallback to simple polyline if directions fail */}
+													{/* Fallback to dashed polyline if directions fail */}
 													<Polyline
 														path={pathCoordinates}
 														options={{
 															strokeColor: '#FEDB25',
-															strokeOpacity: 1,
+															strokeOpacity: 0.7,
 															strokeWeight: 3,
+															strokePattern: [10, 10], // Dashed line to indicate it's not a driving route
+															icons: [{
+																icon: {
+																	path: 'M 0,-1 0,1',
+																	strokeOpacity: 1,
+																	scale: 3
+																},
+																offset: '0',
+																repeat: '15px'
+															}]
 														}}
 													/>
-													{pathCoordinates.map((position, index) => (
-														<Marker
-															key={index}
-															position={position}
-														/>
-													))}
 												</>
 											)}
 
@@ -358,12 +678,18 @@ export default function DayView({ listing }: DayViewProps) {
 											<div className="text-white">No route coordinates available for this day</div>
 										</div>
 									)}
+									
+									{/* Info message when showing direct path */}
+									{!directions && pathCoordinates.length >= 2 && (
+										<div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/80 text-yellow-400 px-4 py-2 rounded-lg text-sm flex items-center gap-2 whitespace-nowrap">
+											<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+											</svg>
+											Showing direct path - driving directions unavailable
+										</div>
+									)}
 								</div>
 							</>
-						) : (
-							<div className="w-full h-[800px] flex items-center justify-center bg-[#141414] rounded-xl">
-								<div className="text-white">Google Maps API key not found or invalid. Please check your environment configuration.</div>
-							</div>
 						)}
 					</div>
 				</div>
