@@ -9,6 +9,7 @@ interface CodeInputProps {
   disabled?: boolean;
   autoFocus?: boolean;
   error?: boolean;
+  onSubmit?: () => void;
 }
 
 export default function CodeInput({
@@ -17,14 +18,17 @@ export default function CodeInput({
   value,
   disabled = false,
   autoFocus = true,
-  error = false
+  error = false,
+  onSubmit
 }: CodeInputProps) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleChange = (index: number, inputValue: string) => {
     if (disabled) return;
 
-    const newValue = inputValue.slice(-1);
+    // Allow only alphanumeric characters
+    const sanitizedValue = inputValue.replace(/[^a-zA-Z0-9]/g, '');
+    const newValue = sanitizedValue.slice(-1).toUpperCase(); // Convert to uppercase
     const newCode = value.split('');
     newCode[index] = newValue;
     
@@ -43,7 +47,13 @@ export default function CodeInput({
   const handleKeyDown = (index: number, e: KeyboardEvent<HTMLInputElement>) => {
     if (disabled) return;
 
-    if (e.key === 'Backspace') {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      // Submit if the code is complete
+      if (value.length === length && !value.includes('') && onSubmit) {
+        onSubmit();
+      }
+    } else if (e.key === 'Backspace') {
       e.preventDefault();
       const newCode = value.split('');
       
@@ -68,7 +78,11 @@ export default function CodeInput({
     if (disabled) return;
     
     e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, length);
+    // Allow alphanumeric characters only
+    const pastedData = e.clipboardData.getData('text')
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .slice(0, length)
+      .toUpperCase(); // Convert to uppercase for consistency
     
     if (pastedData) {
       onChange(pastedData);
@@ -89,8 +103,8 @@ export default function CodeInput({
           key={index}
           ref={(el) => (inputRefs.current[index] = el)}
           type="text"
-          inputMode="numeric"
-          pattern="[0-9]"
+          inputMode="text"
+          pattern="[a-zA-Z0-9]"
           maxLength={1}
           value={value[index] || ''}
           onChange={(e) => handleChange(index, e.target.value)}

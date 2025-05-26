@@ -22,7 +22,7 @@ export default function EmailVerification({
   initialEmail = '',
   token
 }: EmailVerificationProps) {
-  const [step, setStep] = useState<Step>(mode === 'signup' && initialEmail ? 'verify-code' : 'email-input');
+  const [step, setStep] = useState<Step>((mode === 'signup' || mode === 'email-change') && initialEmail ? 'verify-code' : 'email-input');
   const [email, setEmail] = useState(initialEmail);
   const [verificationId, setVerificationId] = useState<string | null>(null);
   const [code, setCode] = useState('');
@@ -31,9 +31,9 @@ export default function EmailVerification({
   const [canResend, setCanResend] = useState(false);
   const [countdown, setCountdown] = useState(0);
 
-  // Auto-send verification code for signup mode when component mounts
+  // Auto-send verification code when component mounts with an email
   useEffect(() => {
-    if (mode === 'signup' && initialEmail && step === 'verify-code' && !verificationId) {
+    if ((mode === 'signup' || mode === 'email-change') && initialEmail && step === 'verify-code' && !verificationId) {
       handleEmailSubmit(new Event('submit') as any);
     }
   }, [mode, initialEmail, step, verificationId]);
@@ -85,7 +85,7 @@ export default function EmailVerification({
     try {
       const endpoint = mode === 'signup' 
         ? '/api/email-verifications'
-        : `/api/users/${userId}/email-verifications`;
+        : `/api/email-verifications?userId=${userId}`;
 
       const headers: HeadersInit = {
         'Content-Type': 'application/json'
@@ -136,7 +136,7 @@ export default function EmailVerification({
     try {
       const endpoint = mode === 'signup'
         ? `/api/email-verifications?id=${verificationId}`
-        : `/api/users/${userId}/email-verifications/${verificationId}`;
+        : `/api/email-verifications?id=${verificationId}&userId=${userId}`;
 
       console.log('Submitting code to endpoint:', endpoint);
       console.log('Verification ID:', verificationId);
@@ -259,6 +259,7 @@ export default function EmailVerification({
                   handleCodeSubmit();
                 }
               }}
+              onSubmit={handleCodeSubmit}
               disabled={loading}
               error={!!error}
             />
@@ -283,23 +284,25 @@ export default function EmailVerification({
           )}
 
           <div className="flex items-center justify-between">
-            <button
-              type="button"
-              onClick={() => {
-                setStep('email-input');
-                setCode('');
-                setError(null);
-              }}
-              className="text-sm text-gray-400 hover:text-white transition-colors"
-            >
-              Change email
-            </button>
+            {mode !== 'email-change' && (
+              <button
+                type="button"
+                onClick={() => {
+                  setStep('email-input');
+                  setCode('');
+                  setError(null);
+                }}
+                className="text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                Change email
+              </button>
+            )}
 
             <button
               type="button"
               onClick={handleResend}
               disabled={!canResend || loading}
-              className="text-sm text-blue-400 hover:text-blue-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors"
+              className={`text-sm text-blue-400 hover:text-blue-300 disabled:text-gray-500 disabled:cursor-not-allowed transition-colors ${mode === 'email-change' ? 'mx-auto' : ''}`}
             >
               {canResend ? 'Resend code' : `Resend in ${countdown}s`}
             </button>

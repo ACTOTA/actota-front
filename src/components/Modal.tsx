@@ -26,23 +26,40 @@ export default function Modal({
 
     // Handle clicking outside the modal to close it
     const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-      // Only close if not a loading modal and not persistent
-      if (!isLoading && !persistent && e.target === e.currentTarget) {
+      // Only close if not a loading modal
+      if (!isLoading && e.target === e.currentTarget) {
         onClose();
       }
     };
 
     return (
       <div
-        className={`fixed inset-0 z-50 flex justify-center bg-black bg-opacity-50 ${isLoading ? 'items-center' : 'items-end sm:items-center'}`}
+        className="fixed inset-0 z-[9999] flex justify-center items-end sm:items-center bg-black/60 p-0 sm:p-4"
         onClick={handleBackdropClick}
       >
-        <GlassPanel className={`!p-4 !rounded-[16px] bg-gradient-to-r max-h-screen overflow-y-auto from-[#252525] via-[#1e1e1e] to-[#121212] ${isLoading ? 'w-auto' : 'w-full sm:w-auto'} `}>
-          {!isLoading && <button className="absolute top-4 right-4" onClick={onClose}>
-                <IoClose className="text-white size-6"/>
-            </button>}
-          {children}
-        </GlassPanel>
+        <div 
+          className={`${isLoading ? 'w-auto' : 'w-full sm:w-auto'} max-w-full sm:max-w-[90vw] max-h-[95vh] sm:max-h-[90vh] flex justify-center`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <GlassPanel className="relative !p-0 !rounded-t-2xl sm:!rounded-2xl !bg-black/40 !backdrop-blur-xl !border-white/10 !border-b-0 sm:!border-b w-full">
+            {!isLoading && (
+              <button 
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 z-50 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full p-2 sm:p-2.5 transition-all duration-200" 
+                onClick={() => {
+                  console.log('Close button clicked - calling onClose');
+                  onClose();
+                }}
+                type="button"
+                aria-label="Close modal"
+              >
+                <IoClose className="text-white size-5 sm:size-6"/>
+              </button>
+            )}
+            <div className="p-6 overflow-y-auto max-h-[85vh] flex flex-col items-center">
+              {children}
+            </div>
+          </GlassPanel>
+        </div>
       </div>
     );
   }

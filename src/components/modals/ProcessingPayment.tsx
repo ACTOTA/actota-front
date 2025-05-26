@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
-import Modal from '../Modal';
 import Loader from '../Loader';
 import { useRouter } from 'next/navigation';
 import Button from '../figma/Button';
@@ -35,9 +34,8 @@ const ProcessingPayment: React.FC = () => {
   };
 
   return (
-    <Modal onClose={hideModal} isLoading={true}>
-      <div className="bg-black w-[556px] max-sm:w-[95vw] rounded-2xl border border-border-primary px-8 py-10">
-        <div className="flex flex-col items-center justify-center gap-4">
+    <div className="w-[556px] max-sm:w-[95vw]">
+      <div className="flex flex-col items-center justify-center gap-4">
           <Loader />
           <h2 className="text-2xl font-bold text-center text-white">Processing Your Payment</h2>
           <p className="text-primary-gray text-center">
@@ -63,7 +61,6 @@ const ProcessingPayment: React.FC = () => {
           )}
         </div>
       </div>
-    </Modal>
   );
 };
 

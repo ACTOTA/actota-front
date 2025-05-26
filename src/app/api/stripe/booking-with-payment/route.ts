@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
         // Call our backend API to create booking and capture payment in one operation
         // The backend now has a flexible date parser to handle various formats
         const response = await actotaApi.post(
-            `/api/account/${user_id}/bookings/${itinerary_id}/with-payment`,
+            `/api/account/${user_id}/bookings/itinerary/${itinerary_id}`,
             {
                 payment_intent_id,
                 customer_id,

@@ -53,8 +53,11 @@ export default function ModalContainer() {
 
     const ModalComponent = MODALS[openModal as keyof typeof MODALS];
     const handleClose = () => {
-        // router.back();
-        router.push(window.location.pathname);
+        // Remove modal parameter from URL
+        const url = new URL(window.location.href);
+        url.searchParams.delete('modal');
+        url.searchParams.delete('message');
+        router.push(url.pathname + url.search);
     };
     // Determine if this is a loading modal
     const isLoadingModal = openModal === "loading" ||
@@ -73,7 +76,7 @@ export default function ModalContainer() {
         <Modal
             onClose={handleClose}
             isLoading={isLoadingModal}
-            persistent={isErrorModal} // Don't allow auto-close for error modals
+            persistent={false} // Allow closing all modals
         >
             {ModalComponent}
         </Modal>

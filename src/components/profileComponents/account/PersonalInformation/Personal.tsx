@@ -121,6 +121,7 @@ const Personal = (props: any) => {
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState("");
   const [showEmailVerification, setShowEmailVerification] = useState(false);
+  const [emailVerified, setEmailVerified] = useState(false);
   const session = getClientSession();
   
   // Get userId from localStorage or session
@@ -171,6 +172,11 @@ const Personal = (props: any) => {
       ...prev,
       [field]: value
     }));
+    
+    // Reset email verified status if email is changed
+    if (field === 'email' && value !== data?.email) {
+      setEmailVerified(false);
+    }
     
     // Clear the error for this field as the user is making changes
     if (errors[field]) {
@@ -223,8 +229,8 @@ const Personal = (props: any) => {
       return;
     }
     
-    // Check if email has changed and if so, use verification process
-    if (data.email !== formData.email) {
+    // Check if email has changed and needs verification
+    if (data.email !== formData.email && !emailVerified) {
       setNewEmail(formData.email);
       setShowEmailVerification(true);
       return;
@@ -248,9 +254,18 @@ const Personal = (props: any) => {
       
       toast.success("Profile updated successfully");
       setEditMode(false);
+      setEmailVerified(false); // Reset for next time
       
-      // Force a refresh of the page data
-      window.location.reload();
+      // Update the displayed data to reflect saved changes
+      if (data) {
+        Object.assign(data, {
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          email: formData.email,
+          phone_number: formData.phone,
+          birth_date: formData.birthDate ? formatDateForBackend(formData.birthDate) : null
+        });
+      }
     } catch (error) {
       toast.error("Failed to update profile");
       console.error("Failed to update profile:", error);
@@ -282,17 +297,17 @@ const Personal = (props: any) => {
         });
       }
       setErrors({});
+      setEmailVerified(false); // Reset email verification status
     }
     setEditMode(!editMode);
   };
 
   const handleEmailChangeSuccess = (email: string) => {
-    // Update the email in the UI
+    // Update the email in the form data
     setFormData(prev => ({...prev, email}));
+    setEmailVerified(true);
     setShowEmailVerification(false);
-    toast.success("Email updated successfully");
-    // You may want to trigger a data refresh here or update the parent component
-    window.location.reload(); // Simple reload to refresh data
+    toast.success("Email verified! Click 'Save Changes' to update your profile.");
   };
 
   const handleEmailChangeError = (error: string) => {
@@ -400,7 +415,36 @@ const Personal = (props: any) => {
         {renderField("First Name*", formData.firstName, "firstName")}
         {renderField("Last Name*", formData.lastName, "lastName")}
         
-        {renderField("Email*", formData.email, "email", "email")}
+        <div className="flex flex-col gap-2">
+          <div className="text-sm font-bold">Email*</div>
+          {editMode ? (
+            <>
+              <Input
+                value={formData.email}
+                placeholder="Email"
+                type="email"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('email', e.target.value)}
+                className={`${errors.email ? "border-red-500" : "border-[#F43E62]"} focus:border-[#F43E62] bg-[#141414]`}
+              />
+              {emailVerified && formData.email !== data?.email && (
+                <div className="text-green-500 text-xs mt-1 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Email verified - click "Save Changes" to update
+                </div>
+              )}
+              {errors.email && (
+                <div className="text-red-500 text-xs mt-1">{errors.email}</div>
+              )}
+            </>
+          ) : (
+            <div className="p-2.5 bg-[#0D0D0D] border border-primary-gray rounded-lg text-white flex justify-between items-center">
+              <span>{formData.email || "Not provided"}</span>
+              <span className="text-xs italic text-gray-400">Read-only</span>
+            </div>
+          )}
+        </div>
         
         <div className="flex flex-col gap-2">
           <div className="text-sm font-bold">Phone Number</div>

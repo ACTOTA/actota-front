@@ -21,12 +21,12 @@ const PaymentInsuranceCard = ({ insurance, onToggleSelect }: PaymentInsuranceCar
     const { id, name, price, image, selected } = insurance;
     
     return (
-        <div className={`relative flex justify-between max-w-[843px] bg-gradient-to-r from-[#1A1A1A] to-[#0D0D0D]/70 border ${selected ? 'border-[#BBD4FB]' : 'border-primary-gray'} rounded-xl`}>
+        <div className={`relative flex justify-between max-w-[843px] bg-gradient-to-r from-[#1A1A1A] to-[#0D0D0D]/70 border ${selected ? 'border-[#BBD4FB]' : 'border-primary-gray'} rounded-xl overflow-hidden`}>
             <div className="flex flex-col gap-2 relative p-4">
                 {selected && (
                     <Image 
                         src="/images/payment-page-card-blur-bg.png" 
-                        className="absolute top-[100px] left-[-100px]" 
+                        className="absolute top-[100px] left-[-100px] -z-10" 
                         alt="background effect" 
                         layout="fill" 
                     />

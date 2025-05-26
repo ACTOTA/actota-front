@@ -22,24 +22,42 @@ export async function PUT(request: NextRequest) {
     
     const payload = await request.json();
     
+    // Check for userId in query params (for email-change mode)
+    const userId = searchParams.get('userId');
+    
+    // Get auth token from headers
+    const authHeader = request.headers.get('authorization');
+    
     // Get the backend URL
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
     console.log('Verifying email with ID:', verificationId);
+    console.log('User ID:', userId);
     console.log('Payload:', payload);
     console.log('Backend base URL:', backendUrl);
     
-    const fullUrl = `${backendUrl}/api/email-verifications/${verificationId}`;
+    // Determine the endpoint based on whether this is a user email change
+    const fullUrl = userId 
+      ? `${backendUrl}/api/account/${userId}/email-verifications/${verificationId}`
+      : `${backendUrl}/api/email-verifications/${verificationId}`;
     console.log('Full backend URL:', fullUrl);
     
-    // Forward the request to the backend without auth
+    // Build headers
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    // Add auth header if present (for email-change mode)
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+    }
+    
+    // Forward the request to the backend
     const response = await fetch(
       fullUrl, 
       {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify(payload)
       }
     );
@@ -74,17 +92,37 @@ export async function POST(request: NextRequest) {
   try {
     const payload = await request.json();
     
+    // Check for userId in query params (for email-change mode)
+    const searchParams = request.nextUrl.searchParams;
+    const userId = searchParams.get('userId');
+    
+    // Get auth token from headers
+    const authHeader = request.headers.get('authorization');
+    
     // Get the backend URL
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
-    // Forward the request to the backend without auth
+    // Determine the endpoint based on whether this is a user email change
+    const endpoint = userId 
+      ? `${backendUrl}/api/account/${userId}/email-verifications`
+      : `${backendUrl}/api/email-verifications`;
+
+    // Build headers
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    // Add auth header if present (for email-change mode)
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+    }
+
+    // Forward the request to the backend
     const response = await fetch(
-      `${backendUrl}/api/email-verifications`, 
+      endpoint, 
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify(payload)
       }
     );

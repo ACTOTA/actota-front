@@ -580,13 +580,15 @@ const Payment = () => {
           <PaymentPageCard itineraryData={itineraryData} />
 
           <p className='text-white text-2xl font-bold mt-12'>Insurance</p>
-          {paymentInsurance.map((insurance) => (
-            <PaymentInsuranceCard
-              key={insurance.id}
-              insurance={insurance}
-              onToggleSelect={handleInsuranceToggle}
-            />
-          ))}
+          <div className="relative z-0 space-y-4">
+            {paymentInsurance.map((insurance) => (
+              <PaymentInsuranceCard
+                key={insurance.id}
+                insurance={insurance}
+                onToggleSelect={handleInsuranceToggle}
+              />
+            ))}
+          </div>
 
           <p className='text-white text-2xl font-bold mt-10'>Trip Members</p>
           <div className='flex max-md:flex-wrap gap-4'>
