@@ -16,6 +16,7 @@ export default function SignUp() {
   const [emailVerified, setEmailVerified] = useState(false);
   const [verifiedEmail, setVerifiedEmail] = useState('');
   const [showEmailVerification, setShowEmailVerification] = useState(false);
+  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
 
   const [errors, setErrors] = useState({
     firstName: '',
@@ -116,23 +117,27 @@ export default function SignUp() {
       },
       {
         onSuccess: (data: any) => {
-          router.back()
           // Log the data structure to debug
           console.log('Signup success data:', JSON.stringify(data, null, 2));
           
           const userData = data.data;
           localStorage.setItem('user', JSON.stringify({
-            user_id: userData._id.$oid,
+            user_id: userData.user_id || userData._id?.$oid,
             first_name: userData.first_name,
             last_name: userData.last_name,
             email: userData.email,
             customer_id: userData.customer_id
           }));
 
-          window.location.href = '/';
+          // Store auth token if available
+          if (data.auth_token) {
+            localStorage.setItem('token', data.auth_token);
+          }
+
+          // Redirect to home page after successful signup
+          router.push('/');
         },
         onError: (error: any) => {
-          router.back()
           // Check if the error is due to duplicate email
           if (error?.response?.status === 409 || error?.message?.toLowerCase().includes('already exists')) {
             setErrors(prev => ({
@@ -153,8 +158,57 @@ export default function SignUp() {
   const handleEmailVerificationSuccess = (email: string) => {
     setEmailVerified(true);
     setVerifiedEmail(email);
-    setShowEmailVerification(false);
     setFormData(prev => ({ ...prev, email }));
+    setIsCreatingAccount(true);
+    
+    // Automatically create the account after email verification
+    signUp(
+      {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: email,
+        password: formData.password
+      },
+      {
+        onSuccess: (data: any) => {
+          // Log the data structure to debug
+          console.log('Signup success data:', JSON.stringify(data, null, 2));
+          
+          const userData = data.data;
+          localStorage.setItem('user', JSON.stringify({
+            user_id: userData.user_id || userData._id?.$oid,
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            email: userData.email,
+            customer_id: userData.customer_id
+          }));
+
+          // Store auth token if available
+          if (data.auth_token) {
+            localStorage.setItem('token', data.auth_token);
+          }
+
+          // Redirect to home page after successful signup
+          router.push('/');
+        },
+        onError: (error: any) => {
+          setIsCreatingAccount(false);
+          setShowEmailVerification(false);
+          // Check if the error is due to duplicate email
+          if (error?.response?.status === 409 || error?.message?.toLowerCase().includes('already exists')) {
+            setErrors(prev => ({
+              ...prev,
+              email: 'This email is already registered. Please sign in or use a different email.'
+            }));
+          } else {
+            setErrors(prev => ({
+              ...prev,
+              email: 'Failed to create account. Please try again.'
+            }));
+          }
+        }
+      }
+    );
   };
 
   const handleEmailVerificationError = (error: string) => {
@@ -198,23 +252,40 @@ export default function SignUp() {
     return (
       <GlassPanel className="w-[584px] max-md:w-full max-md:!rounded-b-none max-md:!border-0 max-md:!border-t-[0.5px] flex flex-col justify-around relative text-white">
         <div className="text-white flex justify-between items-center mb-6">
-          <h3 className="text-2xl font-semibold">Verify Your Email</h3>
+          <h3 className="text-2xl font-semibold">
+            {isCreatingAccount ? 'Creating Your Account' : 'Verify Your Email'}
+          </h3>
           <Image src="/images/actota-logo.png" alt="logo" width={110} height={20} />
         </div>
         
-        <EmailVerification
-          mode="signup"
-          initialEmail={formData.email}
-          onSuccess={handleEmailVerificationSuccess}
-          onError={handleEmailVerificationError}
-        />
+        {isCreatingAccount ? (
+          <div className="py-8 text-center">
+            <div className="mb-4">
+              <svg className="animate-spin h-10 w-10 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+            <p className="text-lg text-white">Please wait while we create your account...</p>
+            <p className="text-sm text-primary-gray mt-2">This will only take a moment</p>
+          </div>
+        ) : (
+          <>
+            <EmailVerification
+              mode="signup"
+              initialEmail={formData.email}
+              onSuccess={handleEmailVerificationSuccess}
+              onError={handleEmailVerificationError}
+            />
 
-        <button
-          onClick={() => setShowEmailVerification(false)}
-          className="mt-6 text-primary-gray hover:text-white transition-colors"
-        >
-          ← Back to signup
-        </button>
+            <button
+              onClick={() => setShowEmailVerification(false)}
+              className="mt-6 text-primary-gray hover:text-white transition-colors"
+            >
+              ← Back to signup
+            </button>
+          </>
+        )}
       </GlassPanel>
     );
   }
@@ -268,7 +339,7 @@ export default function SignUp() {
               type="email"
               name="email"
               value={formData.email}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 handleInputChange(e);
                 // Reset verification if email changes
                 if (verifiedEmail !== e.target.value) {
