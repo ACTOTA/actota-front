@@ -236,20 +236,24 @@ const Personal = (data: any) => {
       </div>
 
       {/* Email Verification Modal */}
-      <Modal
-        isOpen={showEmailVerification}
-        onClose={() => setShowEmailVerification(false)}
-        title="Verify New Email"
-      >
-        <EmailVerification
-          mode="email-change"
-          userId={session?.user?.id}
-          token={session?.jwt}
-          initialEmail={newEmail}
-          onSuccess={handleEmailChangeSuccess}
-          onError={handleEmailChangeError}
-        />
-      </Modal>
+      {showEmailVerification && (
+        <Modal
+          onClose={() => setShowEmailVerification(false)}
+          isLoading={false}
+        >
+          <div className="p-4">
+            <h2 className="text-xl font-semibold text-white mb-4">Verify New Email</h2>
+            <EmailVerification
+              mode="email-change"
+              userId={session?.user?.user_id}
+              token={session?.accessToken}
+              initialEmail={newEmail}
+              onSuccess={handleEmailChangeSuccess}
+              onError={handleEmailChangeError}
+            />
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };
