@@ -16,11 +16,16 @@ import { E164Number } from 'libphonenumber-js'
 import 'react-phone-number-input/style.css'
 import ProfilePictureUpload from "@/src/components/inputs/ProfilePictureUpload";
 import { getClientSession } from "@/src/lib/session";
+import EmailVerification from "@/src/components/inputs/EmailVerification";
+import Modal from "@/src/components/Modal";
 
 const Personal = (data: any) => {
   const [firstName, setFirstName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState<E164Number | undefined>();
   const [profilePicture, setProfilePicture] = useState<string | undefined>();
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [showEmailVerification, setShowEmailVerification] = useState(false);
   const session = getClientSession();
 
   useEffect(() => {
@@ -29,6 +34,20 @@ const Personal = (data: any) => {
       setProfilePicture(data.data.profile_picture);
     }
   }, [data?.data?.profile_picture]);
+
+  const handleEmailChangeSuccess = (email: string) => {
+    // Update the email in the UI
+    setNewEmail(email);
+    setShowEmailVerification(false);
+    setIsEditingEmail(false);
+    // You may want to trigger a data refresh here or update the parent component
+    window.location.reload(); // Simple reload to refresh data
+  };
+
+  const handleEmailChangeError = (error: string) => {
+    console.error('Email change error:', error);
+    setShowEmailVerification(false);
+  };
   return (
     <div className="gap-4 flex flex-col">
       <div className="flex justify-between items-center">
@@ -65,13 +84,55 @@ const Personal = (data: any) => {
         </div>
         <div className="flex flex-col gap-2">
           <div className="text-sm font-bold">Email</div>
-          <Input
-            value={data?.data?.email}
-            placeholder="Email"
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setFirstName(e.target.value)
-            }
-          />
+          <div className="flex gap-2">
+            <Input
+              value={isEditingEmail ? newEmail : data?.data?.email}
+              placeholder="Email"
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                if (isEditingEmail) {
+                  setNewEmail(e.target.value);
+                }
+              }}
+              disabled={!isEditingEmail}
+            />
+            {!isEditingEmail ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setIsEditingEmail(true);
+                  setNewEmail(data?.data?.email || '');
+                }}
+              >
+                <FiEdit3 />
+              </Button>
+            ) : (
+              <div className="flex gap-2">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={() => {
+                    if (newEmail !== data?.data?.email) {
+                      setShowEmailVerification(true);
+                    }
+                  }}
+                  disabled={newEmail === data?.data?.email}
+                >
+                  Save
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setIsEditingEmail(false);
+                    setNewEmail('');
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
         <div className="flex flex-col gap-2">
           <div className="text-sm font-bold">Phone Number</div>
@@ -173,6 +234,22 @@ const Personal = (data: any) => {
           cannot be undone.
         </div>
       </div>
+
+      {/* Email Verification Modal */}
+      <Modal
+        isOpen={showEmailVerification}
+        onClose={() => setShowEmailVerification(false)}
+        title="Verify New Email"
+      >
+        <EmailVerification
+          mode="email-change"
+          userId={session?.user?.id}
+          token={session?.jwt}
+          initialEmail={newEmail}
+          onSuccess={handleEmailChangeSuccess}
+          onError={handleEmailChangeError}
+        />
+      </Modal>
     </div>
   );
 };
