@@ -17,6 +17,8 @@ import ProfilePictureUpload from "@/src/components/inputs/ProfilePictureUpload";
 import { getClientSession } from "@/src/lib/session";
 import actotaApi from '@/src/lib/apiClient';
 import { toast } from 'react-hot-toast';
+import EmailVerification from "@/src/components/inputs/EmailVerification";
+import Modal from "@/src/components/Modal";
 
 interface PersonalFormData {
   firstName: string;
@@ -116,6 +118,10 @@ const Personal = (props: any) => {
   const [profilePicture, setProfilePicture] = useState<string | undefined>();
   const [isSaving, setIsSaving] = useState(false);
   const [userId, setUserId] = useState<string>("");
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [showEmailVerification, setShowEmailVerification] = useState(false);
+  const session = getClientSession();
   
   // Get userId from localStorage or session
   useEffect(() => {
@@ -217,6 +223,13 @@ const Personal = (props: any) => {
       return;
     }
     
+    // Check if email has changed and if so, use verification process
+    if (data.email !== formData.email) {
+      setNewEmail(formData.email);
+      setShowEmailVerification(true);
+      return;
+    }
+    
     setIsSaving(true);
     try {
       // Prepare the request data
@@ -273,6 +286,21 @@ const Personal = (props: any) => {
     setEditMode(!editMode);
   };
 
+  const handleEmailChangeSuccess = (email: string) => {
+    // Update the email in the UI
+    setFormData(prev => ({...prev, email}));
+    setShowEmailVerification(false);
+    toast.success("Email updated successfully");
+    // You may want to trigger a data refresh here or update the parent component
+    window.location.reload(); // Simple reload to refresh data
+  };
+
+  const handleEmailChangeError = (error: string) => {
+    console.error('Email change error:', error);
+    toast.error(`Failed to update email: ${error}`);
+    setShowEmailVerification(false);
+  };
+
   const renderField = (label: string, value: string, field: keyof PersonalFormData, type: string = "text") => {
     return (
       <div className="flex flex-col gap-2">
@@ -309,9 +337,9 @@ const Personal = (props: any) => {
       </div>
     );
   };
-
+  
   return (
-    <div className={`gap-4 flex flex-col ${editMode ? 'border-2 border-[#F43E62] p-5 rounded-xl bg-[#0D0D0D]' : ''}`}>
+    <div className="flex flex-col gap-6">
       {editMode && (
         <div className="bg-[#F43E62] text-black py-2 px-4 rounded-t-lg -mt-5 -mx-5 mb-4 flex items-center">
           <div className="font-bold">Editing Mode</div>
@@ -462,6 +490,26 @@ const Personal = (props: any) => {
             </Button>
           </div>
         </div>
+      )}
+
+      {/* Email Verification Modal */}
+      {showEmailVerification && (
+        <Modal
+          onClose={() => setShowEmailVerification(false)}
+          isLoading={false}
+        >
+          <div className="p-4">
+            <h2 className="text-xl font-semibold text-white mb-4">Verify New Email</h2>
+            <EmailVerification
+              mode="email-change"
+              userId={session?.user?.user_id}
+              token={session?.accessToken}
+              initialEmail={newEmail}
+              onSuccess={handleEmailChangeSuccess}
+              onError={handleEmailChangeError}
+            />
+          </div>
+        </Modal>
       )}
     </div>
   );

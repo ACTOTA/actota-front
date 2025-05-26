@@ -48,7 +48,12 @@ export async function POST(request: Request) {
       }
       
       return NextResponse.json(
-        { success: true, message: 'Signup successful', data: userData },
+        { 
+          success: true, 
+          message: 'Signup successful', 
+          data: userData,
+          auth_token: response.data.auth_token 
+        },
         { status: 200 }
       );
     }
