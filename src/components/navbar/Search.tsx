@@ -4,6 +4,7 @@ import { HiOutlineLocationMarker } from 'react-icons/hi';
 import { AiOutlineCalendar } from 'react-icons/ai';
 import { BsPeople } from 'react-icons/bs';
 import { RiMapPinLine } from 'react-icons/ri';
+import { MdLocationOn, MdDateRange, MdPeople, MdLocalActivity } from 'react-icons/md';
 
 import { STEPS } from '@/src/types/steps';
 import SearchBoxes from './SearchBoxes';
@@ -198,70 +199,103 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
       {/* Remove backdrop - we'll handle dimming differently */}
 
       <div className={`relative ${navbar ? '' : 'max-lg:fixed max-lg:bottom-5 max-lg:h-[60px] max-lg:left-0 max-lg:right-0 max-lg:px-4 max-lg:z-50 max-lg:pb-2'}`} id="search-bar">
-        <div className={`items-center justify-between ${navbar ? 'w-[500px] h-[60px] text-primary-gray max-2xl:h-[60px]' : 'w-[720px] max-lg:w-full max-lg:h-[64px] max-lg:mx-0 text-white'} 
-        ${isTop && !navbar ? 'h-[82px]' : 'h-[60px]'}
+        <div className={`items-center justify-between ${navbar ? 'w-[500px] h-[60px] text-primary-gray max-2xl:h-[60px]' : 'w-[760px] max-lg:w-full max-lg:h-[64px] max-lg:mx-0 text-white'} 
+        ${isTop && !navbar ? 'h-[86px]' : 'h-[66px]'}
         grid grid-cols-9 
-        ${navbar ? 'rounded-full border-2 border-border-primary bg-black/40 backdrop-filter backdrop-blur-sm' : 'max-lg:rounded-2xl max-lg:bg-black/80 max-lg:backdrop-blur-md max-lg:border max-lg:border-gray-600 lg:rounded-full lg:border-2 lg:border-border-primary lg:bg-black/40 lg:backdrop-filter lg:backdrop-blur-sm'}
+        ${navbar ? 'rounded-full border-2 border-border-primary bg-black/40 backdrop-filter backdrop-blur-sm' : 'max-lg:rounded-2xl max-lg:bg-black/80 max-lg:backdrop-blur-md max-lg:border max-lg:border-gray-600 lg:rounded-full lg:border lg:border-gray-600 lg:bg-black/60 lg:backdrop-filter lg:backdrop-blur-md'}
         text-sm text-left m-auto z-50
-        shadow-lg max-lg:shadow-2xl
+        shadow-2xl
         transition-all duration-300 ease-in-out ${className}`} ref={searchRef}>
 
           <section onClick={() => handleSelect(STEPS.LOCATION)}
             id={STEPS.LOCATION.toString()}
             className={`
-            ${currStep == STEPS.LOCATION ? 'border-2 border-white bg-black/50' : currStep !== STEPS.DATE && 'after:content-[""] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2'}
+            ${currStep == STEPS.LOCATION ? 'lg:border-2 lg:border-white lg:bg-white/10' : currStep !== STEPS.DATE && 'lg:after:content-[""] lg:after:absolute lg:after:right-0 lg:after:top-1/2 lg:after:h-8 lg:after:w-[1px] lg:after:bg-gray-400 lg:after:-translate-y-1/2'}
             rounded-full cursor-pointer z-10 h-full w-full col-span-2
-            flex flex-col justify-center gap-1 text-center relative
+            flex flex-col justify-center gap-0.5 px-4 relative
+            hover:bg-white/5 transition-all duration-200
           `}>
-            <p>{locationValue.length > 0 ? locationValue[0] : "Where"}</p>
-            {!navbar && (
-              <p className="text-primary-gray max-md:hidden">
-                {locationValue.length > 0 ? locationValue[0] : "Location"}
-              </p>
-            )}
+            <div className="flex items-center gap-2 max-md:justify-center">
+              <MdLocationOn className={`w-4 h-4 max-md:hidden ${locationValue.length > 0 ? 'text-blue-400' : 'text-gray-400'}`} />
+              <div className="max-md:text-center">
+                <p className={`font-medium ${locationValue.length > 0 ? 'text-white' : 'text-gray-300'}`}>
+                  {locationValue.length > 0 ? locationValue[0].split(',')[0] : "Where"}
+                </p>
+                {!navbar && (
+                  <p className="text-xs text-gray-500 max-md:hidden truncate">
+                    {locationValue.length > 0 ? locationValue[0].split(',')[1]?.trim() || 'Selected' : "Search destinations"}
+                  </p>
+                )}
+              </div>
+            </div>
           </section>
 
           <section onClick={() => handleSelect(STEPS.DATE)}
             id={STEPS.DATE.toString()}
-            className={`${currStep == STEPS.DATE ? 'border-2 border-white bg-black/50' : currStep !== STEPS.GUESTS && 'after:content-[""] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
-        flex flex-col justify-center gap-1 text-center relative`}>
-            <p>{durationValue.length > 0 ? durationValue[0].split(' ')[0] : "When"}</p>
-            {!navbar && (
-              <p className="text-primary-gray max-md:hidden">
-                {durationValue.length > 0 ? durationValue[0] : "Duration"}
-              </p>
-            )}
+            className={`${currStep == STEPS.DATE ? 'lg:border-2 lg:border-white lg:bg-white/10' : currStep !== STEPS.GUESTS && 'lg:after:content-[""] lg:after:absolute lg:after:right-0 lg:after:top-1/2 lg:after:h-8 lg:after:w-[1px] lg:after:bg-gray-400 lg:after:-translate-y-1/2'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
+        flex flex-col justify-center gap-0.5 px-4 relative
+        hover:bg-white/5 transition-all duration-200`}>
+            <div className="flex items-center gap-2 max-md:justify-center">
+              <MdDateRange className={`w-4 h-4 max-md:hidden ${durationValue.length > 0 ? 'text-blue-400' : 'text-gray-400'}`} />
+              <div className="max-md:text-center">
+                <p className={`font-medium ${durationValue.length > 0 ? 'text-white' : 'text-gray-300'}`}>
+                  {durationValue.length > 0 ? durationValue[0].split(' ')[0] : "When"}
+                </p>
+                {!navbar && (
+                  <p className="text-xs text-gray-500 max-md:hidden">
+                    {durationValue.length > 0 ? `${durationValue[0].split(' ').slice(1).join(' ')}` : "Add dates"}
+                  </p>
+                )}
+              </div>
+            </div>
           </section>
 
           <section onClick={() => handleSelect(STEPS.GUESTS)}
             id={STEPS.GUESTS.toString()}
-            className={`${currStep == STEPS.GUESTS ? 'border-2 border-white bg-black/50' : currStep !== STEPS.ACTIVITIES && 'after:content-[""] after:absolute after:right-0 after:top-1/2 after:h-6 after:w-[1px] after:bg-[#FFFFFF] after:-translate-y-1/2'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
-        flex flex-col justify-center gap-1 text-center relative
+            className={`${currStep == STEPS.GUESTS ? 'lg:border-2 lg:border-white lg:bg-white/10' : currStep !== STEPS.ACTIVITIES && 'lg:after:content-[""] lg:after:absolute lg:after:right-0 lg:after:top-1/2 lg:after:h-8 lg:after:w-[1px] lg:after:bg-gray-400 lg:after:-translate-y-1/2'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
+        flex flex-col justify-center gap-0.5 px-4 relative
+        hover:bg-white/5 transition-all duration-200
        `}>
-            <p>{guestsValue.length > 0 ? guestsValue[0].split(' ')[0] : "Who"}</p>
-            {!navbar && (
-              <p className="text-primary-gray max-md:hidden">
-                {guestsValue.length > 0 ? guestsValue[0] : "Add Guests"}
-              </p>
-            )}
+            <div className="flex items-center gap-2 max-md:justify-center">
+              <MdPeople className={`w-4 h-4 max-md:hidden ${guestsValue.length > 0 ? 'text-blue-400' : 'text-gray-400'}`} />
+              <div className="max-md:text-center">
+                <p className={`font-medium ${guestsValue.length > 0 ? 'text-white' : 'text-gray-300'}`}>
+                  {guestsValue.length > 0 ? guestsValue[0].split(' ')[0] : "Who"}
+                </p>
+                {!navbar && (
+                  <p className="text-xs text-gray-500 max-md:hidden">
+                    {guestsValue.length > 0 ? `${guestsValue[0].split(' ').slice(1).join(' ')}` : "Add guests"}
+                  </p>
+                )}
+              </div>
+            </div>
           </section>
 
           <section onClick={() => handleSelect(STEPS.ACTIVITIES)}
             id={STEPS.ACTIVITIES.toString()}
-            className={`${currStep == STEPS.ACTIVITIES ? 'border-2 border-white bg-black/50' : ' border-transparent'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
-        flex flex-col justify-center gap-1 text-center `}>
-            <p>{getActivityCount(activitiesValue)}</p>
-            {!navbar && (
-              <p className="text-primary-gray max-md:hidden">
-                {getActivityCount(activitiesValue, true)}
-              </p>
-            )}
+            className={`${currStep == STEPS.ACTIVITIES ? 'lg:border-2 lg:border-white lg:bg-white/10' : ' border-transparent'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
+        flex flex-col justify-center gap-0.5 px-4 relative
+        hover:bg-white/5 transition-all duration-200`}>
+            <div className="flex items-center gap-2 max-md:justify-center">
+              <MdLocalActivity className={`w-4 h-4 max-md:hidden ${activitiesValue.length > 0 ? 'text-blue-400' : 'text-gray-400'}`} />
+              <div className="max-md:text-center">
+                <p className={`font-medium ${activitiesValue.length > 0 ? 'text-white' : 'text-gray-300'}`}>
+                  {activitiesValue.length > 0 ? `${activitiesValue.length} Activities` : "What"}
+                </p>
+                {!navbar && (
+                  <p className="text-xs text-gray-500 max-md:hidden truncate">
+                    {activitiesValue.length > 0 ? activitiesValue.slice(0, 2).join(", ") + (activitiesValue.length > 2 ? "..." : "") : "Choose activities"}
+                  </p>
+                )}
+              </div>
+            </div>
           </section>
 
-          <section className={`${navbar ? ' h-[55px] w-[55px] pr-1 -ml-2' : 'm-auto max-2xl:h-[58px] max-2xl:w-[58px] max-md:h-[55px] max-md:w-[55px] max-sm:h-[45px] max-sm:w-[45px] max-md:pr-1 max-md:-ml-2 h-full w-full px-2'} col-span-1 flex justify-center items-center`}>
-            <div onClick={() => handleSearch()} className="w-full aspect-square relative rounded-full bg-white cursor-pointer m-auto
-            transition-all duration-300 ease-in-out">
-              <BiSearch size={24} className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 text-black" />
+          <section className={`${navbar ? ' h-[55px] w-[55px] pr-1 -ml-2' : 'm-auto h-[52px] w-[52px] lg:h-[56px] lg:w-[56px] max-md:h-[55px] max-md:w-[55px] max-sm:h-[45px] max-sm:w-[45px] max-md:pr-1 max-md:-ml-2'} col-span-1 flex justify-center items-center`}>
+            <div onClick={() => handleSearch()} className="w-full h-full relative rounded-full bg-gradient-to-r from-blue-500 to-blue-600 cursor-pointer
+            hover:from-blue-600 hover:to-blue-700 transition-all duration-300 ease-in-out
+            shadow-lg hover:shadow-xl transform hover:scale-105">
+              <BiSearch size={24} className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 text-white" />
             </div>
           </section>
         </div>
