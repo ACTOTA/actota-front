@@ -138,8 +138,8 @@ const Personal = (props: any) => {
       
       // If not in localStorage, try session
       const session = getClientSession();
-      if (session?.user?.id) {
-        setUserId(session.user.id);
+      if (session?.user?.user_id) {
+        setUserId(session.user.user_id);
       }
     } catch (error) {
       console.error("Error getting user ID:", error);
@@ -306,9 +306,11 @@ const Personal = (props: any) => {
       console.error("Failed to update profile:", error);
       
       // Log more details about the error
-      if (error.response) {
-        console.error("Error response data:", error.response.data);
-        console.error("Error response status:", error.response.status);
+      // Type assertion for Axios error
+      const axiosError = error as { response?: { data: any, status: number } };
+      if (axiosError.response) {
+        console.error("Error response data:", axiosError.response.data);
+        console.error("Error response status:", axiosError.response.status);
       }
     } finally {
       setIsSaving(false);

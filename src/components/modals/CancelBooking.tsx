@@ -168,7 +168,7 @@ const CancelBooking = ({ onClose, booking, totalAmount }: CancelBookingProps) =>
                 <div>
                   <p className='text-xs text-primary-gray mb-1'>Location</p>
                   <p className='text-white text-sm'>
-                    {itineraryData.start_location?.name || itineraryData.start_location?.city || 'Various Locations'}
+                    {itineraryData.start_location?.city || 'Various Locations'}
                   </p>
                 </div>
                 <div>

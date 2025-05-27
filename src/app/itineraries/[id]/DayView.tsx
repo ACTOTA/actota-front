@@ -652,7 +652,6 @@ export default function DayView({ listing }: DayViewProps) {
 															strokeColor: '#FEDB25',
 															strokeOpacity: 0.7,
 															strokeWeight: 3,
-															strokePattern: [10, 10], // Dashed line to indicate it's not a driving route
 															icons: [{
 																icon: {
 																	path: 'M 0,-1 0,1',

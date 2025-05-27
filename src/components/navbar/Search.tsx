@@ -17,6 +17,30 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
   const [guestsValue, setGuestsValue] = useState<string[]>([]);
   const [activitiesValue, setActivitiesValue] = useState<string[]>([]);
 
+  // Touch/swipe handling for mobile bottom sheet
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientY);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientY);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isDownSwipe = distance < -50; // At least 50px down swipe
+    
+    if (isDownSwipe) {
+      setCurrStep?.(null);
+    }
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -126,7 +150,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
       const initialPosition = searchElement.getBoundingClientRect().top + window.scrollY;
 
       const handleScroll = () => {
-        // Only apply scroll-based positioning on larger screens
+        // Only apply scroll-based positioning on desktop screens
         if (window.innerWidth >= 1024) {
           if (window.scrollY >= initialPosition && !navbar) {
             // Set fixed position for large screens
@@ -139,8 +163,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
             setIsTop(true);
           }
         } else {
-          // No scroll-based positioning needed for smaller screens
-          // as we have fixed position at bottom already
+          // On mobile, no special positioning needed
           setClasses?.('');
           setClassName('');
           setIsTop(true);
@@ -167,17 +190,18 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
 
   return (
     <>
-      {/* Background overlay for mobile when search boxes are open */}
+      {/* Subtle backdrop for mobile when search boxes are open */}
       {currStep !== null && !navbar && (
-        <div className="hidden max-lg:block fixed inset-0 bg-black/60 backdrop-blur-[2px] z-40" onClick={() => setCurrStep?.(null)}></div>
+        <div className="lg:hidden fixed inset-0 bg-black/30 z-40" onClick={() => setCurrStep?.(null)}></div>
       )}
 
       <div className={`relative ${navbar ? '' : 'max-lg:fixed max-lg:bottom-5 max-lg:h-[60px] max-lg:left-0 max-lg:right-0 max-lg:px-4 max-lg:z-50 max-lg:pb-2'}`} id="search-bar">
-        <div className={`items-center justify-between ${navbar ? 'w-[500px] h-[60px] text-primary-gray max-2xl:h-[60px]' : 'w-[720px] max-lg:w-full max-lg:h-[60px] max-md:w-[520px] max-sm:w-[360px] max-sm:h-[50px] max-md:h-[60px] text-white'} 
+        <div className={`items-center justify-between ${navbar ? 'w-[500px] h-[60px] text-primary-gray max-2xl:h-[60px]' : 'w-[720px] max-lg:w-full max-lg:h-[64px] max-lg:mx-0 text-white'} 
         ${isTop && !navbar ? 'h-[82px]' : 'h-[60px]'}
-        grid grid-cols-9 rounded-full border-2 border-border-primary
-        bg-black/40 backdrop-filter backdrop-blur-sm text-sm text-left m-auto z-50
-        shadow-lg max-lg:shadow-xl
+        grid grid-cols-9 
+        ${navbar ? 'rounded-full border-2 border-border-primary bg-black/40 backdrop-filter backdrop-blur-sm' : 'max-lg:rounded-2xl max-lg:bg-black/80 max-lg:backdrop-blur-md max-lg:border max-lg:border-gray-600 lg:rounded-full lg:border-2 lg:border-border-primary lg:bg-black/40 lg:backdrop-filter lg:backdrop-blur-sm'}
+        text-sm text-left m-auto z-50
+        shadow-lg max-lg:shadow-2xl
         transition-all duration-300 ease-in-out ${className}`} ref={searchRef}>
 
           <section onClick={() => handleSelect(STEPS.LOCATION)}
@@ -241,15 +265,39 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
         </div>
 
         {currStep != null && (
-          <div id='search-box' className="w-full max-lg:absolute max-lg:bottom-[calc(100%+10px)] max-lg:left-1/2 max-lg:-translate-x-1/2 max-lg:w-[min(95vw,720px)]">
-            <SearchBoxes
-              step={currStep}
-              updateSearchValue={updateSearchValue}
-              locationValue={locationValue.length > 0 ? locationValue[0] : ""}
-              durationValue={durationValue.length > 0 ? durationValue[0] : ""}
-              guestsValue={guestsValue.length > 0 ? guestsValue[0] : ""}
-              activitiesValue={activitiesValue.length > 0 ? activitiesValue.join(", ") : ""}
-            />
+          <div 
+            id='search-box' 
+            className={`
+              w-full 
+              lg:absolute lg:top-[calc(100%+10px)] lg:left-1/2 lg:-translate-x-1/2 lg:w-[720px]
+              max-lg:fixed max-lg:bottom-0 max-lg:left-0 max-lg:right-0 max-lg:z-[60]
+              max-lg:bg-black max-lg:rounded-t-3xl max-lg:pt-3 max-lg:px-4 max-lg:pb-6
+              max-lg:shadow-2xl max-lg:border-t max-lg:border-gray-600
+              max-lg:animate-slide-up max-lg:min-h-[50vh] max-lg:max-h-[80vh]
+              mt-4 lg:mt-0
+            `}
+            style={{
+              WebkitOverflowScrolling: 'touch'
+            }}
+          >
+            {/* Mobile handle indicator - swipe to dismiss */}
+            <div 
+              className="lg:hidden flex justify-center mb-4 cursor-pointer"
+              onClick={() => setCurrStep?.(null)}
+            >
+              <div className="w-12 h-1 bg-gray-500 rounded-full hover:bg-gray-400 transition-colors"></div>
+            </div>
+            
+            <div className="max-lg:text-white">
+              <SearchBoxes
+                step={currStep}
+                updateSearchValue={updateSearchValue}
+                locationValue={locationValue.length > 0 ? locationValue[0] : ""}
+                durationValue={durationValue.length > 0 ? durationValue[0] : ""}
+                guestsValue={guestsValue.length > 0 ? guestsValue[0] : ""}
+                activitiesValue={activitiesValue.length > 0 ? activitiesValue.join(", ") : ""}
+              />
+            </div>
           </div>
         )}
       </div>

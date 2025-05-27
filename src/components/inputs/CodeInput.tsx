@@ -101,7 +101,10 @@ export default function CodeInput({
       {Array.from({ length }, (_, index) => (
         <input
           key={index}
-          ref={(el) => (inputRefs.current[index] = el)}
+          ref={(el) => {
+            inputRefs.current[index] = el;
+            // Return void to satisfy TypeScript
+          }}
           type="text"
           inputMode="text"
           pattern="[a-zA-Z0-9]"

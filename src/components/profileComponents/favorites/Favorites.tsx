@@ -123,7 +123,7 @@ const Favorites = () => {
                 </div>
               </div>} 
               options={["Lowest Price", "Highest Price"]} 
-              onSelect={(option: string) => setSortOption(option)} 
+              onSelect={(option) => setSortOption(Array.isArray(option) ? option[0] : option)}
               className="border-none !bg-[#141414] rounded-lg" 
             />
           </div>

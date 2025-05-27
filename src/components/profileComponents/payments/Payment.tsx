@@ -87,8 +87,29 @@ const Payment = () => {
     cvv: ''
   });
 
-  const [purchaseHistory, setPurchaseHistory] = useState([]);
-  const [refundsHistory, setRefundsHistory] = useState([]);
+  // Define types for charges and refunds
+  interface ChargeItem {
+    id: string;
+    purchase: string;
+    bookingId?: string;
+    transactionDate: string;
+    paymentDate: string;
+    amount: string;
+    status: string;
+  }
+  
+  interface RefundItem {
+    id: string;
+    bookingId?: string;
+    refundDate: string;
+    originalAmount: string;
+    refundAmount: string;
+    reason: string;
+    status: string;
+  }
+  
+  const [purchaseHistory, setPurchaseHistory] = useState<ChargeItem[]>([]);
+  const [refundsHistory, setRefundsHistory] = useState<RefundItem[]>([]);
 
   useEffect(() => {
     // Skip the fetch if user ID is not available
@@ -131,9 +152,30 @@ const Payment = () => {
           // Handle Stripe charges data structure
           const stripeCharges = data.data;
           
-          // Separate charges and refunds
-          const charges = [];
-          const refunds = [];
+          // Define types for charges and refunds
+          interface ChargeItem {
+            id: string;
+            purchase: string;
+            bookingId?: string;
+            transactionDate: string;
+            paymentDate: string;
+            amount: string;
+            status: string;
+          }
+          
+          interface RefundItem {
+            id: string;
+            bookingId?: string;
+            refundDate: string;
+            originalAmount: string;
+            refundAmount: string;
+            reason: string;
+            status: string;
+          }
+          
+          // Separate charges and refunds with proper types
+          const charges: ChargeItem[] = [];
+          const refunds: RefundItem[] = [];
           
           stripeCharges.forEach((item: any) => {
             if (item.transaction_type === 'refund') {
