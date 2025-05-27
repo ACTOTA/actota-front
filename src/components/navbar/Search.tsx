@@ -279,6 +279,9 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
             style={{
               WebkitOverflowScrolling: 'touch'
             }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
             {/* Mobile handle indicator - swipe to dismiss */}
             <div 

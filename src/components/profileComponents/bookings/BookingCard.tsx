@@ -120,7 +120,7 @@ const BookingCard: React.FC<ListingCardProps> = ({
     <BaseCard className="mt-4">
       
       {/* Header with status and price */}
-      <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6'>
+      <div className='flex flex-row items-center justify-between gap-4 mb-6'>
         <div className='flex items-center gap-3'>
           <StatusBadge 
             status={dataBooking?.status || 'confirmed'}
