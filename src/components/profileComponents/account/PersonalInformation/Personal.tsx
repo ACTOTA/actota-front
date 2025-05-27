@@ -19,6 +19,7 @@ import actotaApi from '@/src/lib/apiClient';
 import { toast } from 'react-hot-toast';
 import EmailVerification from "@/src/components/inputs/EmailVerification";
 import Modal from "@/src/components/Modal";
+import { useQueryClient } from '@tanstack/react-query';
 
 interface PersonalFormData {
   firstName: string;
@@ -123,6 +124,7 @@ const Personal = (props: any) => {
   const [showEmailVerification, setShowEmailVerification] = useState(false);
   const [emailVerified, setEmailVerified] = useState(false);
   const session = getClientSession();
+  const queryClient = useQueryClient();
   
   // Get userId from localStorage or session
   useEffect(() => {
@@ -250,7 +252,40 @@ const Personal = (props: any) => {
       // Log the payload for debugging
       console.log("Update profile payload:", JSON.stringify(requestData, null, 2));
       
-      await actotaApi.put(`/api/account/${userId}`, requestData);
+      const response = await actotaApi.put(`/api/account/${userId}`, requestData);
+      
+      // Check if email was changed (comparing with the original email from data)
+      const emailChanged = data.email !== formData.email;
+      
+      if (emailChanged) {
+        // Clear all cached data
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        
+        // Clear React Query cache
+        queryClient.clear();
+        
+        // Clear persisted React Query cache
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+        }
+        
+        // Show message and redirect to login
+        toast.success("Your email has been updated. Please sign in again with your new email address.");
+        
+        // Perform signout on server side to clear cookies
+        await fetch('/api/auth/session', {
+          method: 'DELETE',
+          credentials: 'include'
+        });
+        
+        // Redirect to login page with message
+        setTimeout(() => {
+          window.location.href = '/auth/signin?message=email-updated';
+        }, 1500);
+        
+        return; // Exit early, don't update local state
+      }
       
       toast.success("Profile updated successfully");
       setEditMode(false);

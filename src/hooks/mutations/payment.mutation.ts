@@ -456,6 +456,12 @@ export const useBookingWithPayment = (): UseMutationResult<
     },
     onSuccess: (data) => {
       if (data.success) {
+        // Store success flag for the ProcessingPayment modal to detect
+        localStorage.setItem('recentBookingSuccess', JSON.stringify({
+          timestamp: new Date().toISOString(),
+          booking_id: data.booking_id
+        }));
+        
         toast.success("Booking confirmed successfully!");
         queryClient.invalidateQueries({ queryKey: ['bookings'] });
       } else if (data.error) {

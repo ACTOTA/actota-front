@@ -23,6 +23,7 @@ export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [sessionExpired, setSessionExpired] = useState(false);
+  const [emailUpdated, setEmailUpdated] = useState(false);
 
   // Check for URL parameters and authentication status
   const [redirectTo, setRedirectTo] = useState<string | null>(null);
@@ -34,6 +35,10 @@ export default function SignIn() {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('expired') === 'true') {
           setSessionExpired(true);
+        }
+        
+        if (urlParams.get('message') === 'email-updated') {
+          setEmailUpdated(true);
         }
         
         const redirectPath = urlParams.get('redirectTo');
@@ -195,6 +200,14 @@ export default function SignIn() {
         <div className="mt-4 px-4 py-3 bg-red-500/20 border border-red-500 rounded-md">
           <p className="text-white text-sm">
             Your session has expired. Please sign in again to continue.
+          </p>
+        </div>
+      )}
+      
+      {emailUpdated && (
+        <div className="mt-4 px-4 py-3 bg-green-500/20 border border-green-500 rounded-md">
+          <p className="text-white text-sm">
+            Your email has been updated. Please sign in again with your new email address.
           </p>
         </div>
       )}

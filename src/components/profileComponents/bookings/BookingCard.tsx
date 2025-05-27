@@ -38,7 +38,35 @@ const BookingCard: React.FC<ListingCardProps> = ({
 }) => {
   const router = useRouter();
 
-  // Remove console.log statements in useEffect to reduce noise and prevent unnecessary rerenders
+  // Log the dataBooking object to see available fields
+  useEffect(() => {
+    if (dataBooking) {
+      console.log('BookingCard - dataBooking object:', dataBooking);
+      console.log('BookingCard - dataBooking fields:', Object.keys(dataBooking));
+      
+      // Log specifically date-related fields
+      console.log('BookingCard - Date fields:', {
+        start_date: dataBooking.start_date,
+        end_date: dataBooking.end_date,
+        created_at: dataBooking.created_at,
+        arrival_datetime: dataBooking.arrival_datetime,
+        departure_datetime: dataBooking.departure_datetime,
+        booking_date: (dataBooking as any).booking_date,
+        travel_dates: (dataBooking as any).travel_dates,
+      });
+    }
+  }, [dataBooking]);
+
+  // Helper function to get start and end dates from booking data
+  const getBookingDates = () => {
+    if (!dataBooking) return { startDate: null, endDate: null };
+    
+    // Try start_date/end_date first, then arrival_datetime/departure_datetime
+    const startDate = dataBooking.start_date || dataBooking.arrival_datetime;
+    const endDate = dataBooking.end_date || dataBooking.departure_datetime;
+    
+    return { startDate, endDate };
+  };
 
   const handleDetailsClick = () => {
     if (!dataBooking || !dataBooking._id) {
@@ -56,10 +84,16 @@ const BookingCard: React.FC<ListingCardProps> = ({
   };
 
   const handleCancelClick = () => {
-    // Store booking and itinerary in localStorage
-    // console.log('Setting localStorage:', { dataBooking, dataItinerary }); // Log here
-    // localStorage.setItem('bookingDetails', JSON.stringify({ dataBooking, dataItinerary }));
-    router.push('/profile/cancellation');
+    // Store booking and itinerary data for the modal
+    if (dataBooking && dataItinerary) {
+      localStorage.setItem('bookingDetails', JSON.stringify({ 
+        dataBooking, 
+        dataItinerary,
+        totalAmount: dataBooking.total_cost || dataItinerary.total_cost || 0
+      }));
+    }
+    // Open the cancel booking modal
+    router.push("?modal=cancelBooking");
   };
 
   const handleCancel = useCallback(
@@ -92,9 +126,16 @@ const BookingCard: React.FC<ListingCardProps> = ({
               dataBooking?.status === "ongoing" ? <Image src="/svg-icons/ongoing-icon.svg" alt="clock" width={16} height={16} /> :
                 <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16.5 5V3m-9 2V3M3.25 8h17.5M3 10.044c0-2.115 0-3.173.436-3.981a3.9 3.9 0 0 1 1.748-1.651C6.04 4 7.16 4 9.4 4h5.2c2.24 0 3.36 0 4.216.412c.753.362 1.364.94 1.748 1.65c.436.81.436 1.868.436 3.983v4.912c0 2.115 0 3.173-.436 3.981a3.9 3.9 0 0 1-1.748 1.651C17.96 21 16.84 21 14.6 21H9.4c-2.24 0-3.36 0-4.216-.412a3.9 3.9 0 0 1-1.748-1.65C3 18.128 3 17.07 3 14.955z"/></svg>
               }
-            {dataBooking?.status === "upcoming" && dataBooking.created_at ? 
-              `in ${Math.max(1, Math.ceil((new Date(dataBooking.start_date || Date.now()).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))} days` : 
-              dataBooking?.status?.charAt(0).toUpperCase() + dataBooking?.status?.slice(1)}
+            {(() => {
+              if (dataBooking?.status === "upcoming") {
+                const { startDate } = getBookingDates();
+                if (startDate) {
+                  const daysUntil = Math.ceil((new Date(startDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                  return `in ${Math.max(1, daysUntil)} days`;
+                }
+              }
+              return dataBooking?.status?.charAt(0).toUpperCase() + dataBooking?.status?.slice(1);
+            })()}
           </Button>
           <p className='text-2xl font-bold text-white'>{dataItinerary?.trip_name || 'Adventure Trip'}</p>
         </div>
@@ -113,7 +154,15 @@ const BookingCard: React.FC<ListingCardProps> = ({
                 <CiCalendar className='h-[17px] w-[17px] text-white' /> Dates
               </p>
               <p className='text-white text-sm ml-5'>
-                {dataItinerary?.length_days ? `${dataItinerary.length_days} ${dataItinerary.length_days === 1 ? 'day' : 'days'}` : '- days'}
+                {(() => {
+                  const { startDate, endDate } = getBookingDates();
+                  if (startDate && endDate) {
+                    return `${moment(startDate).format('MMM D')} - ${moment(endDate).format('MMM D, YYYY')}`;
+                  }
+                  return dataItinerary?.length_days ? 
+                    `${dataItinerary.length_days} ${dataItinerary.length_days === 1 ? 'day' : 'days'}` : 
+                    '- days';
+                })()}
               </p>
             </div>
             <div className='flex flex-1 flex-col gap-1'>
@@ -218,7 +267,11 @@ const BookingCard: React.FC<ListingCardProps> = ({
           <p className='text-sm text-primary-gray ml-7'>You’ll earn the points once you complete the trip.</p>
         </div>
         <div className='flex max-md:w-full gap-2'>
-          {dataBooking?.status !== "completed" && <Button onClick={handleCancelClick} variant={bookingDetailsPage ? "simple" : "primary"} className={`  ${bookingDetailsPage ? "!bg-transparent text-[#C10B2F] " : "!bg-[#C10B2F]"}  text-white w-full`}> <span className={`${bookingDetailsPage ? "border-b border-b-[#C10B2F] whitespace-nowrap " : "text-white whitespace-nowrap"}`}> Cancel Trip</span></Button>}
+          {(dataBooking?.status === "confirmed" || dataBooking?.status === "ongoing" || dataBooking?.status === "upcoming") && 
+            <Button onClick={handleCancelClick} variant={bookingDetailsPage ? "simple" : "primary"} className={`  ${bookingDetailsPage ? "!bg-transparent text-[#C10B2F] " : "!bg-[#C10B2F]"}  text-white w-full`}> 
+              <span className={`${bookingDetailsPage ? "border-b border-b-[#C10B2F] whitespace-nowrap " : "text-white whitespace-nowrap"}`}> Cancel Trip</span>
+            </Button>
+          }
           {!bookingDetailsPage && <Button onClick={handleDetailsClick} variant='outline' className=' text-white gap-2 w-full'> View {dataBooking?.status === "completed" && !bookingConfirmedModal ? "Details" : ""} <CgArrowTopRight className='size-6' /></Button>}
 
         </div>

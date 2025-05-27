@@ -32,15 +32,19 @@ export async function POST(request: NextRequest) {
         }
 
         // Call our backend API to create booking and capture payment in one operation
-        // The backend now has a flexible date parser to handle various formats
+        // Only send the BookingInput payload that the backend expects
+        const bookingPayload = {
+            arrival_datetime,
+            departure_datetime,
+            customer_id,
+            transaction_id: payment_intent_id,
+        };
+
+        console.log('Sending booking payload to backend:', JSON.stringify(bookingPayload, null, 2));
+
         const response = await actotaApi.post(
             `/api/account/${user_id}/bookings/itinerary/${itinerary_id}`,
-            {
-                payment_intent_id,
-                customer_id,
-                arrival_datetime,
-                departure_datetime
-            },
+            bookingPayload,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,

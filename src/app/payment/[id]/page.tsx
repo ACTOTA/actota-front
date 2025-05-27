@@ -408,14 +408,18 @@ const Payment = () => {
         router.replace(pathname);
         router.push("?modal=processingPayment");
 
-        // Use the new combined booking with payment endpoint
-        processBookingWithPayment({
+        // Store booking attempt data for potential retry
+        const bookingAttemptData = {
           itineraryId: objectId,
           paymentIntentId: paymentIntent.id,
           customerId: userInfo.customer_id || "TEST",
           arrivalDatetime: tripDates.arrival_datetime,
           departureDatetime: tripDates.departure_datetime
-        }, {
+        };
+        localStorage.setItem('lastBookingAttempt', JSON.stringify(bookingAttemptData));
+
+        // Use the new combined booking with payment endpoint
+        processBookingWithPayment(bookingAttemptData, {
           onSuccess: (result) => {
             if (result.success) {
               console.log('Booking with payment successful:', result);
@@ -441,13 +445,17 @@ const Payment = () => {
         // Payment already succeeded (rare case) - still use the combined endpoint for consistency
         console.log('Payment already succeeded! Creating booking...');
 
-        processBookingWithPayment({
+        // Store booking attempt data for potential retry
+        const bookingAttemptData2 = {
           itineraryId: objectId,
           paymentIntentId: paymentIntent.id,
           customerId: userInfo.customer_id || "TEST",
           arrivalDatetime: tripDates.arrival_datetime,
           departureDatetime: tripDates.departure_datetime
-        }, {
+        };
+        localStorage.setItem('lastBookingAttempt', JSON.stringify(bookingAttemptData2));
+
+        processBookingWithPayment(bookingAttemptData2, {
           onSuccess: (result) => {
             if (result.success) {
               console.log('Booking created for already succeeded payment:', result);

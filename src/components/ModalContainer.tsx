@@ -18,6 +18,7 @@ import PaymentError from "./modals/PaymentError";
 import BookingFailure from "./modals/BookingFailure";
 import ProcessingPayment from "./modals/ProcessingPayment";
 import PaymentPartial from "./modals/PaymentPartial";
+import CancelBooking from "./modals/CancelBooking";
 
 export default function ModalContainer() {
     const router = useRouter();
@@ -46,7 +47,8 @@ export default function ModalContainer() {
         bookingFailure: <BookingFailure />,
         processingPayment: <ProcessingPayment />,
         paymentFailure: <PaymentError />, // Reuse PaymentError for paymentFailure as well
-        paymentPartial: <PaymentPartial />
+        paymentPartial: <PaymentPartial />,
+        cancelBooking: <CancelBooking onClose={() => router.push(window.location.pathname)} />
     };
 
     if (!openModal) return null; // No modal is open

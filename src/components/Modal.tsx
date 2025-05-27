@@ -55,7 +55,7 @@ export default function Modal({
                 <IoClose className="text-white size-5 sm:size-6"/>
               </button>
             )}
-            <div className="p-6 overflow-y-auto max-h-[85vh] flex flex-col items-center">
+            <div className="p-6 overflow-y-auto max-h-[85vh]">
               {children}
             </div>
           </GlassPanel>
