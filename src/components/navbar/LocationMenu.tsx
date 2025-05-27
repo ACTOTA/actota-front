@@ -131,9 +131,8 @@ export default function LocationMenu({ updateSearchValue, locationValue, classNa
   };
 
   return (
-    <section className={`flex flex-col justify-between backdrop-blur-md gap-6 py-6 h-full w-full max-w-[584px] z-20 p-4 border-2 border-border-primary rounded-3xl ${className}`} >
-      <div>
-        <div className="h-2" />
+    <section className={`flex flex-col max-lg:backdrop-blur-none lg:backdrop-blur-md gap-4 lg:gap-6 py-4 lg:py-6 w-full max-w-[584px] z-20 p-4 max-lg:border-0 lg:border-2 border-border-primary rounded-3xl ${className}`} >
+      <div className="flex-shrink-0">
         <div className="relative">
           <Input
             placeholder="Search for a city..."
@@ -168,7 +167,7 @@ export default function LocationMenu({ updateSearchValue, locationValue, classNa
       </div>
       <Button
         variant="primary"
-        className="bg-white text-black h-14 w-full"
+        className="bg-white text-black h-14 w-full flex-shrink-0"
         disabled={!selectedLocation}
         onClick={handleConfirmLocation}
       >

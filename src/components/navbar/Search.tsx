@@ -1,5 +1,9 @@
 import { useEffect, useState, useRef, Dispatch, SetStateAction } from "react";
 import { BiSearch } from 'react-icons/bi';
+import { HiOutlineLocationMarker } from 'react-icons/hi';
+import { AiOutlineCalendar } from 'react-icons/ai';
+import { BsPeople } from 'react-icons/bs';
+import { RiMapPinLine } from 'react-icons/ri';
 
 import { STEPS } from '@/src/types/steps';
 import SearchBoxes from './SearchBoxes';
@@ -46,9 +50,10 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
       const target = event.target as HTMLElement;
       const searchBar = document.getElementById('search-bar');
       const searchBox = document.getElementById('search-box');
+      const bottomNav = target.closest('.bottom-nav-tabs');
 
-      // Only close if click is outside both search-bar and search-box
-      if (searchBar && searchBox && !searchBar.contains(target) && !searchBox.contains(target)) {
+      // Only close if click is outside search-bar, search-box, and bottom navigation
+      if (searchBar && searchBox && !searchBar.contains(target) && !searchBox.contains(target) && !bottomNav) {
         setCurrStep?.(null);
       }
     };
@@ -190,10 +195,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
 
   return (
     <>
-      {/* Subtle backdrop for mobile when search boxes are open */}
-      {currStep !== null && !navbar && (
-        <div className="lg:hidden fixed inset-0 bg-black/30 z-40" onClick={() => setCurrStep?.(null)}></div>
-      )}
+      {/* Remove backdrop - we'll handle dimming differently */}
 
       <div className={`relative ${navbar ? '' : 'max-lg:fixed max-lg:bottom-5 max-lg:h-[60px] max-lg:left-0 max-lg:right-0 max-lg:px-4 max-lg:z-50 max-lg:pb-2'}`} id="search-bar">
         <div className={`items-center justify-between ${navbar ? 'w-[500px] h-[60px] text-primary-gray max-2xl:h-[60px]' : 'w-[720px] max-lg:w-full max-lg:h-[64px] max-lg:mx-0 text-white'} 
@@ -270,10 +272,11 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
             className={`
               w-full 
               lg:absolute lg:top-[calc(100%+10px)] lg:left-1/2 lg:-translate-x-1/2 lg:w-[720px]
-              max-lg:fixed max-lg:bottom-0 max-lg:left-0 max-lg:right-0 max-lg:z-[60]
-              max-lg:bg-black max-lg:rounded-t-3xl max-lg:pt-3 max-lg:px-4 max-lg:pb-6
+              max-lg:fixed max-lg:bottom-0 max-lg:left-0 max-lg:right-0 max-lg:z-[55]
+              max-lg:bg-black/95 max-lg:rounded-t-3xl max-lg:pt-3 max-lg:px-4 max-lg:pb-24
               max-lg:shadow-2xl max-lg:border-t max-lg:border-gray-600
-              max-lg:animate-slide-up max-lg:min-h-[50vh] max-lg:max-h-[80vh]
+              max-lg:animate-slide-up max-lg:max-h-[85vh] max-lg:min-h-[60vh]
+              max-lg:overflow-y-auto
               mt-4 lg:mt-0
             `}
             style={{
@@ -283,12 +286,35 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
-            {/* Mobile handle indicator - swipe to dismiss */}
-            <div 
-              className="lg:hidden flex justify-center mb-4 cursor-pointer"
-              onClick={() => setCurrStep?.(null)}
-            >
-              <div className="w-12 h-1 bg-gray-500 rounded-full hover:bg-gray-400 transition-colors"></div>
+            {/* Mobile header with current selection */}
+            <div className="lg:hidden">
+              <div 
+                className="flex justify-center mb-2 cursor-pointer"
+                onClick={() => setCurrStep?.(null)}
+              >
+                <div className="w-12 h-1 bg-gray-500 rounded-full hover:bg-gray-400 transition-colors"></div>
+              </div>
+              
+              {/* Selection header */}
+              <div className="flex items-center justify-between mb-2 pb-2 border-b border-gray-700">
+                <button 
+                  onClick={() => setCurrStep?.(null)}
+                  className="text-gray-400 hover:text-white transition-colors p-2 -ml-2"
+                >
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                
+                <h3 className="text-white text-lg font-medium">
+                  {currStep === STEPS.LOCATION && "Select Location"}
+                  {currStep === STEPS.DATE && "Select Dates"}
+                  {currStep === STEPS.GUESTS && "Add Guests"}
+                  {currStep === STEPS.ACTIVITIES && "Choose Activities"}
+                </h3>
+                
+                <div className="w-10"></div> {/* Spacer for centering */}
+              </div>
             </div>
             
             <div className="max-lg:text-white">
@@ -300,6 +326,84 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
                 guestsValue={guestsValue.length > 0 ? guestsValue[0] : ""}
                 activitiesValue={activitiesValue.length > 0 ? activitiesValue.join(", ") : ""}
               />
+            </div>
+            
+            {/* Mobile bottom navigation tabs */}
+            <div className="bottom-nav-tabs lg:hidden fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 px-4 pb-6 pt-3 z-[60]">
+              <div className="flex gap-2">
+                <div className="grid grid-cols-4 gap-2 flex-1">
+                <button
+                  onClick={() => setCurrStep?.(STEPS.LOCATION)}
+                  className={`flex flex-col items-center justify-center py-2 px-2 rounded-lg transition-all ${
+                    currStep === STEPS.LOCATION 
+                      ? 'bg-white text-black' 
+                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+                  }`}
+                >
+                  <HiOutlineLocationMarker className="w-5 h-5 mb-1" />
+                  <span className="text-xs font-medium">Where</span>
+                  <span className="text-[10px] mt-0.5 opacity-75 truncate max-w-full">
+                    {locationValue.length > 0 ? locationValue[0] : "Location"}
+                  </span>
+                </button>
+                
+                <button
+                  onClick={() => setCurrStep?.(STEPS.DATE)}
+                  className={`flex flex-col items-center justify-center py-2 px-2 rounded-lg transition-all ${
+                    currStep === STEPS.DATE 
+                      ? 'bg-white text-black' 
+                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+                  }`}
+                >
+                  <AiOutlineCalendar className="w-5 h-5 mb-1" />
+                  <span className="text-xs font-medium">When</span>
+                  <span className="text-[10px] mt-0.5 opacity-75 truncate max-w-full">
+                    {durationValue.length > 0 ? durationValue[0].split(' ')[0] : "Dates"}
+                  </span>
+                </button>
+                
+                <button
+                  onClick={() => setCurrStep?.(STEPS.GUESTS)}
+                  className={`flex flex-col items-center justify-center py-2 px-2 rounded-lg transition-all ${
+                    currStep === STEPS.GUESTS 
+                      ? 'bg-white text-black' 
+                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+                  }`}
+                >
+                  <BsPeople className="w-5 h-5 mb-1" />
+                  <span className="text-xs font-medium">Who</span>
+                  <span className="text-[10px] mt-0.5 opacity-75 truncate max-w-full">
+                    {guestsValue.length > 0 ? guestsValue[0].split(' ')[0] : "Guests"}
+                  </span>
+                </button>
+                
+                <button
+                  onClick={() => setCurrStep?.(STEPS.ACTIVITIES)}
+                  className={`flex flex-col items-center justify-center py-2 px-2 rounded-lg transition-all ${
+                    currStep === STEPS.ACTIVITIES 
+                      ? 'bg-white text-black' 
+                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+                  }`}
+                >
+                  <RiMapPinLine className="w-5 h-5 mb-1" />
+                  <span className="text-xs font-medium">What</span>
+                  <span className="text-[10px] mt-0.5 opacity-75 truncate max-w-full">
+                    {getActivityCount(activitiesValue, true).split(' ')[0]}
+                  </span>
+                </button>
+                </div>
+                
+                {/* Search button */}
+                <button
+                  onClick={() => {
+                    handleSearch();
+                    setCurrStep?.(null);
+                  }}
+                  className="bg-white text-black px-4 py-2 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors"
+                >
+                  <BiSearch className="w-6 h-6" />
+                </button>
+              </div>
             </div>
           </div>
         )}

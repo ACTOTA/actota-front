@@ -41,15 +41,15 @@ export default function SearchBoxes({
   }, [step]);
 
   return (
-    <div className={`m-auto mt-4
+    <div className={`m-auto mt-4 max-lg:mt-0
         before:rounded-3xl rounded-3xl flex flex-col justify-center items-center box-content 
-        max-lg:max-h-[70vh] max-lg:overflow-y-auto max-lg:w-full
+        max-lg:w-full
         w-full lg:w-[${dimensions.w}px] max-w-full mx-auto`} {...rest}>
       {step === STEPS.LOCATION &&
         <LocationMenu
           updateSearchValue={(value) => updateSearchValue?.(STEPS.LOCATION, value)}
           locationValue={locationValue}
-          className='bg-black/60 backdrop-filter max-lg:mt-0 max-lg:mb-4'
+          className='bg-black/60 backdrop-filter max-lg:bg-black max-lg:mt-0'
         />
       }
 
@@ -57,7 +57,7 @@ export default function SearchBoxes({
         <DateMenu
           updateSearchValue={(value) => updateSearchValue?.(STEPS.DATE, value)}
           durationValue={durationValue}
-          className='bg-black/60 backdrop-filter max-lg:mt-0 max-lg:mb-4'
+          className='bg-black/60 backdrop-filter max-lg:bg-black max-lg:mt-0'
         />
       }
 
@@ -65,7 +65,7 @@ export default function SearchBoxes({
         <GuestMenu
           updateSearchValue={(value) => updateSearchValue?.(STEPS.GUESTS, value)}
           guestsValue={guestsValue}
-          className='bg-black/60 backdrop-filter max-lg:mt-0 max-lg:mb-4'
+          className='bg-black/60 backdrop-filter max-lg:bg-black max-lg:mt-0'
         />
       }
 
@@ -73,7 +73,7 @@ export default function SearchBoxes({
         <ActivitiesMenu
           updateSearchValue={(value) => updateSearchValue?.(STEPS.ACTIVITIES, value)}
           activitiesValue={activitiesValue}
-          className='bg-black/60 backdrop-filter max-lg:mt-0 max-lg:mb-4'
+          className='bg-black/60 backdrop-filter max-lg:bg-black max-lg:mt-0'
         />
       }
     </div>
