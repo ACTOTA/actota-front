@@ -203,9 +203,14 @@ export default function ActivitiesMenu({ updateSearchValue, activitiesValue, cla
 
     ];
     return (
-        <section className={`flex flex-col backdrop-blur-md text-white border-2 border-border-primary rounded-3xl gap-4 h-full w-full max-w-[520px] mx-auto z-20 text-lg p-4 ${className}`}>
-            <div className='mb-2'>
-                <p className='flex items-center gap-2 mb-2'><FaPersonWalking className='h-6 w-6 ' /> Activities</p>
+        <section className={`flex flex-col max-lg:backdrop-blur-none lg:backdrop-blur-lg text-white max-lg:border-0 lg:border lg:border-gray-600 rounded-3xl gap-6 h-full w-full max-w-[520px] mx-auto z-20 text-lg p-6 lg:p-8 lg:bg-black/80 lg:shadow-2xl ${className}`}>
+            <div className="mb-2">
+                <h2 className="text-left text-white text-xl font-semibold mb-1">What do you want to do?</h2>
+                <p className="text-sm text-gray-400 mb-6">Choose your activities and preferences</p>
+            </div>
+            
+            <div className=''>
+                <p className='flex items-center gap-2 mb-3 font-medium'><FaPersonWalking className='h-5 w-5 text-blue-400' /> Activities</p>
 
                 <ActivityDropdown
                     onSelect={(value) => setSelectedActivity(value.toString())}
@@ -214,12 +219,10 @@ export default function ActivitiesMenu({ updateSearchValue, activitiesValue, cla
                 />
             </div>
 
-            <div className='mb-2'>
-                <div className='flex items-center justify-between gap-2 mb-2'>
-
-                    <p className='flex items-center gap-2'><GoHome className='h-6 w-6' /> Lodging</p>
+            <div className=''>
+                <div className='flex items-center justify-between gap-2 mb-3'>
+                    <p className='flex items-center gap-2 font-medium'><GoHome className='h-5 w-5 text-blue-400' /> Lodging</p>
                     <Toggle enabled={lodgingEnabled} setEnabled={() => { setLodgingEnabled(!lodgingEnabled) }} />
-
                 </div>
                 {lodgingEnabled && (
                     <ActivityDropdown
@@ -229,11 +232,10 @@ export default function ActivitiesMenu({ updateSearchValue, activitiesValue, cla
                     />
                 )}
             </div>
-            <div className='mb-2'>
-
-                <div className='flex items-center justify-between mb-2'>
-
-                    <p className='flex items-center gap-2'><MdOutlineDirectionsCarFilled className='h-6 w-6' /> Transportation</p>
+            
+            <div className=''>
+                <div className='flex items-center justify-between mb-3'>
+                    <p className='flex items-center gap-2 font-medium'><MdOutlineDirectionsCarFilled className='h-5 w-5 text-blue-400' /> Transportation</p>
                     <Toggle enabled={transportationEnabled} setEnabled={() => { setTransportationEnabled(!transportationEnabled) }} />
                 </div>
                 {transportationEnabled && (

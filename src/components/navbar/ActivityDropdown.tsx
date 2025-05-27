@@ -82,20 +82,31 @@ export default function ActivityDropdown({
     <div className={`relative inline-block w-full `}>
       <button
         type="button"
-        className={`w-full px-4 py-3 text-left bg-black/20 text-white rounded-lg hover:bg-[#262626] focus:outline-none border border-primary-gray whitespace-nowrap flex items-center justify-between ${className}`}
+        className={`w-full px-4 py-3 text-left bg-gray-800/50 text-white rounded-lg hover:bg-gray-800/70 focus:outline-none border border-gray-700 hover:border-gray-600 whitespace-nowrap flex items-center justify-between transition-all duration-200 ${className}`}
         onClick={toggleDropdown}
       >
         <div className="flex items-center gap-2">
           {displaySelectedItems()}
         </div>
-        <span className="float-right">{isOpen ? <ChevronUpIcon aria-hidden="true" className="h-[24px] w-[24px " /> : <ChevronDownIcon aria-hidden="true" className="h-[24px] w-[24px " />}</span>
+        <span className="float-right">{isOpen ? <ChevronUpIcon aria-hidden="true" className="h-5 w-5 text-gray-400" /> : <ChevronDownIcon aria-hidden="true" className="h-5 w-5 text-gray-400" />}</span>
       </button>
 
       {isOpen && (
-        <div className="absolute p-3 z-10 w-full bg-black border border-primary-gray text-white rounded-lg shadow-lg mt-2 max-h-[466px] overflow-auto">
-          <p className="text-lg font-bold text-white"> <span className="max-lg:hidden "> Select Preferred </span> {title}</p>
-          <p className="text-sm  text-white">{selected.length} Selected</p>
-          <p className="text-sm  text-white flex items-center gap-2 mt-4 "><input type="checkbox" checked={anySelected} onChange={() => setAnySelected(!anySelected)} className="rounded ring-0 focus:ring-0 focus:ring-offset-0" /> Any</p>
+        <div className="absolute p-4 z-10 w-full bg-black/95 backdrop-blur-xl border border-gray-700 text-white rounded-xl shadow-2xl mt-2 max-h-[466px] overflow-auto">
+          <div className="mb-4">
+            <p className="text-lg font-semibold text-white">Select {title}</p>
+            <p className="text-sm text-gray-400 mt-1">{selected.length} selected</p>
+          </div>
+          
+          <label className="flex items-center gap-2 mb-4 cursor-pointer hover:bg-gray-800/50 p-2 rounded-lg transition-colors">
+            <input 
+              type="checkbox" 
+              checked={anySelected} 
+              onChange={() => setAnySelected(!anySelected)} 
+              className="rounded border-gray-600 bg-gray-800 text-blue-500 focus:ring-blue-500 focus:ring-offset-0" 
+            /> 
+            <span className="text-sm font-medium">Any {title?.toLowerCase()}</span>
+          </label>
 
           <div className="flex flex-wrap gap-1 my-4">
             {activities.filter(activity => !activity.unavailable).map((activity) => (
@@ -104,18 +115,31 @@ export default function ActivityDropdown({
           </div>
 
 
-          {title == "Activities" && <div>
-            <p className="text-sm text-white flex items-center gap-2"><GoAlert /> Unavailable</p>
-            <p className="text-sm text-primary-gray">These activities are only available on December-March.</p>
-            <div className="flex flex-wrap gap-1 my-4">
-              {activities.filter(activity => activity.unavailable).map((activity) => (
-                <ActivityTag unavailable={true} key={activity.id} activities={activities} activity={activity.id} onClick={() => handleSelect(activity.id)} selected={selected.includes(activity.id)} />
-              ))}
+          {title == "Activities" && activities.some(activity => activity.unavailable) && (
+            <div className="mt-6 p-3 bg-gray-800/30 rounded-lg border border-gray-700">
+              <p className="text-sm text-yellow-400 flex items-center gap-2 font-medium">
+                <GoAlert className="h-4 w-4" /> Seasonal Activities
+              </p>
+              <p className="text-sm text-gray-400 mt-1">Available December - March only</p>
+              <div className="flex flex-wrap gap-1 mt-3">
+                {activities.filter(activity => activity.unavailable).map((activity) => (
+                  <ActivityTag unavailable={true} key={activity.id} activities={activities} activity={activity.id} onClick={() => handleSelect(activity.id)} selected={selected.includes(activity.id)} />
+                ))}
+              </div>
             </div>
-          </div>}
-          {showSaveButton && <div className="flex justify-end mt-4">
-            <Button variant="primary" size="md" className="">Save</Button>
-          </div>}
+          )}
+          
+          {showSaveButton && (
+            <div className="flex justify-end mt-4 pt-4 border-t border-gray-800">
+              <Button 
+                variant="primary" 
+                size="md" 
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
+              >
+                Save Selection
+              </Button>
+            </div>
+          )}
 
         </div>
       )}

@@ -131,7 +131,7 @@ export default function LocationMenu({ updateSearchValue, locationValue, classNa
   };
 
   return (
-    <section className={`flex flex-col max-lg:backdrop-blur-none lg:backdrop-blur-md gap-4 lg:gap-6 py-4 lg:py-6 w-full max-w-[584px] z-20 p-4 max-lg:border-0 lg:border-2 border-border-primary rounded-3xl ${className}`} >
+    <section className={`flex flex-col max-lg:backdrop-blur-none lg:backdrop-blur-lg gap-4 lg:gap-6 py-6 lg:py-8 w-full max-w-[584px] z-20 p-6 lg:p-8 max-lg:border-0 lg:border lg:border-gray-600 rounded-3xl lg:bg-black/80 lg:shadow-2xl ${className}`} >
       <div className="flex-shrink-0">
         <div className="relative">
           <Input
@@ -142,18 +142,20 @@ export default function LocationMenu({ updateSearchValue, locationValue, classNa
             icon={<GrLocation aria-hidden="true" className="size-5 text-white" />}
           />
           {results.length > 0 && (
-            <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-black/30 backdrop-blur-md py-1 text-base shadow-lg ring-1 ring-white/20 focus:outline-none sm:text-sm">
+            <ul className="absolute z-10 mt-2 max-h-72 w-full overflow-auto rounded-xl bg-black/90 backdrop-blur-xl py-2 text-base shadow-2xl border border-gray-700 focus:outline-none">
               {results.map((location, index) => (
                 <li
                   key={index}
-                  className="relative cursor-pointer py-3 px-4 text-white hover:bg-white/20 transition-colors duration-200"
+                  className="relative cursor-pointer py-3 px-4 text-white hover:bg-white/10 transition-all duration-200 border-b border-gray-800 last:border-0"
                   onClick={() => handleLocationSelect(location)}
                 >
-                  <div className="flex items-center gap-3">
-                    <GrLocation className="size-4" />
-                    <div>
-                      <div className="font-medium">{location.city}</div>
-                      <div className="text-sm text-gray-300">{location.state} {location.country}</div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex-shrink-0 w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
+                      <GrLocation className="size-5 text-blue-400" />
+                    </div>
+                    <div className="flex-grow">
+                      <div className="font-medium text-white">{location.city}</div>
+                      <div className="text-sm text-gray-400">{location.state}{location.country ? `, ${location.country}` : ''}</div>
                     </div>
                   </div>
                 </li>
@@ -167,7 +169,7 @@ export default function LocationMenu({ updateSearchValue, locationValue, classNa
       </div>
       <Button
         variant="primary"
-        className="bg-white text-black h-14 w-full flex-shrink-0"
+        className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white h-14 w-full flex-shrink-0 font-medium shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
         disabled={!selectedLocation}
         onClick={handleConfirmLocation}
       >
