@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PlusMinusButton, { ButtonType } from '../figma/PlusMinusButton';
+import GlassPanel from '../figma/GlassPanel';
+import { MOBILE_GLASS_PANEL_STYLES, getMobileGlassPanelProps } from './constants';
 
 interface GuestMenuProps {
     updateSearchValue?: (value: string) => void;
@@ -9,6 +11,16 @@ interface GuestMenuProps {
 
 export default function GuestMenu({ updateSearchValue, guestsValue, className }: GuestMenuProps) {
     const max = 10;
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 1024);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     // Parse existing guest values if available
     const parseExistingValues = () => {
@@ -78,7 +90,10 @@ export default function GuestMenu({ updateSearchValue, guestsValue, className }:
     };
 
     return (
-        <section className={`h-full w-full max-w-[450px] mx-auto text-white max-lg:backdrop-blur-none lg:backdrop-blur-lg max-lg:border-0 lg:border lg:border-gray-600 rounded-3xl z-20 p-6 lg:p-8 lg:bg-black/80 lg:shadow-2xl ${className}`}>
+        <GlassPanel
+            {...getMobileGlassPanelProps(isMobile)}
+            className={`h-full w-full max-w-[450px] mx-auto z-20 ${isMobile ? MOBILE_GLASS_PANEL_STYLES : ''} ${className}`}
+        >
             <div className="mb-6">
                 <h2 className="text-left text-white text-xl font-semibold">Who's coming?</h2>
                 <p className="text-sm text-gray-400 mt-1">Add guests to your trip</p>
@@ -121,6 +136,6 @@ export default function GuestMenu({ updateSearchValue, guestsValue, className }:
                     </div>
                 </div>
             </div>
-        </section>
+        </GlassPanel>
     );
 }

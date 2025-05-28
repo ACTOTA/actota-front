@@ -6,6 +6,8 @@ import { GoHome } from "react-icons/go";
 import { MdOutlineDirectionsCarFilled } from "react-icons/md";
 import { FaPersonWalking } from "react-icons/fa6";
 import ActivityDropdown from './ActivityDropdown';
+import GlassPanel from '../figma/GlassPanel';
+import { MOBILE_GLASS_PANEL_STYLES, getMobileGlassPanelProps } from './constants';
 
 interface ActivitiesMenuProps {
     updateSearchValue?: (value: string) => void;
@@ -65,6 +67,16 @@ export default function ActivitiesMenu({ updateSearchValue, activitiesValue, cla
     const [selectedTransportation, setSelectedTransportation] = useState('Select preferred transportation');
     const [lodgingEnabled, setLodgingEnabled] = useState(true);
     const [transportationEnabled, setTransportationEnabled] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 1024);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     // Update parent component when selections change
     useEffect(() => {
@@ -203,7 +215,10 @@ export default function ActivitiesMenu({ updateSearchValue, activitiesValue, cla
 
     ];
     return (
-        <section className={`flex flex-col max-lg:backdrop-blur-none lg:backdrop-blur-lg text-white max-lg:border-0 lg:border lg:border-gray-600 rounded-3xl gap-6 h-full w-full max-w-[520px] mx-auto z-20 text-lg p-6 lg:p-8 lg:bg-black/80 lg:shadow-2xl ${className}`}>
+        <GlassPanel
+            {...getMobileGlassPanelProps(isMobile)}
+            className={`flex flex-col gap-6 h-full w-full max-w-[520px] mx-auto z-20 text-lg ${isMobile ? MOBILE_GLASS_PANEL_STYLES : ''} ${className}`}
+        >
             <div className="mb-2">
                 <h2 className="text-left text-white text-xl font-semibold mb-1">What do you want to do?</h2>
                 <p className="text-sm text-gray-400 mb-6">Choose your activities and preferences</p>
@@ -246,6 +261,6 @@ export default function ActivitiesMenu({ updateSearchValue, activitiesValue, cla
                     />
                 )}
             </div>
-        </section>
+        </GlassPanel>
     );
 }

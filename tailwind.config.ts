@@ -44,7 +44,6 @@ const config: Config = {
   },
   plugins: [
     require('@tailwindcss/forms'),
-    require('@tailwindcss/line-clamp'),
   ],
 };
 export default config;

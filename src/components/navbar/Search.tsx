@@ -9,6 +9,7 @@ import { MdLocationOn, MdDateRange, MdPeople, MdLocalActivity } from 'react-icon
 import { STEPS } from '@/src/types/steps';
 import SearchBoxes from './SearchBoxes';
 import { useRouter } from "next/navigation";
+import GlassPanel from '../figma/GlassPanel';
 
 export default function Search({ setClasses, currStep, setCurrStep, navbar }: { setClasses?: Dispatch<SetStateAction<string>>, currStep?: STEPS | null, setCurrStep?: Dispatch<SetStateAction<STEPS | null>>, navbar?: boolean }) {
   const router = useRouter();
@@ -196,33 +197,114 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
 
   return (
     <>
-      {/* Remove backdrop - we'll handle dimming differently */}
+      {/* Backdrop for mobile when search is active */}
+      {currStep != null && !navbar && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black/50 z-40 animate-fade-in"
+          onClick={() => setCurrStep?.(null)}
+        />
+      )}
 
-      <div className={`relative ${navbar ? '' : 'max-lg:fixed max-lg:bottom-5 max-lg:h-[60px] max-lg:left-0 max-lg:right-0 max-lg:px-4 max-lg:z-50 max-lg:pb-2'}`} id="search-bar">
-        <div className={`items-center justify-between ${navbar ? 'w-[500px] h-[60px] text-primary-gray max-2xl:h-[60px]' : 'w-[760px] max-lg:w-full max-lg:h-[64px] max-lg:mx-0 text-white'} 
-        ${isTop && !navbar ? 'h-[86px]' : 'h-[66px]'}
-        grid grid-cols-9 
-        ${navbar ? 'rounded-full border-2 border-border-primary bg-black/40 backdrop-filter backdrop-blur-sm' : 'max-lg:rounded-2xl max-lg:bg-black/80 max-lg:backdrop-blur-md max-lg:border max-lg:border-gray-600 lg:rounded-full lg:border lg:border-gray-600 lg:bg-black/60 lg:backdrop-filter lg:backdrop-blur-md'}
-        text-sm text-left m-auto z-50
-        shadow-2xl
-        transition-all duration-300 ease-in-out ${className}`} ref={searchRef}>
+      <div 
+        className={`relative ${navbar ? '' : `max-lg:fixed max-lg:left-0 max-lg:right-0 max-lg:z-50 max-lg:transition-all max-lg:duration-300 ${currStep != null ? 'max-lg:bottom-0 max-lg:px-2' : 'max-lg:bottom-5 max-lg:px-4'}`}`} 
+        id="search-bar"
+        onTouchStart={currStep != null ? handleTouchStart : undefined}
+        onTouchMove={currStep != null ? handleTouchMove : undefined}
+        onTouchEnd={currStep != null ? handleTouchEnd : undefined}
+      >
+        <div className={`relative ${currStep != null && !navbar ? 'max-lg:overflow-visible' : ''}`}>
+          <GlassPanel
+            variant={navbar ? 'default' : 'light'}
+            blur="xl"
+            padding="none"
+            rounded={navbar ? 'full' : currStep != null ? '3xl' : 'full'}
+            className={`
+              ${navbar ? 'w-[500px] h-[60px] text-primary-gray max-2xl:h-[60px]' : 'w-[760px] max-lg:w-full text-white'} 
+              ${isTop && !navbar ? 'h-[86px]' : 'h-[66px]'}
+              ${currStep != null && !navbar ? 'max-lg:h-auto max-lg:max-h-[90vh]' : 'max-lg:h-[64px]'}
+              m-auto z-50
+              ${currStep != null && !navbar ? 'max-lg:transition-[height,max-height] max-lg:duration-300' : 'transition-all duration-300'} 
+              ease-in-out ${className}
+            `} 
+            ref={searchRef}
+          >
+          {/* Mobile expanded content */}
+          {currStep != null && !navbar && (
+            <div className="lg:hidden">
+              {/* Search options content */}
+              <div className="pt-3 px-4 pb-4 max-h-[70vh] overflow-y-auto">
+                {/* Mobile header with current selection */}
+                <div>
+                  <div 
+                    className="flex justify-center mb-2 cursor-pointer"
+                    onClick={() => setCurrStep?.(null)}
+                  >
+                    <div className="w-12 h-1 bg-white/40 rounded-full hover:bg-white/60 transition-colors"></div>
+                  </div>
+                  
+                  {/* Selection header */}
+                  <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/20">
+                    <button 
+                      onClick={() => setCurrStep?.(null)}
+                      className="text-white/60 hover:text-white transition-colors p-2 -ml-2"
+                    >
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                    
+                    <h3 className="text-white text-lg font-semibold">
+                      {currStep === STEPS.LOCATION && "Select Location"}
+                      {currStep === STEPS.DATE && "Select Dates"}
+                      {currStep === STEPS.GUESTS && "Add Guests"}
+                      {currStep === STEPS.ACTIVITIES && "Choose Activities"}
+                    </h3>
+                    
+                    <div className="w-10"></div> {/* Spacer for centering */}
+                  </div>
+                </div>
+                
+                <div className="text-white">
+                  <SearchBoxes
+                    step={currStep}
+                    updateSearchValue={updateSearchValue}
+                    locationValue={locationValue.length > 0 ? locationValue[0] : ""}
+                    durationValue={durationValue.length > 0 ? durationValue[0] : ""}
+                    guestsValue={guestsValue.length > 0 ? guestsValue[0] : ""}
+                    activitiesValue={activitiesValue.length > 0 ? activitiesValue.join(", ") : ""}
+                  />
+                </div>
+              </div>
+              
+              {/* Divider line */}
+              <div className="h-px bg-white/20"></div>
+            </div>
+          )}
+          
+          {/* Search bar - always visible */}
+          <div className={`
+            ${currStep != null && !navbar ? 'max-lg:p-2' : ''} 
+            ${navbar || currStep == null ? 'grid grid-cols-9 h-full' : 'lg:grid lg:grid-cols-9 lg:h-full'} 
+            ${currStep != null && !navbar ? 'max-lg:grid max-lg:grid-cols-9 max-lg:h-[60px]' : ''}
+            items-center justify-between text-sm text-left transition-all duration-300
+          `}>
 
           <section onClick={() => handleSelect(STEPS.LOCATION)}
             id={STEPS.LOCATION.toString()}
             className={`
-            ${currStep == STEPS.LOCATION ? 'lg:border-2 lg:border-white lg:bg-white/10' : currStep !== STEPS.DATE && 'lg:after:content-[""] lg:after:absolute lg:after:right-0 lg:after:top-1/2 lg:after:h-8 lg:after:w-[1px] lg:after:bg-gray-400 lg:after:-translate-y-1/2'}
+            ${currStep == STEPS.LOCATION ? 'lg:border-2 lg:border-white lg:bg-white/10' : currStep !== STEPS.DATE && 'lg:after:content-[""] lg:after:absolute lg:after:right-0 lg:after:top-1/2 lg:after:h-8 lg:after:w-[1px] lg:after:bg-white/20 lg:after:-translate-y-1/2'}
             rounded-full cursor-pointer z-10 h-full w-full col-span-2
             flex flex-col justify-center gap-0.5 px-4 relative
             hover:bg-white/5 transition-all duration-200
           `}>
             <div className="flex items-center gap-2 max-md:justify-center">
-              <MdLocationOn className={`w-4 h-4 max-md:hidden ${locationValue.length > 0 ? 'text-blue-400' : 'text-gray-400'}`} />
+              <MdLocationOn className={`w-4 h-4 ${currStep != null && !navbar ? '' : 'max-md:hidden'} ${locationValue.length > 0 ? 'text-white/80' : 'text-white/40'}`} />
               <div className="max-md:text-center">
-                <p className={`font-medium ${locationValue.length > 0 ? 'text-white' : 'text-gray-300'}`}>
+                <p className={`font-medium ${locationValue.length > 0 ? 'text-white' : 'text-white/90'} ${currStep != null && !navbar ? 'max-md:text-xs' : ''}`}>
                   {locationValue.length > 0 ? locationValue[0].split(',')[0] : "Where"}
                 </p>
-                {!navbar && (
-                  <p className="text-xs text-gray-500 max-md:hidden truncate">
+                {!navbar && currStep == null && (
+                  <p className="text-xs text-white/60 max-md:hidden truncate">
                     {locationValue.length > 0 ? locationValue[0].split(',')[1]?.trim() || 'Selected' : "Search destinations"}
                   </p>
                 )}
@@ -232,17 +314,17 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
 
           <section onClick={() => handleSelect(STEPS.DATE)}
             id={STEPS.DATE.toString()}
-            className={`${currStep == STEPS.DATE ? 'lg:border-2 lg:border-white lg:bg-white/10' : currStep !== STEPS.GUESTS && 'lg:after:content-[""] lg:after:absolute lg:after:right-0 lg:after:top-1/2 lg:after:h-8 lg:after:w-[1px] lg:after:bg-gray-400 lg:after:-translate-y-1/2'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
+            className={`${currStep == STEPS.DATE ? 'lg:border-2 lg:border-white lg:bg-white/10' : currStep !== STEPS.GUESTS && 'lg:after:content-[""] lg:after:absolute lg:after:right-0 lg:after:top-1/2 lg:after:h-8 lg:after:w-[1px] lg:after:bg-white/20 lg:after:-translate-y-1/2'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
         flex flex-col justify-center gap-0.5 px-4 relative
         hover:bg-white/5 transition-all duration-200`}>
             <div className="flex items-center gap-2 max-md:justify-center">
-              <MdDateRange className={`w-4 h-4 max-md:hidden ${durationValue.length > 0 ? 'text-blue-400' : 'text-gray-400'}`} />
+              <MdDateRange className={`w-4 h-4 ${currStep != null && !navbar ? '' : 'max-md:hidden'} ${durationValue.length > 0 ? 'text-white/80' : 'text-white/40'}`} />
               <div className="max-md:text-center">
-                <p className={`font-medium ${durationValue.length > 0 ? 'text-white' : 'text-gray-300'}`}>
+                <p className={`font-medium ${durationValue.length > 0 ? 'text-white' : 'text-white/90'} ${currStep != null && !navbar ? 'max-md:text-xs' : ''}`}>
                   {durationValue.length > 0 ? durationValue[0].split(' ')[0] : "When"}
                 </p>
-                {!navbar && (
-                  <p className="text-xs text-gray-500 max-md:hidden">
+                {!navbar && currStep == null && (
+                  <p className="text-xs text-white/60 max-md:hidden">
                     {durationValue.length > 0 ? `${durationValue[0].split(' ').slice(1).join(' ')}` : "Add dates"}
                   </p>
                 )}
@@ -252,18 +334,18 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
 
           <section onClick={() => handleSelect(STEPS.GUESTS)}
             id={STEPS.GUESTS.toString()}
-            className={`${currStep == STEPS.GUESTS ? 'lg:border-2 lg:border-white lg:bg-white/10' : currStep !== STEPS.ACTIVITIES && 'lg:after:content-[""] lg:after:absolute lg:after:right-0 lg:after:top-1/2 lg:after:h-8 lg:after:w-[1px] lg:after:bg-gray-400 lg:after:-translate-y-1/2'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
+            className={`${currStep == STEPS.GUESTS ? 'lg:border-2 lg:border-white lg:bg-white/10' : currStep !== STEPS.ACTIVITIES && 'lg:after:content-[""] lg:after:absolute lg:after:right-0 lg:after:top-1/2 lg:after:h-8 lg:after:w-[1px] lg:after:bg-white/20 lg:after:-translate-y-1/2'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
         flex flex-col justify-center gap-0.5 px-4 relative
         hover:bg-white/5 transition-all duration-200
        `}>
             <div className="flex items-center gap-2 max-md:justify-center">
-              <MdPeople className={`w-4 h-4 max-md:hidden ${guestsValue.length > 0 ? 'text-blue-400' : 'text-gray-400'}`} />
+              <MdPeople className={`w-4 h-4 ${currStep != null && !navbar ? '' : 'max-md:hidden'} ${guestsValue.length > 0 ? 'text-white/80' : 'text-white/40'}`} />
               <div className="max-md:text-center">
-                <p className={`font-medium ${guestsValue.length > 0 ? 'text-white' : 'text-gray-300'}`}>
+                <p className={`font-medium ${guestsValue.length > 0 ? 'text-white' : 'text-white/90'} ${currStep != null && !navbar ? 'max-md:text-xs' : ''}`}>
                   {guestsValue.length > 0 ? guestsValue[0].split(' ')[0] : "Who"}
                 </p>
-                {!navbar && (
-                  <p className="text-xs text-gray-500 max-md:hidden">
+                {!navbar && currStep == null && (
+                  <p className="text-xs text-white/60 max-md:hidden">
                     {guestsValue.length > 0 ? `${guestsValue[0].split(' ').slice(1).join(' ')}` : "Add guests"}
                   </p>
                 )}
@@ -277,13 +359,13 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
         flex flex-col justify-center gap-0.5 px-4 relative
         hover:bg-white/5 transition-all duration-200`}>
             <div className="flex items-center gap-2 max-md:justify-center">
-              <MdLocalActivity className={`w-4 h-4 max-md:hidden ${activitiesValue.length > 0 ? 'text-blue-400' : 'text-gray-400'}`} />
+              <MdLocalActivity className={`w-4 h-4 ${currStep != null && !navbar ? '' : 'max-md:hidden'} ${activitiesValue.length > 0 ? 'text-white/80' : 'text-white/40'}`} />
               <div className="max-md:text-center">
-                <p className={`font-medium ${activitiesValue.length > 0 ? 'text-white' : 'text-gray-300'}`}>
+                <p className={`font-medium ${activitiesValue.length > 0 ? 'text-white' : 'text-white/90'} ${currStep != null && !navbar ? 'max-md:text-xs' : ''}`}>
                   {activitiesValue.length > 0 ? `${activitiesValue.length} Activities` : "What"}
                 </p>
-                {!navbar && (
-                  <p className="text-xs text-gray-500 max-md:hidden truncate">
+                {!navbar && currStep == null && (
+                  <p className="text-xs text-white/60 max-md:hidden truncate">
                     {activitiesValue.length > 0 ? activitiesValue.slice(0, 2).join(", ") + (activitiesValue.length > 2 ? "..." : "") : "Choose activities"}
                   </p>
                 )}
@@ -298,60 +380,16 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
               <BiSearch size={24} className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 text-white" />
             </div>
           </section>
-        </div>
+          </div>
+        </GlassPanel>
 
         {currStep != null && (
-          <div 
-            id='search-box' 
-            className={`
-              w-full 
-              lg:absolute lg:top-[calc(100%+10px)] lg:left-1/2 lg:-translate-x-1/2 lg:w-[720px]
-              max-lg:fixed max-lg:bottom-0 max-lg:left-0 max-lg:right-0 max-lg:z-[55]
-              max-lg:bg-black/95 max-lg:rounded-t-3xl max-lg:pt-3 max-lg:px-4 max-lg:pb-24
-              max-lg:shadow-2xl max-lg:border-t max-lg:border-gray-600
-              max-lg:animate-slide-up max-lg:max-h-[85vh] max-lg:min-h-[60vh]
-              max-lg:overflow-y-auto
-              mt-4 lg:mt-0
-            `}
-            style={{
-              WebkitOverflowScrolling: 'touch'
-            }}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-          >
-            {/* Mobile header with current selection */}
-            <div className="lg:hidden">
-              <div 
-                className="flex justify-center mb-2 cursor-pointer"
-                onClick={() => setCurrStep?.(null)}
-              >
-                <div className="w-12 h-1 bg-gray-500 rounded-full hover:bg-gray-400 transition-colors"></div>
-              </div>
-              
-              {/* Selection header */}
-              <div className="flex items-center justify-between mb-2 pb-2 border-b border-gray-700">
-                <button 
-                  onClick={() => setCurrStep?.(null)}
-                  className="text-gray-400 hover:text-white transition-colors p-2 -ml-2"
-                >
-                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                
-                <h3 className="text-white text-lg font-medium">
-                  {currStep === STEPS.LOCATION && "Select Location"}
-                  {currStep === STEPS.DATE && "Select Dates"}
-                  {currStep === STEPS.GUESTS && "Add Guests"}
-                  {currStep === STEPS.ACTIVITIES && "Choose Activities"}
-                </h3>
-                
-                <div className="w-10"></div> {/* Spacer for centering */}
-              </div>
-            </div>
-            
-            <div className="max-lg:text-white">
+          <>
+            {/* Desktop search box */}
+            <div 
+              id='search-box' 
+              className="hidden lg:block absolute top-[calc(100%+10px)] left-1/2 -translate-x-1/2 w-[720px] mt-4"
+            >
               <SearchBoxes
                 step={currStep}
                 updateSearchValue={updateSearchValue}
@@ -361,86 +399,10 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
                 activitiesValue={activitiesValue.length > 0 ? activitiesValue.join(", ") : ""}
               />
             </div>
-            
-            {/* Mobile bottom navigation tabs */}
-            <div className="bottom-nav-tabs lg:hidden fixed bottom-0 left-0 right-0 bg-black border-t border-gray-700 px-4 pb-6 pt-3 z-[60]">
-              <div className="flex gap-2">
-                <div className="grid grid-cols-4 gap-2 flex-1">
-                <button
-                  onClick={() => setCurrStep?.(STEPS.LOCATION)}
-                  className={`flex flex-col items-center justify-center py-2 px-2 rounded-lg transition-all ${
-                    currStep === STEPS.LOCATION 
-                      ? 'bg-white text-black' 
-                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
-                  }`}
-                >
-                  <HiOutlineLocationMarker className="w-5 h-5 mb-1" />
-                  <span className="text-xs font-medium">Where</span>
-                  <span className="text-[10px] mt-0.5 opacity-75 truncate max-w-full">
-                    {locationValue.length > 0 ? locationValue[0] : "Location"}
-                  </span>
-                </button>
-                
-                <button
-                  onClick={() => setCurrStep?.(STEPS.DATE)}
-                  className={`flex flex-col items-center justify-center py-2 px-2 rounded-lg transition-all ${
-                    currStep === STEPS.DATE 
-                      ? 'bg-white text-black' 
-                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
-                  }`}
-                >
-                  <AiOutlineCalendar className="w-5 h-5 mb-1" />
-                  <span className="text-xs font-medium">When</span>
-                  <span className="text-[10px] mt-0.5 opacity-75 truncate max-w-full">
-                    {durationValue.length > 0 ? durationValue[0].split(' ')[0] : "Dates"}
-                  </span>
-                </button>
-                
-                <button
-                  onClick={() => setCurrStep?.(STEPS.GUESTS)}
-                  className={`flex flex-col items-center justify-center py-2 px-2 rounded-lg transition-all ${
-                    currStep === STEPS.GUESTS 
-                      ? 'bg-white text-black' 
-                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
-                  }`}
-                >
-                  <BsPeople className="w-5 h-5 mb-1" />
-                  <span className="text-xs font-medium">Who</span>
-                  <span className="text-[10px] mt-0.5 opacity-75 truncate max-w-full">
-                    {guestsValue.length > 0 ? guestsValue[0].split(' ')[0] : "Guests"}
-                  </span>
-                </button>
-                
-                <button
-                  onClick={() => setCurrStep?.(STEPS.ACTIVITIES)}
-                  className={`flex flex-col items-center justify-center py-2 px-2 rounded-lg transition-all ${
-                    currStep === STEPS.ACTIVITIES 
-                      ? 'bg-white text-black' 
-                      : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
-                  }`}
-                >
-                  <RiMapPinLine className="w-5 h-5 mb-1" />
-                  <span className="text-xs font-medium">What</span>
-                  <span className="text-[10px] mt-0.5 opacity-75 truncate max-w-full">
-                    {getActivityCount(activitiesValue, true).split(' ')[0]}
-                  </span>
-                </button>
-                </div>
-                
-                {/* Search button */}
-                <button
-                  onClick={() => {
-                    handleSearch();
-                    setCurrStep?.(null);
-                  }}
-                  className="bg-white text-black px-4 py-2 rounded-lg flex items-center justify-center hover:bg-gray-200 transition-colors"
-                >
-                  <BiSearch className="w-6 h-6" />
-                </button>
-              </div>
-            </div>
-          </div>
+
+          </>
         )}
+        </div>
       </div>
     </>
   );

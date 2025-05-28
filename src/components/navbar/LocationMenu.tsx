@@ -3,6 +3,8 @@ import { GrLocation } from "react-icons/gr";
 import Button from "../figma/Button";
 import MapPage from "../MapPage";
 import Input from "../figma/Input";
+import GlassPanel from "../figma/GlassPanel";
+import { MOBILE_GLASS_PANEL_STYLES, getMobileGlassPanelProps } from "./constants";
 
 interface Location {
   city: string;
@@ -23,11 +25,19 @@ export default function LocationMenu({ updateSearchValue, locationValue, classNa
   const [results, setResults] = useState<Location[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     if (!window.google) {
       console.error("Google Maps API is not loaded.");
     }
+    
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,7 +141,10 @@ export default function LocationMenu({ updateSearchValue, locationValue, classNa
   };
 
   return (
-    <section className={`flex flex-col max-lg:backdrop-blur-none lg:backdrop-blur-lg gap-4 lg:gap-6 py-6 lg:py-8 w-full max-w-[584px] z-20 p-6 lg:p-8 max-lg:border-0 lg:border lg:border-gray-600 rounded-3xl lg:bg-black/80 lg:shadow-2xl ${className}`} >
+    <GlassPanel 
+      {...getMobileGlassPanelProps(isMobile)}
+      className={`flex flex-col gap-4 lg:gap-6 w-full max-w-[584px] z-20 ${isMobile ? MOBILE_GLASS_PANEL_STYLES : ''} ${className}`}
+    >
       <div className="flex-shrink-0">
         <div className="relative">
           <Input
@@ -175,6 +188,6 @@ export default function LocationMenu({ updateSearchValue, locationValue, classNa
       >
         <p>Confirm Location</p>
       </Button>
-    </section >
+    </GlassPanel>
   );
 }

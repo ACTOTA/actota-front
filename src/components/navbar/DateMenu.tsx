@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DateMenuCalendar from '../figma/DateMenuCalendar';
+import GlassPanel from '../figma/GlassPanel';
+import { MOBILE_GLASS_PANEL_STYLES, getMobileGlassPanelProps } from './constants';
 
 interface DateMenuProps {
   updateSearchValue?: (value: string) => void;
@@ -12,6 +14,16 @@ export default function DateMenu({ updateSearchValue, durationValue, className }
   const [endDate, setEndDate] = useState<string | null>(null);
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('17:00');
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     updateDurationSummary();
@@ -51,7 +63,10 @@ export default function DateMenu({ updateSearchValue, durationValue, className }
   });
 
   return (
-    <section className={`w-full mx-auto h-full text-white max-lg:backdrop-blur-none lg:backdrop-blur-lg max-lg:border-0 lg:border lg:border-gray-600 rounded-3xl flex-col justify-center items-center gap-4 px-6 lg:px-8 pt-6 lg:pt-8 pb-6 lg:pb-8 lg:bg-black/80 lg:shadow-2xl ${className}`}>
+    <GlassPanel
+      {...getMobileGlassPanelProps(isMobile)}
+      className={`w-full mx-auto h-full flex-col justify-center items-center gap-4 ${isMobile ? MOBILE_GLASS_PANEL_STYLES : ''} ${className}`}
+    >
       <div className="w-full mb-4">
         <h2 className="text-left text-white text-xl font-semibold">When are you traveling?</h2>
         <p className="text-sm text-gray-400 mt-1">Select your trip dates</p>
@@ -60,7 +75,7 @@ export default function DateMenu({ updateSearchValue, durationValue, className }
       <DateMenuCalendar onDateRangeChange={handleDateRangeChange} />
 
       <div className='w-full mt-3 mb-1 mx-auto flex flex-wrap'>
-        <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+        <div className='flex justify-around w-full gap-3'>
           <div className="flex items-center bg-gray-800/50 p-3 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
             <div className="text-gray-300 text-sm font-medium whitespace-nowrap mr-3">Start:</div>
             <select
@@ -100,6 +115,6 @@ export default function DateMenu({ updateSearchValue, durationValue, className }
           </div>
         </div>
       </div>
-    </section>
+    </GlassPanel>
   );
 }
