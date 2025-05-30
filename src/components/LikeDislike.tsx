@@ -37,16 +37,24 @@ const LikeDislike = ({liked, favoriteId, className}: {liked: boolean, favoriteId
         );}
     };
     return (
-        <div>  <button
+        <button
             onClick={(e) => {
                 e.stopPropagation();
                 setIsLiked(!isLiked);
                 addToFavorites();
             }}
-            className={` ${className} bg-[#05080D] rounded-full h-10 w-10 flex items-center justify-center ${isLiked ? "bg-[#C10B2F]" : ""}`}
+            className={`${className} w-9 h-9 rounded-full flex items-center justify-center transition-all
+                       ${isLiked ? "bg-red-600 hover:bg-red-700" : "bg-black/60 backdrop-blur-md hover:bg-black/80"}`}
+            disabled={isPending || isRemoving}
         >
-            <Image src={isLiked ? "/svg-icons/heart-filled.svg" : "/svg-icons/heart.svg"} alt="heart" height={20} width={20} />
-        </button></div>
+            <Image 
+                src={isLiked ? "/svg-icons/heart-filled.svg" : "/svg-icons/heart.svg"} 
+                alt="heart" 
+                height={18} 
+                width={18}
+                className={isPending || isRemoving ? "opacity-50" : ""}
+            />
+        </button>
     )
 }
 
