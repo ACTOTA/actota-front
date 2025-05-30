@@ -15,6 +15,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
   const router = useRouter();
   const [className, setClassName] = useState<string>('');
   const searchRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [isTop, setIsTop] = useState(true);
 
   // State for search inputs
@@ -26,6 +27,30 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
   // Touch/swipe handling for mobile bottom sheet
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Helper function to generate section classes
+  const getSectionClassName = (step: STEPS, nextStep?: STEPS) => {
+    const isSelected = currStep === step;
+    const showDivider = nextStep && currStep !== nextStep;
+    
+    return `
+      ${isSelected ? 'lg:ring-2 lg:ring-white lg:bg-white/10' : ''}
+      ${showDivider && !navbar ? 'lg:after:content-[""] lg:after:absolute lg:after:right-0 lg:after:top-1/2 lg:after:h-8 lg:after:w-[1px] lg:after:bg-white/20 lg:after:-translate-y-1/2' : ''}
+      rounded-full cursor-pointer z-10 h-full w-full col-span-2
+      flex items-center justify-center px-4 relative
+      hover:bg-white/5 transition-all duration-200
+    `.trim();
+  };
+
+  // Helper function for icon classes
+  const getIconClassName = (hasValue: boolean) => {
+    return `w-4 h-4 ${currStep != null && !navbar ? '' : 'max-md:hidden'} ${hasValue ? 'text-white/80' : 'text-white/40'}`;
+  };
+
+  // Helper function for text classes
+  const getTextClassName = (hasValue: boolean) => {
+    return `font-medium ${hasValue ? 'text-white' : 'text-white/90'} ${currStep != null && !navbar ? 'max-md:text-xs' : ''}`;
+  };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchEnd(null);
@@ -195,6 +220,41 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
     }, 100);
   }, [searchRef, setClasses, navbar]);
 
+  // Click outside and escape key handler
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // Only handle clicks on desktop
+      if (window.innerWidth >= 1024 && currStep != null && !navbar) {
+        const target = event.target as Node;
+        const clickedInsideSearch = searchRef.current && searchRef.current.contains(target);
+        const clickedInsideDropdown = dropdownRef.current && dropdownRef.current.contains(target);
+        
+        if (!clickedInsideSearch && !clickedInsideDropdown) {
+          setCurrStep?.(null);
+        }
+      }
+    };
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && currStep != null && !navbar) {
+        setCurrStep?.(null);
+      }
+    };
+
+    if (currStep != null) {
+      // Add a small delay to prevent immediate closing when opening
+      setTimeout(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('keydown', handleEscapeKey);
+      }, 100);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [currStep, navbar, setCurrStep]);
+
   return (
     <>
       {/* Backdrop for mobile when search is active */}
@@ -217,13 +277,14 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
             variant={navbar ? 'default' : 'light'}
             blur="xl"
             padding="none"
-            rounded={navbar ? 'full' : currStep != null ? '3xl' : 'full'}
+            rounded={navbar ? 'full' : 'full'}
             className={`
               ${navbar ? 'w-[500px] h-[60px] text-primary-gray max-2xl:h-[60px]' : 'w-[760px] max-lg:w-full text-white'} 
               ${isTop && !navbar ? 'h-[86px]' : 'h-[66px]'}
               ${currStep != null && !navbar ? 'max-lg:h-auto max-lg:max-h-[90vh]' : 'max-lg:h-[64px]'}
+              ${currStep != null && !navbar ? 'max-lg:!rounded-xl' : ''}
               m-auto z-50
-              ${currStep != null && !navbar ? 'max-lg:transition-[height,max-height] max-lg:duration-300' : 'transition-all duration-300'} 
+              ${currStep != null && !navbar ? 'transition-[height,max-height] duration-300' : 'transition-all duration-300'} 
               ease-in-out ${className}
             `} 
             ref={searchRef}
@@ -232,7 +293,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
           {currStep != null && !navbar && (
             <div className="lg:hidden">
               {/* Search options content */}
-              <div className="pt-3 px-4 pb-4 max-h-[70vh] overflow-y-auto">
+              <div className="pt-2 px-3 pb-3 max-h-[75vh] overflow-y-auto">
                 {/* Mobile header with current selection */}
                 <div>
                   <div 
@@ -283,97 +344,135 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
           
           {/* Search bar - always visible */}
           <div className={`
-            ${currStep != null && !navbar ? 'max-lg:p-2' : ''} 
-            ${navbar || currStep == null ? 'grid grid-cols-9 h-full' : 'lg:grid lg:grid-cols-9 lg:h-full'} 
-            ${currStep != null && !navbar ? 'max-lg:grid max-lg:grid-cols-9 max-lg:h-[60px]' : ''}
-            items-center justify-between text-sm text-left transition-all duration-300
+            grid grid-cols-9 h-full
+            items-center justify-center text-sm text-left transition-all duration-300
           `}>
 
           <section onClick={() => handleSelect(STEPS.LOCATION)}
             id={STEPS.LOCATION.toString()}
-            className={`
-            ${currStep == STEPS.LOCATION ? 'lg:border-2 lg:border-white lg:bg-white/10' : currStep !== STEPS.DATE && 'lg:after:content-[""] lg:after:absolute lg:after:right-0 lg:after:top-1/2 lg:after:h-8 lg:after:w-[1px] lg:after:bg-white/20 lg:after:-translate-y-1/2'}
-            rounded-full cursor-pointer z-10 h-full w-full col-span-2
-            flex flex-col justify-center gap-0.5 px-4 relative
-            hover:bg-white/5 transition-all duration-200
-          `}>
-            <div className="flex items-center gap-2 max-md:justify-center">
-              <MdLocationOn className={`w-4 h-4 ${currStep != null && !navbar ? '' : 'max-md:hidden'} ${locationValue.length > 0 ? 'text-white/80' : 'text-white/40'}`} />
-              <div className="max-md:text-center">
-                <p className={`font-medium ${locationValue.length > 0 ? 'text-white' : 'text-white/90'} ${currStep != null && !navbar ? 'max-md:text-xs' : ''}`}>
-                  {locationValue.length > 0 ? locationValue[0].split(',')[0] : "Where"}
-                </p>
-                {!navbar && currStep == null && (
-                  <p className="text-xs text-white/60 max-md:hidden truncate">
+            className={getSectionClassName(STEPS.LOCATION, STEPS.DATE)}>
+            <div className="w-full">
+              {navbar ? (
+                <div className="flex flex-col items-center justify-center h-full">
+                  <p className={getTextClassName(locationValue.length > 0)}>
+                    {locationValue.length > 0 ? locationValue[0].split(',')[0] : "Where"}
+                  </p>
+                  <p className="text-xs text-gray-400">
                     {locationValue.length > 0 ? locationValue[0].split(',')[1]?.trim() || 'Selected' : "Search destinations"}
                   </p>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 max-md:justify-center">
+                  <MdLocationOn className={getIconClassName(locationValue.length > 0)} />
+                  <div className="max-md:text-center">
+                    <p className={getTextClassName(locationValue.length > 0)}>
+                      {locationValue.length > 0 ? locationValue[0].split(',')[0] : "Where"}
+                    </p>
+                    {currStep == null && (
+                      <p className="text-xs text-white/60 max-md:hidden truncate">
+                        {locationValue.length > 0 ? locationValue[0].split(',')[1]?.trim() || 'Selected' : "Search destinations"}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </section>
 
           <section onClick={() => handleSelect(STEPS.DATE)}
             id={STEPS.DATE.toString()}
-            className={`${currStep == STEPS.DATE ? 'lg:border-2 lg:border-white lg:bg-white/10' : currStep !== STEPS.GUESTS && 'lg:after:content-[""] lg:after:absolute lg:after:right-0 lg:after:top-1/2 lg:after:h-8 lg:after:w-[1px] lg:after:bg-white/20 lg:after:-translate-y-1/2'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
-        flex flex-col justify-center gap-0.5 px-4 relative
-        hover:bg-white/5 transition-all duration-200`}>
-            <div className="flex items-center gap-2 max-md:justify-center">
-              <MdDateRange className={`w-4 h-4 ${currStep != null && !navbar ? '' : 'max-md:hidden'} ${durationValue.length > 0 ? 'text-white/80' : 'text-white/40'}`} />
-              <div className="max-md:text-center">
-                <p className={`font-medium ${durationValue.length > 0 ? 'text-white' : 'text-white/90'} ${currStep != null && !navbar ? 'max-md:text-xs' : ''}`}>
-                  {durationValue.length > 0 ? durationValue[0].split(' ')[0] : "When"}
-                </p>
-                {!navbar && currStep == null && (
-                  <p className="text-xs text-white/60 max-md:hidden">
+            className={getSectionClassName(STEPS.DATE, STEPS.GUESTS)}>
+            <div className="w-full">
+              {navbar ? (
+                <div className="flex flex-col items-center justify-center h-full">
+                  <p className={getTextClassName(durationValue.length > 0)}>
+                    {durationValue.length > 0 ? durationValue[0].split(' ')[0] : "When"}
+                  </p>
+                  <p className="text-xs text-gray-400">
                     {durationValue.length > 0 ? `${durationValue[0].split(' ').slice(1).join(' ')}` : "Add dates"}
                   </p>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 max-md:justify-center">
+                  <MdDateRange className={getIconClassName(durationValue.length > 0)} />
+                  <div className="max-md:text-center">
+                    <p className={getTextClassName(durationValue.length > 0)}>
+                      {durationValue.length > 0 ? durationValue[0].split(' ')[0] : "When"}
+                    </p>
+                    {currStep == null && (
+                      <p className="text-xs text-white/60 max-md:hidden">
+                        {durationValue.length > 0 ? `${durationValue[0].split(' ').slice(1).join(' ')}` : "Add dates"}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </section>
 
           <section onClick={() => handleSelect(STEPS.GUESTS)}
             id={STEPS.GUESTS.toString()}
-            className={`${currStep == STEPS.GUESTS ? 'lg:border-2 lg:border-white lg:bg-white/10' : currStep !== STEPS.ACTIVITIES && 'lg:after:content-[""] lg:after:absolute lg:after:right-0 lg:after:top-1/2 lg:after:h-8 lg:after:w-[1px] lg:after:bg-white/20 lg:after:-translate-y-1/2'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
-        flex flex-col justify-center gap-0.5 px-4 relative
-        hover:bg-white/5 transition-all duration-200
-       `}>
-            <div className="flex items-center gap-2 max-md:justify-center">
-              <MdPeople className={`w-4 h-4 ${currStep != null && !navbar ? '' : 'max-md:hidden'} ${guestsValue.length > 0 ? 'text-white/80' : 'text-white/40'}`} />
-              <div className="max-md:text-center">
-                <p className={`font-medium ${guestsValue.length > 0 ? 'text-white' : 'text-white/90'} ${currStep != null && !navbar ? 'max-md:text-xs' : ''}`}>
-                  {guestsValue.length > 0 ? guestsValue[0].split(' ')[0] : "Who"}
-                </p>
-                {!navbar && currStep == null && (
-                  <p className="text-xs text-white/60 max-md:hidden">
+            className={getSectionClassName(STEPS.GUESTS, STEPS.ACTIVITIES)}>
+            <div className="w-full">
+              {navbar ? (
+                <div className="flex flex-col items-center justify-center h-full">
+                  <p className={getTextClassName(guestsValue.length > 0)}>
+                    {guestsValue.length > 0 ? guestsValue[0].split(' ')[0] : "Who"}
+                  </p>
+                  <p className="text-xs text-gray-400">
                     {guestsValue.length > 0 ? `${guestsValue[0].split(' ').slice(1).join(' ')}` : "Add guests"}
                   </p>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 max-md:justify-center">
+                  <MdPeople className={getIconClassName(guestsValue.length > 0)} />
+                  <div className="max-md:text-center">
+                    <p className={getTextClassName(guestsValue.length > 0)}>
+                      {guestsValue.length > 0 ? guestsValue[0].split(' ')[0] : "Who"}
+                    </p>
+                    {currStep == null && (
+                      <p className="text-xs text-white/60 max-md:hidden">
+                        {guestsValue.length > 0 ? `${guestsValue[0].split(' ').slice(1).join(' ')}` : "Add guests"}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </section>
 
           <section onClick={() => handleSelect(STEPS.ACTIVITIES)}
             id={STEPS.ACTIVITIES.toString()}
-            className={`${currStep == STEPS.ACTIVITIES ? 'lg:border-2 lg:border-white lg:bg-white/10' : ' border-transparent'} rounded-full cursor-pointer z-10 h-full w-full col-span-2
-        flex flex-col justify-center gap-0.5 px-4 relative
-        hover:bg-white/5 transition-all duration-200`}>
-            <div className="flex items-center gap-2 max-md:justify-center">
-              <MdLocalActivity className={`w-4 h-4 ${currStep != null && !navbar ? '' : 'max-md:hidden'} ${activitiesValue.length > 0 ? 'text-white/80' : 'text-white/40'}`} />
-              <div className="max-md:text-center">
-                <p className={`font-medium ${activitiesValue.length > 0 ? 'text-white' : 'text-white/90'} ${currStep != null && !navbar ? 'max-md:text-xs' : ''}`}>
-                  {activitiesValue.length > 0 ? `${activitiesValue.length} Activities` : "What"}
-                </p>
-                {!navbar && currStep == null && (
-                  <p className="text-xs text-white/60 max-md:hidden truncate">
+            className={getSectionClassName(STEPS.ACTIVITIES)}>
+            <div className="w-full">
+              {navbar ? (
+                <div className="flex flex-col items-center justify-center h-full">
+                  <p className={getTextClassName(activitiesValue.length > 0)}>
+                    {activitiesValue.length > 0 ? `${activitiesValue.length} Activities` : "What"}
+                  </p>
+                  <p className="text-xs text-gray-400">
                     {activitiesValue.length > 0 ? activitiesValue.slice(0, 2).join(", ") + (activitiesValue.length > 2 ? "..." : "") : "Choose activities"}
                   </p>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 max-md:justify-center">
+                  <MdLocalActivity className={getIconClassName(activitiesValue.length > 0)} />
+                  <div className="max-md:text-center">
+                    <p className={getTextClassName(activitiesValue.length > 0)}>
+                      {activitiesValue.length > 0 ? `${activitiesValue.length} Activities` : "What"}
+                    </p>
+                    {currStep == null && (
+                      <p className="text-xs text-white/60 max-md:hidden truncate">
+                        {activitiesValue.length > 0 ? activitiesValue.slice(0, 2).join(", ") + (activitiesValue.length > 2 ? "..." : "") : "Choose activities"}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </section>
 
-          <section className={`${navbar ? ' h-[55px] w-[55px] pr-1 -ml-2' : 'm-auto h-[52px] w-[52px] lg:h-[56px] lg:w-[56px] max-md:h-[55px] max-md:w-[55px] max-sm:h-[45px] max-sm:w-[45px] max-md:pr-1 max-md:-ml-2'} col-span-1 flex justify-center items-center`}>
+          <section className={`${navbar ? 'h-[55px] w-[55px]' : 'm-auto h-[52px] w-[52px] lg:h-[56px] lg:w-[56px] max-md:h-[55px] max-md:w-[55px] max-sm:h-[45px] max-sm:w-[45px]'} col-span-1 flex justify-center items-center`}>
             <div onClick={() => handleSearch()} className="w-full h-full relative rounded-full bg-gradient-to-r from-blue-500 to-blue-600 cursor-pointer
             hover:from-blue-600 hover:to-blue-700 transition-all duration-300 ease-in-out
             shadow-lg hover:shadow-xl transform hover:scale-105">
@@ -381,26 +480,31 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
             </div>
           </section>
           </div>
+          
         </GlassPanel>
-
-        {currStep != null && (
-          <>
-            {/* Desktop search box */}
-            <div 
-              id='search-box' 
-              className="hidden lg:block absolute top-[calc(100%+10px)] left-1/2 -translate-x-1/2 w-[720px] mt-4"
+        
+        {/* Desktop dropdown - separate from searchbar */}
+        {currStep != null && !navbar && (
+          <div ref={dropdownRef} className="hidden lg:block absolute top-full left-0 right-0 mt-4 z-50 animate-fade-in-down">
+            <GlassPanel
+              variant="light"
+              blur="xl"
+              padding="lg"
+              rounded="2xl"
+              className="w-full max-w-3xl mx-auto shadow-2xl"
             >
-              <SearchBoxes
-                step={currStep}
-                updateSearchValue={updateSearchValue}
-                locationValue={locationValue.length > 0 ? locationValue[0] : ""}
-                durationValue={durationValue.length > 0 ? durationValue[0] : ""}
-                guestsValue={guestsValue.length > 0 ? guestsValue[0] : ""}
-                activitiesValue={activitiesValue.length > 0 ? activitiesValue.join(", ") : ""}
-              />
-            </div>
-
-          </>
+              <div className="text-white">
+                <SearchBoxes
+                  step={currStep}
+                  updateSearchValue={updateSearchValue}
+                  locationValue={locationValue.length > 0 ? locationValue[0] : ""}
+                  durationValue={durationValue.length > 0 ? durationValue[0] : ""}
+                  guestsValue={guestsValue.length > 0 ? guestsValue[0] : ""}
+                  activitiesValue={activitiesValue.length > 0 ? activitiesValue.join(", ") : ""}
+                />
+              </div>
+            </GlassPanel>
+          </div>
         )}
         </div>
       </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DateMenuCalendar from '../figma/DateMenuCalendar';
 import GlassPanel from '../figma/GlassPanel';
 import { MOBILE_GLASS_PANEL_STYLES, getMobileGlassPanelProps } from './constants';
+import WheelPicker from './WheelPicker';
 
 interface DateMenuProps {
   updateSearchValue?: (value: string) => void;
@@ -42,78 +43,69 @@ export default function DateMenu({ updateSearchValue, durationValue, className }
     updateSearchValue?.(summary);
   };
 
+  const getDateRangeDisplay = () => {
+    if (!startDate && !endDate) return 'Select Date';
+    if (startDate && !endDate) return startDate;
+    if (startDate && endDate && startDate === endDate) return startDate;
+    if (startDate && endDate) return `${startDate} → ${endDate}`;
+    return 'Select Date';
+  };
+
   const handleDateRangeChange = (start: string | null, end: string | null) => {
     setStartDate(start);
     setEndDate(end);
   }
 
-  const handleStartTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setStartTime(e.target.value);
-  }
-
-  const handleEndTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setEndTime(e.target.value);
-  }
-
-  // Generate time options from 00:00 to 23:45 in 15-minute increments
-  const timeOptions = Array.from({ length: 96 }, (_, i) => {
-    const hours = Math.floor(i / 4).toString().padStart(2, '0');
-    const minutes = ((i % 4) * 15).toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
-  });
+  // Validate that end time is after start time
+  useEffect(() => {
+    if (startDate && endDate && startDate === endDate) {
+      // If same day, ensure end time is after start time
+      const [startHour, startMin] = startTime.split(':').map(Number);
+      const [endHour, endMin] = endTime.split(':').map(Number);
+      const startMinutes = startHour * 60 + startMin;
+      const endMinutes = endHour * 60 + endMin;
+      
+      if (endMinutes <= startMinutes) {
+        // Set end time to 1 hour after start time
+        const newEndMinutes = startMinutes + 60;
+        const newEndHour = Math.floor(newEndMinutes / 60) % 24;
+        const newEndMin = newEndMinutes % 60;
+        setEndTime(`${newEndHour.toString().padStart(2, '0')}:${newEndMin.toString().padStart(2, '0')}`);
+      }
+    }
+  }, [startTime, endTime, startDate, endDate]);
 
   return (
     <GlassPanel
       {...getMobileGlassPanelProps(isMobile)}
-      className={`w-full mx-auto h-full flex-col justify-center items-center gap-4 ${isMobile ? MOBILE_GLASS_PANEL_STYLES : ''} ${className}`}
+      className={`w-full mx-auto flex flex-col ${isMobile ? MOBILE_GLASS_PANEL_STYLES : ''} ${className}`}
     >
-      <div className="w-full mb-4">
-        <h2 className="text-left text-white text-xl font-semibold">When are you traveling?</h2>
-        <p className="text-sm text-gray-400 mt-1">Select your trip dates</p>
+      {/* Date Range Header */}
+      <div className="w-full text-center mb-2">
+        <h3 className="text-white text-base font-medium">{getDateRangeDisplay()}</h3>
       </div>
 
       <DateMenuCalendar onDateRangeChange={handleDateRangeChange} />
 
-      <div className='w-full mt-3 mb-1 mx-auto flex flex-wrap'>
-        <div className='flex justify-around w-full gap-3'>
-          <div className="flex items-center bg-gray-800/50 p-3 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
-            <div className="text-gray-300 text-sm font-medium whitespace-nowrap mr-3">Start:</div>
-            <select
-              value={startTime}
-              onChange={handleStartTimeChange}
-              className="w-full bg-transparent border-none text-white text-sm font-normal leading-tight appearance-none pl-1 pr-5 cursor-pointer focus:outline-none"
-              style={{
-                backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236B7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 0.5rem center',
-                backgroundSize: '0.5em auto'
-              }}
-            >
-              {timeOptions.map(time => (
-                <option key={time} value={time} className='bg-gray-900'>{time}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex items-center bg-gray-800/50 p-3 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
-            <div className="text-gray-300 text-sm font-medium whitespace-nowrap mr-3">End:</div>
-            <select
-              value={endTime}
-              onChange={handleEndTimeChange}
-              className="w-full bg-transparent border-none text-white text-sm font-normal leading-tight appearance-none pl-1 pr-5 cursor-pointer focus:outline-none"
-              style={{
-                backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236B7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 0.5rem center',
-                backgroundSize: '0.5em auto'
-              }}
-            >
-              {timeOptions.map(time => (
-                <option key={time} value={time} className='bg-gray-900'>{time}</option>
-              ))}
-            </select>
-          </div>
+      {/* Time Selectors */}
+      <div className='w-full mt-2 border-t border-gray-700 pt-3'>
+        <div className='flex gap-4 justify-center'>
+          <WheelPicker
+            value={startTime}
+            onChange={setStartTime}
+            label="Start Time"
+          />
+          <WheelPicker
+            value={endTime}
+            onChange={setEndTime}
+            label="End Time"
+          />
         </div>
+      </div>
+      
+      {/* Booking note */}
+      <div className="text-center text-xs text-gray-500 mt-1">
+        * Minimum 1 day advance booking required
       </div>
     </GlassPanel>
   );

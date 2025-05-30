@@ -49,6 +49,16 @@ export default function DateMenuCalendar({ onDateRangeChange }: DateMenuCalendar
   const handleDateSelect = (date: string, isCurrentMonth: boolean) => {
     if (!isCurrentMonth) return; // Prevent selection of non-current month days
     
+    // Check if date is in the past or today
+    const selectedDate = new Date(date);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    
+    if (selectedDate < tomorrow) {
+      return; // Don't allow selection of today or past dates
+    }
+    
     let newStartDate = startDate;
     let newEndDate = endDate;
 
@@ -94,76 +104,84 @@ export default function DateMenuCalendar({ onDateRangeChange }: DateMenuCalendar
     return date === endDate;
   }
 
+  const isPastDate = (date: string) => {
+    const checkDate = new Date(date);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    return checkDate < tomorrow;
+  }
+
   return (
-    <div className="w-full px-1 py-2">
-      <div className="relative grid grid-cols-1 gap-x-4 md:gap-x-8 2xl:grid-cols-2">
+    <div className="w-full">
+      <div className="relative">
+        {/* Navigation buttons */}
         <button
           type="button"
-          className="absolute -left-1.5 -top-1 flex items-center justify-center p-1.5 text-gray-400 hover:text-gray-500"
+          className="absolute left-0 top-0 flex items-center justify-center p-1 text-gray-400 hover:text-white transition-colors z-10"
           onClick={goBack}
         >
-          <span className="sr-only">Previous month</span>
           <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
         </button>
         <button
           type="button"
-          className="absolute -right-1.5 -top-1 flex items-center justify-center p-1.5 text-gray-400 hover:text-gray-500"
+          className="absolute right-0 top-0 flex items-center justify-center p-1 text-gray-400 hover:text-white transition-colors z-10"
           onClick={goForward}
         >
-          <span className="sr-only">Next month</span>
           <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
         </button>
+        
+        <div className="grid grid-cols-1 gap-x-8 lg:grid-cols-2">
         {months.map((month, monthIdx) => (
           <section
             key={monthIdx}
-            className={classNames(monthIdx === months.length - 1 && 'hidden 2xl:block', 'text-center')}
+            className={classNames(monthIdx === months.length - 1 && 'hidden lg:block', 'text-center')}
           >
-            <h2 className="text-sm font-semibold text-neutral-06">{month.name} {month.days[15].date.split("-")[0]}</h2>
-            <div className="mt-6 grid grid-cols-7 text-xs/6 text-gray-500">
+            <h2 className="text-base font-semibold text-white mb-2">{month.name} {month.days[15].date.split("-")[0]}</h2>
+            <div className="grid grid-cols-7 text-xs text-gray-300 mb-1 font-medium">
+              <div>S</div>
               <div>M</div>
               <div>T</div>
               <div>W</div>
               <div>T</div>
               <div>F</div>
               <div>S</div>
-              <div>S</div>
             </div>
-            <div className="isolate mt-2 grid grid-cols-7 gap-px rounded-lg text-sm">
+            <div className="isolate mt-1 grid grid-cols-7 gap-px rounded-lg text-sm">
               {month.days.map((day, dayIdx) => (
                 <button
                   key={day.date}
                   type="button"
                   onClick={() => handleDateSelect(day.date, day.isCurrentMonth)}
-                  disabled={!day.isCurrentMonth}
+                  disabled={!day.isCurrentMonth || isPastDate(day.date)}
                   className={classNames(
-                    day.isCurrentMonth ? 'text-neutral-06' : 'text-gray-400 cursor-default hover:bg-transparent',
-                    dayIdx === 0 && 'rounded-tl-lg',
-                    dayIdx === 6 && 'rounded-tr-lg',
-                    dayIdx === month.days.length - 7 && 'rounded-bl-lg',
-                    dayIdx === month.days.length - 1 && 'rounded-br-lg',
-                    'relative py-1.5',
-                    day.isCurrentMonth && 'hover:bg-red-500 hover:bg-opacity-15 hover:rounded-lg focus:z-10',
-                    isStart(day.date, day.isCurrentMonth) && 'bg-white text-black rounded-l-lg',
-                    isEnd(day.date, day.isCurrentMonth) && 'bg-white text-black rounded-r-lg',
-                    isInRange(day.date, day.isCurrentMonth) && 'bg-gray-300 text-black'
+                    day.isCurrentMonth && !isPastDate(day.date) ? 'text-white font-medium' : 'text-gray-400 cursor-default',
+                    isPastDate(day.date) && 'opacity-30 cursor-not-allowed',
+                    'relative py-1.5 text-sm',
+                    day.isCurrentMonth && !isPastDate(day.date) && 'hover:bg-blue-500/20 hover:rounded focus:z-10 cursor-pointer',
+                    isStart(day.date, day.isCurrentMonth) && 'bg-blue-500 text-white rounded',
+                    isEnd(day.date, day.isCurrentMonth) && 'bg-blue-500 text-white rounded',
+                    isInRange(day.date, day.isCurrentMonth) && 'bg-blue-500/20'
                   )}
                 >
                   <time
                     dateTime={day.date}
                     className={classNames(
                       day.isToday && 'relative',
-                      'mx-auto flex h-7 w-7 items-center justify-center rounded-full'
+                      'mx-auto flex h-7 w-7 items-center justify-center rounded text-sm'
                     )}
                   >
                     {day.isToday && (
-                      <span className="absolute bottom-[-2px] left-1/2 -translate-x-1/2 w-2 h-2 rounded-full red-04"></span>
-                    )}{day.date?.split('-').pop()?.replace(/^0/, '') || ''}
+                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-red-500 rounded-full"></span>
+                    )}
+                    {day.date?.split('-').pop()?.replace(/^0/, '') || ''}
                   </time>
                 </button>
               ))}
             </div>
           </section>
         ))}
+        </div>
       </div>
     </div>
   )

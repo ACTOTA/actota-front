@@ -326,5 +326,28 @@ Stroke-Blue {
     font-weight: 400;
     font-style: normal;
   }
+  
+  /* Hide scrollbar for wheel picker 
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  */
+.animate-fade-in-down {
+  animation: fadeInDown 0.3s ease-out;
 }
- */
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
