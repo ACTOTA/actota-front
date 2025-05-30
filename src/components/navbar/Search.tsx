@@ -37,7 +37,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
       ${isSelected ? 'lg:ring-2 lg:ring-white lg:bg-white/10' : ''}
       ${showDivider && !navbar ? 'lg:after:content-[""] lg:after:absolute lg:after:right-0 lg:after:top-1/2 lg:after:h-8 lg:after:w-[1px] lg:after:bg-white/20 lg:after:-translate-y-1/2' : ''}
       rounded-full cursor-pointer z-10 h-full w-full col-span-2
-      flex items-center justify-center px-4 relative
+      flex items-center justify-center px-2 sm:px-3 lg:px-4 relative
       hover:bg-white/5 transition-all duration-200
     `.trim();
   };
@@ -49,7 +49,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
 
   // Helper function for text classes
   const getTextClassName = (hasValue: boolean) => {
-    return `font-medium ${hasValue ? 'text-white' : 'text-white/90'} ${currStep != null && !navbar ? 'max-md:text-xs' : ''}`;
+    return `font-medium ${hasValue ? 'text-white' : 'text-white/90'} ${currStep != null && !navbar ? 'max-md:text-xs' : ''} ${navbar ? '' : 'text-sm sm:text-base'}`;
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -266,13 +266,13 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
       )}
 
       <div 
-        className={`relative ${navbar ? '' : `max-lg:fixed max-lg:left-0 max-lg:right-0 max-lg:z-50 max-lg:transition-all max-lg:duration-300 ${currStep != null ? 'max-lg:bottom-0 max-lg:px-2' : 'max-lg:bottom-5 max-lg:px-4'}`}`} 
+        className={`relative ${navbar ? '' : `max-lg:fixed max-lg:left-0 max-lg:right-0 max-lg:z-50 max-lg:transition-all max-lg:duration-300 ${currStep != null ? 'max-lg:bottom-0 max-lg:px-2' : 'max-lg:bottom-5 max-lg:px-2'}`}`} 
         id="search-bar"
         onTouchStart={currStep != null ? handleTouchStart : undefined}
         onTouchMove={currStep != null ? handleTouchMove : undefined}
         onTouchEnd={currStep != null ? handleTouchEnd : undefined}
       >
-        <div className={`relative ${currStep != null && !navbar ? 'max-lg:overflow-visible' : ''}`}>
+        <div className={`relative`}>
           <GlassPanel
             variant={navbar ? 'default' : 'light'}
             blur="xl"
@@ -284,7 +284,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
               ${currStep != null && !navbar ? 'max-lg:h-auto max-lg:max-h-[90vh]' : 'max-lg:h-[64px]'}
               ${currStep != null && !navbar ? 'max-lg:!rounded-xl' : ''}
               m-auto z-50
-              ${currStep != null && !navbar ? 'transition-[height,max-height] duration-300' : 'transition-all duration-300'} 
+              ${currStep != null && !navbar ? 'max-lg:transition-[height,max-height] max-lg:duration-300 lg:transition-all lg:duration-300' : 'transition-all duration-300'} 
               ease-in-out ${className}
             `} 
             ref={searchRef}
@@ -472,11 +472,11 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
             </div>
           </section>
 
-          <section className={`${navbar ? 'h-[55px] w-[55px]' : 'm-auto h-[52px] w-[52px] lg:h-[56px] lg:w-[56px] max-md:h-[55px] max-md:w-[55px] max-sm:h-[45px] max-sm:w-[45px]'} col-span-1 flex justify-center items-center`}>
+          <section className={`${navbar ? 'h-[55px] w-[55px]' : 'm-auto h-[48px] w-[48px] sm:h-[52px] sm:w-[52px] lg:h-[56px] lg:w-[56px]'} col-span-1 flex justify-center items-center`}>
             <div onClick={() => handleSearch()} className="w-full h-full relative rounded-full bg-gradient-to-r from-blue-500 to-blue-600 cursor-pointer
             hover:from-blue-600 hover:to-blue-700 transition-all duration-300 ease-in-out
             shadow-lg hover:shadow-xl transform hover:scale-105">
-              <BiSearch size={24} className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 text-white" />
+              <BiSearch className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 text-white w-5 h-5 sm:w-6 sm:h-6" />
             </div>
           </section>
           </div>
