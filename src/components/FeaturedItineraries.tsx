@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import ListingCard from "@/src/components/ListingCard";
 import ItineraryCardSkeleton from "@/src/components/ItineraryCardSkeleton";
 import Button from "@/src/components/figma/Button";
+import Dropdown from "@/src/components/figma/Dropdown";
 import Image from "next/image";
 import { useItineraries } from "../hooks/queries/itineraries/useItineraryQuery";
 import { useFavorites } from "../hooks/queries/account/useFavoritesQuery";
@@ -235,22 +236,20 @@ export default function FeaturedItineraries() {
               </div>
 
               {/* Sort Selector */}
-              <div className="flex flex-col gap-2 flex-1">
+              <div className="flex flex-col gap-2 flex-1 max-w-xs">
                 <label className={`${filterStyles.label} flex items-center gap-1`}>
                   <TbArrowsSort className="w-4 h-4" />
                   Sort By
                 </label>
-                <select
-                  value={selectedSort}
-                  onChange={(e) => setSelectedSort(e.target.value)}
-                  className={filterStyles.select}
-                >
-                  {sortOptions.map(option => (
-                    <option key={option.id} value={option.id}>
-                      {option.name}
-                    </option>
-                  ))}
-                </select>
+                <Dropdown
+                  options={sortOptions.map(option => option.name)}
+                  onSelect={(value) => {
+                    const selected = sortOptions.find(option => option.name === value);
+                    if (selected) setSelectedSort(selected.id);
+                  }}
+                  placeholder={sortOptions.find(option => option.id === selectedSort)?.name || "Select"}
+                  className="!bg-gray-900 !text-white !border-gray-800 hover:!bg-gray-800 focus:!border-blue-500"
+                />
               </div>
             </div>
 
