@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useCallback, useEffect } from 'react';
 import { BiSolidMap } from 'react-icons/bi';
-import { GoogleMap, DirectionsService, DirectionsRenderer, Marker, useJsApiLoader } from '@react-google-maps/api';
+import { GoogleMap, DirectionsService, DirectionsRenderer, Marker, Polyline, useJsApiLoader } from '@react-google-maps/api';
 import { BsCalendar4 } from 'react-icons/bs';
 import { MdOutlineExplore, MdBed, MdOutlineDirectionsCarFilled, MdFoodBank, MdLocationOn } from 'react-icons/md';
 import Button from '@/src/components/figma/Button';
@@ -56,7 +56,6 @@ export default function DayView({ listing }: DayViewProps) {
 	const [geocodedLocations, setGeocodedLocations] = useState<Record<string, { lat: number, lng: number }>>({}); 
 	const [isGeocodingComplete, setIsGeocodingComplete] = useState(false);
 	const [geocodingProgress, setGeocodingProgress] = useState({ current: 0, total: 0 });
-	const [selectedActivityIndex, setSelectedActivityIndex] = useState<number | null>(null);
 
 	// Use the hook to load Google Maps
 	const { isLoaded, loadError } = useJsApiLoader({
@@ -77,31 +76,12 @@ export default function DayView({ listing }: DayViewProps) {
 		}
 	}, []);
 
-	// Reset directions and selection when day changes
+	// Reset directions when day changes
 	useEffect(() => {
 		setDirections(null);
 		setDirectionsError(null);
 		setIsGeocodingComplete(false);
-		setSelectedActivityIndex(null);
 	}, [selectedDay]);
-
-	// Helper function to generate fallback coordinates
-	const generateFallbackCoordinates = useCallback((index: number, total: number) => {
-		// Start from Denver area center and create a small spiral pattern
-		const centerLat = 39.7392;
-		const centerLng = -104.9903;
-		const baseRadius = 0.015; // Base radius for nearby points
-		const spiralTightness = 0.5; // How tight the spiral is
-		
-		// Create a logarithmic spiral to avoid overlapping
-		const angle = (index / total) * 2 * Math.PI * 2; // Two full rotations
-		const radius = baseRadius * (1 + spiralTightness * index);
-		
-		return {
-			lat: centerLat + radius * Math.sin(angle),
-			lng: centerLng + radius * Math.cos(angle)
-		};
-	}, []);
 
 	// Enhanced geocoding function with retry logic and better error handling
 	const geocodeAddress = useCallback(async (address: string, key: string, retries = 2): Promise<{ lat: number, lng: number } | null> => {
@@ -156,45 +136,40 @@ export default function DayView({ listing }: DayViewProps) {
 			const dayActivities = listing.days[selectedDay.toString()] || [];
 			const addressesToGeocode: Array<{ address: string, key: string }> = [];
 
+			// Collect all addresses that need geocoding
+			// Check start location
+			if (selectedDay === 1 && listing.start_location) {
+				const hasValidCoords = listing.start_location.coordinates && 
+					(listing.start_location.coordinates[0] !== 0 || listing.start_location.coordinates[1] !== 0);
+				
+				if (!hasValidCoords) {
+					const address = `${listing.start_location.city}, ${listing.start_location.state}`;
+					addressesToGeocode.push({ address, key: 'start' });
+				}
+			}
 
-				// Geocode all activities that need it
-				dayActivities.forEach((activity, idx) => {
-					console.log(`Checking geocoding needs for activity ${idx + 1}:`, {
-						type: activity.type,
-						name: getItemDisplayName(activity),
-						hasExistingCoords: !!activity.location?.coordinates
-					});
+			// Check activity locations
+			dayActivities.forEach((activity, idx) => {
+				if (activity.type === 'activity' && 'address' in activity && activity.address) {
+					const { street, city, state, zip } = activity.address;
+					const fullAddress = `${street}, ${city}, ${state} ${zip}`;
+					addressesToGeocode.push({ address: fullAddress, key: `activity-${idx}` });
+				} else if (activity.location && !activity.location.coordinates && activity.location.name) {
+					addressesToGeocode.push({ address: activity.location.name, key: `activity-${idx}` });
+				}
+			});
 
-					// Skip if already has coordinates
-					if (activity.location?.coordinates) {
-						console.log(`Activity ${idx + 1} already has coordinates, skipping geocoding`);
-						return;
-					}
+			// Check end location
+			if (selectedDay === listing.length_days && listing.end_location) {
+				const hasValidCoords = listing.end_location.coordinates && 
+					(listing.end_location.coordinates[0] !== 0 || listing.end_location.coordinates[1] !== 0);
+				
+				if (!hasValidCoords) {
+					const address = `${listing.end_location.city}, ${listing.end_location.state}`;
+					addressesToGeocode.push({ address, key: 'end' });
+				}
+			}
 
-					// For activities with addresses
-					if (activity.type === 'activity' && 'address' in activity && activity.address) {
-						const { street, city, state, zip } = activity.address;
-						const fullAddress = `${street}, ${city}, ${state} ${zip}`;
-						addressesToGeocode.push({ address: fullAddress, key: `activity-${idx}` });
-						console.log(`Activity ${idx + 1} needs geocoding from address:`, fullAddress);
-					} 
-					// For accommodations/transportation with location names
-					else if (activity.location && activity.location.name) {
-						addressesToGeocode.push({ address: activity.location.name, key: `activity-${idx}` });
-						console.log(`Activity ${idx + 1} needs geocoding from location name:`, activity.location.name);
-					}
-					// For any other activity without coordinates
-					else {
-						// Try to use the activity name as a last resort
-						const activityName = getItemDisplayName(activity);
-						if (activityName && activityName !== "Unknown") {
-							addressesToGeocode.push({ address: `${activityName}, Denver, Colorado`, key: `activity-${idx}` });
-							console.log(`Activity ${idx + 1} needs geocoding from activity name:`, activityName);
-						} else {
-							console.warn(`Activity ${idx + 1} has no geocodable information`);
-						}
-					}
-				});
 			if (addressesToGeocode.length === 0) {
 				console.log('No geocoding needed, all locations have coordinates');
 				setIsGeocodingComplete(true);
@@ -215,15 +190,6 @@ export default function DayView({ listing }: DayViewProps) {
 					setGeocodedLocations(prev => {
 						const updated = { ...prev, [key]: coords };
 						console.log('Updated geocodedLocations:', updated);
-						return updated;
-					});
-				} else {
-					// Fallback: generate a slightly offset position based on index
-					console.warn(`Failed to geocode ${key}, using fallback position`);
-					const fallbackCoords = generateFallbackCoordinates(i, addressesToGeocode.length);
-					setGeocodedLocations(prev => {
-						const updated = { ...prev, [key]: fallbackCoords };
-						console.log('Added fallback coordinates for', key, fallbackCoords);
 						return updated;
 					});
 				}
@@ -372,28 +338,15 @@ export default function DayView({ listing }: DayViewProps) {
 	};
 
 	// Get coordinates for the selected day's activities - FIXED VERSION
-	const getDayCoordinates = useCallback(() => {
+	const getDayCoordinates = () => {
 		try {
 			const dayActivities = listing.days[selectedDay.toString()] || [];
 			const coordinates: Array<{lat: number, lng: number, label?: string}> = [];
 
-			console.log('=== getDayCoordinates Debug ===');
-			console.log('Day activities count:', dayActivities.length);
-			console.log('Geocoded locations:', geocodedLocations);
+			console.log('getDayCoordinates called, geocodedLocations:', geocodedLocations);
 
 			// Only add activity locations - no separate start/end markers
 			dayActivities.forEach((activity, idx) => {
-				console.log(`\n--- Processing activity ${idx + 1} ---`);
-				console.log('Activity:', {
-					type: activity.type,
-					name: getItemDisplayName(activity),
-					hasLocation: !!activity.location,
-					locationCoords: activity.location?.coordinates,
-					hasAddress: activity.type === 'activity' && 'address' in activity && !!activity.address
-				});
-
-				let coordinatesAdded = false;
-
 				// Check if activity has location with coordinates (accommodation/transportation)
 				if (activity.location?.coordinates) {
 					// GeoJSON format: [longitude, latitude] -> convert to { lat, lng }
@@ -402,75 +355,40 @@ export default function DayView({ listing }: DayViewProps) {
 						lng: activity.location.coordinates[0]  // longitude is first in GeoJSON
 					};
 					
-					const validCoords = validateAndFixCoordinates(rawCoords.lat, rawCoords.lng, `activity ${idx + 1}`);
+					const validCoords = validateAndFixCoordinates(rawCoords.lat, rawCoords.lng, `activity ${idx}`);
 					if (validCoords) {
 						coordinates.push({
 							...validCoords,
 							label: getItemDisplayName(activity)
 						});
-						console.log(`✅ Added activity ${idx + 1} from location.coordinates:`, validCoords);
-						coordinatesAdded = true;
+						console.log(`Added activity ${idx} from location.coordinates:`, validCoords);
 					}
-				} 
-				
-				// Check geocoded locations
-				if (!coordinatesAdded && geocodedLocations[`activity-${idx}`]) {
+				} else if (geocodedLocations[`activity-${idx}`]) {
 					// Use geocoded coordinates for activities with addresses (these are already in correct format)
 					coordinates.push({
 						...geocodedLocations[`activity-${idx}`],
 						label: getItemDisplayName(activity)
 					});
-					console.log(`✅ Added activity ${idx + 1} from geocoding:`, geocodedLocations[`activity-${idx}`]);
-					coordinatesAdded = true;
-				}
-				
-				// If still no coordinates, generate fallback
-				if (!coordinatesAdded) {
-					console.warn(`⚠️ No coordinates found for activity ${idx + 1}, generating fallback`);
-					const fallbackCoords = generateFallbackCoordinates(idx, dayActivities.length);
-					coordinates.push({
-						...fallbackCoords,
-						label: getItemDisplayName(activity)
-					});
-					console.log(`✅ Added activity ${idx + 1} with fallback coordinates:`, fallbackCoords);
-					
-					// Log why we needed fallback
-					console.log(`Fallback reason for activity ${idx + 1}:`, {
-						type: activity.type,
-						name: getItemDisplayName(activity),
-						hasLocation: !!activity.location,
-						hasCoordinates: !!activity.location?.coordinates,
-						hasAddress: activity.type === 'activity' && 'address' in activity && !!activity.address,
-						geocodingKey: `activity-${idx}`,
-						wasGeocoded: !!geocodedLocations[`activity-${idx}`],
-						geocodedKeys: Object.keys(geocodedLocations)
-					});
+					console.log(`Added activity ${idx} from geocoding:`, geocodedLocations[`activity-${idx}`]);
+				} else {
+					console.log(`No coordinates for activity ${idx}`, activity);
 				}
 			});
 
-			console.log('\n=== Final Results ===');
-			console.log('Total coordinates:', coordinates.length);
-			console.log('Coordinates array:', coordinates);
+			console.log('Final coordinates array:', coordinates);
 			return coordinates;
 		} catch (error) {
 			console.error("Error getting coordinates:", error);
 			return [];
 		}
-	}, [selectedDay, listing, geocodedLocations, validateAndFixCoordinates, getItemDisplayName, generateFallbackCoordinates])
+	};
 
 	// Recalculate coordinates when geocoding changes
 	const pathCoordinates = React.useMemo(() => {
 		const coords = getDayCoordinates();
 		console.log('pathCoordinates recalculated:', coords);
 		return coords;
-	}, [selectedDay, geocodedLocations, getDayCoordinates]);
-
-	// Pan to selected marker when activity is selected
-	useEffect(() => {
-		if (selectedActivityIndex !== null && map && pathCoordinates[selectedActivityIndex]) {
-			map.panTo(pathCoordinates[selectedActivityIndex]);
-		}
-	}, [selectedActivityIndex, map, pathCoordinates]);
+	}, [selectedDay, geocodedLocations]);
 
 	// Calculate map center and zoom based on coordinates
 	const getMapCenter = () => {
@@ -629,12 +547,7 @@ export default function DayView({ listing }: DayViewProps) {
 											
 											{/* Transportation items get special pill styling */}
 											{isTransport ? (
-												<div 
-													className={`bg-[#1A1A1A] rounded-full px-4 py-2 flex items-center gap-3 cursor-pointer transition-all ${
-														selectedActivityIndex === index ? 'ring-2 ring-[#FEDB25] bg-[#1A1A1A]/80' : 'hover:bg-[#262626]'
-													}`}
-													onClick={() => setSelectedActivityIndex(index)}
-												>
+												<div className="bg-[#1A1A1A] rounded-full px-4 py-2 flex items-center gap-3">
 													{/* Yellow icon circle */}
 													<div className="relative z-10 flex-shrink-0">
 														<div className="w-8 h-8 rounded-full bg-[#FEDB25] flex items-center justify-center">
@@ -655,12 +568,7 @@ export default function DayView({ listing }: DayViewProps) {
 												</div>
 											) : (
 												/* Regular styling for activities and accommodations */
-												<div 
-													className={`flex items-start gap-3 cursor-pointer transition-all rounded-lg p-2 -m-2 ${
-														selectedActivityIndex === index ? 'bg-white/10' : 'hover:bg-white/5'
-													}`}
-													onClick={() => setSelectedActivityIndex(index)}
-												>
+												<div className="flex items-start gap-3">
 													{/* Icon circle */}
 													<div className="relative z-10 flex-shrink-0">
 														<div className={`w-8 h-8 rounded-full flex items-center justify-center ${
@@ -750,45 +658,28 @@ export default function DayView({ listing }: DayViewProps) {
 										>
 											{/* Custom markers for route stops */}
 											{pathCoordinates.map((position, index) => {
-													const dayActivity = currentDayActivities[index];
-													const activityName = dayActivity ? getItemDisplayName(dayActivity) : `Activity ${index + 1}`;
-													const isSelected = selectedActivityIndex === index;
-													
-													// Get color based on activity type
-													let markerColor = '#3b82f6'; // Default blue
-													if (dayActivity) {
-														if (isTransportation(dayActivity)) {
-															markerColor = '#FEDB25'; // Yellow
-														} else if (isAccommodation(dayActivity)) {
-															markerColor = '#F10E3B'; // Red
-														} else if (isActivity(dayActivity)) {
-															markerColor = '#0553CE'; // Blue
-														}
-													}
-													
-													// Make marker larger if selected
-													const markerSize = isSelected ? 48 : 32;
-													const markerAnchor = isSelected ? 24 : 16;
+												const isStart = index === 0;
+												const isEnd = index === pathCoordinates.length - 1;
+												const isWaypoint = !isStart && !isEnd;
+												
 												return (
 													<Marker
 														key={`marker-${index}`}
 														position={position}
 														icon={{
 															url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-																<svg width="${markerSize}" height="${markerSize * 1.25}" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+																<svg width="32" height="40" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
 																	<path d="M16 0C7.163 0 0 7.163 0 16C0 24.837 16 40 16 40C16 40 32 24.837 32 16C32 7.163 24.837 0 16 0Z" 
-																		fill="${markerColor}" stroke="${isSelected ? '#ffffff' : 'none'}" stroke-width="${isSelected ? '2' : '0'}"/>
+																		fill="${isStart ? '#22c55e' : isEnd ? '#ef4444' : '#3b82f6'}"/>
 																	<circle cx="16" cy="16" r="8" fill="white"/>
-																	<text x="16" y="20" text-anchor="middle" fill="${markerColor}" 
+																	<text x="16" y="20" text-anchor="middle" fill="${isStart ? '#22c55e' : isEnd ? '#ef4444' : '#3b82f6'}" 
 																		font-family="Arial, sans-serif" font-size="12" font-weight="bold">${index + 1}</text>
 																</svg>
 															`)}`,
-															scaledSize: new google.maps.Size(markerSize, markerSize * 1.25),
-															anchor: new google.maps.Point(markerAnchor, markerSize * 1.25)
+															scaledSize: new google.maps.Size(32, 40),
+															anchor: new google.maps.Point(16, 40)
 														}}
-														title={activityName}
-														onClick={() => setSelectedActivityIndex(index)}
-														animation={isSelected ? google.maps.Animation.BOUNCE : undefined}
+														title={isStart ? 'Start' : isEnd ? 'End' : `Stop ${index + 1}`}
 													/>
 												);
 											})}
@@ -842,7 +733,28 @@ export default function DayView({ listing }: DayViewProps) {
 												/>
 											)}
 
-											{/* Polyline removed per user request - no straight lines between markers */}
+											{!directions && pathCoordinates.length >= 2 && (
+												<>
+													{/* Fallback to dashed polyline if directions fail */}
+													<Polyline
+														path={pathCoordinates}
+														options={{
+															strokeColor: '#FEDB25',
+															strokeOpacity: 0.7,
+															strokeWeight: 3,
+															icons: [{
+																icon: {
+																	path: 'M 0,-1 0,1',
+																	strokeOpacity: 1,
+																	scale: 3
+																},
+																offset: '0',
+																repeat: '15px'
+															}]
+														}}
+													/>
+												</>
+											)}
 
 											{directionsError && (
 												<div className="absolute top-2 left-2 bg-red-500/80 text-white p-2 rounded">
@@ -856,7 +768,15 @@ export default function DayView({ listing }: DayViewProps) {
 										</div>
 									)}
 									
-									{/* Info message removed since we're no longer showing polylines */}
+									{/* Info message when showing direct path */}
+									{!directions && pathCoordinates.length >= 2 && (
+										<div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/80 text-yellow-400 px-4 py-2 rounded-lg text-sm flex items-center gap-2 whitespace-nowrap">
+											<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+											</svg>
+											Showing direct path - driving directions unavailable
+										</div>
+									)}
 								</div>
 							</>
 						)}
@@ -895,4 +815,3 @@ export default function DayView({ listing }: DayViewProps) {
 		</div>
 	);
 }
-
