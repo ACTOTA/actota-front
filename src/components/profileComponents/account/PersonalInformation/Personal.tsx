@@ -20,6 +20,7 @@ import { toast } from 'react-hot-toast';
 import EmailVerification from "@/src/components/inputs/EmailVerification";
 import Modal from "@/src/components/Modal";
 import { useQueryClient } from '@tanstack/react-query';
+import Card from "@/src/components/shared/Card";
 
 interface PersonalFormData {
   firstName: string;
@@ -356,7 +357,7 @@ const Personal = (props: any) => {
   const renderField = (label: string, value: string, field: keyof PersonalFormData, type: string = "text") => {
     return (
       <div className="flex flex-col gap-2">
-        <div className="text-sm font-bold">{label}</div>
+        <label className="text-sm font-medium text-gray-300">{label}</label>
         {editMode ? (
           <>
             <Input
@@ -374,16 +375,20 @@ const Personal = (props: any) => {
                   setErrors(newErrors);
                 }
               }}
-              className={`${errors[field] ? "border-red-500" : "border-[#F43E62]"} focus:border-[#F43E62] bg-[#141414]`}
+              className={`!bg-[#0A0A0A] !border-gray-700 !text-white placeholder:!text-gray-500 focus:!border-yellow-500 transition-colors duration-200 ${errors[field] ? "!border-red-500" : ""}`}
             />
             {errors[field] && (
-              <div className="text-red-500 text-xs mt-1">{errors[field]}</div>
+              <div className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                {errors[field]}
+              </div>
             )}
           </>
         ) : (
-          <div className="p-2.5 bg-[#0D0D0D] border border-primary-gray rounded-lg text-white flex justify-between items-center">
-            <span>{value || "Not provided"}</span>
-            <span className="text-xs italic text-gray-400">Read-only</span>
+          <div className="px-4 py-3 bg-[#0A0A0A] border border-gray-800 rounded-lg text-gray-100">
+            {value || <span className="text-gray-500 italic">Not provided</span>}
           </div>
         )}
       </div>
@@ -391,69 +396,76 @@ const Personal = (props: any) => {
   };
   
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       {editMode && (
-        <div className="bg-[#F43E62] text-black py-2 px-4 rounded-t-lg -mt-5 -mx-5 mb-4 flex items-center">
-          <div className="font-bold">Editing Mode</div>
-          <div className="ml-2 text-sm">Make your changes then click Save</div>
+        <div className="bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 py-3 px-6 rounded-lg flex items-center gap-3">
+          <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <div>
+            <span className="font-semibold">Edit Mode Active</span>
+            <span className="ml-2 text-sm opacity-90">Make your changes and click save when ready</span>
+          </div>
         </div>
       )}
       
       <div className="flex justify-between items-center">
-        <div className="font-bold text-xl">Personal Information</div>
+        <h2 className="font-bold text-2xl text-white">Personal Information</h2>
         {!editMode && (
-          <div className="flex items-center gap-4">
-            <div className="text-gray-400 text-sm italic">
-              Click 'Edit' to modify your information
-            </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="flex gap-2 items-center max-md:hidden hover:bg-[#F43E62] hover:text-white transition-colors"
-              onClick={toggleEditMode}
-            >
-              <FiEdit3 />
-              Edit
-            </Button>
-          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex gap-2 items-center !border-gray-700 !text-gray-300 hover:!bg-gray-800 hover:!text-white transition-all duration-200"
+            onClick={toggleEditMode}
+          >
+            <FiEdit3 className="w-4 h-4" />
+            Edit Profile
+          </Button>
         )}
       </div>
       
       {editMode && (
-        <div className="flex gap-2 justify-end my-2">
+        <div className="flex gap-3 justify-end">
           <Button 
             variant="outline" 
             size="sm" 
-            className="flex gap-2 items-center bg-gray-800 hover:bg-gray-700 transition-colors"
+            className="flex gap-2 items-center !border-gray-700 !text-gray-300 hover:!bg-gray-800 hover:!text-white transition-all duration-200"
             onClick={toggleEditMode}
           >
-            <FiX />
+            <FiX className="w-4 h-4" />
             Cancel
           </Button>
           <Button 
-            variant="outline" 
+            variant="primary" 
             size="sm" 
-            className="flex gap-2 items-center bg-[#F43E62] text-black hover:bg-[#D32D51] hover:text-white transition-colors font-semibold"
+            className="flex gap-2 items-center !bg-yellow-500 !text-black hover:!bg-yellow-400 transition-all duration-200 font-semibold"
             onClick={handleSave}
             disabled={isSaving}
           >
-            <FiSave />
+            <FiSave className="w-4 h-4" />
             {isSaving ? "Saving..." : "Save Changes"}
           </Button>
         </div>
       )}
       
-      <ProfilePictureUpload
-        currentImageUrl={profilePicture}
-        onSuccess={(imageUrl) => setProfilePicture(imageUrl)}
-      />
+      {/* Profile Picture Section */}
+      <Card variant="default">
+        <h3 className="text-lg font-semibold text-white mb-4">Profile Picture</h3>
+        <ProfilePictureUpload
+          currentImageUrl={profilePicture}
+          onSuccess={(imageUrl) => setProfilePicture(imageUrl)}
+        />
+      </Card>
       
-      <div className="grid grid-cols-2 max-md:flex max-md:flex-col gap-6">
+      {/* Personal Information Form */}
+      <Card variant="default">
+        <h3 className="text-lg font-semibold text-white mb-6">Basic Information</h3>
+        <div className="grid grid-cols-2 max-md:grid-cols-1 gap-6">
         {renderField("First Name*", formData.firstName, "firstName")}
         {renderField("Last Name*", formData.lastName, "lastName")}
         
         <div className="flex flex-col gap-2">
-          <div className="text-sm font-bold">Email*</div>
+          <label className="text-sm font-medium text-gray-300">Email*</label>
           {editMode ? (
             <>
               <Input
@@ -461,10 +473,10 @@ const Personal = (props: any) => {
                 placeholder="Email"
                 type="email"
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('email', e.target.value)}
-                className={`${errors.email ? "border-red-500" : "border-[#F43E62]"} focus:border-[#F43E62] bg-[#141414]`}
+                className={`!bg-[#0A0A0A] !border-gray-700 !text-white placeholder:!text-gray-500 focus:!border-yellow-500 transition-colors duration-200 ${errors.email ? "!border-red-500" : ""}`}
               />
               {emailVerified && formData.email !== data?.email && (
-                <div className="text-green-500 text-xs mt-1 flex items-center gap-1">
+                <div className="text-green-400 text-xs mt-1 flex items-center gap-1">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
@@ -472,19 +484,23 @@ const Personal = (props: any) => {
                 </div>
               )}
               {errors.email && (
-                <div className="text-red-500 text-xs mt-1">{errors.email}</div>
+                <div className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {errors.email}
+                </div>
               )}
             </>
           ) : (
-            <div className="p-2.5 bg-[#0D0D0D] border border-primary-gray rounded-lg text-white flex justify-between items-center">
-              <span>{formData.email || "Not provided"}</span>
-              <span className="text-xs italic text-gray-400">Read-only</span>
+            <div className="px-4 py-3 bg-[#0A0A0A] border border-gray-800 rounded-lg text-gray-100">
+              {formData.email || <span className="text-gray-500 italic">Not provided</span>}
             </div>
           )}
         </div>
         
         <div className="flex flex-col gap-2">
-          <div className="text-sm font-bold">Phone Number</div>
+          <label className="text-sm font-medium text-gray-300">Phone Number</label>
           {editMode ? (
             <>
               <div className="relative">
@@ -505,68 +521,77 @@ const Personal = (props: any) => {
                   maxLength={15}
                   international
                   defaultCountry="US"
-                  className={`PhoneInputInput px-4 border rounded-lg !bg-[#141414] ${
-                    errors.phone ? "border-red-500" : "border-[#F43E62]"
-                  }`}
+                  className={`PhoneInputInput px-4 py-3 border rounded-lg !bg-[#0A0A0A] !text-white ${
+                    errors.phone ? "!border-red-500" : "!border-gray-700 focus-within:!border-yellow-500"
+                  } transition-colors duration-200`}
                   style={{
-                    '--PhoneInputCountrySelectArrow-opacity': '1',
-                    '--PhoneInputCountrySelectArrow-color': 'white',
-                    '--PhoneInputCountrySelectArrow-marginLeft': '1rem',
-                    '--PhoneInputCountrySelectArrow-height': '7px',
-                    '--PhoneInputCountrySelectArrow-width': '7px',
+                    '--PhoneInputCountrySelectArrow-opacity': '0.5',
+                    '--PhoneInputCountrySelectArrow-color': '#9CA3AF',
+                    '--PhoneInputCountrySelectArrow-marginLeft': '0.5rem',
+                    '--PhoneInputCountrySelectArrow-height': '0.5rem',
+                    '--PhoneInputCountrySelectArrow-width': '0.5rem',
                   }}
                 />
               </div>
               {errors.phone && (
-                <div className="text-red-500 text-xs mt-1">{errors.phone}</div>
+                <div className="text-red-400 text-xs mt-1 flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {errors.phone}
+                </div>
               )}
             </>
           ) : (
-            <div className="p-2.5 bg-[#0D0D0D] border border-primary-gray rounded-lg text-white flex justify-between items-center">
-              <span>{formData.phone || "Not provided"}</span>
-              <span className="text-xs italic text-gray-400">Read-only</span>
+            <div className="px-4 py-3 bg-[#0A0A0A] border border-gray-800 rounded-lg text-gray-100">
+              {formData.phone || <span className="text-gray-500 italic">Not provided</span>}
             </div>
           )}
         </div>
         
         {renderField("Date of Birth (MM/DD/YYYY)", formData.birthDate, "birthDate")}
-        
-      </div>
-
-      <div className="flex flex-col gap-6">
-        <div className="text-base font-normal text-primary-gray flex flex-wrap items-center gap-2">
-          <span className="border-b-[#F43E62] text-[#F43E62] border-b-2 cursor-pointer">
-            Delete my account
-          </span>
-          Once deleted, your account information will be removed, this action
-          cannot be undone.
         </div>
-        
-        <div className="text-sm text-gray-400 italic">
-          * Required fields
+      </Card>
+
+      {/* Account Actions */}
+      <div className="mt-8 pt-8 border-t border-gray-800">
+        <div className="flex flex-col gap-4">
+          <div className="text-sm text-gray-400">
+            <span className="text-yellow-500">*</span> Required fields
+          </div>
+          
+          <div className="flex items-center gap-2 text-sm">
+            <button className="text-red-400 hover:text-red-300 transition-colors duration-200 underline underline-offset-2">
+              Delete my account
+            </button>
+            <span className="text-gray-500">•</span>
+            <span className="text-gray-500">
+              Once deleted, your account information will be removed. This action cannot be undone.
+            </span>
+          </div>
         </div>
       </div>
       
       {editMode && (
-        <div className="flex justify-end mt-6 pt-4 border-t border-gray-800">
+        <div className="flex justify-end mt-8 pt-6 border-t border-gray-800">
           <div className="flex gap-4">
             <Button 
               variant="outline" 
-              size="lg"
-              className="flex gap-2 items-center bg-gray-800 hover:bg-gray-700 transition-colors"
+              size="md"
+              className="flex gap-2 items-center !border-gray-700 !text-gray-300 hover:!bg-gray-800 hover:!text-white transition-all duration-200 min-w-[120px]"
               onClick={toggleEditMode}
             >
-              <FiX className="w-5 h-5" />
+              <FiX className="w-4 h-4" />
               Cancel
             </Button>
             <Button 
               variant="primary" 
-              size="lg"
-              className="flex gap-2 items-center bg-[#F43E62] text-black hover:bg-[#D32D51] hover:text-white transition-colors font-semibold"
+              size="md"
+              className="flex gap-2 items-center !bg-yellow-500 !text-black hover:!bg-yellow-400 transition-all duration-200 font-semibold min-w-[140px]"
               onClick={handleSave}
               disabled={isSaving}
             >
-              <FiSave className="w-5 h-5" />
+              <FiSave className="w-4 h-4" />
               {isSaving ? "Saving..." : "Save Changes"}
             </Button>
           </div>

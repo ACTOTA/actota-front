@@ -21,56 +21,71 @@ const PaymentInsuranceCard = ({ insurance, onToggleSelect }: PaymentInsuranceCar
     const { id, name, price, image, selected } = insurance;
     
     return (
-        <div className={`relative flex justify-between max-w-[843px] bg-gradient-to-r from-[#1A1A1A] to-[#0D0D0D]/70 border ${selected ? 'border-[#BBD4FB]' : 'border-primary-gray'} rounded-xl overflow-hidden`}>
-            <div className="flex flex-col gap-2 relative p-4">
-                {selected && (
-                    <Image 
-                        src="/images/payment-page-card-blur-bg.png" 
-                        className="absolute top-[100px] left-[-100px] -z-10" 
-                        alt="background effect" 
-                        layout="fill" 
-                    />
-                )}
-
-                <div className="flex items-center gap-2">
-                    <Image src={image} alt={name} width={32} height={32} />
-                    <h3 className="text-white text-xl font-bold">{name}</h3>
+        <div className="p-6">
+            <div className="flex items-start justify-between">
+                {/* Left side - Insurance details */}
+                <div className="flex-1 space-y-3">
+                    <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-lg ${selected ? 'bg-[#BBD4FB]/20' : 'bg-gray-800'} flex items-center justify-center transition-colors`}>
+                            <Image src={image} alt={name} width={24} height={24} className="opacity-80" />
+                        </div>
+                        <div className="flex-1">
+                            <h3 className="font-semibold text-lg">{name}</h3>
+                        </div>
+                    </div>
+                    
+                    {/* Benefits list */}
+                    <div className="space-y-2 pl-13">
+                        {['Up to 100% reimbursement for covered reasons',
+                          'Flight delay reimbursements up to $235',
+                          'Free cancellation due to illness and more'
+                        ].map((benefit, index) => (
+                            <div key={index} className="flex items-start gap-2">
+                                <IoCheckmark className="text-green-500 h-4 w-4 mt-0.5 flex-shrink-0" />
+                                <p className="text-gray-300 text-sm">{benefit}</p>
+                            </div>
+                        ))}
+                    </div>
+                    
+                    {/* Mobile price */}
+                    <div className="flex items-baseline gap-1 sm:hidden pl-13">
+                        <span className="text-2xl font-bold">${price}</span>
+                        <span className="text-gray-400 text-sm">per person</span>
+                    </div>
                 </div>
-                
-                {/* Benefits list */}
-                {['Up to 100% reimbursement for covered reasons.',
-                  'Flight delay reimbursements up to $235',
-                  'Free cancellation due to illness and more'
-                ].map((benefit, index) => (
-                    <div key={index} className="flex items-center gap-2 ml-9">
-                        <IoCheckmark className="text-white h-4 w-4" />
-                        <p className="text-white text-sm">{benefit}</p>
-                    </div>
-                ))}
-                 <div className="flex items-center gap-2 sm:hidden">
-                        <p className="text-white text-xl font-bold">${price}</p>
-                        <span className="text-primary-gray text-xs">per person</span>
-                    </div>
-            </div>
 
-            <div className="max-sm:absolute max-sm:right-0 max-sm:top-0 max-sm:bottom-0 flex flex-col items-end justify-between p-4">
-                <div className="flex items-center gap-8">
-                    <div className="flex items-center gap-2 max-sm:hidden">
-                        <p className="text-white text-xl font-bold">${price}</p>
-                        <span className="text-primary-gray text-xs">per person</span>
+                {/* Right side - Price and checkbox */}
+                <div className="flex items-center gap-6 ml-4">
+                    {/* Desktop price */}
+                    <div className="hidden sm:flex items-baseline gap-1">
+                        <span className="text-2xl font-bold">${price}</span>
+                        <span className="text-gray-400 text-sm">per person</span>
                     </div>
-                    <input 
-                        type="checkbox" 
-                        checked={selected}
-                        onChange={() => onToggleSelect(id)}
-                        className="w-8 h-8 rounded-lg text-primary-gray bg-transparent" 
-                    />
+                    
+                    {/* Checkbox */}
+                    <label className="relative inline-flex items-center cursor-pointer">
+                        <input 
+                            type="checkbox" 
+                            checked={selected}
+                            onChange={() => onToggleSelect(id)}
+                            className="sr-only peer" 
+                        />
+                        <div className={`w-6 h-6 rounded-md border-2 transition-all duration-200 flex items-center justify-center ${
+                            selected 
+                                ? 'bg-[#BBD4FB] border-[#BBD4FB]' 
+                                : 'bg-transparent border-gray-600 hover:border-gray-400'
+                        }`}>
+                            {selected && <IoCheckmark className="text-black h-4 w-4" />}
+                        </div>
+                    </label>
                 </div>
-                <button className="flex items-center gap-1 border-b border-b-[#BBD4FB]">
-                    <p className="text-[#BBD4FB] text-sm">Learn more</p>
-                    <CgArrowTopRight className="text-[#BBD4FB] h-5 w-5" />
-                </button>
             </div>
+            
+            {/* Learn more link */}
+            <button className="flex items-center gap-1 text-[#BBD4FB] hover:text-white transition-colors mt-4 pl-13">
+                <span className="text-sm">Learn more</span>
+                <CgArrowTopRight className="h-4 w-4" />
+            </button>
         </div>
     );
 };

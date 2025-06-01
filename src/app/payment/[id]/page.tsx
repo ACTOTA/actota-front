@@ -6,7 +6,7 @@ import PaymentInsuranceCard from '@/src/components/PaymentInsuranceCard'
 import PaymentPageCard from '@/src/components/PaymentPageCard'
 import SplitPaymentCard from '@/src/components/SplitPaymentCard'
 import DateMenuCalendar from '@/src/components/figma/DateMenuCalendar'
-import { ArrowLeftIcon, ArrowRightIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
+import { ArrowLeftIcon, ArrowRightIcon, ChevronRightIcon, CalendarIcon } from '@heroicons/react/20/solid'
 import Image from 'next/image'
 import Link from 'next/link'
 import React, { useEffect, useRef, useState } from 'react'
@@ -103,11 +103,9 @@ const Payment = () => {
   const user = getClientSession();
   const paymentMethodRef = useRef<HTMLParagraphElement>(null);
 
-  // Add state for arrival and departure dates
+  // Add state for arrival and departure dates - these are now read-only from localStorage
   const [arrivalDate, setArrivalDate] = useState<Date | null>(null);
   const [departureDate, setDepartureDate] = useState<Date | null>(null);
-  const [showArrivalCalendar, setShowArrivalCalendar] = useState(false);
-  const [showDepartureCalendar, setShowDepartureCalendar] = useState(false);
 
   // Payment method options
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodOption[]>([
@@ -208,21 +206,7 @@ const Payment = () => {
     setCardHolderName(e.target.value);
   }
 
-  // Handle date range selection for arrival
-  const handleArrivalDateRangeChange = (startDate: string | null, endDate: string | null) => {
-    if (startDate) {
-      setArrivalDate(new Date(startDate));
-      setShowArrivalCalendar(false);
-    }
-  }
-
-  // Handle date range selection for departure
-  const handleDepartureDateRangeChange = (startDate: string | null, endDate: string | null) => {
-    if (startDate) {
-      setDepartureDate(new Date(startDate));
-      setShowDepartureCalendar(false);
-    }
-  }
+  // Dates are loaded from localStorage and are read-only on this page
 
 
   const handleInsuranceToggle = (id: number) => {
@@ -575,108 +559,212 @@ const Payment = () => {
   }
 
   return (
-    <section className='w-full !h-full text-white   bg-[url("/images/payment-page-bg.png")] bg-cover bg-center bg-repeat'>
-      <div className='grid grid-cols-6 gap-6 pt-[78px]'>
+    <section className='min-h-screen bg-[#0A0A0A] text-white'>
+      <div className='grid grid-cols-1 lg:grid-cols-3 lg:gap-0'>
 
-        {/* left side */}
-        <div className={`lg:col-span-4 col-span-6 flex flex-col gap-4 w-full pl-[80px] max-lg:px-[20px] ${showPaymentReview ? 'max-lg:hidden' : ''}`}>
-          <div className='flex items-center gap-2 mt-5'>
-            <ArrowLeftIcon onClick={() => router.back()} className="h-6 w-6 hover:cursor-pointer" />
-            <p className='text-primary-gray text-sm'>Itineraries /  {itineraryData.trip_name}  /   <span className='text-white'>Confirm Reservation</span></p>
+        {/* left side - main content */}
+        <div className={`lg:col-span-2 flex flex-col gap-6 p-6 lg:p-12 pt-20 lg:pt-28 ${showPaymentReview ? 'max-lg:hidden' : ''}`}>
+          {/* Breadcrumb */}
+          <div className='flex items-center gap-2'>
+            <ArrowLeftIcon onClick={() => router.back()} className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer transition-colors" />
+            <p className='text-gray-400 text-sm'>Itineraries / {itineraryData.trip_name} / <span className='text-white'>Confirm Reservation</span></p>
           </div>
-          <h1 className='text-4xl font-bold'>Confirm your Reservation</h1>
-          <PaymentPageCard itineraryData={itineraryData} />
-
-          <p className='text-white text-2xl font-bold mt-12'>Insurance</p>
-          <div className="relative z-0 space-y-4">
-            {paymentInsurance.map((insurance) => (
-              <PaymentInsuranceCard
-                key={insurance.id}
-                insurance={insurance}
-                onToggleSelect={handleInsuranceToggle}
-              />
-            ))}
+          
+          {/* Page Title */}
+          <h1 className='text-3xl lg:text-4xl font-bold'>Confirm your Reservation</h1>
+          
+          {/* Trip Summary Card */}
+          <div className='bg-[#1A1A1A] rounded-2xl border border-gray-800 p-6'>
+            <PaymentPageCard itineraryData={itineraryData} />
           </div>
 
-          <p className='text-white text-2xl font-bold mt-10'>Trip Members</p>
-          <div className='flex max-md:flex-wrap gap-4'>
-            <div className='flex flex-col gap-2 w-full'>
-              <div className='flex items-center gap-2'>
-                <LuUser className='text-white h-5 w-5' /> <p className='text-white '>Guest 1</p>
-                <Button variant='primary' size='sm' className='!bg-[#215CBA] text-white font-normal !px-2 !py-1'>Trip Leader</Button>
+          {/* Date Selection Section - Read Only */}
+          <div className='space-y-4'>
+            <h2 className='text-2xl font-bold'>Trip Dates</h2>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              {/* Arrival Date - Read Only */}
+              <div className='relative'>
+                <label className='text-gray-400 text-sm block mb-2'>Arrival Date</label>
+                <div className='w-full bg-[#1A1A1A] border border-gray-800 rounded-xl p-4 flex items-center gap-3'>
+                  <CalendarIcon className='h-5 w-5 text-gray-400' />
+                  <span className='text-white'>
+                    {arrivalDate ? arrivalDate.toLocaleDateString('en-US', { 
+                      weekday: 'short', 
+                      year: 'numeric', 
+                      month: 'short', 
+                      day: 'numeric' 
+                    }) : 'No date selected'}
+                  </span>
+                </div>
               </div>
-              <div>
-                <p className="text-primary-gray  text-left mb-1 mt-[10px]">Full Name</p>
-                <Input type="text" name="fullName" placeholder="Full Name" />
-              </div>
-              <div>
-                <p className="text-primary-gray text-left mb-1 mt-[10px]">Email Address</p>
-                <Input type="email" name="email" icon={<HiOutlineMail className="text-white h-[20px] w-[20px]" />} placeholder="Your email address" />
+
+              {/* Departure Date - Read Only */}
+              <div className='relative'>
+                <label className='text-gray-400 text-sm block mb-2'>Departure Date</label>
+                <div className='w-full bg-[#1A1A1A] border border-gray-800 rounded-xl p-4 flex items-center gap-3'>
+                  <CalendarIcon className='h-5 w-5 text-gray-400' />
+                  <span className='text-white'>
+                    {departureDate ? departureDate.toLocaleDateString('en-US', { 
+                      year: 'numeric', 
+                      month: 'short', 
+                      day: 'numeric' 
+                    }) : 'No date selected'}
+                  </span>
+                </div>
               </div>
             </div>
-            <div className='flex flex-col gap-2 w-full'>
-              <div className='flex items-center gap-2'>
-                <LuUser className='text-white h-5 w-5' /> <p className='text-white '>Guest 2</p>
+            
+            {/* Display trip duration if both dates are selected */}
+            {arrivalDate && departureDate && (
+              <div className='bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-center gap-3'>
+                <CalendarIcon className='h-5 w-5 text-blue-400' />
+                <span className='text-sm text-blue-300'>
+                  Trip Duration: {Math.ceil((departureDate.getTime() - arrivalDate.getTime()) / (1000 * 60 * 60 * 24))} days
+                </span>
               </div>
-              <div>
-                <p className="text-primary-gray  text-left mb-1 mt-[10px]">Full Name</p>
-                <Input type="text" name="fullName" placeholder="Full Name" />
+            )}
+          </div>
+
+          {/* Insurance Section */}
+          <div className='space-y-4'>
+            <h2 className='text-2xl font-bold'>Insurance Options</h2>
+            <div className="space-y-3">
+              {paymentInsurance.map((insurance) => (
+                <div
+                  key={insurance.id}
+                  className={`bg-[#1A1A1A] rounded-xl border ${insurance.selected ? 'border-[#BBD4FB]' : 'border-gray-800'} transition-all duration-200`}
+                >
+                  <PaymentInsuranceCard
+                    insurance={insurance}
+                    onToggleSelect={handleInsuranceToggle}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Trip Members Section */}
+          <div className='space-y-4'>
+            <h2 className='text-2xl font-bold'>Trip Members</h2>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              {/* Guest 1 */}
+              <div className='bg-[#1A1A1A] rounded-xl border border-gray-800 p-6 space-y-4'>
+                <div className='flex items-center justify-between'>
+                  <div className='flex items-center gap-2'>
+                    <LuUser className='text-gray-400 h-5 w-5' />
+                    <p className='font-medium'>Guest 1</p>
+                  </div>
+                  <span className='bg-blue-600 text-white text-xs font-medium px-3 py-1 rounded-full'>Trip Leader</span>
+                </div>
+                <div className='space-y-4'>
+                  <div>
+                    <label className="text-gray-400 text-sm block mb-2">Full Name</label>
+                    <Input type="text" name="fullName" placeholder="Enter full name" />
+                  </div>
+                  <div>
+                    <label className="text-gray-400 text-sm block mb-2">Email Address</label>
+                    <Input type="email" name="email" icon={<HiOutlineMail className="text-gray-400 h-5 w-5" />} placeholder="Enter email address" />
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-primary-gray  text-left mb-1 mt-[10px]">Email Address</p>
-                <Input type="email" name="email" icon={<HiOutlineMail className="text-white h-[20px] w-[20px]" />} placeholder="Your email address" />
+              
+              {/* Guest 2 */}
+              <div className='bg-[#1A1A1A] rounded-xl border border-gray-800 p-6 space-y-4'>
+                <div className='flex items-center gap-2'>
+                  <LuUser className='text-gray-400 h-5 w-5' />
+                  <p className='font-medium'>Guest 2</p>
+                </div>
+                <div className='space-y-4'>
+                  <div>
+                    <label className="text-gray-400 text-sm block mb-2">Full Name</label>
+                    <Input type="text" name="fullName" placeholder="Enter full name" />
+                  </div>
+                  <div>
+                    <label className="text-gray-400 text-sm block mb-2">Email Address</label>
+                    <Input type="email" name="email" icon={<HiOutlineMail className="text-gray-400 h-5 w-5" />} placeholder="Enter email address" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <p className='text-white text-2xl font-bold mt-10' ref={paymentMethodRef}>Payment Method</p>
-          <div className='flex gap-2 max-sm:flex-wrap'>
-            {paymentMethod.map((item) => (
-              <div onClick={() => setPaymentMethod(paymentMethod.map(method => ({ ...method, selected: method.id === item.id })))} key={item.id} className={`relative sm:flex-1 max-sm:w-[48%]  flex sm:flex-col  sm:justify-between max-sm:items-center gap-2 p-4 border  rounded-xl ${item.selected ? 'border-[#BBD4FB]' : 'border-primary-gray'}`}>
-                {item.selected && <Image src={"/images/payment-page-card-blur-bg.png"} alt="card" layout='fill' className='absolute top-0 left-[-30px] ' />}
-                <Image src={item.image} alt="card" width={24} height={24} />
-                <p className='text-white font-bold'> {item.name}</p>
-              </div>
-            ))}
-          </div>
-          <div className='flex gap-2 max-md:flex-col-reverse'>
-            <div className='flex-1 flex flex-col gap-2'>
-
-              <p className='text-white text-xl font-bold mt-10 flex items-center gap-2'><Image src={"/svg-icons/atm-card.svg"} alt="add card" width={24} height={24} /> Add a new card</p>
-
-              <div>
-                <p className="text-primary-gray text-left mb-1 mt-[10px]">Card Holder Name</p>
-                <Input
-                  type="text"
-                  name="cardHolderName"
-                  value={cardHolderName}
-                  onChange={handleCardHolderNameChange}
-                  placeholder="Card Holder Name"
-                />
-              </div>
-
-              {/* Stripe Card Element */}
-              <StripeCardElement
-                onSuccess={cardAddSuccess}
-                onError={cardAddError}
-                setAsDefault={true}
-                cardHolderName={cardHolderName}
-                isSubmitting={isPaymentMethodLoading}
-                setIsSubmitting={setIsSubmitting}
-              />
-
+          {/* Payment Method Section */}
+          <div className='space-y-4' ref={paymentMethodRef}>
+            <h2 className='text-2xl font-bold'>Payment Method</h2>
+            <div className='grid grid-cols-2 lg:grid-cols-4 gap-3'>
+              {paymentMethod.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => setPaymentMethod(paymentMethod.map(method => ({ ...method, selected: method.id === item.id })))}
+                  className={`relative flex flex-col items-center justify-center gap-2 p-4 rounded-xl border transition-all duration-200 hover:border-gray-600 ${
+                    item.selected 
+                      ? 'bg-[#1A1A1A] border-[#BBD4FB] shadow-[0_0_20px_rgba(187,212,251,0.2)]' 
+                      : 'bg-[#1A1A1A] border-gray-800'
+                  }`}
+                >
+                  <Image src={item.image} alt={item.name} width={24} height={24} className='opacity-80' />
+                  <p className='text-sm font-medium'>{item.name}</p>
+                  {item.selected && (
+                    <div className='absolute -top-1 -right-1 w-3 h-3 bg-[#BBD4FB] rounded-full' />
+                  )}
+                </button>
+              ))}
             </div>
-            <div className='flex-1 flex flex-col gap-2 '>
-              <p className='text-white text-xl font-bold mt-10 flex items-center gap-2 lg:ml-10'><Image src={"/svg-icons/atm-card.svg"} alt="add card" width={24} height={24} /> My Saved Card(s)</p>
-
+          </div>
+          {/* Payment Cards Section */}
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+            {/* Add New Card */}
+            <div className='bg-[#1A1A1A] rounded-xl border border-gray-800 p-6'>
+              <h3 className='text-lg font-semibold flex items-center gap-2 mb-4'>
+                <Image src={"/svg-icons/atm-card.svg"} alt="add card" width={20} height={20} className='opacity-80' />
+                Add a new card
+              </h3>
+              <div className='space-y-4'>
+                <div>
+                  <label className="text-gray-400 text-sm block mb-2">Card Holder Name</label>
+                  <Input
+                    type="text"
+                    name="cardHolderName"
+                    value={cardHolderName}
+                    onChange={handleCardHolderNameChange}
+                    placeholder="Enter cardholder name"
+                  />
+                </div>
+                <div>
+                  <label className="text-gray-400 text-sm block mb-2">Card Details</label>
+                  <StripeCardElement
+                    onSuccess={cardAddSuccess}
+                    onError={cardAddError}
+                    setAsDefault={true}
+                    cardHolderName={cardHolderName}
+                    isSubmitting={isPaymentMethodLoading}
+                    setIsSubmitting={setIsSubmitting}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            {/* Saved Cards */}
+            <div className='bg-[#1A1A1A] rounded-xl border border-gray-800 p-6'>
+              <h3 className='text-lg font-semibold flex items-center gap-2 mb-4'>
+                <Image src={"/svg-icons/atm-card.svg"} alt="saved cards" width={20} height={20} className='opacity-80' />
+                My Saved Cards
+              </h3>
               {savedCards.length > 0 ? (
-                <div className='lg:ml-[70px] flex flex-col gap-2'>
+                <div className='space-y-3'>
                   {savedCards.map((card) => (
-                    <div key={card.id} className='flex items-center justify-between bg-[#1A1A1A] rounded-xl border border-primary-gray p-3'>
-                      <div className='flex items-center gap-2'>
-                        <Image src={card.image} alt={card.brand} width={32} height={20} />
+                    <label
+                      key={card.id}
+                      className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all duration-200 ${
+                        selectedCard === card.id
+                          ? 'bg-[#262626] border-[#BBD4FB]'
+                          : 'bg-[#0A0A0A] border-gray-800 hover:border-gray-600'
+                      }`}
+                    >
+                      <div className='flex items-center gap-3'>
+                        <Image src={card.image} alt={card.brand} width={40} height={24} className='opacity-90' />
                         <div>
-                          <p className='text-white'>**** **** **** {card.last4}</p>
-                          <p className='text-primary-gray text-xs'>Exp: {card.expiryMonth}/{card.expiryYear}</p>
+                          <p className='font-medium'>•••• •••• •••• {card.last4}</p>
+                          <p className='text-gray-400 text-sm'>Expires {card.expiryMonth}/{card.expiryYear}</p>
                         </div>
                       </div>
                       <input
@@ -686,75 +774,106 @@ const Payment = () => {
                         checked={selectedCard === card.id}
                         onChange={() => handleSelectCard(card.id)}
                       />
-                    </div>
+                    </label>
                   ))}
                 </div>
               ) : (
-                <p className='text-primary-gray text-sm lg:ml-[70px]'>You haven't added any cards yet.</p>
+                <p className='text-gray-400 text-center py-8'>No saved cards yet</p>
               )}
             </div>
           </div>
-          <div>
-            <p className='text-white  font-bold mt-10'>Split Payment</p>
-            <div className='flex max-md:flex-col gap-4 mt-2'>
-              <div className='flex-1'>
-                <SplitPaymentCard name="Denver Tour" />
+          {/* Split Payment Section */}
+          <div className='space-y-4'>
+            <h2 className='text-2xl font-bold'>Split Payment</h2>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <div className='bg-[#1A1A1A] rounded-xl border border-gray-800'>
+                <SplitPaymentCard name="Payment Split 1" />
               </div>
-              <div className='flex-1'>
-                <SplitPaymentCard name="Denver Tour" />
+              <div className='bg-[#1A1A1A] rounded-xl border border-gray-800'>
+                <SplitPaymentCard name="Payment Split 2" />
               </div>
             </div>
           </div>
-          <div className='flex gap-2'>
-            <div className='flex-1 flex flex-col gap-2'>
-
-              <p className='text-white text-2xl font-bold mt-10'>Billing Details</p>
-              <div>
-                <p className="text-primary-gray w-96 text-left mb-1 mt-[10px]">Full Name</p>
-                <Input type="text" name="fullName" placeholder="Full Name" />
-              </div>
-              <div>
-                <p className="text-primary-gray w-96 text-left mb-1 mt-[10px]">Billing Address</p>
-                <Input type="text" name="fullName" placeholder="Address (House No., building Street Area)" />
-              </div>
-              <Input type="text" name="fullName" className='w-full' placeholder="City" />
-              <div className='flex w-full gap-2'>
-                <div className='flex-1'>
-                  <Input type="text" name="fullName" placeholder="State" />
+          {/* Billing Details Section */}
+          <div className='space-y-4'>
+            <h2 className='text-2xl font-bold'>Billing Details</h2>
+            <div className='bg-[#1A1A1A] rounded-xl border border-gray-800 p-6'>
+              <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+                <div className='space-y-4'>
+                  <div>
+                    <label className="text-gray-400 text-sm block mb-2">Full Name</label>
+                    <Input type="text" name="billingName" placeholder="Enter full name" />
+                  </div>
+                  <div>
+                    <label className="text-gray-400 text-sm block mb-2">Billing Address</label>
+                    <Input type="text" name="billingAddress" placeholder="Street address" />
+                  </div>
                 </div>
-                <div className='flex-1'>
-                  <Input type="text" name="fullName" placeholder="Zip Code" />
+                <div className='space-y-4'>
+                  <div>
+                    <label className="text-gray-400 text-sm block mb-2">City</label>
+                    <Input type="text" name="billingCity" placeholder="Enter city" />
+                  </div>
+                  <div className='grid grid-cols-2 gap-4'>
+                    <div>
+                      <label className="text-gray-400 text-sm block mb-2">State</label>
+                      <Input type="text" name="billingState" placeholder="State" />
+                    </div>
+                    <div>
+                      <label className="text-gray-400 text-sm block mb-2">Zip Code</label>
+                      <Input type="text" name="billingZip" placeholder="Zip" />
+                    </div>
+                  </div>
                 </div>
               </div>
-
             </div>
-            <div className='flex-1 flex flex-col gap-2'></div>
           </div>
-          <div>
-            <div className='flex justify-between'>
-              <p className='text-white text-2xl font-bold mt-10'>Message your Guide</p>
-              <p className='text-white  mt-10'>Optional</p>
+          {/* Message Guide Section */}
+          <div className='space-y-4'>
+            <div className='flex justify-between items-center'>
+              <h2 className='text-2xl font-bold'>Message your Guide</h2>
+              <span className='text-gray-400 text-sm'>Optional</span>
             </div>
-            <div className='flex items-start gap-2 mt-4'>
-              <Image src={"/images/logo.png"} alt="message" className='rounded-full border h-[55px] w-[55px] border-border-primary' width={55} height={55} />
-              <div className='flex flex-col gap-2'>
-                <p className='text-white font-bold'>Jennie L.</p>
-
-                <p className='text-primary-gray text-sm flex items-center gap-1'>7 years guiding    <FaStar className='text-[#FEDB25]' />  4.5(100)</p>
-
-                <textarea placeholder='Your message here' className='w-[400px] max-sm:w-full bg-black text-start h-[112px] border border-border-primary rounded-xl p-4' />
+            <div className='bg-[#1A1A1A] rounded-xl border border-gray-800 p-6'>
+              <div className='flex gap-4'>
+                <Image 
+                  src={"/images/logo.png"} 
+                  alt="guide" 
+                  className='rounded-full border border-gray-700 h-12 w-12' 
+                  width={48} 
+                  height={48} 
+                />
+                <div className='flex-1 space-y-3'>
+                  <div>
+                    <p className='font-semibold'>Jennie L.</p>
+                    <p className='text-gray-400 text-sm flex items-center gap-2'>
+                      7 years guiding
+                      <span className='flex items-center gap-1'>
+                        <FaStar className='text-yellow-500' />
+                        4.5 (100)
+                      </span>
+                    </p>
+                  </div>
+                  <textarea 
+                    placeholder='Send a message to your guide...' 
+                    className='w-full bg-[#0A0A0A] text-white h-24 border border-gray-800 rounded-xl p-4 resize-none focus:border-gray-600 focus:outline-none transition-colors' 
+                  />
+                </div>
               </div>
             </div>
-            <p className='text-white text-2xl font-bold mt-6'>Cancellation Policy</p>
-            <br />
-            <p className='text-white  '>Free cancellation for the first 72 hours within payment confirmed.</p>
-            <p className='text-white  '>Cancel before August 20 for a partial refund.</p>
-            <br />
-            <p className='text-white  '>Your reservation won't be confirmed until an Agent or Guide accepts your request (typically within 24hours).
-              You won't be charged until the</p>
-            <div className="inline-flex items-center gap-1 mt-2">
-              <p className=" font-bold">Learn more</p>
-              <CgArrowTopRight className=" h-5 w-5" />
+          </div>
+
+          {/* Cancellation Policy Section */}
+          <div className='space-y-4'>
+            <h2 className='text-2xl font-bold'>Cancellation Policy</h2>
+            <div className='bg-[#1A1A1A] rounded-xl border border-gray-800 p-6 space-y-3'>
+              <p className='text-gray-300'>Free cancellation for the first 72 hours after payment is confirmed.</p>
+              <p className='text-gray-300'>Cancel before August 20 for a partial refund.</p>
+              <p className='text-gray-300'>Your reservation won't be confirmed until an Agent or Guide accepts your request (typically within 24 hours).</p>
+              <button className="flex items-center gap-1 text-[#BBD4FB] hover:text-white transition-colors">
+                <span>Learn more</span>
+                <CgArrowTopRight className="h-4 w-4" />
+              </button>
             </div>
           </div>
           <div>
@@ -767,125 +886,219 @@ const Payment = () => {
 
         </div>
 
-        {/* right side */}
-        <div className={`col-span-6 lg:col-span-2 flex flex-col  w-full bg-black pt-[50px] max-lg:pt-[20px] pl-[32px] pr-[64px] ${showPaymentReview ? '' : 'max-lg:hidden'}`}>
-          <p onClick={() => setShowPaymentReview(false)} className='text-left text-white text-sm flex items-center gap-2 cursor-pointer lg:hidden'><ArrowLeftIcon className='size-4' />Reservation Details </p>
-          <p className='text-center'>Total amount</p>
-          <p className='text-white text-[64px] font-bold text-center'><span className='text-primary-gray'>$</span> {totalAmount}</p>
-
-          <p className='text-sm text-primary-gray mb-2'>Promo Code</p>
-          <Input placeholder='Enter promo code' icon={<Image src={"/svg-icons/promo-code.svg"} alt='search icon' width={16} height={16} />} />
-          <p className='text-sm text-[#BBD4FB] mt-1'>You saved $45 on this booking!</p>
-          <p className='text-xl  mt-8'>Payment Detail</p>
-
-          <div className='flex justify-between mt-2'>
-            <p className='text-sm text-primary-gray'>Base Cost (${itineraryData.person_cost} × {itineraryData.min_group} guests)</p>
-            <p className='text-sm text-white'>${basePrice}</p>
-          </div>
-          <div className='flex justify-between mt-2' >
-            <p className='text-sm text-primary-gray'>Activity Cost</p>
-            <p className='text-sm text-white'> ${itineraryData.activity_cost || 0}</p>
-          </div>
-          <div className='flex justify-between mt-2' >
-            <p className='text-sm text-primary-gray'>Lodging Cost</p>
-            <p className='text-sm text-white'> ${itineraryData.lodging_cost || 0}</p>
-          </div>
-          <div className='flex justify-between mt-2' >
-            <p className='text-sm text-primary-gray'>Transport Cost</p>
-            <p className='text-sm text-white'> ${itineraryData.transport_cost || 0}</p>
-          </div>
-          <div className='flex justify-between mt-2' >
-            <p className='text-sm text-primary-gray'>Travel agent fee</p>
-            <p className='text-sm text-white'> ${itineraryData.service_fee || 0}</p>
-          </div>
-          <div className='flex justify-between mt-2' >
-            <p className='text-sm text-primary-gray'>Service fee</p>
-            <p className='text-sm text-white'> ${itineraryData.service_fee || 0}</p>
-          </div>
-          {paymentInsurance.filter(insurance => insurance.selected).map(insurance => (
-            <div key={insurance.id} className='flex justify-between mt-2'>
-              <p className='text-sm text-primary-gray'>{insurance.name}</p>
-              <p className='text-sm text-white'>${insurance.price}</p>
+        {/* right side - payment sidebar */}
+        <div className={`lg:col-span-1 bg-[#1A1A1A] border-l border-gray-800 ${showPaymentReview ? '' : 'max-lg:hidden'}`}>
+          <div className='sticky top-20 p-6 lg:p-8 space-y-6'>
+            {/* Mobile back button */}
+            <button 
+              onClick={() => setShowPaymentReview(false)} 
+              className='flex items-center gap-2 text-gray-400 hover:text-white transition-colors lg:hidden'
+            >
+              <ArrowLeftIcon className='h-4 w-4' />
+              <span className='text-sm'>Back to details</span>
+            </button>
+            
+            {/* Total Amount */}
+            <div className='text-center space-y-2'>
+              <p className='text-gray-400 text-sm'>Total amount</p>
+              <p className='text-5xl font-bold'>
+                <span className='text-gray-400 text-3xl'>$</span>{totalAmount}
+              </p>
             </div>
-          ))}
-          <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent mt-4"></div>
-          <div className='flex justify-between my-3' >
-            <p className=' font-bold text-white'>Total Amount</p>
-            <p className='text-xl font-bold text-white'> ${totalAmount}</p>
-          </div>
 
-          {user ? (
-            <Button onClick={() => confirmBooking()} variant="primary" className="gap-2">Pay ${totalAmount}  <GoArrowRight className='size-5' /></Button>
-          ) : (
-            <Button onClick={() => router.push("?modal=guestCheckout")} variant="outline" className="gap-2">Checkout as a Guest  <GoArrowRight className='size-5' /></Button>
-          )}
-
-
-
-
-
-
-          {!user && (
-            <>
-
-              <div className="text-white flex justify-center items-center gap-[16px] mt-4">
-                <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
-                <p className='text-primary-gray text-[14px] leading-[20px] whitespace-nowrap'>or </p>
-                <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
-              </div>
-              <p className='text-xl  mt-4'>Sign in or Create an Account</p>
-              <div className='flex relative items-start gap-3 p-4 border border-[#BBD4FB] rounded-xl mt-6 '>
-
-                <Image src={"/images/payment-page-card-blur-bg.png"} alt="user" layout='fill' className='absolute top-0 left-[-30px] ' />
-                <Image src={"/svg-icons/gift-box.svg"} alt="user" width={35} height={35} />
-                <div>
-                  <p className='text-white font-bold mb-1'>Log in or register for a seamless booking and more benefits!</p>
-                  <p className='text-primary-gray text-sm'>Earn points for every booking and save up to 50%!</p>
+            {/* Promo Code */}
+            <div className='space-y-2'>
+              <label className='text-gray-400 text-sm'>Promo Code</label>
+              <Input 
+                placeholder='Enter promo code' 
+                icon={<Image src={"/svg-icons/promo-code.svg"} alt='promo' width={16} height={16} className='opacity-60' />} 
+              />
+              <p className='text-[#BBD4FB] text-sm'>You saved $45 on this booking!</p>
+            </div>
+            {/* Payment Details */}
+            <div className='space-y-3'>
+              <h3 className='text-lg font-semibold'>Payment Details</h3>
+              
+              <div className='space-y-2 text-sm'>
+                <div className='flex justify-between'>
+                  <span className='text-gray-400'>Base Cost (${itineraryData.person_cost} × {itineraryData.min_group} guests)</span>
+                  <span>${basePrice}</span>
                 </div>
+                {itineraryData.activity_cost > 0 && (
+                  <div className='flex justify-between'>
+                    <span className='text-gray-400'>Activity Cost</span>
+                    <span>${itineraryData.activity_cost}</span>
+                  </div>
+                )}
+                {itineraryData.lodging_cost > 0 && (
+                  <div className='flex justify-between'>
+                    <span className='text-gray-400'>Lodging Cost</span>
+                    <span>${itineraryData.lodging_cost}</span>
+                  </div>
+                )}
+                {itineraryData.transport_cost > 0 && (
+                  <div className='flex justify-between'>
+                    <span className='text-gray-400'>Transport Cost</span>
+                    <span>${itineraryData.transport_cost}</span>
+                  </div>
+                )}
+                {itineraryData.service_fee > 0 && (
+                  <div className='flex justify-between'>
+                    <span className='text-gray-400'>Service Fee</span>
+                    <span>${itineraryData.service_fee}</span>
+                  </div>
+                )}
+                {paymentInsurance.filter(insurance => insurance.selected).map(insurance => (
+                  <div key={insurance.id} className='flex justify-between'>
+                    <span className='text-gray-400'>{insurance.name}</span>
+                    <span>${insurance.price}</span>
+                  </div>
+                ))}
               </div>
-              <div>
-                <p className="text-primary-gray w-96 text-left mb-1 mt-[16px]">Email Address</p>
-                <Input type="email" name="email" icon={<HiOutlineMail className="text-white h-[20px] w-[20px]" />} placeholder="Your email address" />
+              
+              <div className="h-px bg-gray-800" />
+              
+              <div className='flex justify-between text-base font-semibold'>
+                <span>Total Amount</span>
+                <span className='text-xl'>${totalAmount}</span>
               </div>
-              <Button onClick={() => router.push("?modal=signin")} variant="primary" className="bg-white text-black w-full my-[24px]">Continue</Button>
+            </div>
 
-              <div className="text-white flex justify-center items-center gap-[16px]">
-                <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
-                <p className='text-primary-gray text-[14px] leading-[20px] whitespace-nowrap'>or continue with</p>
-                <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
-              </div>
-              <div className="flex justify-center items-center gap-[8px] my-[16px] pb-[16px]">
-                <button onClick={() => router.push("?modal=bookingConfirmed")} className='bg-gradient-to-r from-[#1A1A1A] to-[#0D0D0D]/70 rounded-[8px] py-[16px] w-[120px] flex justify-center items-center  hover:cursor-pointer'>
-                  <Image src="/svg-icons/google.svg" alt="google" width={24} height={24} />
-                </button>
-                <button className='bg-gradient-to-r from-[#1A1A1A] to-[#0D0D0D]/70 rounded-[8px] py-[14px] w-[120px] flex justify-center items-center hover:cursor-pointer'>
-                  <Image src="/svg-icons/apple.svg" alt="apple" width={24} height={24} />
-                </button>
-                <button className='bg-gradient-to-r from-[#1A1A1A] to-[#0D0D0D]/70 rounded-[8px] py-[16px] w-[120px] flex justify-center items-center hover:cursor-pointer'>
-                  <Image src="/svg-icons/facebook.svg" alt="facebook" width={24} height={24} />
-                </button>
-              </div>
-
-              <p className="text-center text-primary-gray text-[16px] leading-[20px]"><Link href="/auth/signup" className="text-white"><b><u>Trouble signing in?</u></b></Link></p>
-
-
-            </>
-          )}
+            {/* Payment Button */}
+            {user ? (
+              <Button 
+                onClick={() => confirmBooking()} 
+                variant="primary" 
+                className="w-full gap-2"
+              >
+                Pay ${totalAmount}
+                <GoArrowRight className='h-5 w-5' />
+              </Button>
+            ) : (
+              <Button 
+                onClick={() => router.push("?modal=guestCheckout")} 
+                variant="outline" 
+                className="w-full gap-2"
+              >
+                Checkout as Guest
+                <GoArrowRight className='h-5 w-5' />
+              </Button>
+            )}
 
 
 
 
-          <p className=" text-primary-gray text-sm mt-12 max-lg:text-center">By confirming your reservation, you agree to ACTOTA's <Link href="/auth/signup" className="text-white"><b><u>Terms of Service</u></b></Link> and <Link href="/auth/signup" className="text-white"><b><u>Privacy Policy</u></b></Link></p>
+
+
+            {!user && (
+              <>
+                {/* Divider */}
+                <div className="flex items-center gap-4">
+                  <div className="h-px bg-gray-800 flex-1" />
+                  <span className='text-gray-400 text-sm'>or</span>
+                  <div className="h-px bg-gray-800 flex-1" />
+                </div>
+                
+                {/* Sign In Section */}
+                <div className='space-y-4'>
+                  <h3 className='text-lg font-semibold'>Sign in or Create Account</h3>
+                  
+                  <div className='bg-[#262626] border border-[#BBD4FB]/30 rounded-xl p-4 space-y-2'>
+                    <div className='flex gap-3'>
+                      <Image src={"/svg-icons/gift-box.svg"} alt="benefits" width={24} height={24} className='opacity-80' />
+                      <div className='space-y-1'>
+                        <p className='text-sm font-medium'>Log in for seamless booking</p>
+                        <p className='text-gray-400 text-xs'>Earn points and save up to 50%!</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className='space-y-2'>
+                    <label className="text-gray-400 text-sm">Email Address</label>
+                    <Input 
+                      type="email" 
+                      name="email" 
+                      icon={<HiOutlineMail className="text-gray-400 h-5 w-5" />} 
+                      placeholder="Enter your email" 
+                    />
+                  </div>
+                  
+                  <Button 
+                    onClick={() => router.push("?modal=signin")} 
+                    variant="primary" 
+                    className="w-full"
+                  >
+                    Continue
+                  </Button>
+                  
+                  {/* Social Login */}
+                  <div className='space-y-3'>
+                    <div className="flex items-center gap-4">
+                      <div className="h-px bg-gray-800 flex-1" />
+                      <span className='text-gray-400 text-xs'>or continue with</span>
+                      <div className="h-px bg-gray-800 flex-1" />
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-2">
+                      <button className='bg-[#262626] hover:bg-[#363636] rounded-lg py-3 flex justify-center items-center transition-colors'>
+                        <Image src="/svg-icons/google.svg" alt="google" width={20} height={20} />
+                      </button>
+                      <button className='bg-[#262626] hover:bg-[#363636] rounded-lg py-3 flex justify-center items-center transition-colors'>
+                        <Image src="/svg-icons/apple.svg" alt="apple" width={20} height={20} />
+                      </button>
+                      <button className='bg-[#262626] hover:bg-[#363636] rounded-lg py-3 flex justify-center items-center transition-colors'>
+                        <Image src="/svg-icons/facebook.svg" alt="facebook" width={20} height={20} />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <p className="text-center text-sm">
+                    <Link href="/auth/signup" className="text-[#BBD4FB] hover:text-white transition-colors">
+                      Trouble signing in?
+                    </Link>
+                  </p>
+                </div>
+              </>
+            )}
+
+
+
+
+            {/* Terms */}
+            <p className="text-gray-400 text-xs text-center">
+              By confirming your reservation, you agree to ACTOTA's{' '}
+              <Link href="/terms" className="text-[#BBD4FB] hover:text-white transition-colors">
+                Terms of Service
+              </Link>{' '}
+              and{' '}
+              <Link href="/privacy" className="text-[#BBD4FB] hover:text-white transition-colors">
+                Privacy Policy
+              </Link>
+            </p>
+          </div>
         </div>
-        {!showPaymentReview && <div className='lg:hidden fixed bottom-0 left-0 right-0 bg-black/90 z-10 flex justify-between items-center gap-2 col-span-6 px-[20px] py-[10px]'>
-          <div>
-            <p className='text-white text-sm flex items-center gap-1'>Total <IoAlertCircleOutline className='size-4' /></p>
-            <p className='text-white text-xl font-bold'>${totalAmount}</p>
+        {/* Mobile Bottom Bar */}
+        {!showPaymentReview && (
+          <div className='lg:hidden fixed bottom-0 left-0 right-0 bg-[#1A1A1A] border-t border-gray-800 z-10 px-6 py-4'>
+            <div className='flex justify-between items-center'>
+              <div>
+                <p className='text-gray-400 text-sm flex items-center gap-1'>
+                  Total <IoAlertCircleOutline className='h-4 w-4' />
+                </p>
+                <p className='text-2xl font-bold'>${totalAmount}</p>
+              </div>
+              <Button 
+                onClick={() => setShowPaymentReview(true)} 
+                variant='primary' 
+                size='md'
+                className='gap-2'
+              >
+                Review
+                <ArrowRightIcon className='h-4 w-4' />
+              </Button>
+            </div>
           </div>
-          <div>
-            <Button onClick={() => setShowPaymentReview(true)} variant='primary' size='md' >Review <ArrowRightIcon className='size-4' /></Button>
-          </div>
-        </div>}
+        )}
       </div>
     </section>
   )

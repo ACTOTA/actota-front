@@ -6,6 +6,36 @@ body {
   background-color: black;
 }
 
+/* Dark theme styles for react-phone-number-input */
+.PhoneInput {
+  --PhoneInput-color: white;
+  --PhoneInputInternationalIconPhone-opacity: 0.7;
+  --PhoneInputInternationalIconGlobe-opacity: 0.7;
+  --PhoneInputCountrySelect-marginRight: 0.5rem;
+}
+
+.PhoneInputInput {
+  background-color: #0A0A0A !important;
+  color: white !important;
+  border-color: #374151 !important;
+}
+
+.PhoneInputInput:focus {
+  outline: none;
+  border-color: #EAB308 !important;
+}
+
+.PhoneInputCountrySelect {
+  background-color: #0A0A0A !important;
+  color: white !important;
+  border-right: 1px solid #374151 !important;
+}
+
+.PhoneInputCountrySelectArrow {
+  color: #9CA3AF !important;
+  opacity: 0.5 !important;
+}
+
 @keyframes slideUp {
   from {
     transform: translateY(100%);
@@ -41,6 +71,10 @@ body {
 
 .animate-fade-in {
   animation: fadeIn 0.2s ease-out;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
 }
 
 .animate-expand {

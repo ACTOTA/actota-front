@@ -499,7 +499,8 @@ export default function DayView({ listing }: DayViewProps) {
 			
 			// Set max zoom to prevent over-zooming on single points
 			const listener = google.maps.event.addListener(map, 'bounds_changed', () => {
-				if (map.getZoom() && map.getZoom() > 15) {
+				const zoom = map.getZoom();
+				if (zoom && zoom > 15) {
 					map.setZoom(15);
 				}
 				google.maps.event.removeListener(listener);
@@ -649,7 +650,17 @@ export default function DayView({ listing }: DayViewProps) {
 														</h3>
 														<span className="text-gray-500">|</span>
 														<span className="text-gray-400 text-sm">
-															{activity.duration || '1h'}
+															{(() => {
+																if (isActivity(activity)) {
+																	const activityItem = activity;
+																	if (activityItem.duration_minutes) {
+																		const hours = Math.floor(activityItem.duration_minutes / 60);
+																		const minutes = activityItem.duration_minutes % 60;
+																		return `${hours}h${minutes > 0 ? ` ${minutes}m` : ''}`;
+																	}
+																}
+																return '1h';
+															})()}
 														</span>
 													</div>
 												</div>

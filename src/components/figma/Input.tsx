@@ -18,7 +18,7 @@ type InputProps = {
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export default function Input({ id, name, type, placeholder, value, icon, classname, widthIcon, rightIcon, onChange, readOnly }: InputProps) {
-  const [showPassword, setShowPassword] = useState(type === 'password');
+  const [showPassword, setShowPassword] = useState(false);
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
@@ -35,7 +35,7 @@ export default function Input({ id, name, type, placeholder, value, icon, classn
         readOnly={readOnly}
         id={id}
         name={name}
-        type={showPassword ? 'text' : type}
+        type={type === 'password' && !showPassword ? 'password' : 'text'}
         placeholder={placeholder}
         value={value}
         onChange={onChange}
@@ -48,7 +48,7 @@ export default function Input({ id, name, type, placeholder, value, icon, classn
       {type === 'password' && ( // Only show eye icon for password inputs
         <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-white cursor-pointer" onClick={toggleShowPassword}>
           {/* Assuming you have an EyeOpen and EyeClosed icon component */}
-          {showPassword ? <HiEye className={widthIcon} /> : <HiEyeOff className={widthIcon} />}
+          {showPassword ? <HiEyeOff className={widthIcon} /> : <HiEye className={widthIcon} />}
         </div>
       )}
     {rightIcon && (
