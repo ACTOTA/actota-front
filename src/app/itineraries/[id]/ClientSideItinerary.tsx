@@ -23,23 +23,30 @@ import DateMenu from '@/src/components/navbar/DateMenu';
 
 interface ClientSideItineraryProps {
   initialData: ItineraryData;
+  isAuthenticated?: boolean;
 }
 
-export default function ClientSideItinerary({ initialData }: ClientSideItineraryProps) {
+export default function ClientSideItinerary({ initialData, isAuthenticated = true }: ClientSideItineraryProps) {
   const pathname = usePathname() as string;
   const router = useRouter();
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState<any>(null);
   const objectId = pathname.substring(pathname.lastIndexOf('/') + 1);
+  const [clientIsAuthenticated, setClientIsAuthenticated] = useState(isAuthenticated);
 
   useEffect(() => {
     // Access localStorage only on the client side
     const userData = localStorage.getItem('user');
     if (userData) {
       try {
-        setUser(JSON.parse(userData));
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+        setClientIsAuthenticated(true);
       } catch (error) {
         console.error('Error parsing user data from localStorage:', error);
+        setClientIsAuthenticated(false);
       }
+    } else {
+      setClientIsAuthenticated(false);
     }
   }, []);
 
@@ -63,10 +70,10 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
   const basePrice = (itineraryData?.person_cost ?? 0) * (itineraryData?.min_group ?? 1);
 
 
-  if (error) {
+  if (error && clientIsAuthenticated) {
     console.error('Error details:', error);
     return <div className='text-white flex justify-center items-center h-screen'>
-      {user ? 'Error: ' + error.message : 'Please login to view itinerary details'}
+      Error: {error.message}
     </div>;
   }
 
@@ -435,18 +442,31 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
                   </div>
                 </div>
                 
-                <Button 
-                  onClick={handleBooking} 
-                  variant='primary' 
-                  className='w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-3 rounded-lg flex items-center justify-center gap-2'
-                  disabled={!dateRange}
-                >
-                  <span>Proceed to Payment</span>
-                  <ArrowRightIcon className='h-5 w-5' />
-                </Button>
-                
-                {!dateRange && (
-                  <p className="text-yellow-400 text-xs mt-3 text-center">Please select trip dates to continue</p>
+                {clientIsAuthenticated ? (
+                  <>
+                    <Button 
+                      onClick={handleBooking} 
+                      variant='primary' 
+                      className='w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-3 rounded-lg flex items-center justify-center gap-2'
+                      disabled={!dateRange}
+                    >
+                      <span>Proceed to Payment</span>
+                      <ArrowRightIcon className='h-5 w-5' />
+                    </Button>
+                    
+                    {!dateRange && (
+                      <p className="text-yellow-400 text-xs mt-3 text-center">Please select trip dates to continue</p>
+                    )}
+                  </>
+                ) : (
+                  <Button 
+                    onClick={() => router.push('/auth/signin')} 
+                    variant='primary' 
+                    className='w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-3 rounded-lg flex items-center justify-center gap-2'
+                  >
+                    <span>Login to Book</span>
+                    <ArrowRightIcon className='h-5 w-5' />
+                  </Button>
                 )}
               </div>
               
@@ -454,10 +474,10 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
               <div className='bg-[#141414] rounded-xl p-6 mt-4'>
                 <div className='flex items-center justify-between mb-4'>
                   <h3 className='text-sm font-semibold'>Itinerary Members</h3>
-                  <button className='text-xs text-gray-400 hover:text-white'>Copy Invite Link</button>
+                  <button className='text-xs text-gray-400 hover:text-white' disabled={!clientIsAuthenticated}>Copy Invite Link</button>
                 </div>
                 
-                <div className='space-y-3'>
+                <div className={`space-y-3 ${!clientIsAuthenticated ? 'blur-sm select-none' : ''}`}>
                   <div className='flex items-center gap-3'>
                     <div className='w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs font-medium'>
                       JJ
@@ -468,7 +488,7 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
                     </div>
                   </div>
                   
-                  <button className='w-full py-2 border border-gray-700 rounded-lg text-sm text-gray-400 hover:text-white hover:border-gray-600 transition-colors'>
+                  <button className='w-full py-2 border border-gray-700 rounded-lg text-sm text-gray-400 hover:text-white hover:border-gray-600 transition-colors' disabled={!clientIsAuthenticated}>
                     Invite
                   </button>
                 </div>
@@ -478,7 +498,7 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
         </div>
         {/* Day View Section */}
         <div className='col-span-full mt-8'>
-          <DayView listing={itineraryData} />
+          <DayView listing={itineraryData} isAuthenticated={clientIsAuthenticated} />
         </div>
         
         {/* Budget and Breakdown Section */}
@@ -630,13 +650,23 @@ export default function ClientSideItinerary({ initialData }: ClientSideItinerary
                 <p className='text-2xl font-bold'>Total: ${basePrice.toFixed(2)}</p>
                 <p className='text-sm text-gray-400'>Service fee not included</p>
               </div>
-              <Button 
-                variant='primary' 
-                className='bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-8 py-3 rounded-lg'
-                onClick={handleBooking}
-              >
-                Proceed to Payment →
-              </Button>
+              {clientIsAuthenticated ? (
+                <Button 
+                  variant='primary' 
+                  className='bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-8 py-3 rounded-lg'
+                  onClick={handleBooking}
+                >
+                  Proceed to Payment →
+                </Button>
+              ) : (
+                <Button 
+                  variant='primary' 
+                  className='bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-8 py-3 rounded-lg'
+                  onClick={() => router.push('/auth/signin')}
+                >
+                  Login to Book →
+                </Button>
+              )}
             </div>
           </div>
         </div>

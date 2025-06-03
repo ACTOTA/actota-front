@@ -22,6 +22,7 @@ const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '';
 
 interface DayViewProps {
 	listing: ItineraryData;
+	isAuthenticated?: boolean;
 }
 
 const defaultCenter = {
@@ -47,7 +48,7 @@ const mapOptions = {
 	zoomControl: true,
 };
 
-export default function DayView({ listing }: DayViewProps) {
+export default function DayView({ listing, isAuthenticated = true }: DayViewProps) {
 	const [selectedView, setSelectedView] = useState<'map' | 'day'>('map');
 	const [selectedDay, setSelectedDay] = useState(1);
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -119,13 +120,13 @@ export default function DayView({ listing }: DayViewProps) {
 						if (status === 'OK' && results && results[0]) {
 							const location = results[0].geometry.location;
 							const coords = { lat: location.lat(), lng: location.lng() };
-							console.log(`✅ Geocoded ${key}: ${address} -> ${coords.lat}, ${coords.lng}`);
+							console.log(`Geocoded ${key}: ${address} -> ${coords.lat}, ${coords.lng}`);
 							resolve(coords);
 						} else if (status === 'OVER_QUERY_LIMIT') {
-							console.warn(`⚠️ Query limit exceeded for ${key}, attempt ${attempt + 1}`);
+							console.warn(`Query limit exceeded for ${key}, attempt ${attempt + 1}`);
 							resolve(null);
 						} else {
-							console.error(`❌ Geocoding failed for ${key}: ${address} - ${status}`);
+							console.error(`Geocoding failed for ${key}: ${address} - ${status}`);
 							resolve(null);
 						}
 					});
@@ -355,7 +356,7 @@ export default function DayView({ listing }: DayViewProps) {
 		const isValidLng = lng >= -125 && lng <= -66;
 		
 		if (isValidLat && isValidLng) {
-			console.log(`✅ Valid coordinates for ${source}:`, { lat, lng });
+			console.log(`Valid coordinates for ${source}:`, { lat, lng });
 			return { lat, lng };
 		}
 		
@@ -364,11 +365,11 @@ export default function DayView({ listing }: DayViewProps) {
 		const swappedIsValidLng = lat >= -125 && lat <= -66;
 		
 		if (swappedIsValidLat && swappedIsValidLng) {
-			console.log(`🔄 Swapped coordinates for ${source}:`, { lat: lng, lng: lat });
+			console.log(`Swapped coordinates for ${source}:`, { lat: lng, lng: lat });
 			return { lat: lng, lng: lat };
 		}
 		
-		console.warn(`❌ Invalid coordinates for ${source}:`, { lat, lng });
+		console.warn(`Invalid coordinates for ${source}:`, { lat, lng });
 		return null;
 	};
 
@@ -409,7 +410,7 @@ export default function DayView({ listing }: DayViewProps) {
 							...validCoords,
 							label: getItemDisplayName(activity)
 						});
-						console.log(`✅ Added activity ${idx + 1} from location.coordinates:`, validCoords);
+						console.log(`Added activity ${idx + 1} from location.coordinates:`, validCoords);
 						coordinatesAdded = true;
 					}
 				} 
@@ -421,19 +422,19 @@ export default function DayView({ listing }: DayViewProps) {
 						...geocodedLocations[`activity-${idx}`],
 						label: getItemDisplayName(activity)
 					});
-					console.log(`✅ Added activity ${idx + 1} from geocoding:`, geocodedLocations[`activity-${idx}`]);
+					console.log(`Added activity ${idx + 1} from geocoding:`, geocodedLocations[`activity-${idx}`]);
 					coordinatesAdded = true;
 				}
 				
 				// If still no coordinates, generate fallback
 				if (!coordinatesAdded) {
-					console.warn(`⚠️ No coordinates found for activity ${idx + 1}, generating fallback`);
+					console.warn(`No coordinates found for activity ${idx + 1}, generating fallback`);
 					const fallbackCoords = generateFallbackCoordinates(idx, dayActivities.length);
 					coordinates.push({
 						...fallbackCoords,
 						label: getItemDisplayName(activity)
 					});
-					console.log(`✅ Added activity ${idx + 1} with fallback coordinates:`, fallbackCoords);
+					console.log(`Added activity ${idx + 1} with fallback coordinates:`, fallbackCoords);
 					
 					// Log why we needed fallback
 					console.log(`Fallback reason for activity ${idx + 1}:`, {
@@ -528,9 +529,9 @@ export default function DayView({ listing }: DayViewProps) {
 		service.route(testRequest, (result, status) => {
 			console.log('Test status:', status);
 			if (status === 'OK') {
-				console.log('✅ Test successful! Route found between first two points');
+				console.log('Test successful! Route found between first two points');
 			} else {
-				console.log('❌ Test failed:', status);
+				console.log('Test failed:', status);
 				
 				// Try with lat/lng objects
 				const testRequest2 = {
@@ -556,7 +557,7 @@ export default function DayView({ listing }: DayViewProps) {
 				console.log(`Point ${idx + 1}:`, coord);
 				// Check if coordinates are in valid range
 				if (Math.abs(coord.lat) > 90 || Math.abs(coord.lng) > 180) {
-					console.error(`⚠️ Invalid coordinates at point ${idx + 1}`);
+					console.error(`Invalid coordinates at point ${idx + 1}`);
 				}
 			});
 			
@@ -697,7 +698,7 @@ export default function DayView({ listing }: DayViewProps) {
 															</span>
 														</div>
 														{((activity.type === 'activity' && 'address' in activity && activity.address) || activity.location?.name) ? (
-															<p className="text-gray-500 text-xs mt-0.5">
+															<p className={`text-gray-500 text-xs mt-0.5 ${!isAuthenticated ? 'blur-sm select-none' : ''}`}>
 																{activity.type === 'activity' && 'address' in activity && activity.address
 																	? `${activity.address.street}, ${activity.address.city}`
 																	: activity.location?.name}
@@ -868,7 +869,14 @@ export default function DayView({ listing }: DayViewProps) {
 										</div>
 									)}
 									
-									{/* Info message removed since we're no longer showing polylines */}
+									{/* Blur overlay for unauthenticated users */}
+									{!isAuthenticated && (
+										<div className="absolute inset-0 bg-black/10 backdrop-blur-md rounded-xl flex items-center justify-center">
+											<div className="bg-black/70 px-6 py-4 rounded-lg text-center">
+												<p className="text-white font-medium">Login to view route details</p>
+											</div>
+										</div>
+									)}
 								</div>
 							</>
 						)}

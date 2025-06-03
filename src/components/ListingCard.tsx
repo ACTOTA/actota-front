@@ -120,7 +120,11 @@ const ListingCard: React.FC<ListingCardProps> = ({
                         <div className='flex items-baseline gap-1'>
                             <span className='text-xs text-gray-400'>From</span>
                             <span className='text-2xl font-bold text-white'>
-                                ${data?.person_cost}
+                                ${data?.person_cost ? 
+                                    (typeof data.person_cost === 'string' ? 
+                                        parseFloat(data.person_cost).toLocaleString() : 
+                                        data.person_cost.toLocaleString()
+                                    ) : '0'}
                             </span>
                             <span className='text-xs text-gray-400'>per person</span>
                         </div>

@@ -6,6 +6,13 @@ body {
   background-color: black;
 }
 
+/* Blur effect for unauthenticated users */
+.blur-sensitive {
+  filter: blur(4px);
+  user-select: none;
+  pointer-events: none;
+}
+
 /* Dark theme styles for react-phone-number-input */
 .PhoneInput {
   --PhoneInput-color: white;
