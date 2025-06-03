@@ -11,6 +11,7 @@ import DrawerModal from '@/src/components/DrawerModal';
 import { 
   ItineraryData, 
   PopulatedDayItem, 
+  ActivityItem,
   isActivity, 
   isAccommodation, 
   isTransportation 
@@ -652,7 +653,7 @@ export default function DayView({ listing }: DayViewProps) {
 														<span className="text-gray-400 text-sm">
 															{(() => {
 																if (isActivity(activity)) {
-																	const activityItem = activity;
+																	const activityItem = activity as ActivityItem;
 																	if (activityItem.duration_minutes) {
 																		const hours = Math.floor(activityItem.duration_minutes / 60);
 																		const minutes = activityItem.duration_minutes % 60;

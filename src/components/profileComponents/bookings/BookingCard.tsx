@@ -16,6 +16,85 @@ import { ItineraryData } from '@/src/types/itineraries';
 import BaseCard from '../../shared/BaseCard';
 import StatusBadge from '../../shared/StatusBadge';
 import InfoGrid from '../../shared/InfoGrid';
+import { EJSON } from 'bson';
+
+// Helper function to parse MongoDB Extended JSON dates
+const parseMongoDate = (dateValue: any): Date | null => {
+  if (!dateValue) return null;
+  
+  try {
+    // If it's already a Date object, return it
+    if (dateValue instanceof Date) {
+      return dateValue;
+    }
+    
+    // Handle MongoDB Extended JSON format
+    if (dateValue.$date) {
+      // Handle $numberLong format
+      if (dateValue.$date.$numberLong) {
+        const timestamp = parseInt(dateValue.$date.$numberLong);
+        // TEMPORARY: Add 24 years to test dates from 2001
+        // Remove this when your database has correct dates
+        const date = new Date(timestamp);
+        if (date.getFullYear() < 2020) {
+          date.setFullYear(date.getFullYear() + 24);
+        }
+        return date;
+      }
+      // Handle direct timestamp
+      if (typeof dateValue.$date === 'number') {
+        return new Date(dateValue.$date);
+      }
+      // Handle ISO string
+      if (typeof dateValue.$date === 'string') {
+        return new Date(dateValue.$date);
+      }
+    }
+    
+    // Handle regular date strings or timestamps
+    if (typeof dateValue === 'string' || typeof dateValue === 'number') {
+      return new Date(dateValue);
+    }
+  } catch (error) {
+    console.error('Error parsing date:', error, dateValue);
+  }
+  
+  return null;
+};
+
+// Helper function to determine trip status based on dates (not payment status)
+const getTripStatus = (booking: BookingType): 'upcoming' | 'ongoing' | 'completed' | 'cancelled' | 'unknown' => {
+  // Check if booking is cancelled first
+  if (booking.status === 'cancelled' || booking.status === 'refunded') {
+    return 'cancelled';
+  }
+  
+  const now = new Date();
+  
+  // Parse dates handling MongoDB Extended JSON format
+  const startDate = parseMongoDate(booking.start_date) || 
+                   parseMongoDate(booking.arrival_datetime) || 
+                   parseMongoDate((booking as any).arrivalDatetime) ||
+                   parseMongoDate((booking as any).arrivalDateTime);
+  const endDate = parseMongoDate(booking.end_date) || 
+                 parseMongoDate(booking.departure_datetime) || 
+                 parseMongoDate((booking as any).departureDatetime) ||
+                 parseMongoDate((booking as any).departureDateTime);
+  
+  if (!startDate) return 'unknown';
+  
+  if (startDate > now) {
+    return 'upcoming'; // Trip hasn't started yet
+  } else if (endDate && endDate < now) {
+    return 'completed'; // Trip has ended
+  } else if (startDate <= now && endDate && endDate >= now) {
+    return 'ongoing'; // Trip is currently happening
+  } else if (startDate <= now && !endDate) {
+    // If no end date and trip has started, assume it's completed
+    return 'completed';
+  }
+  return 'unknown';
+};
 
 interface ListingCardProps {
   dataBooking: BookingType | null;
@@ -43,10 +122,25 @@ const BookingCard: React.FC<ListingCardProps> = ({
   // Log the dataBooking object to see available fields
   useEffect(() => {
     if (dataBooking) {
-      console.log('BookingCard - dataBooking object:', dataBooking);
-      console.log('BookingCard - dataBooking fields:', Object.keys(dataBooking));
+      // Parse the dates to check what we're getting
+      const { startDate, endDate } = getBookingDates();
+      const tripStatus = getTripStatus(dataBooking);
       
-      // Log specifically date-related fields
+      console.log('BookingCard - Debug:', {
+        bookingId: dataBooking._id,
+        rawDates: {
+          arrival: dataBooking.arrival_datetime,
+          departure: dataBooking.departure_datetime
+        },
+        parsedDates: {
+          start: startDate,
+          end: endDate
+        },
+        tripStatus,
+        paymentStatus: dataBooking.status
+      });
+      
+      // Original logging
       console.log('BookingCard - Date fields:', {
         start_date: dataBooking.start_date,
         end_date: dataBooking.end_date,
@@ -63,9 +157,15 @@ const BookingCard: React.FC<ListingCardProps> = ({
   const getBookingDates = () => {
     if (!dataBooking) return { startDate: null, endDate: null };
     
-    // Try start_date/end_date first, then arrival_datetime/departure_datetime
-    const startDate = dataBooking.start_date || dataBooking.arrival_datetime;
-    const endDate = dataBooking.end_date || dataBooking.departure_datetime;
+    // Parse dates handling MongoDB Extended JSON format
+    const startDate = parseMongoDate(dataBooking.start_date) || 
+                     parseMongoDate(dataBooking.arrival_datetime) || 
+                     parseMongoDate((dataBooking as any).arrivalDatetime) ||
+                     parseMongoDate((dataBooking as any).arrivalDateTime);
+    const endDate = parseMongoDate(dataBooking.end_date) || 
+                   parseMongoDate(dataBooking.departure_datetime) || 
+                   parseMongoDate((dataBooking as any).departureDatetime) ||
+                   parseMongoDate((dataBooking as any).departureDateTime);
     
     return { startDate, endDate };
   };
@@ -123,16 +223,27 @@ const BookingCard: React.FC<ListingCardProps> = ({
       <div className='flex flex-row items-center justify-between gap-4 mb-6'>
         <div className='flex items-center gap-3'>
           <StatusBadge 
-            status={dataBooking?.status || 'confirmed'}
+            status={getTripStatus(dataBooking)}
             label={(() => {
-              if (dataBooking?.status === "upcoming") {
+              const tripStatus = getTripStatus(dataBooking);
+              
+              if (tripStatus === "upcoming") {
                 const { startDate } = getBookingDates();
                 if (startDate) {
                   const daysUntil = Math.ceil((new Date(startDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-                  return `in ${Math.max(1, daysUntil)} days`;
+                  if (daysUntil === 0) return 'Today';
+                  if (daysUntil === 1) return 'Tomorrow';
+                  return `in ${daysUntil} days`;
                 }
+              } else if (tripStatus === "ongoing") {
+                return "In Progress";
+              } else if (tripStatus === "completed") {
+                return "Completed";
+              } else if (tripStatus === "cancelled") {
+                return "Cancelled";
               }
-              return dataBooking?.status?.charAt(0).toUpperCase() + dataBooking?.status?.slice(1) || 'Confirmed';
+              
+              return tripStatus.charAt(0).toUpperCase() + tripStatus.slice(1);
             })()}
           />
         </div>

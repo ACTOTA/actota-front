@@ -79,13 +79,21 @@ const VerificationPasswor: React.FC<VerificationPasswordProps> = ({ data }) => {
   };
 
   const handleVerifyPhone = () => {
+    if (!data?.phone) {
+      // If no phone number, navigate to Personal Information tab to add one
+      alert("Please add a phone number in your Personal Information first.");
+      return;
+    }
+    
     // Handle phone verification logic
-    console.log("Verify phone");
+    alert("Phone verification would be implemented here. This would send a verification code to your phone.");
+    console.log("Verify phone:", data.phone);
   };
 
   const handleVerifyEmail = () => {
     // Handle email verification resend
-    console.log("Resend email verification");
+    alert("Email verification would be implemented here. This would send a verification email to your address.");
+    console.log("Resend email verification to:", data?.email);
   };
 
   return (
@@ -95,78 +103,74 @@ const VerificationPasswor: React.FC<VerificationPasswordProps> = ({ data }) => {
           <h2 className="font-bold text-2xl text-white">Verification</h2>
           <div className="flex flex-col gap-4">
             {/* Email Verification */}
-            <Card variant="default" noPadding className="hover:border-gray-600">
-              <div className="flex items-center justify-between p-4">
-                <div className="flex gap-3 items-center min-w-0 flex-1">
-                  <div className="flex-shrink-0">
-                    <CiMail className="w-6 h-6 text-gray-400" />
+            <div className="relative rounded-xl border border-gray-700/50 bg-gradient-to-br from-gray-800/40 via-gray-800/20 to-gray-900/40 backdrop-blur-sm hover:border-gray-600/50 transition-all duration-200">
+              <div className="flex items-center justify-between p-6">
+                <div className="flex gap-4 items-center min-w-0 flex-1">
+                  <div className="flex-shrink-0 p-3 bg-gray-600/50 rounded-full backdrop-blur-sm">
+                    <CiMail className="w-6 h-6 text-white" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-sm font-normal text-gray-400">Email</div>
-                    <div className="font-semibold text-base text-white truncate" title={data?.email}>
-                      {data?.email || "No email provided"}
+                    <div className="text-sm font-medium text-gray-400 mb-1">Email</div>
+                    <div className="font-semibold text-lg text-white truncate" title={data?.email}>
+                      {data?.email || "user@email.com"}
                     </div>
                   </div>
                 </div>
                 <div className="flex-shrink-0 ml-4">
                   {data?.emailVerified ? (
-                    <div className="flex gap-2 items-center text-green-500">
-                      <IoCheckmark className="w-5 h-5" />
-                      <span className="font-semibold text-sm">Verified</span>
+                    <div className="flex gap-2 items-center">
+                      <IoCheckmark className="w-5 h-5 text-green-500" />
+                      <span className="font-semibold text-green-500">Verified</span>
                     </div>
                   ) : (
                     <button
                       onClick={handleVerifyEmail}
-                      className="flex gap-2 items-center text-yellow-500 hover:text-yellow-400 transition-colors"
+                      className="flex gap-2 items-center text-yellow-500 hover:text-yellow-400 transition-colors px-4 py-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20 hover:border-yellow-500/40 hover:bg-yellow-500/20 backdrop-blur-sm"
                     >
-                      <span className="font-semibold text-sm">Verify</span>
+                      <span className="font-semibold">Verify</span>
                       <BsArrowRight className="w-4 h-4" />
                     </button>
                   )}
                 </div>
               </div>
-            </Card>
+            </div>
 
             {/* Phone Verification */}
-            <Card variant="default" noPadding className="hover:border-gray-600">
-              <div className="flex items-center justify-between p-4">
-                <div className="flex gap-3 items-center min-w-0 flex-1">
-                  <div className="flex-shrink-0">
-                    <FiPhone className="w-6 h-6 text-gray-400" />
+            <div className="relative rounded-xl border border-gray-700/50 bg-gradient-to-br from-gray-800/40 via-gray-800/20 to-gray-900/40 backdrop-blur-sm hover:border-gray-600/50 transition-all duration-200">
+              <div className="flex items-center justify-between p-6">
+                <div className="flex gap-4 items-center min-w-0 flex-1">
+                  <div className="flex-shrink-0 p-3 bg-gray-600/50 rounded-full backdrop-blur-sm">
+                    <FiPhone className="w-6 h-6 text-white" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-sm font-normal text-gray-400">Phone</div>
-                    <div className="font-semibold text-base text-white truncate" title={data?.phone}>
-                      {data?.phone || "No phone number"}
+                    <div className="text-sm font-medium text-gray-400 mb-1">Phone Number</div>
+                    <div className="font-semibold text-lg text-white truncate" title={data?.phone}>
+                      {data?.phone ? data.phone : (
+                        <span className="text-gray-500 font-normal">Unverified</span>
+                      )}
                     </div>
                   </div>
                 </div>
                 <div className="flex-shrink-0 ml-4">
                   {data?.phoneVerified ? (
-                    <div className="flex gap-2 items-center text-green-500">
-                      <IoCheckmark className="w-5 h-5" />
-                      <span className="font-semibold text-sm">Verified</span>
+                    <div className="flex gap-2 items-center">
+                      <IoCheckmark className="w-5 h-5 text-green-500" />
+                      <span className="font-semibold text-green-500">Verified</span>
                     </div>
-                  ) : data?.phone ? (
-                    <button
-                      onClick={handleVerifyPhone}
-                      className="flex gap-2 items-center text-yellow-500 hover:text-yellow-400 transition-colors"
-                    >
-                      <span className="font-semibold text-sm">Verify</span>
-                      <BsArrowRight className="w-4 h-4" />
-                    </button>
                   ) : (
                     <button
                       onClick={handleVerifyPhone}
-                      className="flex gap-2 items-center text-gray-400 hover:text-gray-300 transition-colors"
+                      className="flex gap-2 items-center text-yellow-500 hover:text-yellow-400 transition-colors px-4 py-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20 hover:border-yellow-500/40 hover:bg-yellow-500/20 backdrop-blur-sm"
                     >
-                      <span className="font-semibold text-sm">Add</span>
+                      <span className="font-semibold">
+                        {data?.phone ? "Verify" : "Add"}
+                      </span>
                       <BsArrowRight className="w-4 h-4" />
                     </button>
                   )}
                 </div>
               </div>
-            </Card>
+            </div>
           </div>
         </div>
 

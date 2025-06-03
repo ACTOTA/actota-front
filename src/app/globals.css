@@ -94,6 +94,13 @@ body {
   display: none;  /* Chrome, Safari and Opera */
 }
 
+/* Global scrollbar hiding */
+body::-webkit-scrollbar,
+.modal-content::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
 .PhoneInputInput {
   background-color: black !important;
 }

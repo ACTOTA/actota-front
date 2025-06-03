@@ -407,6 +407,10 @@ const Payment = () => {
           onSuccess: (result) => {
             if (result.success) {
               console.log('Booking with payment successful:', result);
+              // Store the booking ID for the confirmation modal
+              if (result.booking_id) {
+                localStorage.setItem('bookingId', JSON.stringify(result.booking_id));
+              }
               router.push("?modal=bookingConfirmed");
             } else {
               console.error('Booking with payment failed:', result.error);
@@ -443,6 +447,10 @@ const Payment = () => {
           onSuccess: (result) => {
             if (result.success) {
               console.log('Booking created for already succeeded payment:', result);
+              // Store the booking ID for the confirmation modal
+              if (result.booking_id) {
+                localStorage.setItem('bookingId', JSON.stringify(result.booking_id));
+              }
               router.push("?modal=bookingConfirmed");
             } else {
               console.error('Booking creation failed for already succeeded payment:', result.error);

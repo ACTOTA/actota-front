@@ -36,11 +36,11 @@ export default function Modal({
 
     return (
       <div
-        className="fixed inset-0 z-[9999] flex justify-center items-end sm:items-center bg-black/60 p-0 sm:p-4"
+        className="fixed inset-0 z-[9999] flex justify-center items-end sm:items-center bg-black/60 p-0 sm:p-4 overflow-y-auto scrollbar-hide"
         onClick={handleBackdropClick}
       >
         <div 
-          className={`${isLoading ? 'w-auto' : 'w-full sm:w-auto'} max-w-full sm:max-w-[90vw] max-h-[95vh] sm:max-h-[90vh] flex justify-center`}
+          className={`${isLoading ? 'w-auto' : 'w-full sm:w-auto'} max-w-full sm:max-w-[90vw] max-h-full sm:max-h-[90vh] flex justify-center`}
           onClick={(e) => e.stopPropagation()}
         >
           <GlassPanel 
@@ -66,7 +66,7 @@ export default function Modal({
                 <IoClose className={`size-5 sm:size-6 ${variant === 'light' ? 'text-gray-700' : 'text-white'}`}/>
               </button>
             )}
-            <div className="p-6 overflow-y-auto max-h-[85vh]">
+            <div className="p-6 overflow-y-auto max-h-[calc(100vh-4rem)] sm:max-h-[calc(85vh-2rem)] scrollbar-hide">
               {children}
             </div>
           </GlassPanel>

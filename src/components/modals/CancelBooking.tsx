@@ -7,8 +7,11 @@ import { getClientSession } from '@/src/lib/session';
 import toast from 'react-hot-toast';
 import actotaApi from '@/src/lib/apiClient';
 import { BookingType } from '../models/Itinerary';
-import { XCircleIcon, ArrowLeftIcon } from '@heroicons/react/20/solid';
+import { XCircleIcon, ArrowLeftIcon, ExclamationTriangleIcon } from '@heroicons/react/20/solid';
 import { ItineraryData } from '@/src/types/itineraries';
+import { useQueryClient } from '@tanstack/react-query';
+import moment from 'moment';
+import BaseCard from '../shared/BaseCard';
 
 interface CancelBookingProps {
   onClose: () => void;
@@ -18,7 +21,9 @@ interface CancelBookingProps {
 
 const CancelBooking = ({ onClose, booking, totalAmount }: CancelBookingProps) => {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [bookingData, setBookingData] = useState<BookingType | null>(booking || null);
   const [itineraryData, setItineraryData] = useState<ItineraryData | null>(null);
   const [amount, setAmount] = useState<number>(totalAmount || 0);
@@ -37,10 +42,63 @@ const CancelBooking = ({ onClose, booking, totalAmount }: CancelBookingProps) =>
     }
   }, [booking]);
 
+  // Helper function to parse MongoDB Extended JSON dates
+  const parseMongoDate = (dateValue: any): Date | null => {
+    if (!dateValue) return null;
+    
+    try {
+      if (dateValue instanceof Date) return dateValue;
+      
+      if (dateValue.$date) {
+        if (dateValue.$date.$numberLong) {
+          const timestamp = parseInt(dateValue.$date.$numberLong);
+          // TEMPORARY: Add 24 years to test dates from 2001
+          const date = new Date(timestamp);
+          if (date.getFullYear() < 2020) {
+            date.setFullYear(date.getFullYear() + 24);
+          }
+          return date;
+        }
+        if (typeof dateValue.$date === 'number') {
+          return new Date(dateValue.$date);
+        }
+        if (typeof dateValue.$date === 'string') {
+          return new Date(dateValue.$date);
+        }
+      }
+      
+      if (typeof dateValue === 'string' || typeof dateValue === 'number') {
+        return new Date(dateValue);
+      }
+    } catch (error) {
+      console.error('Error parsing date:', error);
+    }
+    
+    return null;
+  };
+
+  // Get formatted dates
+  const getFormattedDates = () => {
+    const startDate = parseMongoDate(bookingData?.start_date) || 
+                     parseMongoDate(bookingData?.arrival_datetime);
+    const endDate = parseMongoDate(bookingData?.end_date) || 
+                   parseMongoDate(bookingData?.departure_datetime);
+    
+    if (startDate && endDate) {
+      return `${moment(startDate).format('MMM D')} - ${moment(endDate).format('MMM D, YYYY')}`;
+    }
+    return 'Date not available';
+  };
+
   // Calculate refund amount (95% of total)
-  const refundAmount = amount * 0.95;
-  const cancellationFee = amount * 0.05;
+  const calculatedAmount = bookingData?.total_cost || itineraryData?.person_cost || amount || 0;
+  const refundAmount = calculatedAmount * 0.95;
+  const cancellationFee = calculatedAmount * 0.05;
   const handleCancelBooking = async () => {
+    if (!showConfirmation) {
+      setShowConfirmation(true);
+      return;
+    }
     if (!bookingData || !bookingData._id) {
       toast.error('Booking information not found');
       return;
@@ -78,11 +136,21 @@ const CancelBooking = ({ onClose, booking, totalAmount }: CancelBookingProps) =>
         // Clear stored booking data
         localStorage.removeItem('bookingDetails');
 
-        // Close modal and redirect
+        // Invalidate the bookings query to refresh the list
+        await queryClient.invalidateQueries({ queryKey: ['bookings'] });
+        
+        // Also invalidate the specific booking query if it exists
+        if (bookingId) {
+          await queryClient.invalidateQueries({ queryKey: ['bookingsById', bookingId] });
+        }
+
+        // Close modal
         onClose();
         
-        // Refresh the bookings list or redirect to bookings page
-        router.push('/profile/bookings');
+        // Stay on the same page - the list will refresh automatically
+        if (window.location.pathname !== '/profile/bookings') {
+          router.push('/profile/bookings');
+        }
       } else {
         toast.error(response.data.error || 'Failed to cancel booking');
       }
@@ -105,127 +173,222 @@ const CancelBooking = ({ onClose, booking, totalAmount }: CancelBookingProps) =>
   };
 
   return (
-    <div className='w-full max-w-[1200px] mx-auto p-4 sm:p-6 lg:p-8'>
-      <div className='flex flex-col items-center text-center mb-6'>
-        <div className='flex justify-center items-center bg-gradient-to-br from-[#D02B2B] to-[#6A0101] rounded-full h-[48px] w-[48px] sm:h-[64px] sm:w-[64px] mb-4'>
-          <XCircleIcon className='text-white size-6 sm:size-8' />
-        </div>
-        
-        <h2 className='text-white text-xl sm:text-2xl font-bold mb-2'>Cancel This Booking?</h2>
-        <p className='text-white text-sm sm:text-base mb-2 px-4'>
-          Are you sure you want to cancel this booking? You will receive a <b>95% refund</b> (5% cancellation fee).
-        </p>
-        
-        <p className="text-gray-400 text-xs sm:text-sm px-4">
-          By canceling, you agree to our{' '}
-          <a 
-            href="/profile/cancellation" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="text-blue-400 hover:text-blue-300 underline"
-            onClick={(e) => e.stopPropagation()}
-          >
-            cancellation policy
-          </a>
-          . Refunds typically process within 5-10 business days.
-        </p>
-      </div>
+    <div className='w-full max-w-[900px] mx-auto px-4 pb-4'>
+      {!showConfirmation ? (
+        <>
+          {/* Initial Cancellation Screen */}
+          <div className='flex flex-col items-center text-center mb-8'>
+            <div className='flex justify-center items-center bg-red-500/10 rounded-full h-16 w-16 mb-4'>
+              <ExclamationTriangleIcon className='text-red-500 size-8' />
+            </div>
+            
+            <h2 className='text-white text-2xl font-bold mb-3'>Cancel Your Booking?</h2>
+            <p className='text-gray-400 text-base max-w-lg'>
+              We're sorry to see you go. Please review your booking details and cancellation terms below.
+            </p>
+          </div>
 
-      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6'>
-        {/* Booking Details Card */}
-        <div className='bg-[#141414] rounded-2xl border border-primary-gray p-6'>
-          <p className='text-white font-bold mb-4'>Booking Details</p>
-          {bookingData && itineraryData && (
-            <>
-              <div className='flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6'>
-                <div className='flex-1'>
-                  <h3 className='text-lg sm:text-xl font-bold text-white'>{itineraryData.trip_name || 'Adventure Trip'}</h3>
-                  <p className='text-xs sm:text-sm text-primary-gray mt-1'>
-                    ID: {typeof bookingData._id === 'object' ? (bookingData._id as any).$oid?.slice(-8) : String(bookingData._id).slice(-8)}
-                  </p>
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6'>
+            {/* Booking Details Card */}
+            <BaseCard variant="subtle" className="p-6">
+              <h3 className='text-white font-semibold mb-4 flex items-center gap-2'>
+                <svg className='w-5 h-5 text-gray-400' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' />
+                </svg>
+                Booking Information
+              </h3>
+              {bookingData && itineraryData && (
+                <>
+                  <div className='mb-6'>
+                    <h4 className='text-lg font-bold text-white'>{itineraryData.trip_name || 'Adventure Trip'}</h4>
+                    <p className='text-sm text-gray-400 mt-1'>
+                      Booking ID: {typeof bookingData._id === 'object' ? (bookingData._id as any).$oid?.slice(-8) : String(bookingData._id).slice(-8)}
+                    </p>
+                  </div>
+                  
+                  <div className='space-y-3'>
+                    <div className='flex justify-between items-center py-2 border-b border-gray-800'>
+                      <span className='text-sm text-gray-400'>Travel Dates</span>
+                      <span className='text-sm text-white font-medium'>{getFormattedDates()}</span>
+                    </div>
+                    <div className='flex justify-between items-center py-2 border-b border-gray-800'>
+                      <span className='text-sm text-gray-400'>Duration</span>
+                      <span className='text-sm text-white font-medium'>
+                        {itineraryData.length_days} {itineraryData.length_days === 1 ? 'day' : 'days'}
+                      </span>
+                    </div>
+                    <div className='flex justify-between items-center py-2 border-b border-gray-800'>
+                      <span className='text-sm text-gray-400'>Guests</span>
+                      <span className='text-sm text-white font-medium'>
+                        {itineraryData.min_group || 1} - {itineraryData.max_group || 6} people
+                      </span>
+                    </div>
+                    <div className='flex justify-between items-center py-2 border-b border-gray-800'>
+                      <span className='text-sm text-gray-400'>Location</span>
+                      <span className='text-sm text-white font-medium'>
+                        {itineraryData.start_location?.city || 'Various Locations'}
+                      </span>
+                    </div>
+                    <div className='flex justify-between items-center py-2'>
+                      <span className='text-sm text-gray-400'>Booking Status</span>
+                      <span className='text-sm text-green-400 font-medium capitalize'>
+                        {bookingData.status || 'Confirmed'}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
+            </BaseCard>
+
+            {/* Refund Details Card */}
+            <BaseCard variant="subtle" className="p-6">
+              <h3 className='text-white font-semibold mb-4 flex items-center gap-2'>
+                <svg className='w-5 h-5 text-gray-400' fill='none' viewBox='0 0 24 24' stroke='currentColor'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' />
+                </svg>
+                Cancellation Terms
+              </h3>
+              
+              <div className='bg-red-500/10 border border-red-500/20 rounded-lg p-4 mb-4'>
+                <p className='text-sm text-red-400 flex items-start gap-2'>
+                  <ExclamationTriangleIcon className='w-5 h-5 flex-shrink-0 mt-0.5' />
+                  A 5% cancellation fee applies to all bookings
+                </p>
+              </div>
+              
+              <div className='space-y-3'>
+                <div className='flex justify-between items-center py-3 border-b border-gray-800'>
+                  <span className='text-sm text-gray-400'>Original Booking Amount</span>
+                  <span className='text-sm text-white font-medium'>${calculatedAmount.toFixed(2)}</span>
                 </div>
-                <div className='text-left sm:text-right'>
-                  <p className='text-xl sm:text-2xl font-bold text-white'>${itineraryData.person_cost || amount}</p>
-                  <p className='text-xs sm:text-sm text-primary-gray'>per person</p>
+                
+                <div className='flex justify-between items-center py-3 border-b border-gray-800'>
+                  <span className='text-sm text-gray-400'>Cancellation Fee (5%)</span>
+                  <span className='text-sm text-red-400 font-medium'>-${cancellationFee.toFixed(2)}</span>
+                </div>
+                
+                <div className='flex justify-between items-center py-3 bg-green-500/10 rounded-lg px-3'>
+                  <span className='text-base text-white font-semibold'>Refund Amount</span>
+                  <span className='text-lg text-green-400 font-bold'>${refundAmount.toFixed(2)}</span>
                 </div>
               </div>
               
-              <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-                <div>
-                  <p className='text-xs text-primary-gray mb-1'>Travel Dates</p>
-                  <p className='text-white text-sm'>
-                    {bookingData.start_date && bookingData.end_date ? 
-                      `${new Date(bookingData.start_date).toLocaleDateString()} - ${new Date(bookingData.end_date).toLocaleDateString()}` : 
-                      bookingData.arrival_datetime && bookingData.departure_datetime ?
-                      `${new Date(bookingData.arrival_datetime).toLocaleDateString()} - ${new Date(bookingData.departure_datetime).toLocaleDateString()}` :
-                      `${itineraryData.length_days || '-'} days`}
-                  </p>
-                </div>
-                <div>
-                  <p className='text-xs text-primary-gray mb-1'>Guests</p>
-                  <p className='text-white text-sm'>{itineraryData.min_group || 1} - {itineraryData.max_group || 6}</p>
-                </div>
-                <div>
-                  <p className='text-xs text-primary-gray mb-1'>Location</p>
-                  <p className='text-white text-sm'>
-                    {itineraryData.start_location?.city || 'Various Locations'}
-                  </p>
-                </div>
-                <div>
-                  <p className='text-xs text-primary-gray mb-1'>Status</p>
-                  <p className='text-white text-sm capitalize'>{bookingData.status || 'Confirmed'}</p>
-                </div>
+              <div className='mt-4 p-3 bg-gray-800/50 rounded-lg'>
+                <p className='text-xs text-gray-400'>
+                  <span className='font-medium'>Processing Time:</span> Refunds typically appear in your account within 5-10 business days.
+                </p>
               </div>
-            </>
-          )}
-        </div>
-
-        {/* Refund Details Card */}
-        <div className='bg-[#141414] rounded-2xl border border-primary-gray p-6'>
-          <p className='text-white font-bold mb-4'>Refund Details</p>
-          <div className='space-y-4'>
-            <div className='flex justify-between'>
-              <p className='text-sm text-primary-gray'>Original Amount</p>
-              <p className='text-sm text-white'>${amount.toFixed(2)}</p>
-            </div>
-            
-            <div className='flex justify-between'>
-              <p className='text-sm text-primary-gray'>Cancellation Fee (5%)</p>
-              <p className='text-sm text-red-400'>-${cancellationFee.toFixed(2)}</p>
-            </div>
-
-            <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent"></div>
-            
-            <div className='flex justify-between'>
-              <p className='text-white font-bold text-lg'>Refund Amount</p>
-              <p className='text-green-400 font-bold text-lg'>${refundAmount.toFixed(2)}</p>
-            </div>
+            </BaseCard>
           </div>
-        </div>
-      </div>
 
-      {/* Action Buttons */}
-      <div className='grid grid-cols-2 gap-3 max-w-md mx-auto'>
-        <Button 
-          size='md' 
-          variant='outline' 
-          className='!bg-black text-sm font-bold !py-3'
-          onClick={onClose}
-          disabled={isLoading}
-        >
-          Keep Booking
-        </Button>
-        
-        <Button 
-          size='md' 
-          variant='primary' 
-          className='!bg-red-600 hover:!bg-red-700 text-sm font-bold !py-3'
-          onClick={handleCancelBooking}
-          disabled={isLoading}
-        >
-          {isLoading ? 'Cancelling...' : 'Cancel Booking'}
-        </Button>
-      </div>
+          {/* Cancellation Policy Link */}
+          <div className='text-center mb-6'>
+            <p className='text-sm text-gray-400'>
+              By proceeding, you agree to our{' '}
+              <a 
+                href='/profile/cancellation' 
+                target='_blank' 
+                rel='noopener noreferrer'
+                className='text-blue-400 hover:text-blue-300 underline'
+                onClick={(e) => e.stopPropagation()}
+              >
+                cancellation policy
+              </a>
+            </p>
+          </div>
+
+          {/* Action Buttons */}
+          <div className='flex gap-3 max-w-md mx-auto'>
+            <Button 
+              size='md' 
+              variant='outline' 
+              className='flex-1 !bg-transparent !border-gray-600 hover:!bg-gray-800 text-white font-semibold'
+              onClick={onClose}
+              disabled={isLoading}
+            >
+              Keep My Booking
+            </Button>
+            
+            <Button 
+              size='md' 
+              variant='primary' 
+              className='flex-1 !bg-red-600 hover:!bg-red-700 text-white font-semibold'
+              onClick={handleCancelBooking}
+              disabled={isLoading}
+            >
+              Continue to Cancel
+            </Button>
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Confirmation Screen */}
+          <div className='flex flex-col items-center text-center mb-8'>
+            <div className='flex justify-center items-center bg-red-500/10 rounded-full h-16 w-16 mb-4'>
+              <XCircleIcon className='text-red-500 size-8' />
+            </div>
+            
+            <h2 className='text-white text-2xl font-bold mb-3'>Final Confirmation</h2>
+            <p className='text-gray-400 text-base max-w-lg mb-2'>
+              Are you absolutely sure you want to cancel this booking?
+            </p>
+            <p className='text-red-400 font-medium'>
+              This action cannot be undone.
+            </p>
+          </div>
+
+          {/* Summary Box */}
+          <BaseCard variant='bordered' className='p-6 mb-8 max-w-md mx-auto'>
+            <div className='space-y-3'>
+              <div className='flex justify-between items-center'>
+                <span className='text-gray-400'>Trip</span>
+                <span className='text-white font-medium'>{itineraryData?.trip_name || 'Adventure Trip'}</span>
+              </div>
+              <div className='flex justify-between items-center'>
+                <span className='text-gray-400'>Dates</span>
+                <span className='text-white font-medium'>{getFormattedDates()}</span>
+              </div>
+              <div className='border-t border-gray-800 pt-3 flex justify-between items-center'>
+                <span className='text-gray-400'>You will receive</span>
+                <span className='text-green-400 font-bold text-lg'>${refundAmount.toFixed(2)}</span>
+              </div>
+            </div>
+          </BaseCard>
+
+          {/* Final Action Buttons */}
+          <div className='flex gap-3 max-w-md mx-auto'>
+            <Button 
+              size='md' 
+              variant='outline' 
+              className='flex-1 !bg-transparent !border-gray-600 hover:!bg-gray-800 text-white font-semibold'
+              onClick={() => setShowConfirmation(false)}
+              disabled={isLoading}
+            >
+              Go Back
+            </Button>
+            
+            <Button 
+              size='md' 
+              variant='primary' 
+              className='flex-1 !bg-red-600 hover:!bg-red-700 text-white font-semibold'
+              onClick={handleCancelBooking}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <span className='flex items-center gap-2'>
+                  <svg className='animate-spin h-4 w-4' viewBox='0 0 24 24'>
+                    <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' fill='none'></circle>
+                    <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'></path>
+                  </svg>
+                  Cancelling...
+                </span>
+              ) : (
+                'Confirm Cancellation'
+              )}
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
