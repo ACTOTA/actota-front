@@ -9,34 +9,41 @@ export async function POST(request: NextRequest) {
     const searchParams = await request.json();
     console.log('Search params received:', searchParams);
 
-    try {
-      // Forward the search parameters to the backend API
-      const response = await actotaApi.post('/api/itineraries', searchParams);
-      const data = response.data;
+    // Validate and format the request body according to backend expectations
+    const formattedParams = {
+      locations: searchParams.locations || [],
+      duration: searchParams.duration || [],
+      guests: searchParams.guests || [],
+      activities: searchParams.activities || [],
+      adults: searchParams.adults || 1,
+      children: searchParams.children || 0,
+      infants: searchParams.infants || 0,
+      lodging: searchParams.lodging || [],
+      transportation: searchParams.transportation || ""
+    };
 
-      console.log('Backend API response:', data);
+    console.log('Formatted params for backend:', formattedParams);
 
-      return NextResponse.json({
-        success: true,
-        message: "Search results fetched successfully",
-        data: data
-      });
-    } catch (apiError) {
-      console.error('Backend API error:', apiError);
+    // Forward the search parameters to the backend API
+    const response = await actotaApi.post('/itineraries/search', formattedParams);
+    const data = response.data;
 
-      // For now, return a mock success response for testing purposes
-      return NextResponse.json({
-        success: true,
-        message: "Mock search results (backend API not available)",
-        data: {
-          results: []
-        }
-      });
-    }
-  } catch (error) {
+    console.log('Backend API response:', data);
+
+    return NextResponse.json({
+      success: true,
+      message: "Search results fetched successfully",
+      data: data
+    });
+  } catch (error: any) {
     console.error('Search route error:', error);
+    console.error('Error response data:', error.response?.data);
+    
     return NextResponse.json(
-      { success: false, error: 'Failed to process search request' },
+      { 
+        success: false, 
+        error: error.response?.data || error.message || 'Failed to process search request'
+      },
       { status: 500 }
     );
   }

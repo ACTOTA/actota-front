@@ -161,7 +161,22 @@ export default function SignIn() {
   const handleGoogleLogin = async () => {
     // Don't show loading modal for Google login, just redirect directly
     try {
-      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`;
+      // Get the current page to redirect back to after login
+      const currentUrl = window.location.href;
+      const redirectTo = new URLSearchParams(window.location.search).get('redirectTo') || '/';
+      
+      // Construct Google OAuth URL
+      const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '376159580039-vsob610m0blkp0qm1uuvhgle4ok44ild.apps.googleusercontent.com';
+      const redirectUri = `${window.location.origin}/api/auth/callback/google`;
+      
+      const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+        `client_id=${googleClientId}&` +
+        `redirect_uri=${encodeURIComponent(redirectUri)}&` +
+        `response_type=code&` +
+        `scope=email%20profile&` +
+        `state=${encodeURIComponent(redirectTo)}`;
+      
+      window.location.href = googleAuthUrl;
     } catch (error) {
       router.back();
       console.error('Google login error:', error);

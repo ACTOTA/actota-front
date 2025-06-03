@@ -6,20 +6,15 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
 
-    // TODO: Replace with Actota API
-    // TODO: replace env public api url to use local host
-
-    const response = await actotaApi.get('/api/itineraries/featured');
-
-   
+    const response = await actotaApi.get('/itineraries/featured');
 
     const data = response.data;
 
-    return NextResponse.json({success: true, message: "Itineraries fetched successfully",data: data});
+    return NextResponse.json({success: true, message: "Itineraries fetched successfully", data: data});
   } catch (error) {
     console.error('Fetch error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch activities' },
+      { error: 'Failed to fetch itineraries' },
       { status: 500 }
     );
   }

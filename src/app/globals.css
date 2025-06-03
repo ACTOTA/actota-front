@@ -101,6 +101,11 @@ body::-webkit-scrollbar,
   background: transparent;
 }
 
+/* Safe area insets for iOS devices */
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 .PhoneInputInput {
   background-color: black !important;
 }

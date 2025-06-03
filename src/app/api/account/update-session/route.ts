@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     let sessionResponse;
     try {
       sessionResponse = await actotaApi.get(
-        "/api/auth/session",
+        "/auth/session",
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       // Call the backend to update the user with the customer_id
       // This endpoint would need to be created on the backend if it doesn't exist
       await actotaApi.post(
-        `/api/account/${userId}/update-customer-id`,
+        `/account/${userId}/update-customer-id`,
         { customer_id: customerId },
         {
           headers: {

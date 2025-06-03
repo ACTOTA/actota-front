@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 		}
 
 		// Verify booking_id is provided if needed
-		const response = await actotaApi.post("/api/payment/capture-payment",
+		const response = await actotaApi.post("/payment/capture-payment",
 			{
 				user_id,
 				payment_intent_id,

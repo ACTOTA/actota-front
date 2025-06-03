@@ -10,10 +10,10 @@ export default function ProfileLayout({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="relative flex max-w-[1280px] mx-auto pt-20">
+    <div className="relative flex max-w-[1280px] mx-auto pt-0 sm:pt-20">
       {/* Mobile Menu Button */}
       {!isSidebarOpen && <button
-        className="md:hidden absolute top-[70px] left-4 z-30 flex items-center gap-2 text-white"
+        className="md:hidden absolute top-4 left-4 z-30 flex items-center gap-2 text-white"
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -24,7 +24,7 @@ export default function ProfileLayout({
       {/* Sidebar with responsive classes */}
       <div className={`
         md:relative md:translate-x-0 md:block bg-black
-        fixed max-md:top-20 top-2 left-0 h-full max-md:w-full z-20 transform transition-transform duration-300 ease-in-out
+        fixed max-md:top-0 top-2 left-0 h-full max-md:w-full z-20 transform transition-transform duration-300 ease-in-out
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <Sidebar onItemClick={() => { setIsSidebarOpen(false) }} />

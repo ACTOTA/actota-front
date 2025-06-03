@@ -24,14 +24,6 @@ module.exports = {
   publicRuntimeConfig,
   // Ensure environment variables are available during build and runtime
   env: publicRuntimeConfig,
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
-      },
-    ]
-  },
   webpack: (config, { isServer }) => {
     // Add SVG support
     config.module.rules.push({

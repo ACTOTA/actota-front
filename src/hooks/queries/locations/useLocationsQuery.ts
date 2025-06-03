@@ -26,7 +26,7 @@ async function searchLocations(params: SearchParams): Promise<SearchResponse> {
   if (params.page) searchParams.set('page', params.page.toString());
   if (params.limit) searchParams.set('limit', params.limit.toString());
 
-  const response = await actotaApi.get(`/api/locations?${searchParams.toString()}`);
+  const response = await actotaApi.get(`/locations?${searchParams.toString()}`);
   return response.data;
 }
 
@@ -41,7 +41,7 @@ export function useLocationsSearch(params: SearchParams) {
 
 async function getAllLocations() {
   try {
-    const response = await actotaApi.get('/api/locations');
+    const response = await actotaApi.get('/locations');
     return response.data;
   } catch (error) {
     console.error('Error fetching getAllLocations:', error);

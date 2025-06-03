@@ -1,10 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
 
 interface SearchParams {
-  locations?: string[];
-  duration?: string[];
-  guests?: string[];
-  activities?: string[];
+  locations?: string[];        // array of strings
+  duration?: number[];         // array of numbers
+  guests?: number[];           // array of numbers
+  activities?: string[];       // array of strings
+  adults?: number;             // optional number
+  children?: number;           // optional number
+  infants?: number;            // optional number
+  lodging?: string[];          // optional array of strings
+  transportation?: string;     // optional string
 }
 
 interface SearchItinerariesResponse {

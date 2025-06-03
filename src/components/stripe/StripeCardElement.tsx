@@ -135,7 +135,7 @@ const StripeCardForm = ({
 
             // Update the session with the customer_id
             try {
-              await actotaApi.post('/api/account/update-session', {
+              await actotaApi.post('/account/update-session', {
                 customerId
               });
 

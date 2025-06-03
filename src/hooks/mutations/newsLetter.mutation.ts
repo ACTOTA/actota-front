@@ -13,7 +13,7 @@ const useNewsLetterSubscribe = () => {
     mutationFn: async (email: string) => {
       try {
         const response = await actotaApi.post<NewsletterResponse>(
-          '/api/newsletter/subscribe',
+          '/newsletter/subscribe',
           { email }
         );
         return response.data;
@@ -35,7 +35,7 @@ const useNewsLetterUnsubscribe = () => {
     mutationFn: async (email: string) => {
       try {
         const response = await actotaApi.put<NewsletterResponse>(
-          '/api/newsletter/unsubscribe',
+          '/newsletter/unsubscribe',
           { email }
         );
         return response.data;

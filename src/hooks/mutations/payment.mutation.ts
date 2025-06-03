@@ -77,7 +77,7 @@ export const useAttachPaymentMethod = (): UseMutationResult<
         customerId = session.user.customer_id;
       } else {
         // If not, call the backend API to get or create a Stripe customer ID
-        const customerResponse = await actotaApi.post(`/api/account/${userId}/customer`);
+        const customerResponse = await actotaApi.post(`/account/${userId}/customer`);
         customerId = customerResponse.data.customer_id;
 
         if (!customerId) {
@@ -92,7 +92,7 @@ export const useAttachPaymentMethod = (): UseMutationResult<
 
           // Also update the server-side session
           try {
-            await actotaApi.post('/api/account/update-session', {
+            await actotaApi.post('/account/update-session', {
               customerId
             });
             console.log('Server-side session updated with customer_id');
@@ -109,7 +109,7 @@ export const useAttachPaymentMethod = (): UseMutationResult<
       try {
         // Make an API call to attach the payment method to the customer on Stripe's servers
         // This goes through our Next.js API route which then calls the backend service
-        const response = await actotaApi.post(`/api/account/${userId}/payment-methods/attach`, {
+        const response = await actotaApi.post(`/account/${userId}/payment-methods/attach`, {
           customer_id: customerId,
           payment_id: values.paymentMethodId,
           default: values.setAsDefault
@@ -239,7 +239,7 @@ export const useSetDefaultPaymentMethod = (): UseMutationResult<
           customerId = session.user.customer_id;
         } else {
           // If not, call the backend API to get or create a Stripe customer ID
-          const customerResponse = await actotaApi.post(`/api/account/${userId}/customer`);
+          const customerResponse = await actotaApi.post(`/account/${userId}/customer`);
           customerId = customerResponse.data.customer_id;
 
           if (!customerId) {
@@ -326,7 +326,7 @@ export const useDeletePaymentMethod = (): UseMutationResult<
           customerId = session.user.customer_id;
         } else {
           // If not, call the backend API to get or create a Stripe customer ID
-          const customerResponse = await actotaApi.post(`/api/account/${userId}/customer`);
+          const customerResponse = await actotaApi.post(`/account/${userId}/customer`);
           customerId = customerResponse.data.customer_id;
 
           if (!customerId) {
@@ -344,7 +344,7 @@ export const useDeletePaymentMethod = (): UseMutationResult<
         console.log(`Deleting payment method ${paymentMethodId} for customer: ${customerId}`);
 
         // Make the actual API call to delete the payment method
-        await actotaApi.post(`/api/account/${userId}/payment-methods/detach`, {
+        await actotaApi.post(`/account/${userId}/payment-methods/detach`, {
           customer_id: customerId,
           payment_method_id: paymentMethodId
         });

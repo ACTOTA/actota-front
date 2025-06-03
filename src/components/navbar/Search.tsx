@@ -266,7 +266,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
       )}
 
       <div 
-        className={`relative ${navbar ? '' : `max-lg:fixed max-lg:left-0 max-lg:right-0 max-lg:z-50 max-lg:transition-all max-lg:duration-300 ${currStep != null ? 'max-lg:bottom-0 max-lg:px-2' : 'max-lg:bottom-5 max-lg:px-2'}`}`} 
+        className={`relative ${navbar ? '' : `max-lg:fixed max-lg:left-0 max-lg:right-0 max-lg:z-40 max-lg:transition-all max-lg:duration-300 ${currStep != null ? 'max-lg:bottom-16 max-lg:px-2' : 'max-lg:bottom-20 max-lg:px-4'}`}`} 
         id="search-bar"
         onTouchStart={currStep != null ? handleTouchStart : undefined}
         onTouchMove={currStep != null ? handleTouchMove : undefined}
