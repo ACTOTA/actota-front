@@ -62,7 +62,15 @@ const filterStyles = {
 };
 
 export default function FeaturedItineraries() {
-  const { data: itineraries, isLoading: itinerariesLoading, error: itinerariesError } = useItineraries();
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [allListings, setAllListings] = useState<any[]>([]);
+  const [hasMoreData, setHasMoreData] = useState(true);
+  
+  const { data: itineraries, isLoading: itinerariesLoading, error: itinerariesError } = useItineraries({ 
+    page: currentPage, 
+    limit: 10 
+  });
   const { data: favorites, isLoading: favoritesLoading, error: favoritesError } = useFavorites();
   const [listings, setListings] = React.useState<any[]>([]);
   
@@ -73,13 +81,32 @@ export default function FeaturedItineraries() {
   const [selectedSort, setSelectedSort] = useState('featured');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
+  // Effect to accumulate data from multiple pages
   useEffect(() => {
-    if (itineraries) {
-      let filteredListings = itineraries?.data.map((listing: any) =>
+    if (itineraries?.data) {
+      const newListings = itineraries.data.map((listing: any) =>
         favorites?.some((favorite: any) => favorite._id.$oid === listing._id.$oid)
           ? { ...listing, isFavorite: true }
           : listing
       );
+
+      if (currentPage === 1) {
+        // First page - replace all listings
+        setAllListings(newListings);
+      } else {
+        // Additional pages - append to existing listings
+        setAllListings(prev => [...prev, ...newListings]);
+      }
+
+      // Check if we have more data (if we received less than the limit, no more data)
+      setHasMoreData(newListings.length === 10);
+    }
+  }, [itineraries, favorites, currentPage]);
+
+  // Effect to apply filters and sorting to accumulated data
+  useEffect(() => {
+    if (allListings.length > 0) {
+      let filteredListings = [...allListings];
 
       // Apply filters
       filteredListings = applyFilters(filteredListings);
@@ -89,7 +116,7 @@ export default function FeaturedItineraries() {
 
       setListings(filteredListings);
     }
-  }, [itineraries, favorites, selectedTheme, selectedPrice, selectedDuration, selectedSort]);
+  }, [allListings, selectedTheme, selectedPrice, selectedDuration, selectedSort]);
 
   const applyFilters = (listings: any[]) => {
     let filtered = [...listings];
@@ -148,6 +175,12 @@ export default function FeaturedItineraries() {
 
   const activeFiltersCount = [selectedTheme, selectedPrice, selectedDuration]
     .filter(filter => filter !== 'all').length;
+
+  const loadMore = () => {
+    if (hasMoreData && !itinerariesLoading) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
 
   return (
     <section className="w-full text-white bg-black">
@@ -307,14 +340,22 @@ export default function FeaturedItineraries() {
         </div>
 
         {/* Load More Section */}
-        {listings.length > 0 && listings.length < (itineraries?.data?.length || 0) && (
+        {hasMoreData && !itinerariesLoading && listings.length > 0 && (
           <div className="flex flex-col items-center mt-12 gap-4">
             <Button 
+              onClick={loadMore}
               variant="primary" 
               className="bg-white text-black hover:bg-gray-100 px-8 py-3 rounded-xl font-medium transition-colors"
             >
               Load More
             </Button>
+          </div>
+        )}
+
+        {/* Loading More Indicator */}
+        {itinerariesLoading && currentPage > 1 && (
+          <div className="flex justify-center mt-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
           </div>
         )}
       </div>

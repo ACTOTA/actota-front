@@ -142,8 +142,19 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
       locationValue.forEach(loc => params.append('location', loc));
     }
 
-    if (durationValue.length > 0) {
-      durationValue.forEach(dur => params.append('duration', dur));
+    // Handle duration as datetime data
+    if (durationValue.length > 0 && durationValue[0]) {
+      try {
+        const dateTimeData = JSON.parse(durationValue[0]);
+        if (dateTimeData.arrival_datetime) {
+          params.append('arrival_datetime', dateTimeData.arrival_datetime);
+        }
+        if (dateTimeData.departure_datetime) {
+          params.append('departure_datetime', dateTimeData.departure_datetime);
+        }
+      } catch (error) {
+        console.error('Error parsing datetime data:', error);
+      }
     }
 
     if (guestsValue.length > 0) {

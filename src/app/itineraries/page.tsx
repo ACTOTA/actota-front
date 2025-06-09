@@ -42,26 +42,32 @@ const Itineraries = () => {
 
     // Get search parameters from URL as arrays
     const searchLocation = searchParams.getAll('location') || [];
-    const searchDuration = searchParams.getAll('duration') || [];
+    const arrivalDateTime = searchParams.get('arrival_datetime') || '';
+    const departureDateTime = searchParams.get('departure_datetime') || '';
     const searchGuests = searchParams.getAll('guests') || [];
     const searchActivities = searchParams.getAll('activities') || [];
 
     // Determine if we're in search mode
-    const isSearchMode = !!(searchLocation.length || searchDuration.length || searchGuests.length || searchActivities.length);
+    const isSearchMode = !!(searchLocation.length || arrivalDateTime || departureDateTime || searchGuests.length || searchActivities.length);
 
     // Use the appropriate query based on whether we're searching or not
     const {
         data: itineraries,
         isLoading: itinerariesLoading,
+        isFetching: itinerariesFetching,
         error: itinerariesError
     } = isSearchMode
             ? useSearchItineraries({
                 locations: searchLocation,
-                duration: searchDuration.map(d => parseInt(d)).filter(d => !isNaN(d)),
+                arrival_datetime: arrivalDateTime,
+                departure_datetime: departureDateTime,
                 guests: searchGuests.map(g => parseInt(g)).filter(g => !isNaN(g)),
                 activities: searchActivities
             })
             : useItineraries();
+
+    // Determine if we should show loading (either initial loading or fetching new data)
+    const isLoadingOrFetching = itinerariesLoading || itinerariesFetching;
 
     const { data: favorites, isLoading: favoritesLoading, error: favoritesError } = useFavorites();
 
@@ -175,8 +181,17 @@ const Itineraries = () => {
         }
     }, [listings, filters, sortBy]);
 
+    // Clear listings when starting a new search
     useEffect(() => {
-        if (itineraries && itineraries.data) {
+        if (isSearchMode && itinerariesFetching && !itinerariesLoading) {
+            // Clear previous results when fetching new search results
+            setListings([]);
+        }
+    }, [isSearchMode, itinerariesFetching, itinerariesLoading]);
+
+    useEffect(() => {
+        // Only update listings when we have data and we're not currently fetching
+        if (itineraries && itineraries.data && !isLoadingOrFetching) {
 
             // Check if data is an array or nested in another property
             let dataToUse = Array.isArray(itineraries.data)
@@ -197,11 +212,13 @@ const Itineraries = () => {
                 console.error('Error processing itineraries data:', error);
                 setListings([]);
             }
-        } else {
+        } else if (!itineraries || !itineraries.data) {
             console.log('No itineraries data available');
-            setListings([]);
+            if (!isLoadingOrFetching) {
+                setListings([]);
+            }
         }
-    }, [itineraries, favorites]);
+    }, [itineraries, favorites, isLoadingOrFetching]);
     
     return (
         <div className="max-w-[1440px] mx-auto">
@@ -263,13 +280,15 @@ const Itineraries = () => {
                     </div>
                     
                     <div className='max-sm:hidden'>
-                        {itinerariesLoading &&
-                            <div className="text-white text-center py-10">Loading itineraries...</div>
+                        {isLoadingOrFetching &&
+                            <div className="text-white text-center py-10">
+                                {isSearchMode ? "Searching itineraries..." : "Loading itineraries..."}
+                            </div>
                         }
                         {itinerariesError &&
                             <div className="text-red-500 text-center py-10">Error: {itinerariesError.message}</div>
                         }
-                        {!itinerariesLoading && !itinerariesError && filteredListings.length === 0 && (
+                        {!isLoadingOrFetching && !itinerariesError && filteredListings.length === 0 && (
                             <div className="text-white text-center py-10">
                                 {isSearchMode
                                     ? "No itineraries found matching your search criteria. Try adjusting your filters."
@@ -278,19 +297,21 @@ const Itineraries = () => {
                                         : "No itineraries match your current filters. Try adjusting your criteria."}
                             </div>
                         )}
-                        {filteredListings.length > 0 && filteredListings.map((listing, i) => (
+                        {!isLoadingOrFetching && filteredListings.length > 0 && filteredListings.map((listing, i) => (
                             <ItineraryCard key={i} data={listing} />
                         ))}
                     </div>
                     
                     <div className='sm:hidden flex flex-col'>
-                        {itinerariesLoading &&
-                            <div className="text-white text-center py-5">Loading itineraries...</div>
+                        {isLoadingOrFetching &&
+                            <div className="text-white text-center py-5">
+                                {isSearchMode ? "Searching..." : "Loading..."}
+                            </div>
                         }
                         {itinerariesError &&
                             <div className="text-red-500 text-center py-5">Error: {itinerariesError.message}</div>
                         }
-                        {!itinerariesLoading && !itinerariesError && filteredListings.length === 0 && (
+                        {!isLoadingOrFetching && !itinerariesError && filteredListings.length === 0 && (
                             <div className="text-white text-center py-5">
                                 {isSearchMode
                                     ? "No itineraries found matching your search criteria."
@@ -299,12 +320,12 @@ const Itineraries = () => {
                                         : "No itineraries match your current filters. Try adjusting your criteria."}
                             </div>
                         )}
-                        {filteredListings.length > 0 && filteredListings.map((listing, i) => (
+                        {!isLoadingOrFetching && filteredListings.length > 0 && filteredListings.map((listing, i) => (
                             <ListingCard key={i} data={listing} />
                         ))}
                     </div>
                     
-                    {filteredListings.length > 0 && (
+                    {!isLoadingOrFetching && filteredListings.length > 0 && (
                         <div className="flex justify-center flex-col items-center pt-6">
                             <p className="text-white text-xl font-bold">See More Itineraries</p>
                             <Button variant="primary" className="bg-white text-black mt-4 ">Load More</Button>

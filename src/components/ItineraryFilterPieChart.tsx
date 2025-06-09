@@ -1,13 +1,20 @@
 import React from 'react';
 import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from 'recharts';
 
-const data = [
-    { name: 'Activities', value: 40 },
-    { name: 'Lodging', value: 40 },
-    { name: 'Transportation', value: 30 },
-];
 const COLORS = ['#0252D0', '#C10B2F', '#988316',];
-export default function ItineraryFilterPieChart() {
+
+interface ItineraryFilterPieChartProps {
+    data?: { name: string; value: number }[];
+}
+
+export default function ItineraryFilterPieChart({ data: propData }: ItineraryFilterPieChartProps) {
+    const defaultData = [
+        { name: 'Activities', value: 40 },
+        { name: 'Lodging', value: 40 },
+        { name: 'Transportation', value: 30 },
+    ];
+    
+    const data = propData || defaultData;
     return (
         <PieChart width={100} height={100} onMouseEnter={() => { }}>
             <Pie

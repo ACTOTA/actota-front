@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 
 interface SearchParams {
   locations?: string[];        // array of strings
-  duration?: number[];         // array of numbers
+  arrival_datetime?: string;   // ISO datetime string
+  departure_datetime?: string; // ISO datetime string
   guests?: number[];           // array of numbers
   activities?: string[];       // array of strings
   adults?: number;             // optional number
@@ -52,5 +53,7 @@ export function useSearchItineraries(searchParams: SearchParams) {
     enabled: !!Object.values(searchParams).some(value =>
       Array.isArray(value) ? value.length > 0 : !!value
     ),
+    staleTime: 0, // Always consider data stale to prevent showing cached results
+    refetchOnMount: true, // Always refetch when component mounts
   });
 }

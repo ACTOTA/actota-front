@@ -1,13 +1,14 @@
 'use client'
 import { useRouter } from 'next/navigation';
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import Image from 'next/image';
 import { FaPersonWalking } from 'react-icons/fa6';
 import { GoClock } from "react-icons/go";
 import { LuUsers } from "react-icons/lu";
 import { IoLeafOutline } from "react-icons/io5";
 import { MdOutlineDirectionsCarFilled } from 'react-icons/md';
+import { AiOutlineInfoCircle } from 'react-icons/ai';
 import LikeDislike from './LikeDislike';
 interface ListingCardProps {
     data: any;
@@ -25,6 +26,7 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
     actionId = "",
 }) => {
     const router = useRouter();
+    const [showTooltip, setShowTooltip] = useState(false);
 
     const handleCancel = useCallback(
         (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -48,7 +50,7 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
                        border border-gray-800/50 hover:border-gray-700/50 mt-4 max-w-[864px]'
         >
             {/* Main Content */}
-            <div className='flex gap-6 p-6'>
+            <div className='flex max-sm:flex-col gap-6 max-sm:gap-4 p-6 max-sm:p-4'>
                 {/* Left Content */}
                 <div className='flex-1 space-y-4'>
                     {/* Header with Title and Price */}
@@ -118,7 +120,7 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
                 </div>
 
                 {/* Right Image */}
-                <div className='relative w-64 h-48 rounded-xl overflow-hidden flex-shrink-0'>
+                <div className='relative w-64 h-48 sm:w-64 sm:h-48 max-sm:w-full max-sm:h-40 rounded-xl overflow-hidden flex-shrink-0'>
                     <Image 
                         src={data.images[0] || '/images/default-itinerary.jpeg'} 
                         alt={data?.trip_name}
@@ -128,6 +130,108 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
                     
                     {/* Gradient Overlay */}
                     <div className='absolute inset-0 bg-gradient-to-t from-black/30 to-transparent' />
+                    
+                    {/* Match Score Indicator */}
+                    {data?.match_score && (
+                        <div className='absolute top-2 left-2 sm:top-3 sm:left-3 z-20'>
+                            <div 
+                                className='relative w-16 h-16 sm:w-20 sm:h-20 cursor-help transition-all hover:scale-110'
+                                onMouseEnter={() => setShowTooltip(true)}
+                                onMouseLeave={() => setShowTooltip(false)}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowTooltip(!showTooltip);
+                                }}
+                            >
+                                {/* Circular Progress Ring */}
+                                <svg 
+                                    className='w-full h-full transform -rotate-90' 
+                                    viewBox='0 0 42 42'
+                                >
+                                    {/* Background Circle */}
+                                    <circle
+                                        cx='21'
+                                        cy='21'
+                                        r='15.915'
+                                        fill='transparent'
+                                        stroke='rgba(0, 0, 0, 0.3)'
+                                        strokeWidth='3'
+                                    />
+                                    {/* Progress Circle */}
+                                    <circle
+                                        cx='21'
+                                        cy='21'
+                                        r='15.915'
+                                        fill='transparent'
+                                        stroke={(() => {
+                                            const score = data.match_score;
+                                            if (score >= 80) return '#10b981'; // green-500
+                                            if (score >= 60) return '#eab308'; // yellow-500
+                                            if (score >= 40) return '#f97316'; // orange-500
+                                            return '#ef4444'; // red-500
+                                        })()}
+                                        strokeWidth='3'
+                                        strokeDasharray={`${data.match_score} ${100 - data.match_score}`}
+                                        strokeLinecap='round'
+                                        className='transition-all duration-300'
+                                    />
+                                </svg>
+                                
+                                {/* Center Content */}
+                                <div className='absolute inset-0 flex flex-col items-center justify-center text-white'>
+                                    <span className='text-xs sm:text-sm font-bold leading-none'>
+                                        {data.match_score}%
+                                    </span>
+                                    <span className='text-[10px] sm:text-xs font-medium opacity-90 leading-none'>
+                                        Match
+                                    </span>
+                                </div>
+                                
+                                {/* Tooltip */}
+                                {showTooltip && data?.score_breakdown && (
+                                    <div className='absolute top-full left-0 sm:left-0 max-sm:right-0 max-sm:left-auto 
+                                                    mt-2 w-64 max-sm:w-72 bg-gray-900/95 backdrop-blur-sm 
+                                                    rounded-lg border border-gray-700/50 p-4 shadow-xl z-50
+                                                    max-sm:transform max-sm:-translate-x-full'
+                                         onClick={(e) => e.stopPropagation()}>
+                                        <h4 className='text-sm font-semibold text-white mb-3 border-b border-gray-700 pb-2'>
+                                            Match Score Breakdown
+                                        </h4>
+                                        <div className='space-y-2'>
+                                            {Object.entries(data.score_breakdown).map(([key, score]) => {
+                                                const label = key.replace('_score', '').replace('_', ' ');
+                                                const formattedLabel = label.charAt(0).toUpperCase() + label.slice(1);
+                                                const scoreValue = typeof score === 'number' ? score : 0;
+                                                
+                                                return (
+                                                    <div key={key} className='flex justify-between items-center'>
+                                                        <span className='text-xs text-gray-300'>{formattedLabel}:</span>
+                                                        <div className='flex items-center gap-2'>
+                                                            <div className='w-16 h-1.5 bg-gray-700 rounded-full overflow-hidden'>
+                                                                <div 
+                                                                    className='h-full bg-gradient-to-r from-yellow-500 to-yellow-400 rounded-full'
+                                                                    style={{ width: `${Math.min(scoreValue * 5, 100)}%` }}
+                                                                />
+                                                            </div>
+                                                            <span className='text-xs font-medium text-yellow-400 min-w-[2rem] text-right'>
+                                                                {scoreValue}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                        <div className='mt-3 pt-2 border-t border-gray-700'>
+                                            <div className='flex justify-between items-center'>
+                                                <span className='text-xs font-semibold text-white'>Total Match:</span>
+                                                <span className='text-sm font-bold text-yellow-400'>{data.match_score}%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
                     
                     {/* Action Buttons */}
                     <div className='absolute top-3 right-3 flex gap-2'>

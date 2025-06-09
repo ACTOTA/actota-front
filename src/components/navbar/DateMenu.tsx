@@ -33,14 +33,40 @@ export default function DateMenu({ updateSearchValue, durationValue, className }
   const updateDurationSummary = () => {
     let summary = '';
 
-    // Exact dates mode
     if (startDate && endDate) {
-      summary = `${startDate} - ${endDate}`;
+      // Create ISO datetime strings with time information
+      const arrivalDateTime = `${startDate}T${startTime}:00`;
+      const departureDateTime = `${endDate}T${endTime}:00`;
+      
+      // Send both datetime values as a JSON string for the search
+      const dateTimeData = JSON.stringify({
+        arrival_datetime: arrivalDateTime,
+        departure_datetime: departureDateTime
+      });
+      
+      // Calculate duration for display
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const timeDiff = end.getTime() - start.getTime();
+      const durationDays = Math.max(1, Math.ceil(timeDiff / (1000 * 3600 * 24)));
+      summary = `${durationDays} ${durationDays === 1 ? 'day' : 'days'}`;
+      
+      updateSearchValue?.(dateTimeData);
     } else if (startDate) {
-      summary = startDate;
+      // Single date - same arrival and departure
+      const arrivalDateTime = `${startDate}T${startTime}:00`;
+      const departureDateTime = `${startDate}T${endTime}:00`;
+      
+      const dateTimeData = JSON.stringify({
+        arrival_datetime: arrivalDateTime,
+        departure_datetime: departureDateTime
+      });
+      
+      summary = '1 day';
+      updateSearchValue?.(dateTimeData);
+    } else {
+      updateSearchValue?.('');
     }
-
-    updateSearchValue?.(summary);
   };
 
   const getDateRangeDisplay = () => {

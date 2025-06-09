@@ -12,12 +12,12 @@ export async function POST(request: NextRequest) {
     // Validate and format the request body according to backend expectations
     const formattedParams = {
       locations: searchParams.locations || [],
-      duration: searchParams.duration || [],
-      guests: searchParams.guests || [],
-      activities: searchParams.activities || [],
-      adults: searchParams.adults || 1,
+      arrival_datetime: searchParams.arrival_datetime || null,
+      departure_datetime: searchParams.departure_datetime || null,
+      adults: searchParams.adults || (searchParams.guests && searchParams.guests.length > 0 ? searchParams.guests[0] : 2),
       children: searchParams.children || 0,
       infants: searchParams.infants || 0,
+      activities: searchParams.activities || [],
       lodging: searchParams.lodging || [],
       transportation: searchParams.transportation || ""
     };

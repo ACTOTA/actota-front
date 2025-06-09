@@ -1,12 +1,26 @@
 import actotaApi from '@/src/lib/apiClient';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-
-    const response = await actotaApi.get('/itineraries/featured');
+    // Extract pagination parameters from query string
+    const { searchParams } = new URL(request.url);
+    const page = searchParams.get('page');
+    const limit = searchParams.get('limit');
+    
+    // Build query parameters for backend
+    const queryParams = new URLSearchParams();
+    if (page) {
+      queryParams.append('page', page);
+    }
+    if (limit) {
+      queryParams.append('limit', limit);
+    }
+    
+    const backendUrl = `/itineraries/featured${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const response = await actotaApi.get(backendUrl);
 
     const data = response.data;
 
