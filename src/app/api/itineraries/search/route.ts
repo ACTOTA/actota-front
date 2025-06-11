@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     console.log('Formatted params for backend:', formattedParams);
 
     // Forward the search parameters to the backend API
-    const response = await actotaApi.post('/api/itineraries/search', formattedParams);
+    const response = await actotaApi.post('/itineraries/search', formattedParams);
     const data = response.data;
 
     console.log('Backend API response:', data);

@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       queryParams.append('limit', limit);
     }
     
-    const backendUrl = `/api/itineraries/featured${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const backendUrl = `/itineraries/featured${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     const response = await actotaApi.get(backendUrl);
 
     const data = response.data;
