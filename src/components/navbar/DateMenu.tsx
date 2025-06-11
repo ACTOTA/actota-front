@@ -31,39 +31,53 @@ export default function DateMenu({ updateSearchValue, durationValue, className }
   }, [startDate, endDate, startTime, endTime]);
 
   const updateDurationSummary = () => {
-    let summary = '';
-
     if (startDate && endDate) {
       // Create ISO datetime strings with time information
       const arrivalDateTime = `${startDate}T${startTime}:00`;
       const departureDateTime = `${endDate}T${endTime}:00`;
-      
-      // Send both datetime values as a JSON string for the search
-      const dateTimeData = JSON.stringify({
-        arrival_datetime: arrivalDateTime,
-        departure_datetime: departureDateTime
-      });
       
       // Calculate duration for display
       const start = new Date(startDate);
       const end = new Date(endDate);
       const timeDiff = end.getTime() - start.getTime();
       const durationDays = Math.max(1, Math.ceil(timeDiff / (1000 * 3600 * 24)));
-      summary = `${durationDays} ${durationDays === 1 ? 'day' : 'days'}`;
       
-      updateSearchValue?.(dateTimeData);
+      // Format dates for display
+      const formatDate = (dateStr: string) => {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      };
+      
+      const displayText = startDate === endDate 
+        ? `${formatDate(startDate)} (1 day)`
+        : `${formatDate(startDate)} - ${formatDate(endDate)} (${durationDays} ${durationDays === 1 ? 'day' : 'days'})`;
+      
+      // Send formatted display text with embedded datetime data
+      const searchValue = `${displayText}|${JSON.stringify({
+        arrival_datetime: arrivalDateTime,
+        departure_datetime: departureDateTime
+      })}`;
+      
+      updateSearchValue?.(searchValue);
     } else if (startDate) {
       // Single date - same arrival and departure
       const arrivalDateTime = `${startDate}T${startTime}:00`;
       const departureDateTime = `${startDate}T${endTime}:00`;
       
-      const dateTimeData = JSON.stringify({
+      const formatDate = (dateStr: string) => {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      };
+      
+      const displayText = `${formatDate(startDate)} (1 day)`;
+      
+      // Send formatted display text with embedded datetime data
+      const searchValue = `${displayText}|${JSON.stringify({
         arrival_datetime: arrivalDateTime,
         departure_datetime: departureDateTime
-      });
+      })}`;
       
-      summary = '1 day';
-      updateSearchValue?.(dateTimeData);
+      updateSearchValue?.(searchValue);
     } else {
       updateSearchValue?.('');
     }

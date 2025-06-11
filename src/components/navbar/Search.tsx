@@ -145,12 +145,27 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
     // Handle duration as datetime data
     if (durationValue.length > 0 && durationValue[0]) {
       try {
-        const dateTimeData = JSON.parse(durationValue[0]);
-        if (dateTimeData.arrival_datetime) {
-          params.append('arrival_datetime', dateTimeData.arrival_datetime);
-        }
-        if (dateTimeData.departure_datetime) {
-          params.append('departure_datetime', dateTimeData.departure_datetime);
+        // Check if the value contains embedded JSON data (new format)
+        const value = durationValue[0];
+        if (value.includes('|')) {
+          // New format: "display text|{json data}"
+          const jsonPart = value.split('|')[1];
+          const dateTimeData = JSON.parse(jsonPart);
+          if (dateTimeData.arrival_datetime) {
+            params.append('arrival_datetime', dateTimeData.arrival_datetime);
+          }
+          if (dateTimeData.departure_datetime) {
+            params.append('departure_datetime', dateTimeData.departure_datetime);
+          }
+        } else {
+          // Legacy format: assume it's JSON directly
+          const dateTimeData = JSON.parse(value);
+          if (dateTimeData.arrival_datetime) {
+            params.append('arrival_datetime', dateTimeData.arrival_datetime);
+          }
+          if (dateTimeData.departure_datetime) {
+            params.append('departure_datetime', dateTimeData.departure_datetime);
+          }
         }
       } catch (error) {
         console.error('Error parsing datetime data:', error);
@@ -397,10 +412,12 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
               {navbar ? (
                 <div className="flex flex-col items-center justify-center h-full">
                   <p className={getTextClassName(durationValue.length > 0)}>
-                    {durationValue.length > 0 ? durationValue[0].split(' ')[0] : "When"}
+                    {durationValue.length > 0 ? (
+                      durationValue[0].includes('|') ? durationValue[0].split('|')[0] : "When"
+                    ) : "When"}
                   </p>
                   <p className="text-xs text-gray-400">
-                    {durationValue.length > 0 ? `${durationValue[0].split(' ').slice(1).join(' ')}` : "Add dates"}
+                    {durationValue.length > 0 ? "" : "Add dates"}
                   </p>
                 </div>
               ) : (
@@ -408,11 +425,13 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
                   <MdDateRange className={getIconClassName(durationValue.length > 0)} />
                   <div className="max-md:text-center">
                     <p className={getTextClassName(durationValue.length > 0)}>
-                      {durationValue.length > 0 ? durationValue[0].split(' ')[0] : "When"}
+                      {durationValue.length > 0 ? (
+                        durationValue[0].includes('|') ? durationValue[0].split('|')[0] : "When"
+                      ) : "When"}
                     </p>
                     {currStep == null && (
                       <p className="text-xs text-white/60 max-md:hidden">
-                        {durationValue.length > 0 ? `${durationValue[0].split(' ').slice(1).join(' ')}` : "Add dates"}
+                        {durationValue.length > 0 ? "" : "Add dates"}
                       </p>
                     )}
                   </div>

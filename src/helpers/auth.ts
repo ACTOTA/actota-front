@@ -23,7 +23,7 @@ export async function getCurrentUser() {
 
   try {
     const response = await actotaApi.get(
-      "/api/auth/session",
+      "/auth/session",
       { headers: {
         'Authorization': `Bearer ${token}`,
       }},
