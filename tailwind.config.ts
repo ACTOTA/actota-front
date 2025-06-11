@@ -10,6 +10,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        '3xl': '2100px',
+      },
       fontFamily: {
         'manrope': ['Manrope', 'sans-serif'],
       },
@@ -27,7 +30,16 @@ const config: Config = {
         "primary-gray": "#B3B3B3",
         "border-primary": "#6D6D6D",
         cyan: "#79FFE1",
-      },   
+      },
+      animation: {
+        'slide-up': 'slideUp 0.3s ease-out',
+      },
+      keyframes: {
+        slideUp: {
+          '0%': { transform: 'translateY(100%)' },
+          '100%': { transform: 'translateY(0)' },
+        },
+      },
     },
   },
   plugins: [

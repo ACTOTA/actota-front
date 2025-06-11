@@ -10,6 +10,7 @@ import DrawerModal from "../components/DrawerModal";
 import { Providers } from "./providers";
 import { Toaster } from "react-hot-toast";
 import Script from 'next/script';
+import MobileLayoutWrapper from "../components/layout/MobileLayoutWrapper";
 
 export const metadata = {
   title: "ACTOTA!",
@@ -50,8 +51,10 @@ export default async function RootLayout({
             <ModalContainer />
             <Navbar />
           </ClientOnly>
-          <div>{children}</div>
-        <Toaster />
+          <MobileLayoutWrapper>
+            <div>{children}</div>
+          </MobileLayoutWrapper>
+          <Toaster />
         </Providers>
       </body>
     </html>

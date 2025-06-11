@@ -1,6 +1,6 @@
-import generateCalendarData from '@/src/helpers/calendarData';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import React, { useEffect, useState } from 'react';
+import generateCalendarData from '../helpers/calendarData';
 
 function classNames(...classes: (string | boolean | undefined)[]) {
   return classes.filter(Boolean).join(' ')
@@ -136,7 +136,7 @@ export default function ItineraryPageFilterDateMenuCalendar({ onDateRangeChange 
                     day.isCurrentMonth && 'hover:bg-red-500 hover:bg-opacity-15 hover:rounded-lg focus:z-10',
                     isStart(day.date, day.isCurrentMonth) && 'bg-white text-black rounded-l-lg',
                     isEnd(day.date, day.isCurrentMonth) && 'bg-white text-black rounded-r-lg',
-                    isInRange(day.date, day.isCurrentMonth) && 'translucent-white20 text-white'
+                    isInRange(day.date, day.isCurrentMonth) && 'bg-gray-600 text-gray-700'
                   )}
                 >
                   <time
@@ -159,4 +159,3 @@ export default function ItineraryPageFilterDateMenuCalendar({ onDateRangeChange 
     </div>
   )
 }
-

@@ -20,5 +20,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
+  // Only match the profile routes - do not process API routes in middleware
   matcher: '/profile/:path*',
 };

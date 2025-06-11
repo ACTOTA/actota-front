@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
 	try {
 
 		const requestData = await request.json();
-		const { user_id, payment_intent_id } = requestData;;
+		const { user_id, payment_intent_id, booking_id } = requestData;;
 
 		if (!payment_intent_id || !user_id) {
 			return NextResponse.json(
@@ -24,10 +24,12 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		const response = await actotaApi.post("/api/payment/capture-payment",
+		// Verify booking_id is provided if needed
+		const response = await actotaApi.post("/payment/capture-payment",
 			{
 				user_id,
 				payment_intent_id,
+				booking_id, // Pass booking_id to backend
 			},
 			{
 				headers: {

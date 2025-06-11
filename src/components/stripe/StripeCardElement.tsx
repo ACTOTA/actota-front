@@ -132,6 +132,25 @@ const StripeCardForm = ({
 
           if (attachResponse.status === 200) {
             // Successfully attached payment method to customer
+
+            // Update the session with the customer_id
+            try {
+              await actotaApi.post('/account/update-session', {
+                customerId
+              });
+
+              // Also update the local storage user data
+              const userObj = JSON.parse(getLocalStorageItem('user') || '{}');
+              userObj.customer_id = customerId;
+              const { setLocalStorageItem } = await import('@/src/utils/browserStorage');
+              setLocalStorageItem('user', JSON.stringify(userObj));
+
+              console.log('Session and localStorage updated with customer_id');
+            } catch (sessionError) {
+              console.error('Error updating session with customer_id:', sessionError);
+              // Continue even if session update fails
+            }
+
             onSuccess(paymentMethod.id);
           } else {
             throw new Error('Failed to attach payment method to customer');

@@ -84,7 +84,7 @@ export default function Dropdown({
       </button>
 
       {isOpen && (
-        <ul className={`absolute z-10 w-full bg-black text-white rounded-lg shadow-lg mt-2 max-h-48 overflow-auto ${isOpen && options.length > 0 ? ' border border-primary-gray' : ' '}`}>
+        <ul className={`absolute z-10 w-full bg-black text-white rounded-lg shadow-lg mt-2 max-h-48 overflow-y-auto scrollbar-hide ${isOpen && options.length > 0 ? ' border border-primary-gray' : ' '}`}>
           {options.map((option, index) => (
             <li
               key={index}

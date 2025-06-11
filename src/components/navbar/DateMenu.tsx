@@ -1,233 +1,152 @@
 import React, { useState, useEffect } from 'react';
 import DateMenuCalendar from '../figma/DateMenuCalendar';
+import GlassPanel from '../figma/GlassPanel';
+import { MOBILE_GLASS_PANEL_STYLES, getMobileGlassPanelProps } from './constants';
+import WheelPicker from './WheelPicker';
 
 interface DateMenuProps {
-    updateSearchValue?: (value: string) => void;
-    durationValue?: string;
-    className?: string;
+  updateSearchValue?: (value: string) => void;
+  durationValue?: string;
+  className?: string;
 }
 
 export default function DateMenu({ updateSearchValue, durationValue, className }: DateMenuProps) {
-    const [startDate, setStartDate] = useState<string | null>(null);
-    const [endDate, setEndDate] = useState<string | null>(null);
-    const [startTime, setStartTime] = useState('09:00');
-    const [endTime, setEndTime] = useState('17:00');
-    const [dateSettings, setDateSettings] = useState([
-        { label: "Dates", selected: true },
-        { label: "Flexible", selected: false }
-    ]);
-    const [rangeSettings, setRangeSettings] = useState([
-        { label: "Exact dates", selected: true },
-        { label: "1 day", selected: false },
-        { label: "2 days", selected: false },
-        { label: "3 days", selected: false },
-        { label: "7 days", selected: false }
-    ]);
+  const [startDate, setStartDate] = useState<string | null>(null);
+  const [endDate, setEndDate] = useState<string | null>(null);
+  const [startTime, setStartTime] = useState('09:00');
+  const [endTime, setEndTime] = useState('17:00');
+  const [isMobile, setIsMobile] = useState(false);
 
-    const [estimatedStay, setEstimatedStay] = useState([
-        { label: "A Weekend", selected: true },
-        { label: "A Week", selected: false },
-        { label: "2 Weeks", selected: false },
-        { label: "3 Weeks", selected: false },
-        { label: "A Month", selected: false },
-        { label: "> 1 Month", selected: false }
-    ]);
-
-    const [whenToGo, setWhenToGo] = useState(() => {
-        const currentYear = new Date().getFullYear();
-        const months = [
-            "January", "February", "March", "April", "May", "June",
-            "July", "August", "September", "October", "November", "December"
-        ].map(month => ({
-            label: `${month.slice(0, 3)} ${currentYear}`,
-            selected: month === "January" ? true : false
-        }));
-
-        return [...months];
-    });
-
-    useEffect(() => {
-        // Initialize with existing value if available
-        if (durationValue) {
-            // Handle initialization from durationValue if needed
-        }
-
-        updateDurationSummary();
-    }, [startDate, endDate, startTime, endTime,
-        dateSettings, rangeSettings, estimatedStay, whenToGo]);
-
-    const updateDurationSummary = () => {
-        let summary = '';
-
-        if (dateSettings[0].selected) {
-            // Exact dates mode
-            if (startDate && endDate) {
-                summary = `${startDate} - ${endDate}`;
-            } else if (startDate) {
-                summary = startDate;
-            }
-
-            // Add selected range if available
-            const selectedRange = rangeSettings.find(r => r.selected);
-            if (selectedRange && selectedRange.label !== "Exact dates") {
-                summary += summary ? ` (${selectedRange.label})` : selectedRange.label;
-            }
-        } else {
-            // Flexible mode
-            const selectedStay = estimatedStay.find(s => s.selected);
-            const selectedWhen = whenToGo.find(w => w.selected);
-
-            if (selectedStay) {
-                summary = selectedStay.label;
-            }
-
-            if (selectedWhen) {
-                summary += summary ? ` in ${selectedWhen.label}` : selectedWhen.label;
-            }
-        }
-
-        updateSearchValue?.(summary);
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
     };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
-    const handleDateRangeChange = (start: string | null, end: string | null) => {
-        setStartDate(start);
-        setEndDate(end);
+  useEffect(() => {
+    updateDurationSummary();
+  }, [startDate, endDate, startTime, endTime]);
+
+  const updateDurationSummary = () => {
+    if (startDate && endDate) {
+      // Create ISO datetime strings with time information
+      const arrivalDateTime = `${startDate}T${startTime}:00`;
+      const departureDateTime = `${endDate}T${endTime}:00`;
+      
+      // Calculate duration for display
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const timeDiff = end.getTime() - start.getTime();
+      const durationDays = Math.max(1, Math.ceil(timeDiff / (1000 * 3600 * 24)));
+      
+      // Format dates for display
+      const formatDate = (dateStr: string) => {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      };
+      
+      const displayText = startDate === endDate 
+        ? `${formatDate(startDate)} (1 day)`
+        : `${formatDate(startDate)} - ${formatDate(endDate)} (${durationDays} ${durationDays === 1 ? 'day' : 'days'})`;
+      
+      // Send formatted display text with embedded datetime data
+      const searchValue = `${displayText}|${JSON.stringify({
+        arrival_datetime: arrivalDateTime,
+        departure_datetime: departureDateTime
+      })}`;
+      
+      updateSearchValue?.(searchValue);
+    } else if (startDate) {
+      // Single date - same arrival and departure
+      const arrivalDateTime = `${startDate}T${startTime}:00`;
+      const departureDateTime = `${startDate}T${endTime}:00`;
+      
+      const formatDate = (dateStr: string) => {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      };
+      
+      const displayText = `${formatDate(startDate)} (1 day)`;
+      
+      // Send formatted display text with embedded datetime data
+      const searchValue = `${displayText}|${JSON.stringify({
+        arrival_datetime: arrivalDateTime,
+        departure_datetime: departureDateTime
+      })}`;
+      
+      updateSearchValue?.(searchValue);
+    } else {
+      updateSearchValue?.('');
     }
+  };
 
-    const handleStartTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setStartTime(e.target.value);
+  const getDateRangeDisplay = () => {
+    if (!startDate && !endDate) return 'Select Date';
+    if (startDate && !endDate) return startDate;
+    if (startDate && endDate && startDate === endDate) return startDate;
+    if (startDate && endDate) return `${startDate} → ${endDate}`;
+    return 'Select Date';
+  };
+
+  const handleDateRangeChange = (start: string | null, end: string | null) => {
+    setStartDate(start);
+    setEndDate(end);
+  }
+
+  // Validate that end time is after start time
+  useEffect(() => {
+    if (startDate && endDate && startDate === endDate) {
+      // If same day, ensure end time is after start time
+      const [startHour, startMin] = startTime.split(':').map(Number);
+      const [endHour, endMin] = endTime.split(':').map(Number);
+      const startMinutes = startHour * 60 + startMin;
+      const endMinutes = endHour * 60 + endMin;
+      
+      if (endMinutes <= startMinutes) {
+        // Set end time to 1 hour after start time
+        const newEndMinutes = startMinutes + 60;
+        const newEndHour = Math.floor(newEndMinutes / 60) % 24;
+        const newEndMin = newEndMinutes % 60;
+        setEndTime(`${newEndHour.toString().padStart(2, '0')}:${newEndMin.toString().padStart(2, '0')}`);
+      }
     }
+  }, [startTime, endTime, startDate, endDate]);
 
-    const handleEndTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setEndTime(e.target.value);
-    }
+  return (
+    <GlassPanel
+      {...getMobileGlassPanelProps(isMobile)}
+      className={`w-full mx-auto flex flex-col ${isMobile ? MOBILE_GLASS_PANEL_STYLES : ''} ${className}`}
+    >
+      {/* Date Range Header */}
+      <div className="w-full text-center mb-2">
+        <h3 className="text-white text-base font-medium">{getDateRangeDisplay()}</h3>
+      </div>
 
-    const handleWhenToGoChange = (selectedLabel: string) => {
-        setWhenToGo(prevSettings =>
-            prevSettings.map(item => ({
-                ...item,
-                selected: item.label === selectedLabel
-            }))
-        );
-    }
+      <DateMenuCalendar onDateRangeChange={handleDateRangeChange} />
 
-    // Generate time options from 00:00 to 23:45 in 15-minute increments
-    const timeOptions = Array.from({ length: 96 }, (_, i) => {
-        const hours = Math.floor(i / 4).toString().padStart(2, '0');
-        const minutes = ((i % 4) * 15).toString().padStart(2, '0');
-        return `${hours}:${minutes}`;
-    });
-
-    const handleSelect = (selectedLabel: string) => {
-        setRangeSettings(prevSettings =>
-            prevSettings.map(item => ({
-                ...item,
-                selected: item.label === selectedLabel
-            }))
-        );
-    };
-
-    const handleDateSettingChange = (selectedLabel: string) => {
-        setDateSettings(prevSettings =>
-            prevSettings.map(item => ({
-                ...item,
-                selected: item.label === selectedLabel
-            }))
-        );
-    }
-
-    const handleEstimatedStayChange = (selectedLabel: string) => {
-        setEstimatedStay(prevSettings =>
-            prevSettings.map(item => ({
-                ...item,
-                selected: item.label === selectedLabel
-            }))
-        );
-    }
-
-    return (
-        <section className={`w-full max-w-[720px] mx-auto h-full text-white backdrop-blur-md border-2 border-border-primary rounded-3xl flex-col justify-center items-center gap-2 pl-4 pr-4 pt-6 pb-4 ${className}`}>
-            <div className="h-9 gap-2 w-full flex justify-center">
-                {dateSettings.map((item, i) => (
-                    <div key={i} className={`px-3 py-2 h-full bg-black/50 rounded-[200px] border border-white hover:cursor-pointer hover:bg-black/70 hover:border-[#FFF]
-                            ${item.selected ? "px-3 py-2 h-full bg-black/50 rounded-[200px] border border-white" : "neutral-03 opacity-50"}`}
-                        onClick={() => handleDateSettingChange(item.label)}>
-                        <div className="text-white text-sm font-normal leading-tight whitespace-nowrap">{item.label}</div>
-                    </div>
-                ))}
-            </div>
-
-            {dateSettings[0].selected === true ? (
-                <>
-                    <DateMenuCalendar onDateRangeChange={handleDateRangeChange} />
-                    <div className='w-full gap-4'>
-                        <div className='flex justify-between items-center flex-wrap'>
-                            <div className="flex justify-center items-center gap-4">
-                                <div className="text-white text-base font-bold leading-normal text-center">Start Time</div>
-                                <div className="flex-col justify-start items-end gap-2 inline-flex">
-                                    <select
-                                        value={startTime}
-                                        onChange={handleStartTimeChange}
-                                        className="h-12 bg-transparent border-none text-[#f7f7f7] text-base font-normal leading-normal z-10"
-                                    >
-                                        {timeOptions.map(time => (
-                                            <option key={time} value={time} className=''>{time}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="justify-center items-center gap-4 flex">
-                                <div className="text-white text-base font-bold leading-normal">End Time</div>
-                                <div className="flex-col justify-start items-end gap-2 inline-flex">
-                                    <select
-                                        value={endTime}
-                                        onChange={handleEndTimeChange}
-                                        className="h-12 bg-transparent border-none text-[#f7f7f7] text-base font-normal leading-normal z-10"
-                                    >
-                                        {timeOptions.map(time => (
-                                            <option key={time} value={time} className=''>{time}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="h-8 gap-2 w-full flex overflow-x-scroll">
-                            {rangeSettings.map((item, i) => (
-                                <div key={i} className={`px-3 py-1.5 h-full bg-black/50 rounded-[200px] border border-white hover:cursor-pointer hover:bg-black/70 hover:border-[#FFF]
-                            ${item.selected ? "px-3 py-1.5 h-full bg-black/50 rounded-[200px] border border-white" : "neutral-03 opacity-50"}`}
-                                    onClick={() => handleSelect(item.label)}>
-                                    <div className="text-white text-sm font-normal leading-tight whitespace-nowrap">{item.label}</div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </>
-            ) : (
-                <div className='flex flex-col items-start justify-start mt-8'>
-                    <p className='text-white text-xl font-bold'>How long you're staying?</p>
-                    <div className="h-8 gap-2 w-full flex flex-wrap mt-4">
-                        {estimatedStay.map((item, i) => (
-                            <div key={i} className={`px-3 py-1.5 h-full bg-black/50 rounded-[200px] border border-white hover:cursor-pointer hover:bg-black/70 hover:border-[#FFF]
-                            ${item.selected ? "px-3 py-1.5 h-full bg-black/50 rounded-[200px] border border-white" : "neutral-03 opacity-50"}`}
-                                onClick={() => handleEstimatedStayChange(item.label)}>
-                                <div className="text-white text-sm font-normal leading-tight whitespace-nowrap">{item.label}</div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <p className='text-white text-xl font-bold mt-8'>When do you want to go?</p>
-                    <div className="gap-2 w-[90%] flex flex-wrap">
-                        {whenToGo.map((item, i) => (
-                            <div key={i} className={`px-3 py-1.5 h-full mt-4 bg-black/50 rounded-[200px] border border-white hover:cursor-pointer hover:bg-black/70 hover:border-[#FFF]
-                            ${item.selected ? "px-3 py-1.5 h-full bg-black/50 rounded-[200px] border border-white" : "neutral-03 opacity-50"}`}
-                                onClick={() => handleWhenToGoChange(item.label)}>
-                                <div className="text-white text-sm font-normal leading-tight whitespace-nowrap">{item.label}</div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-        </section>
-    );
+      {/* Time Selectors */}
+      <div className='w-full mt-2 border-t border-gray-700 pt-3'>
+        <div className='flex gap-4 justify-center'>
+          <WheelPicker
+            value={startTime}
+            onChange={setStartTime}
+            label="Start Time"
+          />
+          <WheelPicker
+            value={endTime}
+            onChange={setEndTime}
+            label="End Time"
+          />
+        </div>
+      </div>
+      
+      {/* Booking note */}
+      <div className="text-center text-xs text-gray-500 mt-1">
+        * Minimum 1 day advance booking required
+      </div>
+    </GlassPanel>
+  );
 }

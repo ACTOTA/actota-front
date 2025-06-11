@@ -77,7 +77,7 @@ export const useAttachPaymentMethod = (): UseMutationResult<
         customerId = session.user.customer_id;
       } else {
         // If not, call the backend API to get or create a Stripe customer ID
-        const customerResponse = await actotaApi.post(`/api/account/${userId}/customer`);
+        const customerResponse = await actotaApi.post(`/account/${userId}/customer`);
         customerId = customerResponse.data.customer_id;
 
         if (!customerId) {
@@ -89,6 +89,17 @@ export const useAttachPaymentMethod = (): UseMutationResult<
           session.user.customer_id = customerId;
           // Update localStorage for client-side persistence
           localStorage.setItem('user', JSON.stringify(session.user));
+
+          // Also update the server-side session
+          try {
+            await actotaApi.post('/account/update-session', {
+              customerId
+            });
+            console.log('Server-side session updated with customer_id');
+          } catch (sessionError) {
+            console.error('Error updating server-side session:', sessionError);
+            // Continue even if server-side session update fails
+          }
         }
       }
 
@@ -98,7 +109,7 @@ export const useAttachPaymentMethod = (): UseMutationResult<
       try {
         // Make an API call to attach the payment method to the customer on Stripe's servers
         // This goes through our Next.js API route which then calls the backend service
-        const response = await actotaApi.post(`/api/account/${userId}/payment-methods/attach`, {
+        const response = await actotaApi.post(`/account/${userId}/payment-methods/attach`, {
           customer_id: customerId,
           payment_id: values.paymentMethodId,
           default: values.setAsDefault
@@ -228,7 +239,7 @@ export const useSetDefaultPaymentMethod = (): UseMutationResult<
           customerId = session.user.customer_id;
         } else {
           // If not, call the backend API to get or create a Stripe customer ID
-          const customerResponse = await actotaApi.post(`/api/account/${userId}/customer`);
+          const customerResponse = await actotaApi.post(`/account/${userId}/customer`);
           customerId = customerResponse.data.customer_id;
 
           if (!customerId) {
@@ -315,7 +326,7 @@ export const useDeletePaymentMethod = (): UseMutationResult<
           customerId = session.user.customer_id;
         } else {
           // If not, call the backend API to get or create a Stripe customer ID
-          const customerResponse = await actotaApi.post(`/api/account/${userId}/customer`);
+          const customerResponse = await actotaApi.post(`/account/${userId}/customer`);
           customerId = customerResponse.data.customer_id;
 
           if (!customerId) {
@@ -333,7 +344,7 @@ export const useDeletePaymentMethod = (): UseMutationResult<
         console.log(`Deleting payment method ${paymentMethodId} for customer: ${customerId}`);
 
         // Make the actual API call to delete the payment method
-        await actotaApi.post(`/api/account/${userId}/payment-methods/detach`, {
+        await actotaApi.post(`/account/${userId}/payment-methods/detach`, {
           customer_id: customerId,
           payment_method_id: paymentMethodId
         });
@@ -356,6 +367,109 @@ export const useDeletePaymentMethod = (): UseMutationResult<
     },
     onError: (error) => {
       const message = getErrorMessage(error) || "Failed to delete payment method";
+      toast.error(message);
+    },
+  });
+  
+  return { ...mutation, isLoading: mutation.isPending };
+};
+
+// New combined booking with payment mutation
+export interface BookingWithPaymentParams {
+  itineraryId: string;
+  paymentIntentId: string;
+  customerId: string;
+  arrivalDatetime: string;
+  departureDatetime: string;
+}
+
+interface BookingWithPaymentResponse {
+  success: boolean;
+  booking_id?: string;
+  payment_intent?: any;
+  status?: string;
+  error?: string;
+  warning?: string;
+}
+
+export const useBookingWithPayment = (): UseMutationResult<
+  BookingWithPaymentResponse,
+  Error,
+  BookingWithPaymentParams,
+  unknown
+> & { isLoading: boolean } => {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (params: BookingWithPaymentParams) => {
+      let userId = '';
+      const session = getClientSession();
+
+      if (typeof window !== 'undefined') {
+        try {
+          // First try to get from session
+          if (session.isLoggedIn && session.user) {
+            userId = session.user.user_id;
+          } else {
+            // Fall back to localStorage for compatibility
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            userId = user.user_id;
+          }
+
+          if (!userId) {
+            throw new Error("Please login");
+          }
+        } catch (error) {
+          console.error('Error getting user data:', error);
+          throw new Error("Please login");
+        }
+
+        console.log(`Processing booking with payment for itinerary: ${params.itineraryId}`);
+        
+        // Call the combined endpoint
+        const response = await fetch('/api/stripe/booking-with-payment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            itinerary_id: params.itineraryId,
+            payment_intent_id: params.paymentIntentId,
+            customer_id: params.customerId,
+            arrival_datetime: params.arrivalDatetime,
+            departure_datetime: params.departureDatetime
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `Error: ${response.status}`);
+        }
+
+        const result = await response.json();
+                
+        return result;
+      }
+
+      throw new Error("Cannot access browser environment");
+    },
+    onSuccess: (data) => {
+      if (data.success) {
+        // Store success flag for the ProcessingPayment modal to detect
+        localStorage.setItem('recentBookingSuccess', JSON.stringify({
+          timestamp: new Date().toISOString(),
+          booking_id: data.booking_id
+        }));
+        
+        toast.success("Booking confirmed successfully!");
+        queryClient.invalidateQueries({ queryKey: ['bookings'] });
+      } else if (data.error) {
+        toast.error(data.error);
+      }
+    },
+    onError: (error) => {
+      const message = getErrorMessage(error) || "Failed to process booking";
       toast.error(message);
     },
   });

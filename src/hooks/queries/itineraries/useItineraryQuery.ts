@@ -12,8 +12,25 @@ interface ItinerariesResponse {
   data: any[];
 }
 
-async function fetchItineraries(): Promise<ItinerariesResponse> {
-  const response = await fetch('/api/itineraries', {
+interface PaginationParams {
+  page?: number;
+  limit?: number;
+}
+
+async function fetchItineraries(params?: PaginationParams): Promise<ItinerariesResponse> {
+  const queryParams = new URLSearchParams();
+  
+  if (params?.page) {
+    queryParams.append('page', params.page.toString());
+  }
+  
+  if (params?.limit) {
+    queryParams.append('limit', params.limit.toString());
+  }
+  
+  const url = `/api/itineraries${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+  
+  const response = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
     },
@@ -26,9 +43,9 @@ async function fetchItineraries(): Promise<ItinerariesResponse> {
   return response.json();
 }
 
-export function useItineraries() {
+export function useItineraries(params?: PaginationParams) {
   return useQuery({
-    queryKey: ['itineraries'],
-    queryFn: fetchItineraries,
+    queryKey: ['itineraries', params],
+    queryFn: () => fetchItineraries(params),
   });
 }

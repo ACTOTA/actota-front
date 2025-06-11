@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
 
-    const response = await actotaApi.get('/api/activities');
+    const response = await actotaApi.get('/activities');
 
     return NextResponse.json({success: true,message: "Activities fetched successfully", data: response.data});
   } catch (error) {

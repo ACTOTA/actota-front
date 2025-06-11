@@ -218,7 +218,7 @@ function BookingDetails() {
       <div className='mt-8 px-[80px] max-sm:px-6 max-lg:px-10'>
         <p className='text-white text-2xl font-bold'>Itinerary Details</p>
 
-        {/* <ItineraryCalendar /> */}
+        <ItineraryCalendar />
       </div>
 
       <div className='mt-8 px-[80px] max-sm:px-6 max-lg:px-10'>

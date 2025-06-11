@@ -16,6 +16,12 @@ const BookingConfirmed = () => {
     if (itineraryData) {
         itineraryData = JSON.parse(itineraryData);
     }
+
+    // Get the booking ID from localStorage
+    let bookingId = getLocalStorageItem('bookingId');
+    if (bookingId) {
+        bookingId = JSON.parse(bookingId);
+    }
     
     const [itinerary, setItinerary] = React.useState<any>(itineraryData ?? {
         id: 1,
@@ -60,7 +66,11 @@ const BookingConfirmed = () => {
                 <div className='w-full lg:w-[707px]'>
                     <p className='text-white font-bold mb-2'>Booking Details</p>
 
-                    <BookingCard dataBooking={itinerary} dataItinerary={itinerary} bookingConfirmedModal={true} />
+                    <BookingCard 
+                        dataBooking={{...itinerary, _id: bookingId}} 
+                        dataItinerary={itinerary} 
+                        bookingConfirmedModal={true} 
+                    />
 
                 </div>
 

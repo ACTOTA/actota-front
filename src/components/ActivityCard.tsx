@@ -93,7 +93,7 @@ const ActivityCard = ({ activity, formatTime, getActivityIcon, setIsFeedbackDraw
 
         const hours = Math.floor(duration / 60);
         const minutes = duration % 60;
-        return `{hours} hours and ${minutes} minutes.`;
+        return `${hours} hours and ${minutes} minutes.`;
       }
   }
 

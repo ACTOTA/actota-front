@@ -32,5 +32,6 @@ export function useItineraryById(id: string) {
   return useQuery({
     queryKey: ['itineraryById', id],
     queryFn: () => fetchItineraryById(id),
+    enabled: !!id, // Only fetch if id is provided
   });
 }

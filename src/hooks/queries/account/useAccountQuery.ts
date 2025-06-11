@@ -9,6 +9,12 @@ async function getAccountInfo(id: string): Promise<any> {
       toast.error("Please login to view account info");
       throw new Error("Please login to view account info");
     }
+    
+    // Ensure we have a valid ID to avoid making requests to /api/account/ without an ID
+    if (!id) {
+      throw new Error("User ID is required");
+    }
+    
     const response = await actotaApi.get(`/api/account/${id}`);
     return response.data;
    
@@ -20,8 +26,9 @@ async function getAccountInfo(id: string): Promise<any> {
 
 export function useAccountInfo(id: string) {
   return useQuery({
-    queryKey: ['accountInfo'],
+    queryKey: ['accountInfo', id],
     queryFn: () => getAccountInfo(id),
-   
+    // Don't run the query if id is empty
+    enabled: !!id
   });
 }

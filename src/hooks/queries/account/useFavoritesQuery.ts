@@ -8,7 +8,7 @@ async function getFavorites(): Promise<any> {
       throw new Error("Please login to view favorites");
     }
 
-    const response = await actotaApi.get(`/api/account/${user?.user_id}/favorites`);
+    const response = await actotaApi.get(`/account/${user?.user_id}/favorites`);
     return response.data;
    
   } catch (error) {

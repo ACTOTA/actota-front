@@ -1,6 +1,5 @@
 'use server'
 
-import { jwtVerify } from 'jose/jwt/verify';
 import { cookies } from 'next/headers';
 import actotaApi from '@/src/lib/apiClient';
 export interface Claims {
@@ -24,7 +23,7 @@ export async function getCurrentUser() {
 
   try {
     const response = await actotaApi.get(
-      "/api/auth/session",
+      "/auth/session",
       { headers: {
         'Authorization': `Bearer ${token}`,
       }},
@@ -41,6 +40,27 @@ export async function getCurrentUser() {
 
 export async function getAuthCookie() {
   return cookies().get('auth_token')?.value;
+}
+
+export async function isTokenExpired(token: string | null | undefined): Promise<boolean> {
+  if (!token) return true;
+  
+  try {
+    // JWT tokens are in three parts separated by a dot
+    const payload = token.split('.')[1];
+    if (!payload) return true;
+    
+    // Decode the base64 payload
+    const decodedPayload = Buffer.from(payload, 'base64').toString();
+    const parsedPayload = JSON.parse(decodedPayload);
+    
+    // Check if the token expiration time is in the past
+    const expiration = parsedPayload.exp * 1000; // Convert to milliseconds
+    return Date.now() > expiration;
+  } catch (error) {
+    console.error('Error checking token expiration:', error);
+    return true; // If there's an error, assume token is expired
+  }
 }
 
 
