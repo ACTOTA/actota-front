@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import LocationMenu from './LocationMenu';
 import DateMenu from './DateMenu';
 import GuestMenu from './GuestMenu';
-import ActivitiesMenu from './ActivitiesMenu';
+import CompactActivitiesMenu from './CompactActivitiesMenu';
 
 type SearchBoxesProps = {
   step: STEPS;
@@ -70,7 +70,7 @@ export default function SearchBoxes({
       }
 
       {step === STEPS.ACTIVITIES &&
-        <ActivitiesMenu
+        <CompactActivitiesMenu
           updateSearchValue={(value) => updateSearchValue?.(STEPS.ACTIVITIES, value)}
           activitiesValue={activitiesValue}
           className='max-lg:mt-0'
