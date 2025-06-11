@@ -2,10 +2,13 @@
 import React, { useState } from 'react'
 import Toggle from './Toggle/Toggle'
 import Button from './figma/Button'
-import ItineraryFilterBarGraph from './ItineraryFilterBarGraph'
+import GlassPanel from './figma/GlassPanel'
+import Dropdown from './figma/Dropdown'
+import { BiLeftArrow } from 'react-icons/bi'
+import { GoArrowRight } from 'react-icons/go'
+import { ArrowLeftIcon } from '@heroicons/react/20/solid'
 import { MdOutlineDirectionsCarFilled } from 'react-icons/md'
 import Counter from './Counter'
-import ActivityDropdown from './navbar/ActivityDropdown'
 
 // activity icons
 import ATVing from "@/public/activity-icons/atVing.svg";
@@ -44,6 +47,10 @@ import SUV from "@/public/transportation-icons/suv.svg";
 import Luxury from "@/public/transportation-icons/luxury.svg";
 import PartyBus from "@/public/transportation-icons/partyBus.svg";
 import Van from "@/public/transportation-icons/van.svg";
+import ActivityDropdown from './navbar/ActivityDropdown'
+import DateMenu from './navbar/DateMenu'
+import GuestMenu from './navbar/GuestMenu'
+import ItineraryPageDateMenu from './ItineraryPageDateMenu'
 
 const activities = [
     { id: 'atving', label: 'ATVing', icon: ATVing },
@@ -86,230 +93,248 @@ const transportation = [
     { id: 'van', label: '15 Passenger Van', icon: Van },
 ];
 
-interface AdvancedFilterContentProps {
-    selectedView: 'activities' | 'lodging' | 'transport';
-    setSelectedView: (view: 'activities' | 'lodging' | 'transport') => void;
-    categoryBudgets: {
-        activities: number;
-        lodging: number;
-        transport: number;
+interface ItineraryPageAdvanceFilterProps {
+    setShowFilter?: (value: boolean) => void;
+    advanceFilter: boolean;
+    setAdvanceFilter: (value: boolean) => void;
+    filters?: {
+        budget: { max: number; enabled: boolean };
+        destinations: string[];
+        activities: string[];
+        lodging: string[];
+        transportation: string[];
+        guests: { adults: number; children: number };
+        dateRange: any;
     };
-    updateCategoryBudget: (category: 'activities' | 'lodging' | 'transport', value: number) => void;
-    totalBudget: number;
-    sliderValue: number;
-    handleSliderChange: (e: any) => void;
-    activityType: "daily" | "total";
-    setActivityType: (type: "daily" | "total") => void;
-    count: number;
-    setCount: (count: number) => void;
-    rooms: number;
-    setRooms: (rooms: number) => void;
-    beds: number;
-    setBeds: (beds: number) => void;
-    bathrooms: number;
-    setBathrooms: (bathrooms: number) => void;
+    setFilters?: (filters: any) => void;
 }
 
-const AdvancedFilterContent = ({
-    selectedView,
-    setSelectedView,
-    categoryBudgets,
-    updateCategoryBudget,
-    totalBudget,
-    sliderValue,
-    handleSliderChange,
-    activityType,
-    setActivityType,
-    count,
-    setCount,
-    rooms,
-    setRooms,
-    beds,
-    setBeds,
-    bathrooms,
-    setBathrooms
-}: AdvancedFilterContentProps) => {
+const ItineraryPageAdvanceFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, filters, setFilters }: ItineraryPageAdvanceFilterProps) => {
+    const [selectedView, setSelectedView] = useState<'activities' | 'lodging' | 'transport'>('activities');
+    const [count, setCount] = useState(0);
+    const [rooms, setRooms] = useState(0);
+    const [beds, setBeds] = useState(0);
+    const [bathrooms, setBathrooms] = useState(0);
+    const [activityType, setActivityType] = useState<"daily" | "total">("daily");
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+    const [isGuestOpen, setIsGuestOpen] = useState(false);
     return (
-        <div className='mt-6'>
-            {/* Tab Selection */}
-            <div className='overflow-auto scrollbar-hide'>
-                <div className=" inline-flex justify-start  my-5 border border-border-primary rounded-full p-1">
-                    <Button
-                        onClick={() => setSelectedView('activities')}
-                        className={` border-white  !py-2 ${selectedView === 'activities' ? 'bg-gradient-to-r from-white/20 to-white/5' : ''}`}
-                        variant={selectedView === 'activities' ? 'outline' : 'simple'}
-                    >
-                        Activities
-                    </Button>
-                    <Button
-                        onClick={() => setSelectedView('lodging')}
-                        className={` border-white !py-2 ${selectedView === 'lodging' ? 'bg-gradient-to-r from-white/20 to-white/5' : ''}`}
-                        variant={selectedView === 'lodging' ? 'outline' : 'simple'}
-                    >
-                        Lodging
-                    </Button>
-                    <Button
-                        onClick={() => setSelectedView('transport')}
-                        className={` border-white  !py-2 ${selectedView === 'transport' ? 'bg-gradient-to-r from-white/20 to-white/5' : ''}`}
-                        variant={selectedView === 'transport' ? 'outline' : 'simple'}
-                    >
-                        Transport
-                    </Button>
-                </div>
-            </div>
-
-            {/* Transportation Toggle */}
-            {selectedView === 'transport' && (
-                <div className='flex items-center justify-between '>
-                    <p className='flex items-center gap-2 text-white'><MdOutlineDirectionsCarFilled className='h-6 w-6' /> Transportation</p>
-                    <Toggle enabled={true} setEnabled={() => { }} />
-                </div>
-            )}
-            
-            {/* Category Budget */}
-            <div className='mt-4 flex justify-between items-center w-full'>
-                <p className='text-white  font-bold'>{selectedView === 'activities' ? 'Activities' : selectedView === 'lodging' ? 'Lodging' : 'Transportation'} Budget</p>
-                <p className='text-white  font-bold flex items-center gap-1'>${categoryBudgets[selectedView]} <span className='text-sm font-normal text-primary-gray'> Max</span></p>
-            </div>
-
-            <ItineraryFilterBarGraph 
-                color={selectedView === 'activities' ? '#0252D0' : selectedView === 'lodging' ? '#C10B2F' : '#988316'} 
-                bars={20}
-                maxValue={totalBudget}
-                currentValue={categoryBudgets[selectedView]}
-                enabled={true}
-                onValueChange={(value) => updateCategoryBudget(selectedView, value)}
-            />
-            
-            {/* Max Day Length / Drive Time for Activities and Transport */}
-            {selectedView !== "lodging" && (
-                <div>
-                    <div className='mt-4 flex justify-between items-center w-full'>
-                        <p className='text-white  font-bold'>{selectedView === 'activities' ? 'Max Day Length' : selectedView === 'transport' ? 'Max Daily Drive Time' : ''}</p>
-                        <p className='text-white  font-bold flex items-center gap-1'>{selectedView === 'activities' ? '10h' : selectedView === 'transport' ? '10h' : ''} <span className='text-sm font-normal text-primary-gray'> Max</span></p>
+        <GlassPanel className=' !rounded-3xl !p-[24px] bg-gradient-to-br from-[#6B6B6B]/30 to-[black] '>
+            <div className='w-full space-y-6'>
+                {/* Header with Back Button */}
+                <div className='flex justify-between items-center'>
+                    <div className='flex items-center gap-3'>
+                        <button 
+                            onClick={() => setAdvanceFilter(false)}
+                            className='flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors cursor-pointer'
+                        >
+                            <BiLeftArrow className='size-5' />
+                            <span className='text-sm font-medium'>Back to Filters</span>
+                        </button>
                     </div>
-                    <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={sliderValue}
-                        onChange={handleSliderChange}
-                        className={`w-full mt-1 accent-[${selectedView === 'activities' ? '#0252D0' : selectedView === 'transport' ? '#988316' : '#C10B2F'}]`}
-                    />
-                </div>
-            )}
-
-            {/* Content Based on Selected View */}
-            {selectedView === 'activities' ? (
-                <div className='mt-3'>
-                    <div className='flex items-center justify-between'>
-                        <p className='text-white  font-bold mb-2'>No of Activities</p>
-                        <div className='flex items-center gap-1'>
-                            <Button variant='outline' size='sm' className={`!py-2 ${activityType === "daily" ? "!bg-black" : "!bg-transparent"}`} onClick={() => setActivityType("daily")}>Daily</Button>
-                            <Button variant='outline' size='sm' className={`!py-2 ${activityType === "total" ? "!bg-black" : "!bg-transparent"}`} onClick={() => setActivityType("total")}>Total</Button>
+                    <div className='flex items-center gap-3'>
+                        <div className='flex items-center gap-2'>
+                            <h3 className='text-white text-lg font-bold'>Advanced Filters</h3>
+                            <span className='text-xs text-gray-400 bg-gray-800/50 px-2 py-1 rounded-full'>2 of 2</span>
                         </div>
+                        <p onClick={() => setShowFilter?.(false)} className='text-white text-sm flex items-center gap-2 cursor-pointer lg:hidden'><ArrowLeftIcon className='size-4' />Close</p>
                     </div>
-                    {activityType === "daily" ? (
-                        <div className='mt-4 flex items-center justify-between w-full gap-3'>
-                            <div>
-                                <p className='text-white text-sm font-bold mb-1'>Activities</p>
-                                <p className='text-white text-xs font-normal mb-2'>per day</p>
+                </div>
+
+                {/* Filter Category Tabs */}
+                <div className='space-y-4'>
+                    <div className='flex justify-center items-center gap-2'>
+                        {(['activities', 'lodging', 'transport'] as const).map((view) => (
+                            <button
+                                key={view}
+                                onClick={() => setSelectedView(view)}
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                                    selectedView === view 
+                                        ? 'bg-blue-600 text-white' 
+                                        : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                                }`}
+                            >
+                                {view.charAt(0).toUpperCase() + view.slice(1)}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Activities View */}
+                    {selectedView === 'activities' && (
+                        <div className='space-y-4'>
+                            <div className='flex justify-center items-center gap-2'>
+                                {(['daily', 'total'] as const).map((type) => (
+                                    <button
+                                        key={type}
+                                        onClick={() => setActivityType(type)}
+                                        className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                                            activityType === type 
+                                                ? 'bg-blue-500 text-white' 
+                                                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                        }`}
+                                    >
+                                        {type === 'daily' ? 'Per Day' : 'Total Trip'}
+                                    </button>
+                                ))}
                             </div>
-                            <Counter count={count} setCount={setCount} max={10} />
-                        </div>
-                    ) : (
-                        <div>
-                            {["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"].map((item, i) => {
-                                return (
-                                    <div key={i} className='flex items-center justify-between w-full gap-3 mb-2'>
-                                        <div>
-                                            <p className='text-white text-sm font-bold mb-1'>{item}</p>
-                                            <p className='text-white text-xs font-normal mb-2'>per day</p>
-                                        </div>
-                                        <Counter count={count} setCount={setCount} max={10} />
+                            
+                            {activityType === "daily" && (
+                                <div className='space-y-3'>
+                                    <p className='text-white font-bold text-center'>Activities per Day</p>
+                                    <div className='grid grid-cols-2 gap-2'>
+                                        {["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"].map((item, i) => (
+                                            <div key={i} className='flex items-center justify-between bg-gray-800/50 rounded-lg p-2'>
+                                                <p className='text-white text-sm'>{item}</p>
+                                                <Counter count={count} setCount={setCount} max={5} />
+                                            </div>
+                                        ))}
                                     </div>
-                                )
-                            })}
+                                </div>
+                            )}
+
+                            <div className='space-y-3'>
+                                <p className='text-white font-bold'>Activity Preferences</p>
+                                <ActivityDropdown
+                                    onSelect={(selectedActivities) => {
+                                        if (setFilters) {
+                                            const activitiesArray = Array.isArray(selectedActivities) 
+                                                ? selectedActivities 
+                                                : [selectedActivities];
+                                            setFilters((prev: any) => ({
+                                                ...prev,
+                                                activities: activitiesArray
+                                            }));
+                                        }
+                                    }}
+                                    activities={activities}
+                                    title="Activities"
+                                    showSaveButton={false}
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Lodging View */}
+                    {selectedView === 'lodging' && (
+                        <div className='space-y-4'>
+                            <div className='space-y-3'>
+                                <p className='text-white font-bold text-center'>Accommodation Details</p>
+                                {["No of Room(s)", "No of Bed(s)", "No of Bathroom(s)"].map((item, i) => (
+                                    <div key={i} className='flex items-center justify-between bg-gray-800/50 rounded-lg p-3'>
+                                        <p className='text-white text-sm font-medium'>{item}</p>
+                                        <Counter 
+                                            count={item === "No of Room(s)" ? rooms : item === "No of Bed(s)" ? beds : bathrooms} 
+                                            setCount={item === "No of Room(s)" ? setRooms : item === "No of Bed(s)" ? setBeds : setBathrooms} 
+                                            max={10} 
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className='space-y-3'>
+                                <p className='text-white font-bold'>Lodging Preferences</p>
+                                <ActivityDropdown
+                                    onSelect={(selectedLodging) => {
+                                        if (setFilters) {
+                                            const lodgingArray = Array.isArray(selectedLodging) 
+                                                ? selectedLodging 
+                                                : [selectedLodging];
+                                            setFilters((prev: any) => ({
+                                                ...prev,
+                                                lodging: lodgingArray
+                                            }));
+                                        }
+                                    }}
+                                    activities={lodging}
+                                    title="Lodging"
+                                    showSaveButton={false}
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Transportation View */}
+                    {selectedView === 'transport' && (
+                        <div className='space-y-4'>
+                            <div className='space-y-3'>
+                                <p className='text-white font-bold'>Transportation Preferences</p>
+                                <ActivityDropdown
+                                    onSelect={(selectedTransportation) => {
+                                        if (setFilters) {
+                                            const transportationArray = Array.isArray(selectedTransportation) 
+                                                ? selectedTransportation 
+                                                : [selectedTransportation];
+                                            setFilters((prev: any) => ({
+                                                ...prev,
+                                                transportation: transportationArray
+                                            }));
+                                        }
+                                    }}
+                                    activities={transportation}
+                                    title="Transportation"
+                                    showSaveButton={false}
+                                />
+                            </div>
+
+                            <div className='flex items-center justify-between bg-gray-800/50 rounded-lg p-3'>
+                                <div className='flex items-center gap-2'>
+                                    <MdOutlineDirectionsCarFilled className='text-blue-400 size-5' />
+                                    <p className='text-white text-sm font-medium'>Vehicle Capacity</p>
+                                </div>
+                                <Counter count={count} setCount={setCount} max={15} />
+                            </div>
                         </div>
                     )}
                 </div>
-            ) : selectedView === 'lodging' ? (
-                <div>
-                    {["No of Room(s)", "No of Bed(s)", "No of Bathroom(s)"].map((item, i) => {
-                        return (
-                            <div key={i} className='mt-4 flex items-center justify-between w-full gap-3'>
-                                <p className='text-white  font-bold mb-2'>{item}</p>
-                                <Counter count={item === "No of Room(s)" ? rooms : item === "No of Bed(s)" ? beds : bathrooms} setCount={item === "No of Room(s)" ? setRooms : item === "No of Bed(s)" ? setBeds : setBathrooms} max={10} />
-                            </div>
-                        )
-                    })}
-                </div>
-            ) : null}
-        </div>
-    );
-};
 
-// Wrapper component that manages state and props for AdvancedFilterContent
-interface ItineraryPageAdvanceFilterProps {
-    setShowFilter: (show: boolean) => void;
-    advanceFilter: boolean;
-    setAdvanceFilter: (advance: boolean) => void;
+                {/* Advanced Date & Guest Controls */}
+                <div className='space-y-4'>
+                    <div className='border-t border-gray-700/50 pt-4'>
+                        <div className='space-y-4'>
+                            <div className='w-full'>
+                                <p className='text-white font-bold mb-2'>Detailed Date Selection</p>
+                                <Dropdown isOpend={isCalendarOpen} setIsOpend={setIsCalendarOpen} className='w-full' onSelect={() => { }} options={[]} />
+                                {isCalendarOpen && <div className='mt-2'> <ItineraryPageDateMenu /></div>}
+                            </div>
+                            <div className='w-full'>
+                                <p className='text-white font-bold mb-2'>Guest Details</p>
+                                <Dropdown isOpend={isGuestOpen} setIsOpend={setIsGuestOpen} className='w-full' onSelect={() => { }} options={[]} />
+                                {isGuestOpen && <div className='mt-2'> <GuestMenu /></div>}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className='flex gap-2'>
+                    <Button onClick={() => {
+                        if (setFilters) {
+                            setFilters((prev: any) => ({
+                                ...prev,
+                                activities: [],
+                                lodging: [],
+                                transportation: [],
+                                guests: { adults: 1, children: 0 },
+                                dateRange: null
+                            }));
+                        }
+                        setCount(0);
+                        setRooms(0);
+                        setBeds(0);
+                        setBathrooms(0);
+                    }} variant='outline' className='flex-1'>Reset Advanced</Button>
+
+                    <Button 
+                        onClick={() => setAdvanceFilter(false)}
+                        variant='primary' 
+                        className='flex-1'
+                    >
+                        Apply & Back
+                    </Button>
+                </div>
+            </div>
+        </GlassPanel>
+    )
 }
 
-const ItineraryPageAdvanceFilter = ({ 
-    setShowFilter, 
-    advanceFilter, 
-    setAdvanceFilter 
-}: ItineraryPageAdvanceFilterProps) => {
-    // State management for the advanced filter
-    const [selectedView, setSelectedView] = useState<'activities' | 'lodging' | 'transport'>('activities');
-    const [categoryBudgets, setCategoryBudgets] = useState({
-        activities: 1000,
-        lodging: 1500,
-        transport: 500
-    });
-    const [totalBudget, setTotalBudget] = useState(3000);
-    const [sliderValue, setSliderValue] = useState(1500);
-    const [activityType, setActivityType] = useState<"daily" | "total">("daily");
-    const [count, setCount] = useState(1);
-    const [rooms, setRooms] = useState(1);
-    const [beds, setBeds] = useState(1);
-    const [bathrooms, setBathrooms] = useState(1);
-
-    const updateCategoryBudget = (category: 'activities' | 'lodging' | 'transport', value: number) => {
-        setCategoryBudgets(prev => ({
-            ...prev,
-            [category]: value
-        }));
-    };
-
-    const handleSliderChange = (e: any) => {
-        const value = parseInt(e.target.value);
-        setSliderValue(value);
-        updateCategoryBudget(selectedView, value);
-    };
-
-    return (
-        <AdvancedFilterContent
-            selectedView={selectedView}
-            setSelectedView={setSelectedView}
-            categoryBudgets={categoryBudgets}
-            updateCategoryBudget={updateCategoryBudget}
-            totalBudget={totalBudget}
-            sliderValue={sliderValue}
-            handleSliderChange={handleSliderChange}
-            activityType={activityType}
-            setActivityType={setActivityType}
-            count={count}
-            setCount={setCount}
-            rooms={rooms}
-            setRooms={setRooms}
-            beds={beds}
-            setBeds={setBeds}
-            bathrooms={bathrooms}
-            setBathrooms={setBathrooms}
-        />
-    );
-};
-
-export default ItineraryPageAdvanceFilter;
+export default ItineraryPageAdvanceFilter

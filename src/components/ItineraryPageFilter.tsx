@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import GlassPanel from './figma/GlassPanel'
 import Toggle from './Toggle/Toggle'
 import Input from './figma/Input'
@@ -9,11 +9,8 @@ import Dropdown from './figma/Dropdown'
 import Button from './figma/Button'
 import { BiLeftArrow } from 'react-icons/bi'
 import { GoArrowRight } from 'react-icons/go'
-import { ArrowLeftIcon } from '@heroicons/react/20/solid'
 import ItineraryFilterBarGraph from './ItineraryFilterBarGraph'
 import ItineraryFilterPieChart from './ItineraryFilterPieChart'
-import Counter from './Counter'
-import { MdOutlineDirectionsCarFilled } from 'react-icons/md'
 
 
 
@@ -57,6 +54,7 @@ import Van from "@/public/transportation-icons/van.svg";
 import ActivityDropdown from './navbar/ActivityDropdown'
 import DateMenu from './navbar/DateMenu'
 import GuestMenu from './navbar/GuestMenu'
+import { ArrowLeftIcon } from '@heroicons/react/20/solid'
 import ItineraryPageDateMenu from './ItineraryPageDateMenu'
 
 
@@ -79,21 +77,6 @@ interface ItineraryPageFilterProps {
 
 const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, filters, setFilters }: ItineraryPageFilterProps) => {
     const [toggle, setToggle] = useState(filters?.budget.enabled || false);
-    const [showAdvanced, setShowAdvanced] = useState(false);
-    const [selectedView, setSelectedView] = useState<'activities' | 'lodging' | 'transport'>('activities');
-    const [sliderValue, setSliderValue] = useState(50);
-    const [rooms, setRooms] = useState(0);
-    const [beds, setBeds] = useState(0);
-    const [bathrooms, setBathrooms] = useState(0);
-    const [activityType, setActivityType] = useState<"daily" | "total">("daily");
-    const [count, setCount] = useState(0);
-    
-    // Category budget states
-    const [categoryBudgets, setCategoryBudgets] = useState({
-        activities: 700,
-        lodging: 700,
-        transport: 700
-    });
 
 
 
@@ -144,564 +127,120 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [isGuestOpen, setIsGuestOpen] = useState(false);
     const [destination, setDestination] = useState(filters?.destinations?.length ? filters.destinations.map((_, i) => i) : [0]);
-    
-    const handleSliderChange = (e: any) => {
-        setSliderValue(e.target.value);
-    };
-    
-    // Calculate total budget and percentages
-    const totalBudget = filters?.budget.max || 5000;
-    const totalCategoryBudget = categoryBudgets.activities + categoryBudgets.lodging + categoryBudgets.transport;
-    
-    const percentages = {
-        activities: totalCategoryBudget > 0 ? Math.round((categoryBudgets.activities / totalCategoryBudget) * 100) : 33,
-        lodging: totalCategoryBudget > 0 ? Math.round((categoryBudgets.lodging / totalCategoryBudget) * 100) : 33,
-        transport: totalCategoryBudget > 0 ? Math.round((categoryBudgets.transport / totalCategoryBudget) * 100) : 34
-    };
-    
-    const updateCategoryBudget = (category: 'activities' | 'lodging' | 'transport', value: number) => {
-        setCategoryBudgets(prev => ({
-            ...prev,
-            [category]: value
-        }));
-    };
-
-    // Sync category budgets when total budget changes
-    useEffect(() => {
-        const currentTotal = categoryBudgets.activities + categoryBudgets.lodging + categoryBudgets.transport;
-        if (currentTotal !== totalBudget && totalBudget > 0) {
-            // Proportionally adjust category budgets to match total budget
-            const ratio = totalBudget / currentTotal;
-            setCategoryBudgets(prev => ({
-                activities: Math.round(prev.activities * ratio),
-                lodging: Math.round(prev.lodging * ratio),
-                transport: Math.round(prev.transport * ratio)
-            }));
-        }
-    }, [totalBudget]);
     return (
-        <GlassPanel className=' !rounded-3xl !p-[24px] bg-gradient-to-br from-[#6B6B6B]/30 to-[black]'>
-            <div className='w-full'>
-                <p onClick={() => setShowFilter?.(false)} className='text-left text-white text-sm flex items-center gap-2 cursor-pointer mb-2 lg:hidden'><ArrowLeftIcon className='size-4' />Filter </p>
-
-                <div className='flex justify-between items-center w-full'>
-                    <p className='text-white  font-bold'>Trip Budget</p>
-                    <Toggle enabled={toggle} setEnabled={(enabled) => {
-                        setToggle(enabled);
-                        if (setFilters) {
-                            setFilters((prev: any) => ({
-                                ...prev,
-                                budget: { ...prev.budget, enabled }
-                            }));
-                        }
-                    }} />
-                </div>
-
-                {/* Budget Breakdown Cards - Show when budget is enabled */}
-                {toggle && (
-                    <div className='mt-6'>
-                        {/* Category Tab Buttons */}
-                        <div className='flex gap-2 mb-6'>
-                            <button 
-                                onClick={() => setSelectedView('activities')}
-                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                                    selectedView === 'activities' 
-                                        ? 'bg-white text-black' 
-                                        : 'border border-gray-600 text-gray-400 hover:text-white hover:border-gray-400'
-                                }`}
-                            >
-                                Activities
-                            </button>
-                            <button 
-                                onClick={() => setSelectedView('lodging')}
-                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                                    selectedView === 'lodging' 
-                                        ? 'bg-white text-black' 
-                                        : 'border border-gray-600 text-gray-400 hover:text-white hover:border-gray-400'
-                                }`}
-                            >
-                                Lodging
-                            </button>
-                            <button 
-                                onClick={() => setSelectedView('transport')}
-                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                                    selectedView === 'transport' 
-                                        ? 'bg-white text-black' 
-                                        : 'border border-gray-600 text-gray-400 hover:text-white hover:border-gray-400'
-                                }`}
-                            >
-                                Transportation
-                            </button>
-                        </div>
-
-                        {/* Single Card Container */}
-                        <div className='bg-gradient-to-br from-gray-800/40 to-gray-900/60 rounded-2xl p-6 border border-gray-700/30'>
-                            {/* Activity Filter Content */}
-                            {selectedView === 'activities' && (
-                                <div>
-                                    <div className='flex justify-between items-start mb-4'>
-                                <div>
-                                    <h3 className='text-white font-semibold text-lg'>Activity</h3>
-                                    <p className='text-gray-400 text-sm'>Filter</p>
-                                </div>
-                                <div className='text-right'>
-                                    <p className='text-gray-400 text-sm'>Per Person</p>
-                                    <Toggle enabled={true} setEnabled={() => {}} />
-                                </div>
-                            </div>
-                            
-                            <div className='mb-4'>
-                                <p className='text-white text-xl font-bold'>${categoryBudgets.activities} <span className='text-gray-400 text-sm font-normal'>Max</span></p>
-                            </div>
-
-                            {/* Pie Chart */}
-                            <div className='flex items-center gap-4 mb-4'>
-                                <ItineraryFilterPieChart data={[
-                                    { name: 'Activities', value: 40 },
-                                    { name: 'Lodging', value: 40 },
-                                    { name: 'Transportation', value: 20 },
-                                ]} />
-                                <div className='flex flex-col gap-1 text-xs'>
-                                    <div className='flex items-center gap-2'>
-                                        <span className='w-2 h-2 rounded-full bg-[#0252D0]'></span>
-                                        <span className='text-white'>Activities</span>
-                                        <span className='text-white font-bold ml-auto'>40%</span>
-                                    </div>
-                                    <div className='flex items-center gap-2'>
-                                        <span className='w-2 h-2 rounded-full bg-[#C10B2F]'></span>
-                                        <span className='text-white'>Lodging</span>
-                                        <span className='text-white font-bold ml-auto'>40%</span>
-                                    </div>
-                                    <div className='flex items-center gap-2'>
-                                        <span className='w-2 h-2 rounded-full bg-[#988316]'></span>
-                                        <span className='text-white'>Transportation</span>
-                                        <span className='text-white font-bold ml-auto'>20%</span>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            {/* Activities Budget Bar */}
-                            <div className='mb-4'>
-                                <div className='flex justify-between items-center mb-2'>
-                                    <span className='text-white text-sm'>Activities Budget</span>
-                                    <span className='text-white text-sm font-bold'>${categoryBudgets.activities} <span className='text-gray-400 font-normal'>Max</span></span>
-                                </div>
-                                <ItineraryFilterBarGraph 
-                                    bars={20}
-                                    maxValue={1000}
-                                    currentValue={categoryBudgets.activities}
-                                    enabled={true}
-                                    onValueChange={(value) => setCategoryBudgets(prev => ({ ...prev, activities: value }))}
-                                />
-                            </div>
-
-                            {/* Max Day Length */}
-                            <div className='mb-4'>
-                                <div className='flex justify-between items-center mb-2'>
-                                    <span className='text-white text-sm'>Max Day Length</span>
-                                    <span className='text-white text-sm font-bold'>8h <span className='text-gray-400 font-normal'>Max</span></span>
-                                </div>
-                                <input 
-                                    type="range" 
-                                    min="1" 
-                                    max="12" 
-                                    value="8" 
-                                    className="w-full h-2 bg-gray-700 rounded-lg appearance-none slider"
-                                />
-                            </div>
-
-                            {/* No. of Activities */}
-                            <div className='mb-4'>
-                                <div className='flex justify-between items-center mb-2'>
-                                    <span className='text-white text-sm'>No. of Activities</span>
-                                    <div className='flex gap-2'>
-                                        <button className='px-2 py-1 rounded border border-gray-600 text-white text-xs'>Total</button>
-                                        <button className='px-2 py-1 rounded border border-gray-600 text-gray-400 text-xs'>Daily</button>
-                                    </div>
-                                </div>
-                                <div className='flex items-center gap-3'>
-                                    <span className='text-white text-sm'>Activities for the whole trip</span>
-                                    <div className='flex items-center gap-2'>
-                                        <button className='w-6 h-6 rounded border border-gray-600 flex items-center justify-center text-white'>-</button>
-                                        <span className='text-white font-bold'>2</span>
-                                        <button className='w-6 h-6 rounded border border-gray-600 flex items-center justify-center text-white'>+</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Preferred Activities */}
-                            <div className='mb-6'>
-                                <span className='text-white text-sm mb-2 block'>Preferred Activities</span>
-                                <div className='flex flex-wrap gap-2'>
-                                    <div className='flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-sm'>
-                                        <span>💎</span>
-                                        <span>Gold Mine Tours</span>
-                                    </div>
-                                    <div className='flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-sm'>
-                                        <span>🥾</span>
-                                        <span>Hiking</span>
-                                    </div>
-                                    <span className='text-white text-sm'>+2</span>
-                                </div>
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className='flex gap-2'>
-                                <button className='flex-1 py-2 rounded-xl border border-gray-600 text-white text-sm'>Reset</button>
-                                <button className='flex-1 py-2 rounded-xl bg-white text-black text-sm font-medium'>Apply</button>
-                            </div>
-                                </div>
-                            )}
-
-                            {/* Lodging Filter Content */}
-                            {selectedView === 'lodging' && (
-                                <div>
-                                    <div className='flex justify-between items-start mb-4'>
-                                <div>
-                                    <h3 className='text-white font-semibold text-lg'>Lodging</h3>
-                                    <p className='text-gray-400 text-sm'>Filter</p>
-                                </div>
-                                <div className='text-right'>
-                                    <p className='text-gray-400 text-sm'>Per Person</p>
-                                    <Toggle enabled={true} setEnabled={() => {}} />
-                                </div>
-                            </div>
-                            
-                            <div className='mb-4'>
-                                <p className='text-white text-xl font-bold'>${categoryBudgets.lodging} <span className='text-gray-400 text-sm font-normal'>Max</span></p>
-                            </div>
-
-                            {/* Pie Chart */}
-                            <div className='flex items-center gap-4 mb-4'>
-                                <ItineraryFilterPieChart data={[
-                                    { name: 'Activities', value: 40 },
-                                    { name: 'Lodging', value: 40 },
-                                    { name: 'Transportation', value: 20 },
-                                ]} />
-                                <div className='flex flex-col gap-1 text-xs'>
-                                    <div className='flex items-center gap-2'>
-                                        <span className='w-2 h-2 rounded-full bg-[#0252D0]'></span>
-                                        <span className='text-white'>Activities</span>
-                                        <span className='text-white font-bold ml-auto'>40%</span>
-                                    </div>
-                                    <div className='flex items-center gap-2'>
-                                        <span className='w-2 h-2 rounded-full bg-[#C10B2F]'></span>
-                                        <span className='text-white'>Lodging</span>
-                                        <span className='text-white font-bold ml-auto'>40%</span>
-                                    </div>
-                                    <div className='flex items-center gap-2'>
-                                        <span className='w-2 h-2 rounded-full bg-[#988316]'></span>
-                                        <span className='text-white'>Transportation</span>
-                                        <span className='text-white font-bold ml-auto'>20%</span>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            {/* Lodging Budget Bar */}
-                            <div className='mb-4'>
-                                <div className='flex justify-between items-center mb-2'>
-                                    <span className='text-white text-sm'>Lodging Budget</span>
-                                    <span className='text-white text-sm font-bold'>${categoryBudgets.lodging} <span className='text-gray-400 font-normal'>Max</span></span>
-                                </div>
-                                <ItineraryFilterBarGraph 
-                                    bars={20}
-                                    maxValue={1000}
-                                    currentValue={categoryBudgets.lodging}
-                                    enabled={true}
-                                    onValueChange={(value) => setCategoryBudgets(prev => ({ ...prev, lodging: value }))}
-                                />
-                            </div>
-
-                            {/* Room Details */}
-                            <div className='space-y-3 mb-4'>
-                                <div className='flex justify-between items-center'>
-                                    <span className='text-white text-sm'>No. of Room(s)</span>
-                                    <div className='flex items-center gap-2'>
-                                        <button className='w-6 h-6 rounded border border-gray-600 flex items-center justify-center text-white'>-</button>
-                                        <span className='text-white font-bold'>0</span>
-                                        <button className='w-6 h-6 rounded border border-gray-600 flex items-center justify-center text-white'>+</button>
-                                    </div>
-                                </div>
-                                <div className='flex justify-between items-center'>
-                                    <span className='text-white text-sm'>No. of Bed(s)</span>
-                                    <div className='flex items-center gap-2'>
-                                        <button className='w-6 h-6 rounded border border-gray-600 flex items-center justify-center text-white'>-</button>
-                                        <span className='text-white font-bold'>0</span>
-                                        <button className='w-6 h-6 rounded border border-gray-600 flex items-center justify-center text-white'>+</button>
-                                    </div>
-                                </div>
-                                <div className='flex justify-between items-center'>
-                                    <span className='text-white text-sm'>No. of Bathroom(s)</span>
-                                    <div className='flex items-center gap-2'>
-                                        <button className='w-6 h-6 rounded border border-gray-600 flex items-center justify-center text-white'>-</button>
-                                        <span className='text-white font-bold'>0</span>
-                                        <button className='w-6 h-6 rounded border border-gray-600 flex items-center justify-center text-white'>+</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Lodging Types */}
-                            <div className='mb-6'>
-                                <span className='text-white text-sm mb-2 block'>Lodging Type(s)</span>
-                                <div className='flex flex-wrap gap-2'>
-                                    <div className='flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-sm'>
-                                        <span>🏠</span>
-                                        <span>Cabin</span>
-                                    </div>
-                                    <div className='flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-sm'>
-                                        <span>🏨</span>
-                                        <span>Hotel</span>
-                                    </div>
-                                    <div className='flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-sm'>
-                                        <span>⚠️</span>
-                                        <span>Camp</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className='flex gap-2'>
-                                <button className='flex-1 py-2 rounded-xl border border-gray-600 text-white text-sm'>Reset</button>
-                                <button className='flex-1 py-2 rounded-xl bg-white text-black text-sm font-medium'>Apply</button>
-                            </div>
-                                </div>
-                            )}
-
-                            {/* Transport Filter Content */}
-                            {selectedView === 'transport' && (
-                                <div>
-                                    <div className='flex justify-between items-start mb-4'>
-                                <div>
-                                    <h3 className='text-white font-semibold text-lg'>Transport</h3>
-                                    <p className='text-gray-400 text-sm'>Filter</p>
-                                </div>
-                                <div className='text-right'>
-                                    <p className='text-gray-400 text-sm'>Per Person</p>
-                                    <Toggle enabled={true} setEnabled={() => {}} />
-                                </div>
-                            </div>
-                            
-                            <div className='mb-4'>
-                                <p className='text-white text-xl font-bold'>${categoryBudgets.transport} <span className='text-gray-400 text-sm font-normal'>Max</span></p>
-                            </div>
-
-                            {/* Pie Chart */}
-                            <div className='flex items-center gap-4 mb-4'>
-                                <ItineraryFilterPieChart data={[
-                                    { name: 'Activities', value: 40 },
-                                    { name: 'Lodging', value: 40 },
-                                    { name: 'Transportation', value: 20 },
-                                ]} />
-                                <div className='flex flex-col gap-1 text-xs'>
-                                    <div className='flex items-center gap-2'>
-                                        <span className='w-2 h-2 rounded-full bg-[#0252D0]'></span>
-                                        <span className='text-white'>Activities</span>
-                                        <span className='text-white font-bold ml-auto'>40%</span>
-                                    </div>
-                                    <div className='flex items-center gap-2'>
-                                        <span className='w-2 h-2 rounded-full bg-[#C10B2F]'></span>
-                                        <span className='text-white'>Lodging</span>
-                                        <span className='text-white font-bold ml-auto'>40%</span>
-                                    </div>
-                                    <div className='flex items-center gap-2'>
-                                        <span className='w-2 h-2 rounded-full bg-[#988316]'></span>
-                                        <span className='text-white'>Transportation</span>
-                                        <span className='text-white font-bold ml-auto'>20%</span>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            {/* Transportation Toggle */}
-                            <div className='flex justify-between items-center mb-4'>
-                                <div className='flex items-center gap-2'>
-                                    <MdOutlineDirectionsCarFilled className='text-white text-lg' />
-                                    <span className='text-white text-sm'>Transportation</span>
-                                </div>
-                                <Toggle enabled={true} setEnabled={() => {}} />
-                            </div>
-
-                            {/* Transportation Budget Bar */}
-                            <div className='mb-4'>
-                                <div className='flex justify-between items-center mb-2'>
-                                    <span className='text-white text-sm'>Transportation Budget</span>
-                                    <span className='text-white text-sm font-bold'>${categoryBudgets.transport} <span className='text-gray-400 font-normal'>Max</span></span>
-                                </div>
-                                <ItineraryFilterBarGraph 
-                                    bars={20}
-                                    maxValue={1000}
-                                    currentValue={categoryBudgets.transport}
-                                    enabled={true}
-                                    onValueChange={(value) => setCategoryBudgets(prev => ({ ...prev, transport: value }))}
-                                />
-                            </div>
-
-                            {/* Max Daily Drive Time */}
-                            <div className='mb-4'>
-                                <div className='flex justify-between items-center mb-2'>
-                                    <span className='text-white text-sm'>Max Daily Drive Time</span>
-                                    <span className='text-white text-sm font-bold'>4h <span className='text-gray-400 font-normal'>Max</span></span>
-                                </div>
-                                <input 
-                                    type="range" 
-                                    min="1" 
-                                    max="8" 
-                                    value="4" 
-                                    className="w-full h-2 bg-gray-700 rounded-lg appearance-none slider"
-                                />
-                            </div>
-
-                            {/* Transportation Types */}
-                            <div className='mb-6'>
-                                <span className='text-white text-sm mb-2 block'>Transportation Type(s)</span>
-                                <div className='flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-600 bg-gray-800/30'>
-                                    <MdOutlineDirectionsCarFilled className='text-white text-lg' />
-                                    <span className='text-white text-sm'>Sedan</span>
-                                    <span className='ml-auto text-gray-400'>▼</span>
-                                </div>
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className='flex gap-2'>
-                                <button className='flex-1 py-2 rounded-xl border border-gray-600 text-white text-sm'>Reset</button>
-                                <button className='flex-1 py-2 rounded-xl bg-white text-black text-sm font-medium'>Apply</button>
-                            </div>
-                                </div>
-                            )}
-                        </div>
+        <GlassPanel className=' !rounded-3xl !p-[24px] bg-gradient-to-br from-[#6B6B6B]/30 to-[black] '>
+            <div className='w-full space-y-6'>
+                {/* Header */}
+                <div className='flex justify-between items-center'>
+                    <div className='flex items-center gap-2'>
+                        <h3 className='text-white text-lg font-bold'>Filters</h3>
                     </div>
-                )}
-
-                {advanceFilter ? (
-                            <div className='mt-6'>
-                                <div className='overflow-auto scrollbar-hide'>
-                                    <div className=" inline-flex justify-start  my-5 border border-border-primary rounded-full p-1">
-                                        <Button
-                                            onClick={() => setSelectedView('activities')}
-                                            className={` border-white  !py-2 ${selectedView === 'activities' ? 'bg-gradient-to-r from-white/20 to-white/5' : ''}`}
-                                            variant={selectedView === 'activities' ? 'outline' : 'simple'}
-                                        >
-                                            Activities
-                                        </Button>
-                                        <Button
-                                            onClick={() => setSelectedView('lodging')}
-                                            className={` border-white !py-2 ${selectedView === 'lodging' ? 'bg-gradient-to-r from-white/20 to-white/5' : ''}`}
-                                            variant={selectedView === 'lodging' ? 'outline' : 'simple'}
-                                        >
-                                            Lodging
-                                        </Button>
-                                        <Button
-                                            onClick={() => setSelectedView('transport')}
-                                            className={` border-white  !py-2 ${selectedView === 'transport' ? 'bg-gradient-to-r from-white/20 to-white/5' : ''}`}
-                                            variant={selectedView === 'transport' ? 'outline' : 'simple'}
-                                        >
-                                            Transport
-                                        </Button>
-                                    </div>
-                                </div>
-
-                                {selectedView === 'transport' && (
-                                    <div className='flex items-center justify-between '>
-                                        <p className='flex items-center gap-2 text-white'><MdOutlineDirectionsCarFilled className='h-6 w-6' /> Transportation</p>
-                                        <Toggle enabled={true} setEnabled={() => { }} />
-                                    </div>
-                                )}
-                                
-                                <div className='mt-4 flex justify-between items-center w-full'>
-                                    <p className='text-white  font-bold'>{selectedView === 'activities' ? 'Activities' : selectedView === 'lodging' ? 'Lodging' : 'Transportation'} Budget</p>
-                                    <p className='text-white  font-bold flex items-center gap-1'>${categoryBudgets[selectedView]} <span className='text-sm font-normal text-primary-gray'> Max</span></p>
-                                </div>
-
-                                <ItineraryFilterBarGraph 
-                                    color={selectedView === 'activities' ? '#0252D0' : selectedView === 'lodging' ? '#C10B2F' : '#988316'} 
-                                    bars={20}
-                                    maxValue={totalBudget}
-                                    currentValue={categoryBudgets[selectedView]}
-                                    enabled={true}
-                                    onValueChange={(value) => updateCategoryBudget(selectedView, value)}
-                                />
-                                
-                                {selectedView !== "lodging" && (
-                                    <div>
-                                        <div className='mt-4 flex justify-between items-center w-full'>
-                                            <p className='text-white  font-bold'>{selectedView === 'activities' ? 'Max Day Length' : selectedView === 'transport' ? 'Max Daily Drive Time' : ''}</p>
-                                            <p className='text-white  font-bold flex items-center gap-1'>{selectedView === 'activities' ? '10h' : selectedView === 'transport' ? '10h' : ''} <span className='text-sm font-normal text-primary-gray'> Max</span></p>
-                                        </div>
-                                        <input
-                                            type="range"
-                                            min="0"
-                                            max="100"
-                                            value={sliderValue}
-                                            onChange={handleSliderChange}
-                                            className={`w-full mt-1 accent-[${selectedView === 'activities' ? '#0252D0' : selectedView === 'transport' ? '#988316' : '#C10B2F'}]`}
-                                        />
-                                    </div>
-                                )}
-
-                                {selectedView === 'activities' ? (
-                                    <div className='mt-3'>
-                                        <div className='flex items-center justify-between'>
-                                            <p className='text-white  font-bold mb-2'>No of Activities</p>
-                                            <div className='flex items-center gap-1'>
-                                                <Button variant='outline' size='sm' className={`!py-2 ${activityType === "daily" ? "!bg-black" : "!bg-transparent"}`} onClick={() => setActivityType("daily")}>Daily</Button>
-                                                <Button variant='outline' size='sm' className={`!py-2 ${activityType === "total" ? "!bg-black" : "!bg-transparent"}`} onClick={() => setActivityType("total")}>Total</Button>
-                                            </div>
-                                        </div>
-                                        {activityType === "daily" ? (
-                                            <div className='mt-4 flex items-center justify-between w-full gap-3'>
-                                                <div>
-                                                    <p className='text-white text-sm font-bold mb-1'>Activities</p>
-                                                    <p className='text-white text-xs font-normal mb-2'>per day</p>
-                                                </div>
-                                                <Counter count={count} setCount={setCount} max={10} />
-                                            </div>
-                                        ) : (
-                                            <div>
-                                                {["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"].map((item, i) => {
-                                                    return (
-                                                        <div key={i} className='flex items-center justify-between w-full gap-3 mb-2'>
-                                                            <div>
-                                                                <p className='text-white text-sm font-bold mb-1'>{item}</p>
-                                                                <p className='text-white text-xs font-normal mb-2'>per day</p>
-                                                            </div>
-                                                            <Counter count={count} setCount={setCount} max={10} />
-                                                        </div>
-                                                    )
-                                                })}
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : selectedView === 'lodging' ? (
-                                    <div>
-                                        {["No of Room(s)", "No of Bed(s)", "No of Bathroom(s)"].map((item, i) => {
-                                            return (
-                                                <div key={i} className='mt-4 flex items-center justify-between w-full gap-3'>
-                                                    <p className='text-white  font-bold mb-2'>{item}</p>
-                                                    <Counter count={item === "No of Room(s)" ? rooms : item === "No of Bed(s)" ? beds : bathrooms} setCount={item === "No of Room(s)" ? setRooms : item === "No of Bed(s)" ? setBeds : setBathrooms} max={10} />
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                ) : null}
-                            </div>
-                        ) : null}
-                
-                <div className='mt-4 flex justify-between items-center w-full'>
-                    <p className='text-white  font-bold'>Destination</p>
-                    <p onClick={() => {
-                        const newIndex = destination.length;
-                        setDestination([...destination, newIndex]);
-                        if (setFilters) {
-                            setFilters((prev: any) => ({
-                                ...prev,
-                                destinations: [...prev.destinations, '']
-                            }));
-                        }
-                    }} className='text-[#BBD4FB] font-normal flex items-center gap-1 cursor-pointer'>Add <span className='text-2xl'> +</span></p>
-
+                    <p onClick={() => setShowFilter?.(false)} className='text-white text-sm flex items-center gap-2 cursor-pointer lg:hidden'><ArrowLeftIcon className='size-4' />Close</p>
                 </div>
+
+                {/* Advanced Budget Section */}
+                <div className='space-y-3'>
+                    <div className='flex justify-between items-center w-full'>
+                        <p className='text-white font-bold'>Budget</p>
+                        <Toggle enabled={toggle} setEnabled={(enabled) => {
+                            setToggle(enabled);
+                            if (setFilters) {
+                                setFilters((prev: any) => ({
+                                    ...prev,
+                                    budget: { ...prev.budget, enabled }
+                                }));
+                            }
+                        }} />
+                    </div>
+                    
+                    {toggle && (
+                        <div className='space-y-4'>
+                            <p className='text-white text-xl font-bold'>${filters?.budget.max || 1000} <span className='text-[16px] font-normal'>Max</span></p>
+                            
+                            {/* Full Budget Controls */}
+                            <div className='flex items-center w-full gap-5'>
+                                <div className='flex-shrink-0'>
+                                    <ItineraryFilterPieChart />
+                                </div>
+                                <div className='flex flex-col gap-2 w-full'>
+                                    <div className='flex justify-between items-center w-full'>
+                                        <p className='text-white text-sm font-normal flex items-center gap-2'>
+                                            <span className='h-2 w-2 rounded-full bg-[#0252D0]' /> Activities
+                                        </p>
+                                        <p className='text-white text-sm font-bold'>
+                                            ${Math.round((filters?.budget.max || 5000) * 0.4).toLocaleString()}
+                                        </p>
+                                    </div>
+                                    <div className='flex justify-between items-center w-full'>
+                                        <p className='text-white text-sm font-normal flex items-center gap-2'>
+                                            <span className='h-2 w-2 rounded-full bg-[#8B5CF6]' /> Lodging
+                                        </p>
+                                        <p className='text-white text-sm font-bold'>
+                                            ${Math.round((filters?.budget.max || 5000) * 0.35).toLocaleString()}
+                                        </p>
+                                    </div>
+                                    <div className='flex justify-between items-center w-full'>
+                                        <p className='text-white text-sm font-normal flex items-center gap-2'>
+                                            <span className='h-2 w-2 rounded-full bg-[#10B981]' /> Transportation
+                                        </p>
+                                        <p className='text-white text-sm font-bold'>
+                                            ${Math.round((filters?.budget.max || 5000) * 0.25).toLocaleString()}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Budget Slider */}
+                            <div>
+                                <ItineraryFilterBarGraph 
+                                    bars={20}
+                                    maxValue={15000}
+                                    currentValue={filters?.budget.max || 5000}
+                                    enabled={true}
+                                    onValueChange={(value) => {
+                                        if (setFilters) {
+                                            setFilters((prev: any) => ({
+                                                ...prev,
+                                                budget: { ...prev.budget, max: value }
+                                            }));
+                                        }
+                                    }}
+                                />
+                            </div>
+
+                            {/* Total Trip Cost */}
+                            <div className='bg-gray-800/50 rounded-lg p-3'>
+                                <div className='flex justify-between items-center'>
+                                    <div>
+                                        <p className='text-white text-sm font-medium'>Total Trip Cost</p>
+                                        <p className='text-gray-300 text-xs'>
+                                            {filters?.guests?.adults || 1} adults, {filters?.guests?.children || 0} children
+                                        </p>
+                                    </div>
+                                    <p className='text-green-400 text-lg font-bold'>
+                                        ${((filters?.budget.max || 5000) * ((filters?.guests?.adults || 1) + (filters?.guests?.children || 0))).toLocaleString()}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Destinations Section */}
+                <div className='space-y-3'>
+                    <div className='flex justify-between items-center w-full'>
+                        <p className='text-white font-bold'>Destinations</p>
+                        <p onClick={() => {
+                            const newIndex = destination.length;
+                            setDestination([...destination, newIndex]);
+                            if (setFilters) {
+                                setFilters((prev: any) => ({
+                                    ...prev,
+                                    destinations: [...prev.destinations, '']
+                                }));
+                            }
+                        }} className='text-[#BBD4FB] font-normal flex items-center gap-1 cursor-pointer text-sm'>Add <span className='text-lg'> +</span></p>
+                    </div>
                 {destination.map((item, i) => {
                     return (
                         <div key={i} className='mt-2 flex justify-between items-center gap-2 w-full'>
@@ -736,22 +275,25 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
                         </div>
                     )
                 })}
-                <div className={` flex justify-between items-center w-full gap-3 ${!advanceFilter ? 'flex-col' : 'flex-row'}`}>
-                    <div className=' w-full mt-6'>
-                        <p className='text-white  font-bold mb-2'>Dates</p>
+                </div>
 
+                {/* Dates & Guests Section */}
+                <div className='space-y-4'>
+                    <div className='w-full'>
+                        <p className='text-white font-bold mb-2'>Dates</p>
                         <Dropdown isOpend={isCalendarOpen} setIsOpend={setIsCalendarOpen} className='w-full' onSelect={() => { }} options={[]} />
-                        {isCalendarOpen && <div className='mt-2 '> <ItineraryPageDateMenu /></div>}
+                        {isCalendarOpen && <div className='mt-2'> <ItineraryPageDateMenu /></div>}
                     </div>
-                    <div className=' w-full mt-4'>
-                        <p className='text-white  font-bold mb-2'>Guests</p>
+                    <div className='w-full'>
+                        <p className='text-white font-bold mb-2'>Guests</p>
                         <Dropdown isOpend={isGuestOpen} setIsOpend={setIsGuestOpen} className='w-full' onSelect={() => { }} options={[]} />
-
                         {isGuestOpen && <div className='mt-2'> <GuestMenu /></div>}
                     </div>
                 </div>
-                <div className='mt-6  w-full gap-3'>
-                    <p className='text-white  font-bold mb-2'>Preferred Activities</p>
+
+                {/* Activities Section */}
+                <div className='space-y-3'>
+                    <p className='text-white font-bold'>Activities</p>
                     <ActivityDropdown
                         onSelect={(selectedActivities) => {
                             if (setFilters) {
@@ -770,8 +312,10 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
                     />
 
                 </div>
-                <div className='mt-6  w-full gap-3'>
-                    <p className='text-white  font-bold mb-2'>Lodging Type(s)</p>
+
+                {/* Lodging Section */}
+                <div className='space-y-3'>
+                    <p className='text-white font-bold'>Lodging</p>
                     <ActivityDropdown
                         onSelect={(selectedLodging) => {
                             if (setFilters) {
@@ -788,10 +332,11 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
                         title="Lodging"
                         showSaveButton={false}
                     />
-
                 </div>
-                <div className='mt-6  w-full gap-3'>
-                    <p className='text-white  font-bold mb-2'>Transportation Type(s)</p>
+
+                {/* Transportation Section */}
+                <div className='space-y-3'>
+                    <p className='text-white font-bold'>Transportation</p>
                     <ActivityDropdown
                         onSelect={(selectedTransportation) => {
                             if (setFilters) {
@@ -809,45 +354,41 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
                         showSaveButton={false}
                     />
                 </div>
-                {toggle && (
-                    <div className='mt-6 flex items-center justify-between w-full'>
-                        <Button 
-                            onClick={() => setShowAdvanced(!showAdvanced)} 
-                            variant='outline' 
-                            className='!bg-black flex items-center justify-center gap-2'
-                        >
-                            {showAdvanced ? 'Hide Advanced' : 'Show Advanced'} 
-                            <GoArrowRight className={`size-6 transition-transform ${showAdvanced ? 'rotate-90' : ''}`} />
-                        </Button>
-                    </div>
-                )}
+                
+                {/* Advanced Filters Button */}
+                <div className='border-t border-gray-700/50 pt-4 mt-6'>
+                    <Button 
+                        onClick={() => setAdvanceFilter(true)} 
+                        variant='outline' 
+                        className='w-full !bg-gradient-to-r from-blue-600/20 to-purple-600/20 hover:from-blue-600/30 hover:to-purple-600/30 border-blue-500/50 hover:border-blue-400 flex items-center justify-center gap-2 transition-all duration-200 group'
+                    >
+                        <span className='text-blue-400'>✨</span>
+                        <span>Advanced Filters</span>
+                        <GoArrowRight className='size-4 text-blue-400 group-hover:translate-x-1 transition-transform' />
+                    </Button>
+                    <p className='text-xs text-gray-400 text-center mt-2'>More filter options & detailed controls</p>
+                </div>
 
-                {advanceFilter ? (
-                    <div className='flex justify-between items-center w-full gap-2'>
-                        <Button onClick={() => {
-                            if (setFilters) {
-                                setFilters({
-                                    budget: { max: 5000, enabled: false },
-                                    destinations: [''],
-                                    activities: [],
-                                    lodging: [],
-                                    transportation: [],
-                                    guests: { adults: 1, children: 0 },
-                                    dateRange: null
-                                });
-                            }
-                            setToggle(false);
-                            setDestination([0]);
-                            setAdvanceFilter(false);
-                        }} variant='outline' className='mt-6 w-full'>Reset</Button>
+                {/* Action Buttons */}
+                <div className='flex gap-2 mt-4'>
+                    <Button onClick={() => {
+                        if (setFilters) {
+                            setFilters({
+                                budget: { max: 5000, enabled: false },
+                                destinations: [''],
+                                activities: [],
+                                lodging: [],
+                                transportation: [],
+                                guests: { adults: 1, children: 0 },
+                                dateRange: null
+                            });
+                        }
+                        setToggle(false);
+                        setDestination([0]);
+                    }} variant='outline' className='flex-1'>Clear All</Button>
 
-                        <Button variant='primary' className='mt-6 w-full'>Apply</Button>
-
-
-                    </div>
-                ) : (
-                    <Button onClick={() => setAdvanceFilter(true)} variant='outline' className='mt-6 w-full !bg-black flex items-center justify-center gap-2'>Advance Filter <GoArrowRight className='size-6' /></Button>
-                )}
+                    <Button variant='primary' className='flex-1'>Apply Filters</Button>
+                </div>
             </div>
         </GlassPanel>
     )

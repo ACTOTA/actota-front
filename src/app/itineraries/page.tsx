@@ -335,11 +335,17 @@ const Itineraries = () => {
                 
                 <div className={`${showFilter ? '' : 'max-lg:hidden'} md:pt-14 w-[33%] max-lg:w-full`}>
                     {advanceFilter ?
-                        <ItineraryPageAdvanceFilter setShowFilter={setShowFilter} advanceFilter={advanceFilter} setAdvanceFilter={setAdvanceFilter} />
-                        :
-                        <ItineraryPageFilter 
+                        <ItineraryPageAdvanceFilter 
                             setShowFilter={setShowFilter} 
                             advanceFilter={advanceFilter} 
+                            setAdvanceFilter={setAdvanceFilter}
+                            filters={filters}
+                            setFilters={setFilters}
+                        />
+                        :
+                        <ItineraryPageFilter 
+                            setShowFilter={setShowFilter}
+                            advanceFilter={advanceFilter}
                             setAdvanceFilter={setAdvanceFilter}
                             filters={filters}
                             setFilters={setFilters}
