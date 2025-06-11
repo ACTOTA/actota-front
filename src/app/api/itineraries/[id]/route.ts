@@ -16,7 +16,7 @@ export async function GET(
     
     // Try to fetch from backend without auth first (assuming it's a public endpoint)
     try {
-      const response = await actotaApi.get(`/itineraries/${id}`);
+      const response = await actotaApi.get(`/api/itineraries/${id}`);
       
       if (response.status === 200) {
         return NextResponse.json(response.data);
@@ -27,7 +27,7 @@ export async function GET(
       // If public fetch fails and we have auth token, try with auth
       if (authToken) {
         try {
-          const authResponse = await actotaApi.get(`/itineraries/${id}`, {
+          const authResponse = await actotaApi.get(`/api/itineraries/${id}`, {
             headers: {
               'Authorization': `Bearer ${authToken}`
             }

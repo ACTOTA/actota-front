@@ -20,6 +20,8 @@ import { useFavorites } from '@/src/hooks/queries/account/useFavoritesQuery';
 import Image from 'next/image';
 import { ItineraryData } from '@/src/types/itineraries';
 import DateMenu from '@/src/components/navbar/DateMenu';
+import ItineraryFilterPieChart from '@/src/components/ItineraryFilterPieChart';
+import ItineraryFilterBarGraph from '@/src/components/ItineraryFilterBarGraph';
 
 interface ClientSideItineraryProps {
   initialData: ItineraryData;
@@ -351,42 +353,6 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
               <p className='text-gray-400 leading-relaxed'>{itineraryData.description}</p>
             </div>
             
-            {/* Customize Your Itinerary */}
-            <div className='bg-[#141414] rounded-xl p-6'>
-              <h2 className='text-xl font-semibold mb-2'>Customize Your Itinerary</h2>
-              <p className='text-gray-400 text-sm mb-6'>
-                Customize your itinerary based on your events, interests, and may even optimize your route for you. Manage participating members on each activity, set your transport schedule and more!
-              </p>
-              <div className='grid grid-cols-2 gap-4'>
-                <Button 
-                  variant="outline" 
-                  className='bg-transparent border-gray-700 hover:border-gray-600 text-white py-3 rounded-lg'
-                >
-                  Calendar
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className='bg-transparent border-gray-700 hover:border-gray-600 text-white py-3 rounded-lg'
-                >
-                  Map
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className='bg-transparent border-gray-700 hover:border-gray-600 text-white py-3 rounded-lg'
-                >
-                  Day by Day
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className='bg-transparent border-gray-700 hover:border-gray-600 text-white py-3 rounded-lg'
-                >
-                  Day 1
-                </Button>
-              </div>
-              <p className='text-gray-500 text-xs mt-4 text-center'>
-                Last Updated • 21 Sep 2024, by You
-              </p>
-            </div>
           </div>
           {/* Booking Sidebar */}
           <div>
@@ -507,29 +473,18 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
           <p className='text-gray-400 text-sm mb-6'>Show price per person</p>
           
           <div className='grid lg:grid-cols-[300px_1fr] gap-8'>
-            {/* Total Cost Donut Chart */}
+            {/* Recharts Pie Chart */}
             <div className='flex flex-col items-center'>
-              <div className='relative w-48 h-48 mx-auto mb-4'>
-                <svg className='w-full h-full transform -rotate-90'>
-                  <circle cx="96" cy="96" r="80" fill="none" stroke="#374151" strokeWidth="16" />
-                  <circle 
-                    cx="96" cy="96" r="80" fill="none" 
-                    stroke="#EAB308" strokeWidth="16"
-                    strokeDasharray={`${2 * Math.PI * 80 * 0.3} ${2 * Math.PI * 80}`}
+              <div className='relative w-48 h-48 mx-auto mb-4 flex items-center justify-center'>
+                <div className='scale-[2]'>
+                  <ItineraryFilterPieChart 
+                    data={[
+                      { name: 'Activities', value: itineraryData?.activity_cost || 0 },
+                      { name: 'Lodging', value: itineraryData?.lodging_cost || 0 },
+                      { name: 'Transportation', value: itineraryData?.transport_cost || 0 }
+                    ]}
                   />
-                  <circle 
-                    cx="96" cy="96" r="80" fill="none" 
-                    stroke="#3B82F6" strokeWidth="16"
-                    strokeDasharray={`${2 * Math.PI * 80 * 0.2} ${2 * Math.PI * 80}`}
-                    strokeDashoffset={`-${2 * Math.PI * 80 * 0.3}`}
-                  />
-                  <circle 
-                    cx="96" cy="96" r="80" fill="none" 
-                    stroke="#EF4444" strokeWidth="16"
-                    strokeDasharray={`${2 * Math.PI * 80 * 0.1} ${2 * Math.PI * 80}`}
-                    strokeDashoffset={`-${2 * Math.PI * 80 * 0.5}`}
-                  />
-                </svg>
+                </div>
                 <div className='absolute inset-0 flex flex-col items-center justify-center'>
                   <p className='text-sm text-gray-400'>Total</p>
                   <p className='text-3xl font-bold'>${basePrice.toFixed(2)}</p>
@@ -538,17 +493,17 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
               
               <div className='space-y-2 w-full'>
                 <div className='flex items-center gap-3'>
-                  <div className='w-4 h-4 bg-yellow-500 rounded' />
+                  <div className='w-4 h-4 bg-[#0252D0] rounded' />
                   <span className='text-sm flex-1'>Activities</span>
                   <span className='text-sm font-medium'>${itineraryData?.activity_cost || 0}</span>
                 </div>
                 <div className='flex items-center gap-3'>
-                  <div className='w-4 h-4 bg-blue-500 rounded' />
+                  <div className='w-4 h-4 bg-[#C10B2F] rounded' />
                   <span className='text-sm flex-1'>Lodging</span>
                   <span className='text-sm font-medium'>${itineraryData?.lodging_cost || 0}</span>
                 </div>
                 <div className='flex items-center gap-3'>
-                  <div className='w-4 h-4 bg-red-500 rounded' />
+                  <div className='w-4 h-4 bg-[#988316] rounded' />
                   <span className='text-sm flex-1'>Transport</span>
                   <span className='text-sm font-medium'>${itineraryData?.transport_cost || 0}</span>
                 </div>
@@ -560,8 +515,8 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
               </div>
             </div>
             
-            {/* Cost Breakdown by Category */}
-            <div className='space-y-4'>
+            {/* Cost Breakdown with Interactive Bar Graph */}
+            <div className='space-y-6'>
               <div className='grid grid-cols-4 gap-4'>
                 <div className='text-center'>
                   <div className='bg-gray-800 rounded-lg p-4 mb-2'>
@@ -570,7 +525,7 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
                     </div>
                     <p className='text-2xl font-bold'>${itineraryData?.activity_cost || 0}.00</p>
                   </div>
-                  <p className='text-xs text-gray-400'>Activities • 33%</p>
+                  <p className='text-xs text-gray-400'>Activities • {Math.round(((itineraryData?.activity_cost || 0) / basePrice) * 100)}%</p>
                 </div>
                 
                 <div className='text-center'>
@@ -580,7 +535,7 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
                     </div>
                     <p className='text-2xl font-bold'>${itineraryData?.lodging_cost || 0}.00</p>
                   </div>
-                  <p className='text-xs text-gray-400'>Lodging • 56%</p>
+                  <p className='text-xs text-gray-400'>Lodging • {Math.round(((itineraryData?.lodging_cost || 0) / basePrice) * 100)}%</p>
                 </div>
                 
                 <div className='text-center'>
@@ -590,7 +545,7 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
                     </div>
                     <p className='text-2xl font-bold'>${itineraryData?.transport_cost || 0}.00</p>
                   </div>
-                  <p className='text-xs text-gray-400'>Transport • 11%</p>
+                  <p className='text-xs text-gray-400'>Transport • {Math.round(((itineraryData?.transport_cost || 0) / basePrice) * 100)}%</p>
                 </div>
                 
                 <div className='text-center'>
@@ -604,42 +559,17 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
                 </div>
               </div>
               
-              {/* Detailed Breakdown Table */}
-              <div className='bg-gray-800/50 rounded-lg p-4 space-y-3'>
-                <div className='text-sm font-medium mb-3'>Guideline Fee:</div>
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className='grid grid-cols-[1fr_auto_auto_auto_auto] gap-4 items-center text-sm'>
-                    <div className='flex items-center gap-3'>
-                      <div className='w-8 h-8 bg-gray-700 rounded flex items-center justify-center'>
-                        {i + 1}
-                      </div>
-                      <span className='text-gray-400'>${(372 / 6).toFixed(2)}</span>
-                    </div>
-                    <div className='flex items-center gap-1'>
-                      <div className='w-6 h-6 bg-blue-500/20 rounded flex items-center justify-center'>
-                        <MdOutlineExplore className='h-4 w-4 text-blue-500' />
-                      </div>
-                      <GoHome className='h-4 w-4 text-gray-600' />
-                    </div>
-                    <div className='flex items-center gap-1'>
-                      <GoHome className='h-4 w-4 text-gray-600' />
-                      <GoHome className='h-4 w-4 text-gray-600' />
-                    </div>
-                    <div className='flex items-center gap-1'>
-                      <div className='w-6 h-6 bg-red-500/20 rounded flex items-center justify-center'>
-                        <MdOutlineDirectionsCarFilled className='h-4 w-4 text-red-500' />
-                      </div>
-                    </div>
-                    <div className='flex items-center gap-1'>
-                      <div className='w-6 h-6 bg-yellow-500/20 rounded flex items-center justify-center'>
-                        <BiSolidMap className='h-4 w-4 text-yellow-500' />
-                      </div>
-                      <div className='w-6 h-6 bg-yellow-500/20 rounded flex items-center justify-center'>
-                        <MdOutlineExplore className='h-4 w-4 text-yellow-500' />
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              {/* Interactive Budget Bar Graph */}
+              <div className='bg-gray-800/50 rounded-lg p-6'>
+                <h3 className='text-lg font-semibold mb-4'>Budget Trend Analysis</h3>
+                <p className='text-sm text-gray-400 mb-4'>Interactive budget visualization showing cost trends over time</p>
+                <ItineraryFilterBarGraph 
+                  currentValue={basePrice}
+                  maxValue={Math.max(5000, basePrice * 1.5)}
+                  color="#EAB308"
+                  enabled={true}
+                  onValueChange={(value) => console.log('Budget adjusted to:', value)}
+                />
               </div>
             </div>
           </div>
