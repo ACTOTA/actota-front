@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     // Get user session from backend
     const response = await actotaApi.get(
-      "/api/auth/session",
+      "/auth/session",
       {
         headers: {
           'Authorization': `Bearer ${authToken}`,
