@@ -177,10 +177,10 @@ export function searchActivitiesByCategories(
     const activityTypes = (activity.activity_types || []).map((type: string) => type.toLowerCase());
 
     // Check direct tag matches
-    const hasMatchingTag = activityTags.some(tag => searchTags.has(tag));
+    const hasMatchingTag = activityTags.some((tag: string) => searchTags.has(tag));
     
     // Check activity type matches
-    const hasMatchingType = activityTypes.some(type => searchTags.has(type));
+    const hasMatchingType = activityTypes.some((type: string) => searchTags.has(type));
     
     // Check keyword matches in name
     const hasKeywordMatch = Array.from(searchKeywords).some(keyword => 

@@ -72,7 +72,9 @@ export default function CompactActivitiesMenu({ updateSearchValue, activitiesVal
             }
         `;
         document.head.appendChild(style);
-        return () => document.head.removeChild(style);
+        return () => {
+            document.head.removeChild(style);
+        };
     }, []);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [selectedLodging, setSelectedLodging] = useState<string[]>([]);
