@@ -359,6 +359,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
                     durationValue={durationValue.length > 0 ? durationValue[0] : ""}
                     guestsValue={guestsValue.length > 0 ? guestsValue[0] : ""}
                     activitiesValue={activitiesValue.length > 0 ? activitiesValue.join(", ") : ""}
+                    setCurrStep={setCurrStep}
                   />
                 </div>
               </div>
@@ -531,6 +532,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
                   durationValue={durationValue.length > 0 ? durationValue[0] : ""}
                   guestsValue={guestsValue.length > 0 ? guestsValue[0] : ""}
                   activitiesValue={activitiesValue.length > 0 ? activitiesValue.join(", ") : ""}
+                  setCurrStep={setCurrStep}
                 />
               </div>
             </GlassPanel>

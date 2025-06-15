@@ -16,6 +16,7 @@ interface CompactActivitiesMenuProps {
     updateSearchValue?: (value: string) => void;
     activitiesValue?: string;
     className?: string;
+    onConfirm?: () => void;
 }
 
 // Activity category icons mapping
@@ -58,7 +59,7 @@ const categoryIcons: Record<string, any> = {
     'dining': PrivateChef,
 };
 
-export default function CompactActivitiesMenu({ updateSearchValue, activitiesValue, className }: CompactActivitiesMenuProps) {
+export default function CompactActivitiesMenu({ updateSearchValue, activitiesValue, className, onConfirm }: CompactActivitiesMenuProps) {
     // Add CSS to hide scrollbars
     React.useEffect(() => {
         const style = document.createElement('style');
@@ -402,6 +403,19 @@ export default function CompactActivitiesMenu({ updateSearchValue, activitiesVal
                         />
                     </div>
                 </div>
+            </div>
+            
+            {/* Confirm Button */}
+            <div className="mt-6">
+                <button
+                    onClick={() => {
+                        updateSummary();
+                        onConfirm?.();
+                    }}
+                    className="w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white hover:shadow-xl transform hover:scale-[1.02]"
+                >
+                    Confirm Selection
+                </button>
             </div>
         </GlassPanel>
 
