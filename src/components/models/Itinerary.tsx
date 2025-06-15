@@ -5,6 +5,12 @@ export interface BookingType {
     itinerary_id: Object;
     status: string;
     created_at?: Date; // Optional, matches Rust's DateTime
+    start_date?: string; // Start date of the booking
+    end_date?: string; // End date of the booking
+    arrival_datetime?: string; // Alternative field name for start date
+    departure_datetime?: string; // Alternative field name for end date
+    total_cost?: number; // Total cost of the booking
+    payment_intent_id?: string; // Stripe payment intent ID
 }
 
 // export interface FeaturedVacation {

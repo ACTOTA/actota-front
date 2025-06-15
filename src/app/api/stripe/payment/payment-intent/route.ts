@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		const response = await actotaApi.post("/api/payment/payment-intent",
+		const response = await actotaApi.post("/payment/payment-intent",
 			{
 				user_id,
 				amount,

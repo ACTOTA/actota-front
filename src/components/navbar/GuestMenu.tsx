@@ -1,14 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import PlusMinusButton, { ButtonType } from '../figma/PlusMinusButton';
+import GlassPanel from '../figma/GlassPanel';
+import { MOBILE_GLASS_PANEL_STYLES, getMobileGlassPanelProps } from './constants';
 
 interface GuestMenuProps {
     updateSearchValue?: (value: string) => void;
     guestsValue?: string;
     className?: string;
+    onConfirm?: () => void;
 }
 
-export default function GuestMenu({ updateSearchValue, guestsValue, className }: GuestMenuProps) {
+export default function GuestMenu({ updateSearchValue, guestsValue, className, onConfirm }: GuestMenuProps) {
     const max = 10;
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 1024);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     // Parse existing guest values if available
     const parseExistingValues = () => {
@@ -78,43 +91,70 @@ export default function GuestMenu({ updateSearchValue, guestsValue, className }:
     };
 
     return (
-        <section className={`h-full w-full max-w-[400px] mx-auto text-white backdrop-blur-md border-2 border-border-primary rounded-3xl grid grid-rows-3 gap-3 text-lg z-20 p-4 ${className}`}>
-            <div className="flex justify-between">
-                <div>
-                    <p>Adults</p>
-                    <p className="text-sm text-neutral-04">Ages 13 and above</p>
-                </div>
-                <div className="flex justify-around items-center gap-4">
-                    <PlusMinusButton buttonType={ButtonType.minus} onClick={updateAdults(ButtonType.minus)} />
-                    <p className="w-4 text-center">{adults}</p>
-                    <PlusMinusButton buttonType={ButtonType.plus} onClick={updateAdults(ButtonType.plus)} />
-                </div>
+        <GlassPanel
+            {...getMobileGlassPanelProps(isMobile)}
+            className={`h-full w-full max-w-[450px] mx-auto z-20 ${isMobile ? MOBILE_GLASS_PANEL_STYLES : ''} ${className}`}
+        >
+            <div className="mb-6">
+                <h2 className="text-left text-white text-xl font-semibold">Who's coming?</h2>
+                <p className="text-sm text-gray-400 mt-1">Add guests to your trip</p>
             </div>
-
-            <div className="flex justify-between">
-                <div>
-                    <p>Children</p>
-                    <p className="text-sm text-neutral-04">Ages 2-12</p>
-                </div>
-                <div className="flex justify-around items-center gap-4">
-                    <PlusMinusButton buttonType={ButtonType.minus} onClick={updateChildren(ButtonType.minus)} />
-                    <p className="w-4 text-center">{children}</p>
-                    <PlusMinusButton buttonType={ButtonType.plus} onClick={updateChildren(ButtonType.plus)} />
-                </div>
-            </div>
-
-            <div className="flex justify-between">
-                <div>
-                    <p>Infants</p>
-                    <p className="text-sm text-neutral-04">Ages 2 and below</p>
+            
+            <div className="space-y-6">
+                <div className="flex justify-between items-center p-4 bg-gray-800/30 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
+                    <div>
+                        <p className="font-medium">Adults</p>
+                        <p className="text-sm text-gray-400">Ages 13 and above</p>
+                    </div>
+                    <div className="flex justify-around items-center gap-4">
+                        <PlusMinusButton buttonType={ButtonType.minus} onClick={updateAdults(ButtonType.minus)} />
+                        <p className="w-8 text-center font-medium text-lg">{adults}</p>
+                        <PlusMinusButton buttonType={ButtonType.plus} onClick={updateAdults(ButtonType.plus)} />
+                    </div>
                 </div>
 
-                <div className="flex justify-around items-center gap-4">
-                    <PlusMinusButton buttonType={ButtonType.minus} onClick={updateInfant(ButtonType.minus)} />
-                    <p className="w-4 text-center">{infants}</p>
-                    <PlusMinusButton buttonType={ButtonType.plus} onClick={updateInfant(ButtonType.plus)} />
+                <div className="flex justify-between items-center p-4 bg-gray-800/30 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
+                    <div>
+                        <p className="font-medium">Children</p>
+                        <p className="text-sm text-gray-400">Ages 2-12</p>
+                    </div>
+                    <div className="flex justify-around items-center gap-4">
+                        <PlusMinusButton buttonType={ButtonType.minus} onClick={updateChildren(ButtonType.minus)} />
+                        <p className="w-8 text-center font-medium text-lg">{children}</p>
+                        <PlusMinusButton buttonType={ButtonType.plus} onClick={updateChildren(ButtonType.plus)} />
+                    </div>
+                </div>
+
+                <div className="flex justify-between items-center p-4 bg-gray-800/30 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors">
+                    <div>
+                        <p className="font-medium">Infants</p>
+                        <p className="text-sm text-gray-400">Ages 2 and below</p>
+                    </div>
+                    <div className="flex justify-around items-center gap-4">
+                        <PlusMinusButton buttonType={ButtonType.minus} onClick={updateInfant(ButtonType.minus)} />
+                        <p className="w-8 text-center font-medium text-lg">{infants}</p>
+                        <PlusMinusButton buttonType={ButtonType.plus} onClick={updateInfant(ButtonType.plus)} />
+                    </div>
                 </div>
             </div>
-        </section>
+            
+            {/* Confirm Button */}
+            <div className="mt-6">
+                <button
+                    onClick={() => {
+                        updateGuestSummary();
+                        onConfirm?.();
+                    }}
+                    disabled={adults === 0 && children === 0 && infants === 0}
+                    className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-lg ${
+                        (adults > 0 || children > 0 || infants > 0)
+                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white hover:shadow-xl transform hover:scale-[1.02]' 
+                            : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                    }`}
+                >
+                    Confirm Guests
+                </button>
+            </div>
+        </GlassPanel>
     );
 }

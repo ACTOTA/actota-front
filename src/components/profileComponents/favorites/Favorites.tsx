@@ -13,6 +13,7 @@ import { useFavorites } from "@/src/hooks/queries/account/useFavoritesQuery";
 const Favorites = () => {
   const [activeTab, setActiveTab] = useState("all");
   const [search, setSearch] = useState("");
+  const [sortOption, setSortOption] = useState("Lowest Price");
   const { data: favoriteItineraries, isLoading, error } = useFavorites();
 
   console.log('favoriteItineraries', favoriteItineraries);
@@ -20,7 +21,8 @@ const Favorites = () => {
   const filteredFavorites = React.useMemo(() => {
     if (!favoriteItineraries) return [];
 
-    return favoriteItineraries.filter((favorite: any) => {
+    // First filter based on search and tab
+    const filtered = favoriteItineraries.filter((favorite: any) => {
       const matchesSearch = favorite.trip_name.toLowerCase().includes(search.toLowerCase());
       const matchesTab = activeTab === "all" ||
         (activeTab === "dayItineraries" && favorite.length_days === 1) ||
@@ -28,7 +30,20 @@ const Favorites = () => {
 
       return matchesSearch && matchesTab;
     });
-  }, [favoriteItineraries, search, activeTab]);
+
+    // Then sort based on the selected option
+    return [...filtered].sort((a, b) => {
+      const priceA = a.person_cost || 0;
+      const priceB = b.person_cost || 0;
+      
+      if (sortOption === "Lowest Price") {
+        return priceA - priceB;
+      } else if (sortOption === "Highest Price") {
+        return priceB - priceA;
+      }
+      return 0;
+    });
+  }, [favoriteItineraries, search, activeTab, sortOption]);
 
   const tabs = [
     {
@@ -91,7 +106,7 @@ const Favorites = () => {
           <div className="w-full">
 
             <Input
-              placeholder="Select Your Bookings"
+              placeholder="Select Your Favorites"
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setSearch(e.target.value)
               }
@@ -101,12 +116,16 @@ const Favorites = () => {
           </div>
           <div className="inline-flex ">
 
-            <Dropdown label={<div className="flex items-center gap-1">
-              <div className=" h-5 w-5">
-
-                <Image src="/svg-icons/chevron-selector.svg" alt="dropdown-arrow" width={24} height={24} />
-              </div>
-            </div>} options={["Lowest Price", "Highest Price", "Any Duration"]} onSelect={() => { }} className="border-none !bg-[#141414] rounded-lg" />
+            <Dropdown 
+              label={<div className="flex items-center gap-1">
+                <div className="h-5 w-5">
+                  <Image src="/svg-icons/chevron-selector.svg" alt="dropdown-arrow" width={24} height={24} />
+                </div>
+              </div>} 
+              options={["Lowest Price", "Highest Price"]} 
+              onSelect={(option) => setSortOption(Array.isArray(option) ? option[0] : option)}
+              className="border-none !bg-[#141414] rounded-lg" 
+            />
           </div>
         </div>
         {renderContent()}

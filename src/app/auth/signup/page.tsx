@@ -8,9 +8,15 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useSignUp } from '@/src/hooks/mutations/auth.mutation';
 import { getAuthCookie } from '@/src/helpers/auth';
+import EmailVerification from '@/src/components/inputs/EmailVerification';
+
 export default function SignUp() {
   const router = useRouter();
   const { mutate: signUp, isPending } = useSignUp();
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [verifiedEmail, setVerifiedEmail] = useState('');
+  const [showEmailVerification, setShowEmailVerification] = useState(false);
+  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
 
   const [errors, setErrors] = useState({
     firstName: '',
@@ -96,6 +102,12 @@ export default function SignUp() {
     e.preventDefault();
     if (!validateForm()) return;
 
+    // Check if email needs verification
+    if (!emailVerified || verifiedEmail !== formData.email) {
+      setShowEmailVerification(true);
+      return;
+    }
+
     signUp(
       {
         firstName: formData.firstName,
@@ -105,37 +117,111 @@ export default function SignUp() {
       },
       {
         onSuccess: (data: any) => {
-          router.back()
           // Log the data structure to debug
           console.log('Signup success data:', JSON.stringify(data, null, 2));
           
           const userData = data.data;
           localStorage.setItem('user', JSON.stringify({
-            user_id: userData._id.$oid,
+            user_id: userData.user_id || userData._id?.$oid,
             first_name: userData.first_name,
             last_name: userData.last_name,
             email: userData.email,
             customer_id: userData.customer_id
           }));
 
-          window.location.href = '/';
+          // Store auth token if available
+          if (data.auth_token) {
+            localStorage.setItem('token', data.auth_token);
+          }
+
+          // Redirect to home page after successful signup
+          router.push('/');
         },
-        onError: (error) => {
-          router.back()
-          setErrors(prev => ({
-            ...prev,
-            email: 'Failed to create account'
-          }));
+        onError: (error: any) => {
+          // Check if the error is due to duplicate email
+          if (error?.response?.status === 409 || error?.message?.toLowerCase().includes('already exists')) {
+            setErrors(prev => ({
+              ...prev,
+              email: 'This email is already registered. Please sign in or use a different email.'
+            }));
+          } else {
+            setErrors(prev => ({
+              ...prev,
+              email: 'Failed to create account. Please try again.'
+            }));
+          }
         }
       }
     );
   };
 
+  const handleEmailVerificationSuccess = (email: string) => {
+    setEmailVerified(true);
+    setVerifiedEmail(email);
+    setFormData(prev => ({ ...prev, email }));
+    setIsCreatingAccount(true);
+    
+    // Automatically create the account after email verification
+    signUp(
+      {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: email,
+        password: formData.password
+      },
+      {
+        onSuccess: (data: any) => {
+          // Log the data structure to debug
+          console.log('Signup success data:', JSON.stringify(data, null, 2));
+          
+          const userData = data.data;
+          localStorage.setItem('user', JSON.stringify({
+            user_id: userData.user_id || userData._id?.$oid,
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            email: userData.email,
+            customer_id: userData.customer_id
+          }));
+
+          // Store auth token if available
+          if (data.auth_token) {
+            localStorage.setItem('token', data.auth_token);
+          }
+
+          // Redirect to home page after successful signup
+          router.push('/');
+        },
+        onError: (error: any) => {
+          setIsCreatingAccount(false);
+          setShowEmailVerification(false);
+          // Check if the error is due to duplicate email
+          if (error?.response?.status === 409 || error?.message?.toLowerCase().includes('already exists')) {
+            setErrors(prev => ({
+              ...prev,
+              email: 'This email is already registered. Please sign in or use a different email.'
+            }));
+          } else {
+            setErrors(prev => ({
+              ...prev,
+              email: 'Failed to create account. Please try again.'
+            }));
+          }
+        }
+      }
+    );
+  };
+
+  const handleEmailVerificationError = (error: string) => {
+    setErrors(prev => ({ ...prev, email: error }));
+    setShowEmailVerification(false);
+  };
+
+
 
   const handleGoogleLogin = async () => {
     // Don't show loading modal for Google login, just redirect directly
     try {
-      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`;
+      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
     } catch (error) {
       router.back();
       console.error('Google login error:', error);
@@ -161,6 +247,49 @@ export default function SignUp() {
       console.error('Facebook login error:', error);
     }
   };
+  
+  if (showEmailVerification) {
+    return (
+      <GlassPanel className="w-[584px] max-md:w-full max-md:!rounded-b-none max-md:!border-0 max-md:!border-t-[0.5px] flex flex-col justify-around relative text-white">
+        <div className="text-white flex justify-between items-center mb-6">
+          <h3 className="text-2xl font-semibold">
+            {isCreatingAccount ? 'Creating Your Account' : 'Verify Your Email'}
+          </h3>
+          <Image src="/images/actota-logo.png" alt="logo" width={110} height={20} />
+        </div>
+        
+        {isCreatingAccount ? (
+          <div className="py-8 text-center">
+            <div className="mb-4">
+              <svg className="animate-spin h-10 w-10 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+            <p className="text-lg text-white">Please wait while we create your account...</p>
+            <p className="text-sm text-primary-gray mt-2">This will only take a moment</p>
+          </div>
+        ) : (
+          <>
+            <EmailVerification
+              mode="signup"
+              initialEmail={formData.email}
+              onSuccess={handleEmailVerificationSuccess}
+              onError={handleEmailVerificationError}
+            />
+
+            <button
+              onClick={() => setShowEmailVerification(false)}
+              className="mt-6 text-primary-gray hover:text-white transition-colors"
+            >
+              ← Back to signup
+            </button>
+          </>
+        )}
+      </GlassPanel>
+    );
+  }
+
   return (
     <GlassPanel className="w-[584px] max-md:w-full max-md:!rounded-b-none max-md:!border-0 max-md:!border-t-[0.5px] flex flex-col justify-around relative text-white">
       <div className="text-white flex justify-between items-center">
@@ -205,15 +334,31 @@ export default function SignUp() {
         </div>
         <div>
           <p className="text-primary-gray  text-left mb-1 mt-[10px]">Email Address</p>
-          <Input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            icon={<Image src="/svg-icons/mail.svg" alt="mail" width={20} height={20} />}
-            placeholder="Your email address"
-            classname={errors.email ? 'border-[#79071D] ring-1 ring-[#79071D]' : ''}
-          />
+          <div className="relative">
+            <Input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                handleInputChange(e);
+                // Reset verification if email changes
+                if (verifiedEmail !== e.target.value) {
+                  setEmailVerified(false);
+                }
+              }}
+              icon={<Image src="/svg-icons/mail.svg" alt="mail" width={20} height={20} />}
+              placeholder="Your email address"
+              classname={errors.email ? 'border-[#79071D] ring-1 ring-[#79071D]' : ''}
+            />
+            {emailVerified && verifiedEmail === formData.email && (
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
+                <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="text-sm text-green-500">Verified</span>
+              </div>
+            )}
+          </div>
           {errors.email && (
             <div className="mt-1 px-2 py-1 text-sm text-white bg-[#79071D] rounded">
               {errors.email}

@@ -87,7 +87,29 @@ const Payment = () => {
     cvv: ''
   });
 
-  const [purchaseHistory, setPurchaseHistory] = useState([]);
+  // Define types for charges and refunds
+  interface ChargeItem {
+    id: string;
+    purchase: string;
+    bookingId?: string;
+    transactionDate: string;
+    paymentDate: string;
+    amount: string;
+    status: string;
+  }
+  
+  interface RefundItem {
+    id: string;
+    bookingId?: string;
+    refundDate: string;
+    originalAmount: string;
+    refundAmount: string;
+    reason: string;
+    status: string;
+  }
+  
+  const [purchaseHistory, setPurchaseHistory] = useState<ChargeItem[]>([]);
+  const [refundsHistory, setRefundsHistory] = useState<RefundItem[]>([]);
 
   useEffect(() => {
     // Skip the fetch if user ID is not available
@@ -129,19 +151,62 @@ const Payment = () => {
         if (data && data.data) {
           // Handle Stripe charges data structure
           const stripeCharges = data.data;
-          // Transform Stripe charges to match purchaseHistory format
-          const formattedTransactions = stripeCharges.map((charge: any) => ({
-            id: charge.id,
-            purchase: charge.description || "Vacation",
-            transactionId: charge.id,
-            transactionDate: new Date(charge.created * 1000).toLocaleDateString(),
-            paymentDate: new Date(charge.created * 1000).toLocaleDateString(),
-            amount: `$${(charge.amount / 100).toFixed(2)}`,
-            status: charge.status === "succeeded" ? "paid" : charge.status
-          }));
           
-          console.log("Formatted transactions:", formattedTransactions);
-          setPurchaseHistory(formattedTransactions);
+          // Define types for charges and refunds
+          interface ChargeItem {
+            id: string;
+            purchase: string;
+            bookingId?: string;
+            transactionDate: string;
+            paymentDate: string;
+            amount: string;
+            status: string;
+          }
+          
+          interface RefundItem {
+            id: string;
+            bookingId?: string;
+            refundDate: string;
+            originalAmount: string;
+            refundAmount: string;
+            reason: string;
+            status: string;
+          }
+          
+          // Separate charges and refunds with proper types
+          const charges: ChargeItem[] = [];
+          const refunds: RefundItem[] = [];
+          
+          stripeCharges.forEach((item: any) => {
+            if (item.transaction_type === 'refund') {
+              // This is a refund
+              refunds.push({
+                id: item.id,
+                bookingId: item.booking_id || item.metadata?.booking_id || item.charge,
+                refundDate: new Date(item.created * 1000).toLocaleDateString(),
+                originalAmount: `$${((item.charge_details?.amount || item.amount) / 100).toFixed(2)}`,
+                refundAmount: `$${(item.amount / 100).toFixed(2)}`,
+                reason: item.reason === 'expired_uncaptured_charge' ? 'Expired Authorization' : item.reason || 'Cancellation',
+                status: item.status
+              });
+            } else if (item.transaction_type === 'charge') {
+              // This is a charge
+              charges.push({
+                id: item.id,
+                purchase: item.description || "Vacation",
+                bookingId: item.booking_id || item.metadata?.booking_id,
+                transactionDate: new Date(item.created * 1000).toLocaleDateString(),
+                paymentDate: new Date(item.created * 1000).toLocaleDateString(),
+                amount: `$${(item.amount / 100).toFixed(2)}`,
+                status: item.status === "succeeded" ? "paid" : item.status
+              });
+            }
+          });
+          
+          console.log("Formatted transactions:", charges);
+          console.log("Formatted refunds:", refunds);
+          setPurchaseHistory(charges);
+          setRefundsHistory(refunds);
         } else {
           console.error("Invalid data format received:", data);
         }
@@ -149,7 +214,6 @@ const Payment = () => {
         console.error("Error fetching transactions:", error);
       }
     };
-
 
     fetchTransactions();
 
@@ -165,6 +229,11 @@ const Payment = () => {
       id: "paymentMethods",
       label: "Payment Methods",
       component: <>Payment Methods</>,
+    },
+    {
+      id: "refunds",
+      label: "Refunds",
+      component: <>Refunds</>,
     },
   ];
 
@@ -251,40 +320,11 @@ const Payment = () => {
     }
   };
 
-  // Handle card number input with formatting
-  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formattedValue = formatCardNumber(e.target.value);
-    setCardFormData(prev => ({
-      ...prev,
-      cardNumber: formattedValue
-    }));
-  };
-
-  // Detect card type based on the card number
-  const detectCardType = (cardNumber: string): string => {
-    const cleanNumber = cardNumber.replace(/\s+/g, '');
-
-    if (/^4/.test(cleanNumber)) {
-      return 'Visa';
-    } else if (/^5[1-5]/.test(cleanNumber)) {
-      return 'MasterCard';
-    } else if (/^3[47]/.test(cleanNumber)) {
-      return 'Amex';
-    } else if (/^6(?:011|5)/.test(cleanNumber)) {
-      return 'Discover';
-    } else {
-      return 'Unknown';
-    }
-  };
-
-  const handleAddCard = () => {
-    if (!validateCardForm()) {
-      return;
-    }
-
-    };
-
-  // Delete card
+  const navigateToBooking = (id: string) => {
+    console.log("ID: ", id);
+    router.push(`/bookings/${id}`);
+  }
+  
   const handleDeleteCard = (cardId: string | number) => {
     // Preserve the current tab state when opening the modal
     const query = new URLSearchParams(window.location.search);
@@ -392,7 +432,7 @@ const Payment = () => {
                         <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent" />
                       </td>
                     </tr>
-                    <tr key={i} className="w-full">
+                    <tr key={i} className="w-full cursor-pointer" onClick={() => navigateToBooking(item.bookingId)}>
                       <td className="py-5">
                         <p className="text-white text-sm">{item.purchase}   </p>
                       </td>
@@ -407,7 +447,7 @@ const Payment = () => {
                 ))}
               </tbody>
             </table>
-          </div> :
+          </div> : activeTab === "paymentMethods" ? (
           <div>
             <p className="font-bold text-2xl mb-8">Saved Cards {savedCards.length > 0 && `(${savedCards.length})`}</p>
 
@@ -520,7 +560,92 @@ const Payment = () => {
               </div>
             )}
           </div>
-        }
+          ) : activeTab === "refunds" ? (
+          <div className="mb-4">
+            <p className="font-bold text-2xl mb-8">Refund History ({refundsHistory.length})</p>
+
+            <div className="mb-4 flex gap-2">
+              <div className="w-full">
+                <Input
+                  placeholder="Search refunds"
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setSearch(e.target.value)
+                  }
+                  icon={<FiSearch className="w-5 h-5" />}
+                  className="px-3 py-2.5 "
+                />
+              </div>
+              <div className="inline-flex">
+                <Dropdown
+                  options={["Newest", "Oldest"]}
+                  onSelect={() => { }}
+                  className="border-none !bg-[#141414]"
+                  placeholder="Newest"
+                />
+              </div>
+            </div>
+
+            {refundsHistory.length > 0 ? (
+              <table className="w-full overflow-auto text-white text-sm ">
+                <thead className="text-primary-gray font-normal text-left ">
+                  <tr>
+                    <th className="py-5">Booking ID</th>
+                    <th className="py-5">Refund Date</th>
+                    <th className="py-5">Original Amount</th>
+                    <th className="py-5">Refund Amount</th>
+                    <th className="py-5">Reason</th>
+                    <th className="py-5 text-center">Status</th>
+                  </tr>
+                </thead>
+
+                <tbody className="w-full ">
+                  {refundsHistory.map((item: any, i) => (
+                    <React.Fragment key={i}>
+                      <tr className="w-full">
+                        <td colSpan={6}>
+                          <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-primary-gray to-transparent" />
+                        </td>
+                      </tr>
+                      <tr key={i} className="w-full cursor-pointer" onClick={() => item.bookingId && navigateToBooking(item.bookingId)}>
+                        <td className="py-5">
+                          <p className="text-white text-sm">{item.bookingId ? item.bookingId.slice(-8) : '-'}</p>
+                        </td>
+                        <td className="py-5">{item.refundDate}</td>
+                        <td className="py-5">{item.originalAmount}</td>
+                        <td className="py-5 text-green-400">{item.refundAmount}</td>
+                        <td className="py-5">{item.reason}</td>
+                        <td className="py-5 text-center ">
+                          <Button 
+                            variant="primary" 
+                            size="sm" 
+                            className={`mx-auto ${
+                              item.status === "succeeded" ? "!bg-green-600" : 
+                              item.status === "pending" ? "!bg-[#FFC107]" : 
+                              item.status === "failed" ? "!bg-red-600" : 
+                              "!bg-[#215CBA]"
+                            } text-white`}
+                          >
+                            {item.status === "succeeded" ? "Refunded" : 
+                             item.status === "pending" ? "Processing" : 
+                             item.status === "failed" ? "Failed" : 
+                             item.status}
+                          </Button>
+                        </td>
+                      </tr>
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="text-center py-8 text-primary-gray">
+                <p>No refunds found.</p>
+                <p className="mt-2">Your refund history will appear here.</p>
+              </div>
+            )}
+          </div>
+          ) : (
+          null
+          )}
       </div>
     </div>
   );

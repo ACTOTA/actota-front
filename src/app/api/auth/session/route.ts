@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import actotaApi from '@/src/lib/apiClient';
-import { getAuthCookie } from '@/src/helpers/auth';
+import { getAuthCookie, signOut } from '@/src/helpers/auth';
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     // Get user session from backend
     const response = await actotaApi.get(
-      "/api/auth/session",
+      "/auth/session",
       {
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -36,6 +36,24 @@ export async function GET(request: NextRequest) {
     console.error('Error getting session:', error);
     return NextResponse.json(
       { success: false, message: error.message || 'An error occurred' },
+      { status: error.response?.status || 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    // Clear the auth cookie
+    await signOut();
+    
+    return NextResponse.json(
+      { success: true, message: 'Successfully logged out' },
+      { status: 200 }
+    );
+  } catch (error: any) {
+    console.error('Error during logout:', error);
+    return NextResponse.json(
+      { success: false, message: error.message || 'An error occurred during logout' },
       { status: error.response?.status || 500 }
     );
   }

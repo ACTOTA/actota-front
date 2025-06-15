@@ -3,13 +3,14 @@ import { useRouter } from 'next/navigation';
 import React from 'react';
 import Button from '@/src/components/figma/Button';
 import Image from 'next/image';
-import GlassPanel from '@/src/components/figma/GlassPanel';
 import { FaPersonWalking } from 'react-icons/fa6';
 import { LuUsers } from "react-icons/lu";
 import { IoLeafOutline } from "react-icons/io5";
 import { MdAccessTime } from 'react-icons/md';
 import LikeDislike from '../../LikeDislike';
 import { ItineraryData } from '@/src/types/itineraries';
+import BaseCard from '../../shared/BaseCard';
+import ActivityTag from '../../shared/ActivityTag';
 
 interface FavoritesCardProps {
     data: ItineraryData;
@@ -25,7 +26,7 @@ const FavoritesCard: React.FC<FavoritesCardProps> = ({ data }) => {
             .map(day => day.location?.name)
             .filter((loc, index, self) =>
                 self.indexOf(loc) === index &&
-                loc !== data.start_location.city
+                loc !== data.start_location?.city
             )
     ];
 
@@ -33,74 +34,91 @@ const FavoritesCard: React.FC<FavoritesCardProps> = ({ data }) => {
         ? `${locations.slice(0, 2).join(', ')}, ${locations.length - 2} More`
         : locations.join(', ');
 
-    return (
-        <GlassPanel className='!p-4 max-sm:!p-0 max-sm:border-none !rounded-[22px] max-w-[864px] hover:cursor-pointer flex justify-between items-end mt-4 bg-gradient-to-br from-[#6B6B6B]/30 to-[black]'>
-            <div onClick={() => router.push(`/itineraries/${data._id.$oid}`)} className='flex justify-between max-lg:flex-col-reverse relative gap-4 h-full w-full'>
-                <div>
-                    <div className='flex justify-start items-center flex-wrap gap-1 max-w-[70%] text-white max-md:absolute max-md:top-2 max-md:left-2'>
-                        {data.activities?.slice(0, 2).map((activity, index) => (
-                            <div key={index} className='bg-[#05080D] rounded-full px-3 py-1 flex items-center justify-center gap-1'>
-                                <IoLeafOutline className='h-5 w-5 text-white' />
-                                {activity.label}
-                            </div>
-                        ))}
-                    </div>
-                    <div className='max-md:flex w-full justify-between'>
-                        <div>
-                            <p className='text-2xl font-bold mt-3 max-md:mt-0 flex items-start gap-1'>
-                                {data.trip_name?.length > 30 ? data.trip_name?.slice(0, 30) + "..." : data.trip_name}
-                                {data.length_days === 1 && (
-                                    <Button variant='primary' size='sm' className='!bg-[#215CBA] text-white text-xs font-normal whitespace-nowrap'>
-                                        Day 1/1
-                                    </Button>
-                                )}
-                            </p>
+    const handleCardClick = () => {
+        router.push(`/itineraries/${data._id.$oid}`);
+    };
 
-                            <p className='py-2 text-sm text-primary-gray'>{locationString}</p>
-                            <div className='flex justify-start items-center gap-3 mb-2 text-white'>
-                                <div className='flex gap-1 text-xs'>
-                                    <MdAccessTime className='h-[17px] w-[17px] text-white' />
-                                    <p>{data.length_days} {data.length_days > 1 ? "Days" : "Day"}</p>
-                                </div>
-                                <div className='flex gap-1 text-xs'>
-                                    <LuUsers className='h-[17px] w-[17px] text-white' />
-                                    <p>{data.min_group}-{data.max_group}</p>
-                                </div>
-                                <div className='flex gap-1 text-xs my-2'>
-                                    <FaPersonWalking className='h-[17px] w-[17px] text-white' />
-                                    <p>{data.activities?.length} {data.activities?.length === 1 ? "Activity" : "Activities"}</p>
-                                </div>
-                            </div>
+    const handleShareClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        router.push(`?modal=shareModal&itineraryId=${data._id.$oid}`);
+    };
+
+    return (
+        <BaseCard className="mt-4 !p-0 overflow-hidden lg:h-64" onClick={handleCardClick}>
+            <div className='flex flex-col lg:flex-row lg:h-full relative'>
+                {/* Mobile/Desktop image section */}
+                <div className='relative lg:w-80 h-48 lg:h-full lg:order-2'>
+                    <Image
+                        src={data.images?.[0] || "/images/default-itinerary.jpeg"}
+                        alt={data.trip_name}
+                        fill
+                        className='object-cover lg:rounded-r-2xl lg:rounded-tl-none rounded-t-2xl'
+                    />
+                    
+                    {/* Action buttons overlay */}
+                    <div className='absolute top-3 right-3 flex gap-2'>
+                        <button
+                            onClick={handleShareClick}
+                            className='bg-black/60 hover:bg-black/80 backdrop-blur-sm rounded-full h-10 w-10 flex items-center justify-center transition-colors'
+                        >
+                            <Image src="/svg-icons/share.svg" alt="share" height={20} width={20} />
+                        </button>
+                        <div onClick={(e) => e.stopPropagation()}>
+                            <LikeDislike liked={true} favoriteId={data._id.$oid} />
                         </div>
-                        <div>
-                            <p className='text-xs text-primary-gray'>from</p>
-                            <p className='text-xl font-bold'>${data.person_cost}</p>
-                        </div>
+                    </div>
+
+                    {/* Price overlay at bottom right */}
+                    <div className='absolute bottom-3 right-3 text-right'>
+                        <p className='text-xs text-gray-300 bg-black/60 backdrop-blur-sm px-2 py-1 rounded'>from</p>
+                        <p className='text-2xl font-bold text-white bg-black/60 backdrop-blur-sm px-2 py-1 rounded mt-1'>${data.person_cost}</p>
                     </div>
                 </div>
 
-                <Image
-                    src={data.images[0] || "/images/hero-bg.jpg"} // Fallback image since data.images is null
-                    alt={data.trip_name}
-                    height={200}
-                    width={300}
-                    objectFit='cover'
-                    className='rounded-lg max-lg:w-full'
-                />
-                <div className='flex gap-2 absolute top-2 right-2'>
-                    <div
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            router.push(`?modal=shareModal&itineraryId=${data._id.$oid}`)
-                        }}
-                        className='bg-[#05080D] rounded-full h-10 w-10 flex items-center justify-center'
-                    >
-                        <Image src="/svg-icons/share.svg" alt="share" height={20} width={20} />
+                {/* Content section */}
+                <div className='flex-1 p-4 lg:p-6 lg:order-1'>
+                    {/* Activity tags */}
+                    <div className='flex flex-wrap gap-2 mb-3 lg:mb-4'>
+                        {data.activities?.slice(0, 2).map((activity, index) => (
+                            <ActivityTag key={index} icon={<IoLeafOutline className='size-4' />}>
+                                {activity.label}
+                            </ActivityTag>
+                        ))}
+                        {data.length_days === 1 && (
+                            <ActivityTag>
+                                Day Trip
+                            </ActivityTag>
+                        )}
                     </div>
-                    <LikeDislike liked={true} favoriteId={data._id.$oid} />
+
+                    {/* Trip name */}
+                    <h3 className='text-lg lg:text-xl font-bold text-white mb-2'>
+                        {data.trip_name}
+                    </h3>
+
+                    {/* Location */}
+                    <p className='text-sm text-gray-400 mb-3'>{locationString}</p>
+                    
+                    {/* Trip details - stack on mobile, horizontal on desktop */}
+                    <div className='flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2 text-white text-xs'>
+                        <div className='flex items-center gap-1'>
+                            <MdAccessTime className='size-3' />
+                            <span>{data.length_days} day{data.length_days > 1 ? 's' : ''}{data.lodging && data.lodging.length > 0 ? ` ${data.lodging.length} night${data.lodging.length > 1 ? 's' : ''}` : ''}</span>
+                        </div>
+                        <div className='hidden sm:block text-gray-400'>|</div>
+                        <div className='flex items-center gap-1'>
+                            <LuUsers className='size-3' />
+                            <span>{data.min_group}-{data.max_group} Guests</span>
+                        </div>
+                        <div className='hidden sm:block text-gray-400'>|</div>
+                        <div className='flex items-center gap-1'>
+                            <FaPersonWalking className='size-3' />
+                            <span>{data.activities?.length || 0} Activities</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </GlassPanel>
+        </BaseCard>
     );
 }
 

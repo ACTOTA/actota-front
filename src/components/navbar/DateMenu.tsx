@@ -1,33 +1,95 @@
 import React, { useState, useEffect } from 'react';
 import DateMenuCalendar from '../figma/DateMenuCalendar';
+import GlassPanel from '../figma/GlassPanel';
+import { MOBILE_GLASS_PANEL_STYLES, getMobileGlassPanelProps } from './constants';
+import WheelPicker from './WheelPicker';
 
 interface DateMenuProps {
   updateSearchValue?: (value: string) => void;
   durationValue?: string;
   className?: string;
+  onConfirm?: () => void;
 }
 
-export default function DateMenu({ updateSearchValue, durationValue, className }: DateMenuProps) {
+export default function DateMenu({ updateSearchValue, durationValue, className, onConfirm }: DateMenuProps) {
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('17:00');
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     updateDurationSummary();
   }, [startDate, endDate, startTime, endTime]);
 
   const updateDurationSummary = () => {
-    let summary = '';
-
-    // Exact dates mode
     if (startDate && endDate) {
-      summary = `${startDate} - ${endDate}`;
+      // Create ISO datetime strings with time information
+      const arrivalDateTime = `${startDate}T${startTime}:00`;
+      const departureDateTime = `${endDate}T${endTime}:00`;
+      
+      // Calculate duration for display
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      const timeDiff = end.getTime() - start.getTime();
+      const durationDays = Math.max(1, Math.ceil(timeDiff / (1000 * 3600 * 24)));
+      
+      // Format dates for display
+      const formatDate = (dateStr: string) => {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      };
+      
+      const displayText = startDate === endDate 
+        ? `${formatDate(startDate)} (1 day)`
+        : `${formatDate(startDate)} - ${formatDate(endDate)} (${durationDays} ${durationDays === 1 ? 'day' : 'days'})`;
+      
+      // Send formatted display text with embedded datetime data
+      const searchValue = `${displayText}|${JSON.stringify({
+        arrival_datetime: arrivalDateTime,
+        departure_datetime: departureDateTime
+      })}`;
+      
+      updateSearchValue?.(searchValue);
     } else if (startDate) {
-      summary = startDate;
+      // Single date - same arrival and departure
+      const arrivalDateTime = `${startDate}T${startTime}:00`;
+      const departureDateTime = `${startDate}T${endTime}:00`;
+      
+      const formatDate = (dateStr: string) => {
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      };
+      
+      const displayText = `${formatDate(startDate)} (1 day)`;
+      
+      // Send formatted display text with embedded datetime data
+      const searchValue = `${displayText}|${JSON.stringify({
+        arrival_datetime: arrivalDateTime,
+        departure_datetime: departureDateTime
+      })}`;
+      
+      updateSearchValue?.(searchValue);
+    } else {
+      updateSearchValue?.('');
     }
+  };
 
-    updateSearchValue?.(summary);
+  const getDateRangeDisplay = () => {
+    if (!startDate && !endDate) return 'Select Date';
+    if (startDate && !endDate) return startDate;
+    if (startDate && endDate && startDate === endDate) return startDate;
+    if (startDate && endDate) return `${startDate} → ${endDate}`;
+    return 'Select Date';
   };
 
   const handleDateRangeChange = (start: string | null, end: string | null) => {
@@ -35,70 +97,77 @@ export default function DateMenu({ updateSearchValue, durationValue, className }
     setEndDate(end);
   }
 
-  const handleStartTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setStartTime(e.target.value);
-  }
-
-  const handleEndTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setEndTime(e.target.value);
-  }
-
-  // Generate time options from 00:00 to 23:45 in 15-minute increments
-  const timeOptions = Array.from({ length: 96 }, (_, i) => {
-    const hours = Math.floor(i / 4).toString().padStart(2, '0');
-    const minutes = ((i % 4) * 15).toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
-  });
+  // Validate that end time is after start time
+  useEffect(() => {
+    if (startDate && endDate && startDate === endDate) {
+      // If same day, ensure end time is after start time
+      const [startHour, startMin] = startTime.split(':').map(Number);
+      const [endHour, endMin] = endTime.split(':').map(Number);
+      const startMinutes = startHour * 60 + startMin;
+      const endMinutes = endHour * 60 + endMin;
+      
+      if (endMinutes <= startMinutes) {
+        // Set end time to 1 hour after start time
+        const newEndMinutes = startMinutes + 60;
+        const newEndHour = Math.floor(newEndMinutes / 60) % 24;
+        const newEndMin = newEndMinutes % 60;
+        setEndTime(`${newEndHour.toString().padStart(2, '0')}:${newEndMin.toString().padStart(2, '0')}`);
+      }
+    }
+  }, [startTime, endTime, startDate, endDate]);
 
   return (
-    <section className={`w-full mx-auto h-full text-white backdrop-blur-md border-2 border-border-primary rounded-3xl flex-col justify-center items-center gap-2 px-3 sm:px-4 md:px-6 pt-6 pb-5 ${className}`}>
-      <div className="w-full mb-2">
-        <h2 className="text-center text-white text-lg font-semibold">Select Dates</h2>
+    <GlassPanel
+      {...getMobileGlassPanelProps(isMobile)}
+      className={`w-full mx-auto flex flex-col ${isMobile ? MOBILE_GLASS_PANEL_STYLES : ''} ${className}`}
+    >
+      {/* Date Range Header */}
+      <div className="w-full text-center mb-2">
+        <h3 className="text-white text-base font-medium">{getDateRangeDisplay()}</h3>
       </div>
 
       <DateMenuCalendar onDateRangeChange={handleDateRangeChange} />
 
-      <div className='w-full mt-3 mb-1 mx-auto flex flex-wrap'>
-        <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
-          <div className="flex items-center bg-[#111] p-2 rounded-md">
-            <div className="text-white text-xs font-bold whitespace-nowrap mr-2">Start:</div>
-            <select
-              value={startTime}
-              onChange={handleStartTimeChange}
-              className="w-full bg-transparent border-none text-[#f7f7f7] text-sm font-normal leading-tight appearance-none pl-1 pr-5 cursor-pointer"
-              style={{
-                backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 0.25rem center',
-                backgroundSize: '0.5em auto'
-              }}
-            >
-              {timeOptions.map(time => (
-                <option key={time} value={time} className='bg-black'>{time}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex items-center bg-[#111] p-2 rounded-md">
-            <div className="text-white text-xs font-bold whitespace-nowrap mr-2">End:</div>
-            <select
-              value={endTime}
-              onChange={handleEndTimeChange}
-              className="w-full bg-transparent border-none text-[#f7f7f7] text-sm font-normal leading-tight appearance-none pl-1 pr-5 cursor-pointer"
-              style={{
-                backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
-                backgroundRepeat: 'no-repeat',
-                backgroundPosition: 'right 0.25rem center',
-                backgroundSize: '0.5em auto'
-              }}
-            >
-              {timeOptions.map(time => (
-                <option key={time} value={time} className='bg-black'>{time}</option>
-              ))}
-            </select>
-          </div>
+      {/* Time Selectors */}
+      <div className='w-full mt-2 border-t border-gray-700 pt-3'>
+        <div className='flex gap-4 justify-center'>
+          <WheelPicker
+            value={startTime}
+            onChange={setStartTime}
+            label="Start Time"
+          />
+          <WheelPicker
+            value={endTime}
+            onChange={setEndTime}
+            label="End Time"
+          />
         </div>
       </div>
-    </section>
+      
+      {/* Booking note */}
+      <div className="text-center text-xs text-gray-500 mt-1">
+        * Minimum 1 day advance booking required
+      </div>
+      
+      {/* Confirm Button */}
+      <div className="mt-3 px-4 pb-3">
+        <button
+          onClick={() => {
+            if (startDate) {
+              updateDurationSummary();
+              onConfirm?.();
+            }
+          }}
+          disabled={!startDate}
+          className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-lg ${
+            startDate 
+              ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white hover:shadow-xl transform hover:scale-[1.02]' 
+              : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+          }`}
+        >
+          Confirm Dates
+        </button>
+      </div>
+    </GlassPanel>
   );
 }

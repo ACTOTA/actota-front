@@ -31,6 +31,15 @@ const config: Config = {
         "border-primary": "#6D6D6D",
         cyan: "#79FFE1",
       },
+      animation: {
+        'slide-up': 'slideUp 0.3s ease-out',
+      },
+      keyframes: {
+        slideUp: {
+          '0%': { transform: 'translateY(100%)' },
+          '100%': { transform: 'translateY(0)' },
+        },
+      },
     },
   },
   plugins: [

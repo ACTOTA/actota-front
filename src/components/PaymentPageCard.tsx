@@ -71,81 +71,77 @@ const PaymentPageCard = ({ itineraryData }: PaymentPageCardProps) => {
     })}`;
 
     return (
-        <div className="md:!p-4 !rounded-2xl max-w-[843px]  hover:cursor-pointer mt-4 bg-gradient-to-r from-[#1A1A1A] to-[#0D0D0D]/70 border border-primary-gray max-md:!bg-transparent max-md:border-none">
-            <div className="relative flex justify-between items-center max-md:flex-col-reverse gap-4 w-full max-md:!bg-transparent">
-                <div className="flex flex-col justify-between text-white max-md:w-full max-md:!bg-transparent">
-                    <div>
-
-                        <div className=" inline-flex items-center max-md:absolute max-md:top-2 max-md:left-2 gap-1 mb-2 bg-black rounded-full p-2 pr-4">
-                           
-                            <Image src="/svg-icons/diamond.svg" alt="rare find" width={24} height={24} />
-                            <span className="">Rare Find!</span>
-                        </div>
-                    </div>
-                    <h3 className="text-2xl font-bold">{trip_name}</h3>
-
-                    <div className="flex justify-between gap-4 mt-2 text-sm max-md:w-full max-md:!bg-transparent">
-                        <div className='flex flex-col gap-1'>
-
-                            <div className="flex items-center gap-1">
-                                <CiCalendar className="h-5 w-5" />
-                                <span>{dateRange}</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <Image src="/svg-icons/clock.svg" alt="duration" width={20} height={20} />
-                                <span>{length_days} day{length_days > 1 ? 's' : ''} ({length_hours} hours)</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <LuUsers className="h-5 w-5" />
-                                <span>{min_group}-{max_group} Guests</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <GrLocation className="h-5 w-5" />
-                                <span>{locationString}</span>
-                            </div>
-                        </div>
-                        <div className='flex flex-col gap-1'>
-
-
-                            <div className="flex items-center gap-1">
-                                <LuUser className="h-5 w-5" />
-                                <span>Guided Tour</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <GoHome className="h-5 w-5" />
-                                <span>{length_days} day trip</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <Image 
-                                    src="/transportation-icons/sedan.svg" 
-                                    alt="transportation" 
-                                    width={20} 
-                                    height={20} 
-                                />
-                                <span>Transportation included</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                                <Image 
-                                    src="/activity-icons/hiking.svg" 
-                                    alt="activities" 
-                                    width={20} 
-                                    height={20} 
-                                />
-                                <span>{activities?.length} Activities</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+        <div className="flex flex-col lg:flex-row gap-6">
+            {/* Image Section */}
+            <div className="lg:w-1/3">
                 <Image
                     src={images[0] || '/images/hero-bg.jpg'}
                     alt={trip_name}
                     height={200}
-                    width={300}
-                    objectFit="cover"
-                    className="rounded-lg max-md:w-full"
+                    width={400}
+                    className="rounded-xl w-full h-48 lg:h-full object-cover"
                 />
+            </div>
 
+            {/* Details Section */}
+            <div className="flex-1 space-y-4">
+                {/* Header */}
+                <div className="flex items-start justify-between">
+                    <div>
+                        <h3 className="text-xl font-bold mb-2">{trip_name}</h3>
+                        <div className="inline-flex items-center gap-2 bg-yellow-500/10 text-yellow-500 rounded-full px-3 py-1 text-sm">
+                            <Image src="/svg-icons/diamond.svg" alt="rare find" width={16} height={16} />
+                            <span className="font-medium">Rare Find!</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Info Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-3 text-gray-300">
+                            <CiCalendar className="h-5 w-5 text-gray-400" />
+                            <span>{dateRange}</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-gray-300">
+                            <Image src="/svg-icons/clock.svg" alt="duration" width={20} height={20} className="opacity-60" />
+                            <span>{length_days} day{length_days > 1 ? 's' : ''} ({length_hours} hours)</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-gray-300">
+                            <LuUsers className="h-5 w-5 text-gray-400" />
+                            <span>{min_group}-{max_group} Guests</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-gray-300">
+                            <GrLocation className="h-5 w-5 text-gray-400" />
+                            <span>{locationString}</span>
+                        </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                        <div className="flex items-center gap-3 text-gray-300">
+                            <LuUser className="h-5 w-5 text-gray-400" />
+                            <span>Guided Tour</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-gray-300">
+                            <div className="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center">
+                                <GoHome className="h-3 w-3 text-red-500" />
+                            </div>
+                            <span>Accommodation included</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-gray-300">
+                            <div className="w-5 h-5 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                                <MdOutlineDirectionsCarFilled className="h-3 w-3 text-yellow-500" />
+                            </div>
+                            <span>Transportation included</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-gray-300">
+                            <div className="w-5 h-5 rounded-full bg-blue-500/20 flex items-center justify-center">
+                                <FaPersonWalking className="h-3 w-3 text-blue-500" />
+                            </div>
+                            <span>{activities?.length} Activities</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );

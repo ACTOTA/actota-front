@@ -5,6 +5,88 @@
 body {
   background-color: black;
 }
+
+/* Blur effect for unauthenticated users */
+.blur-sensitive {
+  filter: blur(4px);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Dark theme styles for react-phone-number-input */
+.PhoneInput {
+  --PhoneInput-color: white;
+  --PhoneInputInternationalIconPhone-opacity: 0.7;
+  --PhoneInputInternationalIconGlobe-opacity: 0.7;
+  --PhoneInputCountrySelect-marginRight: 0.5rem;
+}
+
+.PhoneInputInput {
+  background-color: #0A0A0A !important;
+  color: white !important;
+  border-color: #374151 !important;
+}
+
+.PhoneInputInput:focus {
+  outline: none;
+  border-color: #EAB308 !important;
+}
+
+.PhoneInputCountrySelect {
+  background-color: #0A0A0A !important;
+  color: white !important;
+  border-right: 1px solid #374151 !important;
+}
+
+.PhoneInputCountrySelectArrow {
+  color: #9CA3AF !important;
+  opacity: 0.5 !important;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes expandPanel {
+  from {
+    max-height: 64px;
+  }
+  to {
+    max-height: 90vh;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-expand {
+  animation: expandPanel 0.3s ease-out forwards;
+}
 .gradient-bg {
   background: linear-gradient(135deg, #1a1a1a, #0d0d0d);
  
@@ -17,6 +99,18 @@ body {
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;  /* Chrome, Safari and Opera */
+}
+
+/* Global scrollbar hiding */
+body::-webkit-scrollbar,
+.modal-content::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+/* Safe area insets for iOS devices */
+.safe-area-inset-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .PhoneInputInput {
@@ -285,5 +379,28 @@ Stroke-Blue {
     font-weight: 400;
     font-style: normal;
   }
+  
+  /* Hide scrollbar for wheel picker 
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  */
+.animate-fade-in-down {
+  animation: fadeInDown 0.3s ease-out;
 }
- */
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

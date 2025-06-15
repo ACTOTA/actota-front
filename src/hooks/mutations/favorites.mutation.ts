@@ -14,7 +14,7 @@ const useAddFavorites = () => {
           throw new Error("Please login to add favorites");
         }
             const response = await actotaApi.post(
-          `/api/account/${user?.user_id}/favorites/${favoriteId}`,
+          `/account/${user?.user_id}/favorites/${favoriteId}`,
           {},
          
         );
@@ -42,7 +42,7 @@ const useRemoveFavorites = () => {
             throw new Error("Please login to remove favorites");
           }
               const response = await actotaApi.delete(
-            `/api/account/${user?.user_id}/favorites/${favoriteId}`,
+            `/account/${user?.user_id}/favorites/${favoriteId}`,
            
           );
           return response.data;

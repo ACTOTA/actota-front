@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import LocationMenu from './LocationMenu';
 import DateMenu from './DateMenu';
 import GuestMenu from './GuestMenu';
-import ActivitiesMenu from './ActivitiesMenu';
+import CompactActivitiesMenu from './CompactActivitiesMenu';
 
 type SearchBoxesProps = {
   step: STEPS;
@@ -13,6 +13,7 @@ type SearchBoxesProps = {
   durationValue?: string;
   guestsValue?: string;
   activitiesValue?: string;
+  setCurrStep?: (step: STEPS | null) => void;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export default function SearchBoxes({
@@ -22,6 +23,7 @@ export default function SearchBoxes({
   durationValue,
   guestsValue,
   activitiesValue,
+  setCurrStep,
   ...rest
 }: SearchBoxesProps) {
 
@@ -41,15 +43,16 @@ export default function SearchBoxes({
   }, [step]);
 
   return (
-    <div className={`m-auto mt-4
-        before:rounded-3xl rounded-3xl flex flex-col justify-center items-center box-content 
-        max-lg:max-h-[70vh] max-lg:overflow-y-auto max-lg:w-full
+    <div className={`m-auto mt-4 max-lg:mt-0
+        flex flex-col justify-center items-center box-content 
+        max-lg:w-full
         w-full lg:w-[${dimensions.w}px] max-w-full mx-auto`} {...rest}>
       {step === STEPS.LOCATION &&
         <LocationMenu
           updateSearchValue={(value) => updateSearchValue?.(STEPS.LOCATION, value)}
           locationValue={locationValue}
-          className='bg-black/60 backdrop-filter max-lg:mt-0 max-lg:mb-4'
+          className='max-lg:mt-0'
+          onConfirm={() => setCurrStep?.(STEPS.DATE)}
         />
       }
 
@@ -57,7 +60,8 @@ export default function SearchBoxes({
         <DateMenu
           updateSearchValue={(value) => updateSearchValue?.(STEPS.DATE, value)}
           durationValue={durationValue}
-          className='bg-black/60 backdrop-filter max-lg:mt-0 max-lg:mb-4'
+          className='max-lg:mt-0'
+          onConfirm={() => setCurrStep?.(STEPS.GUESTS)}
         />
       }
 
@@ -65,15 +69,17 @@ export default function SearchBoxes({
         <GuestMenu
           updateSearchValue={(value) => updateSearchValue?.(STEPS.GUESTS, value)}
           guestsValue={guestsValue}
-          className='bg-black/60 backdrop-filter max-lg:mt-0 max-lg:mb-4'
+          className='max-lg:mt-0'
+          onConfirm={() => setCurrStep?.(STEPS.ACTIVITIES)}
         />
       }
 
       {step === STEPS.ACTIVITIES &&
-        <ActivitiesMenu
+        <CompactActivitiesMenu
           updateSearchValue={(value) => updateSearchValue?.(STEPS.ACTIVITIES, value)}
           activitiesValue={activitiesValue}
-          className='bg-black/60 backdrop-filter max-lg:mt-0 max-lg:mb-4'
+          className='max-lg:mt-0'
+          onConfirm={() => setCurrStep?.(null)}
         />
       }
     </div>

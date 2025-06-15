@@ -130,4 +130,8 @@ export interface ItineraryData {
 
   // The populated days field
   days: Record<string, PopulatedDayItem[]>;
+  
+  // Additional properties needed by components
+  total_cost?: number;
+  lodging?: Array<any>;
 }

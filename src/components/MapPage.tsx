@@ -11,6 +11,11 @@ const containerStyle = {
   height: '400px',
 };
 
+const mobileContainerStyle = {
+  width: '100%',
+  height: '300px',
+};
+
 const defaultCenter = { lat: 39.7392, lng: -104.9903 }; // Default to Denver, CO
 
 const darkMapStyles = [
@@ -102,9 +107,20 @@ interface MapProps {
 }
 
 const Map: React.FC<MapProps> = ({ location, zoom = 11 }) => {
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return (
     <GoogleMap
-      mapContainerStyle={containerStyle}
+      mapContainerStyle={isMobile ? mobileContainerStyle : containerStyle}
       center={location || defaultCenter}
       zoom={zoom}
       mapContainerClassName='rounded-lg'

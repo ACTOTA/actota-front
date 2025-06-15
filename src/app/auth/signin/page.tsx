@@ -23,10 +23,11 @@ export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [sessionExpired, setSessionExpired] = useState(false);
+  const [emailUpdated, setEmailUpdated] = useState(false);
 
   // Check for URL parameters and authentication status
   const [redirectTo, setRedirectTo] = useState<string | null>(null);
-  
+
   React.useEffect(() => {
     const checkAuthAndParams = async () => {
       // Check if redirected due to expired session or has redirectTo parameter
@@ -35,7 +36,11 @@ export default function SignIn() {
         if (urlParams.get('expired') === 'true') {
           setSessionExpired(true);
         }
-        
+
+        if (urlParams.get('message') === 'email-updated') {
+          setEmailUpdated(true);
+        }
+
         const redirectPath = urlParams.get('redirectTo');
         if (redirectPath) {
           setRedirectTo(redirectPath);
@@ -45,6 +50,36 @@ export default function SignIn() {
       // Check if user is already authenticated
       const authStatus = await getAuthCookie();
       if (authStatus) {
+        // Check if we have user data in localStorage, if not fetch it (OAuth flow)
+        const existingUserData = localStorage.getItem('user');
+        if (!existingUserData) {
+          try {
+            // Fetch session data after OAuth
+            const response = await fetch('/api/auth/session');
+            const sessionData = await response.json();
+            
+            if (sessionData.success && sessionData.data) {
+              const userData = sessionData.data;
+              
+              // Store user data in localStorage with same structure as regular signin
+              const userDataToStore = {
+                user_id: userData._id?.$oid || userData.user_id,
+                first_name: userData.first_name,
+                last_name: userData.last_name,
+                email: userData.email,
+                customer_id: userData.customer_id,
+                auth_token: authStatus,
+                role: userData.role || 'user'
+              };
+              
+              console.log('Storing OAuth user data:', userDataToStore);
+              localStorage.setItem('user', JSON.stringify(userDataToStore));
+            }
+          } catch (error) {
+            console.error('Error fetching session data after OAuth:', error);
+          }
+        }
+        
         // If there's a redirect path, go there, otherwise go to home
         if (redirectTo) {
           router.push(redirectTo);
@@ -96,12 +131,12 @@ export default function SignIn() {
       {
         onSuccess: (data: any) => {
           router.back()
-          
+
           // Log the data structure to debug
           console.log('Login successful data:', JSON.stringify(data, null, 2));
           console.log('Auth token present:', !!data.auth_token);
           console.log('User data present:', !!data.data);
-          
+
           const userData = data.data;
           // Store the auth token along with user data for client-side access
           // Note: the role should come from the UserSession response
@@ -114,12 +149,12 @@ export default function SignIn() {
             auth_token: data.auth_token, // Include the auth token for client access
             role: userData.role || 'user' // Include the user role from UserSession (default to 'user')
           };
-          
+
           console.log('userData from API:', userData);
           console.log('Storing user data with role:', userDataToStore);
-          
+
           localStorage.setItem('user', JSON.stringify(userDataToStore));
-          
+
           // Log what's being stored in localStorage
           console.log('Storing in localStorage:', JSON.stringify({
             user_id: userDataToStore.user_id,
@@ -134,7 +169,7 @@ export default function SignIn() {
           // Check if there's a redirectTo parameter in the URL
           const urlParams = new URLSearchParams(window.location.search);
           const redirectPath = urlParams.get('redirectTo');
-          
+
           if (redirectPath) {
             window.location.href = redirectPath;
           } else {
@@ -156,7 +191,7 @@ export default function SignIn() {
   const handleGoogleLogin = async () => {
     // Don't show loading modal for Google login, just redirect directly
     try {
-      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google`;
+      window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
     } catch (error) {
       router.back();
       console.error('Google login error:', error);
@@ -190,11 +225,19 @@ export default function SignIn() {
         <Image src="/images/actota-logo.png" alt="logo" width={110} height={20} />
       </div>
       <p className='text-light-gray text-[16px] leading-[24px] mt-1'>Sign in to your account to continue.</p>
-      
+
       {sessionExpired && (
         <div className="mt-4 px-4 py-3 bg-red-500/20 border border-red-500 rounded-md">
           <p className="text-white text-sm">
             Your session has expired. Please sign in again to continue.
+          </p>
+        </div>
+      )}
+
+      {emailUpdated && (
+        <div className="mt-4 px-4 py-3 bg-green-500/20 border border-green-500 rounded-md">
+          <p className="text-white text-sm">
+            Your email has been updated. Please sign in again with your new email address.
           </p>
         </div>
       )}

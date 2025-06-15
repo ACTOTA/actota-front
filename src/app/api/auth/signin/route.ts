@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     const payload = (await request.json()) as { email: string; password: string };
 
     const response = await actotaApi.post(
-      "/api/auth/signin",
+      "/auth/signin",
       { email: payload.email, password: payload.password },
     );
 
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
       
       // Get the session data
       const sessionResponse = await actotaApi.get(
-        "/api/auth/session",
+        "/auth/session",
         {
           headers: {
             'Authorization': `Bearer ${authToken}`,
@@ -39,7 +39,7 @@ export async function POST(request: Request) {
       if (!userData.customer_id && userData.user_id) {
         try {
           const customerResponse = await actotaApi.post(
-            `/api/account/${userData.user_id}/customer`,
+            `/account/${userData.user_id}/customer`,
             {},
             {
               headers: {

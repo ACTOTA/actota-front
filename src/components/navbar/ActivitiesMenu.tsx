@@ -6,6 +6,8 @@ import { GoHome } from "react-icons/go";
 import { MdOutlineDirectionsCarFilled } from "react-icons/md";
 import { FaPersonWalking } from "react-icons/fa6";
 import ActivityDropdown from './ActivityDropdown';
+import GlassPanel from '../figma/GlassPanel';
+import { MOBILE_GLASS_PANEL_STYLES, getMobileGlassPanelProps } from './constants';
 
 interface ActivitiesMenuProps {
     updateSearchValue?: (value: string) => void;
@@ -65,6 +67,16 @@ export default function ActivitiesMenu({ updateSearchValue, activitiesValue, cla
     const [selectedTransportation, setSelectedTransportation] = useState('Select preferred transportation');
     const [lodgingEnabled, setLodgingEnabled] = useState(true);
     const [transportationEnabled, setTransportationEnabled] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 1024);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     // Update parent component when selections change
     useEffect(() => {
@@ -203,9 +215,17 @@ export default function ActivitiesMenu({ updateSearchValue, activitiesValue, cla
 
     ];
     return (
-        <section className={`flex flex-col backdrop-blur-md text-white border-2 border-border-primary rounded-3xl gap-4 h-full w-full max-w-[520px] mx-auto z-20 text-lg p-4 ${className}`}>
-            <div className='mb-2'>
-                <p className='flex items-center gap-2 mb-2'><FaPersonWalking className='h-6 w-6 ' /> Activities</p>
+        <GlassPanel
+            {...getMobileGlassPanelProps(isMobile)}
+            className={`flex flex-col gap-6 h-full w-full max-w-[520px] mx-auto z-20 text-lg ${isMobile ? MOBILE_GLASS_PANEL_STYLES : ''} ${className}`}
+        >
+            <div className="mb-2">
+                <h2 className="text-left text-white text-xl font-semibold mb-1">What do you want to do?</h2>
+                <p className="text-sm text-gray-400 mb-6">Choose your activities and preferences</p>
+            </div>
+            
+            <div className=''>
+                <p className='flex items-center gap-2 mb-3 font-medium'><FaPersonWalking className='h-5 w-5 text-blue-400' /> Activities</p>
 
                 <ActivityDropdown
                     onSelect={(value) => setSelectedActivity(value.toString())}
@@ -214,12 +234,10 @@ export default function ActivitiesMenu({ updateSearchValue, activitiesValue, cla
                 />
             </div>
 
-            <div className='mb-2'>
-                <div className='flex items-center justify-between gap-2 mb-2'>
-
-                    <p className='flex items-center gap-2'><GoHome className='h-6 w-6' /> Lodging</p>
+            <div className=''>
+                <div className='flex items-center justify-between gap-2 mb-3'>
+                    <p className='flex items-center gap-2 font-medium'><GoHome className='h-5 w-5 text-blue-400' /> Lodging</p>
                     <Toggle enabled={lodgingEnabled} setEnabled={() => { setLodgingEnabled(!lodgingEnabled) }} />
-
                 </div>
                 {lodgingEnabled && (
                     <ActivityDropdown
@@ -229,11 +247,10 @@ export default function ActivitiesMenu({ updateSearchValue, activitiesValue, cla
                     />
                 )}
             </div>
-            <div className='mb-2'>
-
-                <div className='flex items-center justify-between mb-2'>
-
-                    <p className='flex items-center gap-2'><MdOutlineDirectionsCarFilled className='h-6 w-6' /> Transportation</p>
+            
+            <div className=''>
+                <div className='flex items-center justify-between mb-3'>
+                    <p className='flex items-center gap-2 font-medium'><MdOutlineDirectionsCarFilled className='h-5 w-5 text-blue-400' /> Transportation</p>
                     <Toggle enabled={transportationEnabled} setEnabled={() => { setTransportationEnabled(!transportationEnabled) }} />
                 </div>
                 {transportationEnabled && (
@@ -244,6 +261,6 @@ export default function ActivitiesMenu({ updateSearchValue, activitiesValue, cla
                     />
                 )}
             </div>
-        </section>
+        </GlassPanel>
     );
 }
