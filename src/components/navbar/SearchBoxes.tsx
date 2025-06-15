@@ -13,6 +13,7 @@ type SearchBoxesProps = {
   durationValue?: string;
   guestsValue?: string;
   activitiesValue?: string;
+  setCurrStep?: (step: STEPS | null) => void;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export default function SearchBoxes({
@@ -22,6 +23,7 @@ export default function SearchBoxes({
   durationValue,
   guestsValue,
   activitiesValue,
+  setCurrStep,
   ...rest
 }: SearchBoxesProps) {
 
@@ -50,6 +52,7 @@ export default function SearchBoxes({
           updateSearchValue={(value) => updateSearchValue?.(STEPS.LOCATION, value)}
           locationValue={locationValue}
           className='max-lg:mt-0'
+          onConfirm={() => setCurrStep?.(STEPS.DATE)}
         />
       }
 
@@ -58,6 +61,7 @@ export default function SearchBoxes({
           updateSearchValue={(value) => updateSearchValue?.(STEPS.DATE, value)}
           durationValue={durationValue}
           className='max-lg:mt-0'
+          onConfirm={() => setCurrStep?.(STEPS.GUESTS)}
         />
       }
 
@@ -66,6 +70,7 @@ export default function SearchBoxes({
           updateSearchValue={(value) => updateSearchValue?.(STEPS.GUESTS, value)}
           guestsValue={guestsValue}
           className='max-lg:mt-0'
+          onConfirm={() => setCurrStep?.(STEPS.ACTIVITIES)}
         />
       }
 
@@ -74,6 +79,7 @@ export default function SearchBoxes({
           updateSearchValue={(value) => updateSearchValue?.(STEPS.ACTIVITIES, value)}
           activitiesValue={activitiesValue}
           className='max-lg:mt-0'
+          onConfirm={() => setCurrStep?.(null)}
         />
       }
     </div>

@@ -18,9 +18,10 @@ interface LocationMenuProps {
   updateSearchValue?: (value: string) => void;
   locationValue?: string;
   className?: string;
+  onConfirm?: () => void;
 }
 
-export default function LocationMenu({ updateSearchValue, locationValue, className }: LocationMenuProps) {
+export default function LocationMenu({ updateSearchValue, locationValue, className, onConfirm }: LocationMenuProps) {
   const [searchTerm, setSearchTerm] = useState(locationValue || "");
   const [results, setResults] = useState<Location[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
@@ -137,6 +138,7 @@ export default function LocationMenu({ updateSearchValue, locationValue, classNa
     if (selectedLocation) {
       const locationText = `${selectedLocation.city}, ${selectedLocation.state}`;
       updateSearchValue?.(locationText);
+      onConfirm?.();
     }
   };
 
@@ -180,14 +182,19 @@ export default function LocationMenu({ updateSearchValue, locationValue, classNa
       <div className="w-full">
         <MapPage visible={true} location={selectedLocation} />
       </div>
-      <Button
-        variant="primary"
-        className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white h-14 w-full flex-shrink-0 font-medium shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
-        disabled={!selectedLocation}
-        onClick={handleConfirmLocation}
-      >
-        <p>Confirm Location</p>
-      </Button>
+      <div className="mt-3">
+        <button
+          onClick={handleConfirmLocation}
+          disabled={!selectedLocation}
+          className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-lg ${
+            selectedLocation 
+              ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white hover:shadow-xl transform hover:scale-[1.02]' 
+              : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+          }`}
+        >
+          Confirm Location
+        </button>
+      </div>
     </GlassPanel>
   );
 }
