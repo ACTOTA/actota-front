@@ -11,6 +11,7 @@ import { Providers } from "./providers";
 import { Toaster } from "react-hot-toast";
 import Script from 'next/script';
 import MobileLayoutWrapper from "../components/layout/MobileLayoutWrapper";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata = {
   title: "ACTOTA!",
@@ -55,6 +56,7 @@ export default async function RootLayout({
             <div>{children}</div>
           </MobileLayoutWrapper>
           <Toaster />
+          <SpeedInsights />
         </Providers>
       </body>
     </html>

@@ -23,6 +23,7 @@
     "@tanstack/react-query-devtools": "^5.66.3",
     "@tanstack/react-query-persist-client": "^5.66.3",
     "@types/react-big-calendar": "^1.16.1",
+    "@vercel/speed-insights": "^1.2.0",
     "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
     "bson": "^6.10.4",
