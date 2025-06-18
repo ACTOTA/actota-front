@@ -9,6 +9,7 @@ async function getFavorites(): Promise<any> {
     }
 
     const response = await actotaApi.get(`/account/${user?.user_id}/favorites`);
+    console.log("FAVORITES: ", response);
     return response.data;
    
   } catch (error) {

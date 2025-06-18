@@ -8,9 +8,10 @@ interface DateMenuProps {
   updateSearchValue?: (value: string) => void;
   durationValue?: string;
   className?: string;
+  onConfirm?: () => void;
 }
 
-export default function DateMenu({ updateSearchValue, durationValue, className }: DateMenuProps) {
+export default function DateMenu({ updateSearchValue, durationValue, className, onConfirm }: DateMenuProps) {
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [startTime, setStartTime] = useState('09:00');
@@ -146,6 +147,26 @@ export default function DateMenu({ updateSearchValue, durationValue, className }
       {/* Booking note */}
       <div className="text-center text-xs text-gray-500 mt-1">
         * Minimum 1 day advance booking required
+      </div>
+      
+      {/* Confirm Button */}
+      <div className="mt-3 px-4 pb-3">
+        <button
+          onClick={() => {
+            if (startDate) {
+              updateDurationSummary();
+              onConfirm?.();
+            }
+          }}
+          disabled={!startDate}
+          className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-lg ${
+            startDate 
+              ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white hover:shadow-xl transform hover:scale-[1.02]' 
+              : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+          }`}
+        >
+          Confirm Dates
+        </button>
       </div>
     </GlassPanel>
   );

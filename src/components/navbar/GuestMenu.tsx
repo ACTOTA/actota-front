@@ -7,9 +7,10 @@ interface GuestMenuProps {
     updateSearchValue?: (value: string) => void;
     guestsValue?: string;
     className?: string;
+    onConfirm?: () => void;
 }
 
-export default function GuestMenu({ updateSearchValue, guestsValue, className }: GuestMenuProps) {
+export default function GuestMenu({ updateSearchValue, guestsValue, className, onConfirm }: GuestMenuProps) {
     const max = 10;
     const [isMobile, setIsMobile] = useState(false);
 
@@ -135,6 +136,24 @@ export default function GuestMenu({ updateSearchValue, guestsValue, className }:
                         <PlusMinusButton buttonType={ButtonType.plus} onClick={updateInfant(ButtonType.plus)} />
                     </div>
                 </div>
+            </div>
+            
+            {/* Confirm Button */}
+            <div className="mt-6">
+                <button
+                    onClick={() => {
+                        updateGuestSummary();
+                        onConfirm?.();
+                    }}
+                    disabled={adults === 0 && children === 0 && infants === 0}
+                    className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-lg ${
+                        (adults > 0 || children > 0 || infants > 0)
+                            ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white hover:shadow-xl transform hover:scale-[1.02]' 
+                            : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                    }`}
+                >
+                    Confirm Guests
+                </button>
             </div>
         </GlassPanel>
     );

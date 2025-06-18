@@ -253,7 +253,7 @@ const Personal = (props: any) => {
       // Log the payload for debugging
       console.log("Update profile payload:", JSON.stringify(requestData, null, 2));
       
-      const response = await actotaApi.put(`/api/account/${userId}`, requestData);
+      const response = await actotaApi.put(`/account/${userId}`, requestData);
       
       // Check if email was changed (comparing with the original email from data)
       const emailChanged = data.email !== formData.email;
