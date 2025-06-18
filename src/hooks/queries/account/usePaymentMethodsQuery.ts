@@ -30,7 +30,7 @@ async function getPaymentMethods(): Promise<any> {
       return []; // Return empty array or placeholder when on server
     }
 
-    const response = await actotaApi.get(`/api/account/${userId}/payment-methods`);
+    const response = await actotaApi.get(`/account/${userId}/payment-methods`);
     return response.data;
   } catch (error) {
     console.error('Fetch Error:', error);
