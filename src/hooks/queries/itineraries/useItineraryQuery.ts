@@ -27,7 +27,7 @@ async function fetchItineraries(params?: PaginationParams): Promise<ItinerariesR
   if (params?.limit) {
     queryParams.append('limit', params.limit.toString());
   }
-  
+
   const url = `/api/itineraries${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
   
   const response = await fetch(url, {

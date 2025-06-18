@@ -122,7 +122,7 @@ const CancelBooking = ({ onClose, booking, totalAmount }: CancelBookingProps) =>
         : bookingData._id.toString();
 
       // Call the cancellation API
-      const response = await actotaApi.post(`/api/account/${userId}/bookings/${bookingId}/cancel`);
+      const response = await actotaApi.post(`/account/${userId}/bookings/${bookingId}/cancel`);
 
       if (response.data.success) {
         // Show success message with refund info

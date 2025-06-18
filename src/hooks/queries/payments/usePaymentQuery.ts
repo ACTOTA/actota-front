@@ -7,7 +7,7 @@ interface PaymentMethod {
 }
 
 async function fetchPaymentMethodsById(id: string): Promise<PaymentMethod[]> {
-	const response = await fetch(`/api/account/${id}`, {
+	const response = await fetch(`/account/${id}`, {
 		headers: {
 			'Content-Type': 'application/json',
 		},

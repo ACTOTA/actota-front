@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
         console.log('Sending booking payload to backend:', JSON.stringify(bookingPayload, null, 2));
 
         const response = await actotaApi.post(
-            `/api/account/${user_id}/bookings/itinerary/${itinerary_id}`,
+            `/account/${user_id}/bookings/itinerary/${itinerary_id}`,
             bookingPayload,
             {
                 headers: {

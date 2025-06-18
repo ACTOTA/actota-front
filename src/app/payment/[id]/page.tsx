@@ -318,7 +318,7 @@ const Payment = () => {
       if (!userInfo.customer_id && userInfo.user_id) {
         try {
           console.log('No customer_id found, fetching from API...');
-          const customerResponse = await fetch(`/api/account/${userInfo.user_id}/customer`, {
+          const customerResponse = await fetch(`/account/${userInfo.user_id}/customer`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',

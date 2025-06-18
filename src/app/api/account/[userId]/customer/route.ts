@@ -23,7 +23,7 @@ export async function GET(
     // Make a request to the backend to get or create a customer ID
     console.log(`Fetching/creating Stripe customer for user ${userId}`);
     const response = await actotaApi.post(
-      `/api/account/${userId}/customer`,
+      `/account/${userId}/customer`,
       {}, // Empty body
       {
         headers: {

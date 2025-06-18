@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       if (!userData.customer_id && userData.user_id) {
         try {
           const customerResponse = await actotaApi.post(
-            `/api/account/${userData.user_id}/customer`,
+            `/account/${userData.user_id}/customer`,
             {},
             {
               headers: {

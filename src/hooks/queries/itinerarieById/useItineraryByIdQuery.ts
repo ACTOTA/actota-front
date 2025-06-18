@@ -18,7 +18,7 @@ export async function fetchItineraryById(id: string): Promise<any> {
       return null;
     }
 
-    const response = await actotaApi.get(`/api/itineraries/${id}`);
+    const response = await actotaApi.get(`/itineraries/${id}`);
     console.log('Response:', response);
     return response.data;
 

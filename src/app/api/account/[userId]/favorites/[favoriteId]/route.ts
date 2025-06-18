@@ -1,57 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { userId: string } }
-) {
-  try {
-    const { userId } = params;
-    
-    // Get the auth token
-    const token = cookies().get('auth_token')?.value;
-    if (!token) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 }
-      );
-    }
-
-    // Forward the request to the backend API
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://actota-api-88694943961.us-central1.run.app';
-    const response = await fetch(`${API_BASE_URL}/account/${userId}/favorites`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.text();
-      return NextResponse.json(
-        { error: errorData || "Failed to fetch favorites" },
-        { status: response.status }
-      );
-    }
-
-    const data = await response.json();
-    return NextResponse.json(data);
-  } catch (error: any) {
-    console.error('Error fetching favorites:', error);
-    return NextResponse.json(
-      { error: error.message || "Internal server error" },
-      { status: 500 }
-    );
-  }
-}
-
 export async function POST(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: { userId: string; favoriteId: string } }
 ) {
   try {
-    const { userId } = params;
+    const { userId, favoriteId } = params;
     
     // Get the auth token
     const token = cookies().get('auth_token')?.value;
@@ -62,16 +17,12 @@ export async function POST(
       );
     }
 
-    // Get the request body as text first, then parse it
-    const bodyText = await request.text();
-    const body = JSON.parse(bodyText);
-    console.log('Add favorite request - userId:', userId, 'body:', body, 'token exists:', !!token);
+    console.log('Add favorite request - userId:', userId, 'favoriteId:', favoriteId, 'token exists:', !!token);
 
     // Forward the request to the backend API
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://actota-api-88694943961.us-central1.run.app';
-    const response = await fetch(`${API_BASE_URL}/account/${userId}/favorites`, {
+    const response = await fetch(`${API_BASE_URL}/account/${userId}/favorites/${favoriteId}`, {
       method: 'POST',
-      body: bodyText,
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -92,7 +43,19 @@ export async function POST(
       );
     }
 
-    const data = await response.json();
+    // Check if response is JSON before parsing
+    const contentType = response.headers.get('content-type');
+    let data;
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      const textData = await response.text();
+      console.error('Non-JSON response from backend:', textData);
+      return NextResponse.json(
+        { error: 'Backend returned non-JSON response', details: textData },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(data);
   } catch (error: any) {
     console.error('Error adding favorite:', error);
@@ -105,10 +68,10 @@ export async function POST(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: { userId: string; favoriteId: string } }
 ) {
   try {
-    const { userId } = params;
+    const { userId, favoriteId } = params;
     
     // Get the auth token
     const token = cookies().get('auth_token')?.value;
@@ -119,20 +82,11 @@ export async function DELETE(
       );
     }
 
-    // Get favoriteId from query parameters
-    const { searchParams } = new URL(request.url);
-    const favoriteId = searchParams.get('favoriteId');
-
-    if (!favoriteId) {
-      return NextResponse.json(
-        { error: "Favorite ID is required" },
-        { status: 400 }
-      );
-    }
+    console.log('Remove favorite request - userId:', userId, 'favoriteId:', favoriteId, 'token exists:', !!token);
 
     // Forward the request to the backend API
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://actota-api-88694943961.us-central1.run.app';
-    const response = await fetch(`${API_BASE_URL}/account/${userId}/favorites?favoriteId=${favoriteId}`, {
+    const response = await fetch(`${API_BASE_URL}/account/${userId}/favorites/${favoriteId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -154,7 +108,19 @@ export async function DELETE(
       );
     }
 
-    const data = await response.json();
+    // Check if response is JSON before parsing
+    const contentType = response.headers.get('content-type');
+    let data;
+    if (contentType && contentType.includes('application/json')) {
+      data = await response.json();
+    } else {
+      const textData = await response.text();
+      console.error('Non-JSON response from backend:', textData);
+      return NextResponse.json(
+        { error: 'Backend returned non-JSON response', details: textData },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(data);
   } catch (error: any) {
     console.error('Error removing favorite:', error);

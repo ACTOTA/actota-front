@@ -26,7 +26,7 @@ interface VerifyCodeResponse {
 export const useRequestVerificationMutation = () => {
   return useMutation<EmailVerificationResponse, Error, EmailVerificationRequest>({
     mutationFn: async ({ email }) => {
-      const response = await fetch('/api/email-verifications', {
+      const response = await fetch('/email-verifications', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ export const useRequestVerificationMutation = () => {
 export const useVerifyCodeMutation = () => {
   return useMutation<VerifyCodeResponse, Error, { verificationId: string; code: string }>({
     mutationFn: async ({ verificationId, code }) => {
-      const response = await fetch(`/api/email-verifications?id=${verificationId}`, {
+      const response = await fetch(`/email-verifications?id=${verificationId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ export const useRequestEmailChangeMutation = () => {
         throw new Error('Authentication required');
       }
 
-      const response = await fetch(`/api/users/${userId}/email-verifications`, {
+      const response = await fetch(`/users/${userId}/email-verifications`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ export const useVerifyEmailChangeMutation = () => {
         throw new Error('Authentication required');
       }
 
-      const response = await fetch(`/api/users/${userId}/email-verifications/${verificationId}`, {
+      const response = await fetch(`/users/${userId}/email-verifications/${verificationId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -139,7 +139,7 @@ export const useCheckPendingVerificationsMutation = () => {
         throw new Error('Authentication required');
       }
 
-      const response = await fetch(`/api/users/${userId}/email-verifications`, {
+      const response = await fetch(`/users/${userId}/email-verifications`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${session.accessToken}`,

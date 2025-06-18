@@ -44,7 +44,7 @@ const StripeCardForm = ({
               return;
             }
 
-            const response = await actotaApi.post(`/api/account/${userId}/customer`);
+            const response = await actotaApi.post(`/account/${userId}/customer`);
             const { customer_id } = response.data;
 
             if (customer_id) {
@@ -124,7 +124,7 @@ const StripeCardForm = ({
           const user = JSON.parse(getLocalStorageItem('user') || '{}');
           const userId = user.user_id;
 
-          const attachResponse = await actotaApi.post(`/api/account/${userId}/payment-methods`, {
+          const attachResponse = await actotaApi.post(`/account/${userId}/payment-methods`, {
             payment_method_id: paymentMethod.id,
             customer_id: customerId,
             set_as_default: setAsDefault

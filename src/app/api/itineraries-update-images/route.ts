@@ -123,7 +123,7 @@ export async function PUT(request: NextRequest) {
     console.log(`Sending request to backend API: PUT /api/itineraries/${cleanId}/images`);
     try {
       const response = await actotaApi.put(
-        `/api/itineraries/${cleanId}/images`,
+        `/itineraries/${cleanId}/images`,
         { images: validImages || images }, // Use validated images if available
         {
           headers: {

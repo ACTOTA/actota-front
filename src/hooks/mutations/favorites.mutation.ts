@@ -15,7 +15,6 @@ const useAddFavorites = () => {
         }
             const response = await actotaApi.post(
           `/account/${user?.user_id}/favorites/${favoriteId}`,
-          {},
          
         );
         return response.data;
