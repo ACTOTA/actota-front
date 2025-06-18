@@ -1,27 +1,14 @@
-import actotaApi from '@/src/lib/apiClient';
-import { cookies } from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { serverApiClient } from "@/src/lib/serverApiClient";
 
-export async function GET(request: NextRequest, { params }: { params: { userId: string } }) {
-  console.log("#### GET TRANSACTIONS ROUTE ACCESSED");
-  console.log("Request URL:", request.url);
-  console.log("Request method:", request.method);
-  console.log("Params:", params);
-  
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { userId: string } }
+) {
   try {
     const { userId } = params;
     
-    console.log('User ID from params:', userId);
-    
-    // Return a simple response for testing
-    return NextResponse.json({
-      message: "GET route is working",
-      userId: userId,
-      timestamp: new Date().toISOString()
-    });
-    
-    // Comment out the actual implementation temporarily for testing
-    /*
     // Get the auth token
     const token = cookies().get('auth_token')?.value;
     if (!token) {
@@ -31,32 +18,38 @@ export async function GET(request: NextRequest, { params }: { params: { userId: 
       );
     }
 
-    const response = await actotaApi.get(`/api/account/${userId}/transactions`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    // Forward the request to the backend API
+    const response = await serverApiClient.get(`/account/${userId}/transactions`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
 
-    return NextResponse.json(response.data);
-    */
+    if (!response.ok) {
+      const errorData = await response.text();
+      return NextResponse.json(
+        { error: errorData || "Failed to fetch transactions" },
+        { status: response.status }
+      );
+    }
+
+    const data = await response.json();
+    return NextResponse.json(data);
   } catch (error: any) {
-    console.error('Error in transactions GET route:', error);
+    console.error('Error fetching transactions:', error);
     return NextResponse.json(
-      { error: error.message, stack: error.stack },
+      { error: error.message || "Internal server error" },
       { status: 500 }
     );
   }
 }
 
-// Keep the POST method if you need it
-export async function POST(request: NextRequest, { params }: { params: { userId: string } }) {
-  console.log("#### POST TRANSACTIONS ROUTE");
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { userId: string } }
+) {
   try {
     const { userId } = params;
-    
-    console.log('User: ', userId);
     
     // Get the auth token
     const token = cookies().get('auth_token')?.value;
@@ -70,20 +63,31 @@ export async function POST(request: NextRequest, { params }: { params: { userId:
     // Get the request body
     const body = await request.json();
 
-    const response = await actotaApi.post(`/api/account/${userId}/transactions`,
+    // Forward the request to the backend API
+    const response = await serverApiClient.post(
+      `/account/${userId}/transactions`,
       body,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          'Authorization': `Bearer ${token}`,
         },
       }
     );
 
-    return NextResponse.json(response.data);
+    if (!response.ok) {
+      const errorData = await response.text();
+      return NextResponse.json(
+        { error: errorData || "Failed to create transaction" },
+        { status: response.status }
+      );
+    }
+
+    const data = await response.json();
+    return NextResponse.json(data);
   } catch (error: any) {
-    console.error('Error processing transaction request:', error);
+    console.error('Error creating transaction:', error);
     return NextResponse.json(
-      { error: error.message },
+      { error: error.message || "Internal server error" },
       { status: 500 }
     );
   }

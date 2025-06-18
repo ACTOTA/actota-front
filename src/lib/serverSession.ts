@@ -33,7 +33,7 @@ export const getServerSession = async (): Promise<Session> => {
       if (!userData.customer_id) {
         try {
           const customerResponse = await actotaApi.post(
-            `/api/account/${userData.user_id}/customer`,
+            `/account/${userData.user_id}/customer`,
             {},
             {
               headers: {
