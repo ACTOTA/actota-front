@@ -9,7 +9,7 @@ async function getBookings(): Promise<BookingType[]> {
       console.warn("User not logged in");
       return [];
     }
-    const response = await actotaApi.get(`/api/account/${user.user_id}/bookings`);
+    const response = await actotaApi.get(`/account/${user.user_id}/bookings`);
     return response.data;
   } catch (error) {
     console.error('Fetch Error:', error);
@@ -25,7 +25,7 @@ async function getBookingById(id: string): Promise<BookingType | null> {
       console.warn("User not logged in");
       return null;
     }
-    const response = await actotaApi.get(`/api/account/${user.user_id}/bookings/${id}`);
+    const response = await actotaApi.get(`/account/${user.user_id}/bookings/${id}`);
     return response.data;
   } catch (error) {
     console.error('Fetch Error:', error);

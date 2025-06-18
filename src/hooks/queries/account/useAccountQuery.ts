@@ -15,7 +15,7 @@ async function getAccountInfo(id: string): Promise<any> {
       throw new Error("User ID is required");
     }
     
-    const response = await actotaApi.get(`/api/account/${id}`);
+    const response = await actotaApi.get(`/account/${id}`);
     return response.data;
    
   } catch (error) {

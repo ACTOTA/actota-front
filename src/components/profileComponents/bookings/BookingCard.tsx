@@ -249,7 +249,7 @@ const BookingCard: React.FC<ListingCardProps> = ({
         </div>
         {!bookingConfirmedModal && (
           <div className='text-right'>
-            <p className='text-2xl font-bold text-white'>${dataItinerary?.person_cost || '--'}</p>
+            <p className='text-2xl font-bold text-white'>${dataBooking?.total_cost || dataItinerary?.total_cost || dataItinerary?.person_cost || '0'}</p>
             <p className='text-xs text-gray-400'>per person</p>
           </div>
         )}
@@ -297,15 +297,35 @@ const BookingCard: React.FC<ListingCardProps> = ({
               {
                 icon: <FaPersonWalking className='size-4' />,
                 label: 'Activities',
-                value: `${dataItinerary?.activities?.length || '-'} Total`
+                value: (() => {
+                  if (!dataItinerary || !dataItinerary.days) return '0 Total';
+                  let activityCount = 0;
+                  Object.values(dataItinerary.days).forEach(dayItems => {
+                    dayItems.forEach(item => {
+                      if (item.type === 'activity') {
+                        activityCount++;
+                      }
+                    });
+                  });
+                  return `${activityCount} Total`;
+                })()
               },
               {
                 icon: <GoHome className='size-4' />,
                 label: 'Lodging',
-                value: isItineraryLoading ? '- nights' : 
-                  (dataItinerary?.lodging && dataItinerary.lodging.length > 0 ?
-                    `${dataItinerary.lodging.length} ${dataItinerary.lodging.length === 1 ? 'night' : 'nights'}` :
-                    '0 nights')
+                value: (() => {
+                  if (isItineraryLoading) return '- nights';
+                  if (!dataItinerary || !dataItinerary.days) return '0 nights';
+                  let lodgingCount = 0;
+                  Object.values(dataItinerary.days).forEach(dayItems => {
+                    dayItems.forEach(item => {
+                      if (item.type === 'accommodation') {
+                        lodgingCount++;
+                      }
+                    });
+                  });
+                  return `${lodgingCount} ${lodgingCount === 1 ? 'night' : 'nights'}`;
+                })()
               }
             ]}
             columns={2}
@@ -357,7 +377,7 @@ const BookingCard: React.FC<ListingCardProps> = ({
         <div className='flex items-center gap-2'>
           <Image src="/svg-icons/booking-points.svg" alt="points" width={20} height={20} />
           <div>
-            <p className='text-white font-medium text-sm'>+220 Points ($22)</p>
+            <p className='text-white font-medium text-sm'>+{Math.floor((dataBooking?.total_cost || dataItinerary?.total_cost || dataItinerary?.person_cost || 0) * 0.1)} Points (${Math.floor((dataBooking?.total_cost || dataItinerary?.total_cost || dataItinerary?.person_cost || 0) * 0.1 / 10)})</p>
             <p className='text-xs text-gray-400'>Earned once you complete the trip</p>
           </div>
         </div>
