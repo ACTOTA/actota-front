@@ -8,15 +8,9 @@ const headers = {
   "Content-Type": "application/json",
 };
 
-// Get API URL from runtime config on client-side or env on server-side
+// Get API URL - use local /api routes
 const getApiUrl = () => {
-  // Server-side rendering - use process.env
-  if (typeof window === 'undefined') {
-    return process.env.NEXT_PUBLIC_API_URL;
-  }
-  
-  // Client-side rendering - use runtime config
-  return clientEnv.NEXT_PUBLIC_API_URL;
+  return '/api';
 };
 
 const actotaApi = axios.create({

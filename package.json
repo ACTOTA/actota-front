@@ -1,5 +1,5 @@
 {
-  "name": "-actota_front",
+  "name": "actota-front",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -23,10 +23,13 @@
     "@tanstack/react-query-devtools": "^5.66.3",
     "@tanstack/react-query-persist-client": "^5.66.3",
     "@types/react-big-calendar": "^1.16.1",
+    "@vercel/analytics": "^1.5.0",
+    "@vercel/speed-insights": "^1.2.0",
     "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
     "bson": "^6.10.4",
     "date-fns": "^3.6.0",
+    "google-auth-library": "^10.1.0",
     "jose": "^5.9.6",
     "leaflet": "^1.9.4",
     "moment": "^2.30.1",

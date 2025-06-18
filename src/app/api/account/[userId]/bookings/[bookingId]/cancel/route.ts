@@ -20,7 +20,7 @@ export async function POST(
 
     // Call the backend cancellation endpoint
     const response = await actotaApi.post(
-      `/api/account/${userId}/bookings/${bookingId}/cancel`,
+      `/account/${userId}/bookings/${bookingId}/cancel`,
       {},
       {
         headers: {
