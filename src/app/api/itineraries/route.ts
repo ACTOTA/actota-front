@@ -1,4 +1,4 @@
-import actotaApi from '@/src/lib/apiClient';
+import { serverApiClient } from '@/src/lib/serverApiClient';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = "force-dynamic";
@@ -20,9 +20,9 @@ export async function GET(request: NextRequest) {
     }
     
     const backendUrl = `/itineraries/featured${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
-    const response = await actotaApi.get(backendUrl);
+    const response = await serverApiClient.get(backendUrl);
 
-    const data = response.data;
+    const data = await response.json();
 
     return NextResponse.json({success: true, message: "Itineraries fetched successfully", data: data});
   } catch (error) {

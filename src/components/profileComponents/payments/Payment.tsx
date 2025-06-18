@@ -120,17 +120,10 @@ const Payment = () => {
         const userId = user.user_id;
         console.log("Fetching transactions for user ID:", userId);
         
-        // Next.js is rewriting all /api/* URLs to the backend API
-        // We need to use the internal Next.js API route structure to bypass the rewrite
-        // Using _next/data path to access our internal API route
-        const url = `/api/account/${userId}/transactions`;
-        console.log("Requesting URL:", url);
-        console.log("User object:", user);
-
         // Match the exact pattern of your working request
         // Use the API client from the same place used in the route handlers
         const apiClient = (await import("@/src/lib/apiClient")).default;
-        const response = await apiClient.get(`/api/account/${userId}/transactions`, {
+        const response = await apiClient.get(`/account/${userId}/transactions`, {
           headers: {
             "Content-Type": "application/json"
           }
