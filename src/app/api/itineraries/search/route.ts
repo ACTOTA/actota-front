@@ -1,4 +1,4 @@
-import actotaApi from '@/src/lib/apiClient';
+import { serverApiClient } from '@/src/lib/serverApiClient';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = "force-dynamic";
@@ -25,8 +25,8 @@ export async function POST(request: NextRequest) {
     console.log('Formatted params for backend:', formattedParams);
 
     // Forward the search parameters to the backend API
-    const response = await actotaApi.post('/itineraries/search', formattedParams);
-    const data = response.data;
+    const response = await serverApiClient.post('/itineraries/search', formattedParams);
+    const data = await response.json();
 
     console.log('Backend API response:', data);
 
