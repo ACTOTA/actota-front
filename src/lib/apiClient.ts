@@ -8,10 +8,9 @@ const headers = {
   "Content-Type": "application/json",
 };
 
-// Get API URL - use local proxy for authenticated requests
+// Get API URL - use local /api routes
 const getApiUrl = () => {
-  // Use local proxy route that handles authentication server-side
-  return '/api/proxy';
+  return '/api';
 };
 
 const actotaApi = axios.create({
