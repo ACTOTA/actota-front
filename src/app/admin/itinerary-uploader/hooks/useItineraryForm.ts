@@ -136,7 +136,7 @@ export function useItineraryForm() {
   const fetchActivities = async () => {
     setIsLoadingActivities(true);
     try {
-      const response = await fetch(`${clientEnv.NEXT_PUBLIC_API_URL}/api/activities`);
+      const response = await fetch(`${clientEnv.NEXT_PUBLIC_API_URL}/activities`);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
