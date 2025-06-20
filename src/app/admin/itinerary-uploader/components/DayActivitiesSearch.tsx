@@ -8,6 +8,7 @@ import Button from '@/src/components/figma/Button';
 import { Activity, ActiveSearchItem, DayItem } from '../types';
 import { extractObjectId, extractCompanyName } from '../utils';
 import ActivityDetails from './ActivityDetails';
+import { clientEnv } from '@/src/lib/config/client-env';
 
 interface DayActivitiesSearchProps {
   dayNumber: string;
@@ -113,7 +114,7 @@ const DayActivitiesSearch: React.FC<DayActivitiesSearchProps> = ({
                     {!Array.isArray(activities) || activities.length === 0 ? (
                       <div>
                         <p className="mb-1">No activities available.</p>
-                        <p className="text-xs">Please verify the API is running at <span className="text-blue-400">http://localhost:8080/api/activities</span></p>
+                        <p className="text-xs">Please verify the API is running at <span className="text-blue-400">{clientEnv.NEXT_PUBLIC_API_URL}/api/activities</span></p>
                         <button
                           className="mt-2 px-3 py-1 bg-blue-900/30 border border-blue-800 rounded-md text-xs hover:bg-blue-900/50"
                           onClick={() => fetchActivities()}

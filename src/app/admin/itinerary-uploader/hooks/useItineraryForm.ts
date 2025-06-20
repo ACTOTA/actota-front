@@ -19,6 +19,7 @@ import {
   formatPayloadForBackend
 } from '../utils';
 import { getErrorMessage } from '@/src/utils/getErrorMessage';
+import { clientEnv } from '@/src/lib/config/client-env';
 
 // Initial form state with default values
 const initialFormData: FeaturedVacation = {
@@ -135,7 +136,7 @@ export function useItineraryForm() {
   const fetchActivities = async () => {
     setIsLoadingActivities(true);
     try {
-      const response = await fetch('http://localhost:8080/api/activities');
+      const response = await fetch(`${clientEnv.NEXT_PUBLIC_API_URL}/api/activities`);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }

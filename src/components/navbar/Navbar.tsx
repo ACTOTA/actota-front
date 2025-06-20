@@ -17,7 +17,7 @@ import Search from "./Search";
 import { useLogout } from "@/src/hooks/mutations/auth.mutation";
 import { useRouter } from "next/navigation";
 import { LoadScript } from "@react-google-maps/api";
-import { getAuthCookie, isTokenExpired, signOut } from "@/src/helpers/auth";
+import { getAuthCookie, isTokenExpired } from "@/src/helpers/auth";
 import { getLocalStorageItem, removeLocalStorageItem } from "@/src/utils/browserStorage";
 
 const Navbar = () => {
@@ -108,7 +108,14 @@ const Navbar = () => {
                     }
                 } else if (token && isExpired) {
                     // Token exists but is expired - handle logout
-                    await signOut();
+                    // Call the API route to delete the auth cookie
+                    await fetch('/api/auth/signout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    
                     removeLocalStorageItem('user');
                     removeLocalStorageItem('token');
                     setCurrentUser(null);
@@ -134,11 +141,29 @@ const Navbar = () => {
     }, [pathname, router]);
 
     async function handleSignout() {
-        signOut();
-        const { removeLocalStorageItem } = require('@/src/utils/browserStorage');
-        removeLocalStorageItem('user');
-        window.location.href = '/auth/signin';
-        setCurrentUser(null);
+        try {
+            // Call the API route to delete the auth cookie
+            const response = await fetch('/api/auth/signout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                // Clear local storage
+                removeLocalStorageItem('user');
+                removeLocalStorageItem('token');
+                setCurrentUser(null);
+                
+                // Redirect to signin page
+                router.push('/auth/signin');
+            } else {
+                console.error('Failed to sign out');
+            }
+        } catch (error) {
+            console.error('Error during signout:', error);
+        }
     }
 
     return (

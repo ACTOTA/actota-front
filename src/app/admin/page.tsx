@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { HiOutlineUpload, HiOutlineViewGrid, HiOutlineCog, HiUserCircle, HiRefresh } from 'react-icons/hi';
+import { clientEnv } from '@/src/lib/config/client-env';
 
 export default function AdminDashboard() {
   const [adminUser, setAdminUser] = useState<string | null>(null);
@@ -28,7 +29,7 @@ export default function AdminDashboard() {
   const checkApiConnection = async () => {
     try {
       console.log('Checking API connection...');
-      const response = await fetch('http://localhost:8080/health', {
+      const response = await fetch(`${clientEnv.NEXT_PUBLIC_API_URL}/health`, {
         method: 'GET',
       });
 
@@ -137,7 +138,7 @@ export default function AdminDashboard() {
               <>
                 <span className="h-3 w-3 bg-red-500 rounded-full mr-2"></span>
                 <span className="text-red-400">
-                  API health check failed. Please ensure the backend server is running at localhost:8080.
+                  API health check failed. Please ensure the backend server is running at {clientEnv.NEXT_PUBLIC_API_URL}.
                 </span>
               </>
             )}
