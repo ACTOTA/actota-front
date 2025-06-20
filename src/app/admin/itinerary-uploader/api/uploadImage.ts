@@ -1,3 +1,5 @@
+import { clientEnv } from '@/src/lib/config/client-env';
+
 /**
  * Uploads an image file to Google Cloud Storage
  * @param file The file to upload
@@ -13,11 +15,10 @@ export const uploadImageToGCS = async (file: File, itineraryId: string): Promise
     formData.append('file', file);
     formData.append('itineraryId', itineraryId);
     
-    // Use the Next.js API route to upload the file
-    const response = await fetch('/api/upload/itinerary-image', {
+    // Use the backend API directly to upload the file
+    const response = await fetch(`${clientEnv.NEXT_PUBLIC_API_URL}/upload/itinerary-image`, {
       method: 'POST',
-      body: formData,
-      credentials: 'include' // Include cookies for authentication
+      body: formData
     });
     
     if (!response.ok) {

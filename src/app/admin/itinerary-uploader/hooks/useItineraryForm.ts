@@ -427,7 +427,7 @@ export function useItineraryForm() {
       const batchResults = await Promise.allSettled(batch.map(async (tempImage) => {
         console.log(`Starting upload for: ${tempImage.file.name}`);
         try {
-          const response = await fetch('/api/upload/itinerary-image', {
+          const response = await fetch(`${clientEnv.NEXT_PUBLIC_API_URL}/upload/itinerary-image`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -944,16 +944,14 @@ export function useItineraryForm() {
     
     // Use the Next.js API route which can access httpOnly cookies
     try {
-      const response = await fetch('/api/admin/itineraries/featured/add', {
+      const response = await fetch(`${clientEnv.NEXT_PUBLIC_API_URL}/admin/itineraries/featured/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           // If we found an auth token in localStorage, include it
-          ...(authToken ? { 'X-Auth-Token': authToken } : {})
+          ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {})
         },
-        body: JSON.stringify(finalPayload),
-        // Include credentials for cookie auth
-        credentials: 'include'
+        body: JSON.stringify(finalPayload)
       });
 
       const responseText = await response.text();

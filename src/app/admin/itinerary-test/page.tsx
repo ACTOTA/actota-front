@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { clientEnv } from '@/src/lib/config/client-env';
 
 export default function TestItineraryUpload() {
   const [status, setStatus] = useState('');
@@ -58,14 +59,13 @@ export default function TestItineraryUpload() {
         }
       }
 
-      const res = await fetch('/api/itineraries/featured/add', {
+      const res = await fetch(`${clientEnv.NEXT_PUBLIC_API_URL}/admin/itineraries/featured/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(authToken ? { 'X-Auth-Token': authToken } : {})
+          ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {})
         },
-        body: JSON.stringify(payload),
-        credentials: 'include'
+        body: JSON.stringify(payload)
       });
 
       const responseText = await res.text();
