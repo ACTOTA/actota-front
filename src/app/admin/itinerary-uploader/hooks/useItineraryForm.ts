@@ -944,12 +944,12 @@ export function useItineraryForm() {
     
     // Use the Next.js API route which can access httpOnly cookies
     try {
-      const response = await fetch(`${clientEnv.NEXT_PUBLIC_API_URL}/admin/itineraries/featured/add`, {
+      const response = await fetch('/api/admin/itineraries/featured/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // If we found an auth token in localStorage, include it
-          ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {})
+          // Include auth token from localStorage as fallback
+          ...(authToken ? { 'X-Auth-Token': authToken } : {})
         },
         body: JSON.stringify(finalPayload)
       });
