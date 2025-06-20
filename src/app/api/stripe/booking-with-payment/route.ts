@@ -1,4 +1,4 @@
-import actotaApi from '@/src/lib/apiClient';
+import { serverApiClient } from '@/src/lib/serverApiClient';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -42,17 +42,28 @@ export async function POST(request: NextRequest) {
 
         console.log('Sending booking payload to backend:', JSON.stringify(bookingPayload, null, 2));
 
-        const response = await actotaApi.post(
+        const response = await serverApiClient.post(
             `/account/${user_id}/bookings/itinerary/${itinerary_id}`,
             bookingPayload,
             {
                 headers: {
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
             }
         );
 
-        return NextResponse.json(response.data);
+        const data = await response.json();
+        
+        if (!response.ok) {
+            console.error('Backend API error:', data);
+            return NextResponse.json(
+                { error: data.error || 'Failed to create booking with payment' },
+                { status: response.status }
+            );
+        }
+
+        return NextResponse.json(data);
 
     } catch (error: any) {
         console.error('Error processing booking with payment:', error);

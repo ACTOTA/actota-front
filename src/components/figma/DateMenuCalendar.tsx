@@ -8,13 +8,16 @@ function classNames(...classes: (string | boolean | undefined)[]) {
 
 interface DateMenuCalendarProps {
   onDateRangeChange: (startDate: string | null, endDate: string | null) => void;
+  itineraryLength?: number; // Number of days for the itinerary
+  initialStartDate?: string | null;
+  initialEndDate?: string | null;
 }
 
-export default function DateMenuCalendar({ onDateRangeChange }: DateMenuCalendarProps) {
+export default function DateMenuCalendar({ onDateRangeChange, itineraryLength = 1, initialStartDate = null, initialEndDate = null }: DateMenuCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-  const [startDate, setStartDate] = useState<string | null>(null);
-  const [endDate, setEndDate] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<string | null>(initialStartDate);
+  const [endDate, setEndDate] = useState<string | null>(initialEndDate);
 
   const goBack = () => {
     if (currentMonth === 0) {
@@ -59,33 +62,21 @@ export default function DateMenuCalendar({ onDateRangeChange }: DateMenuCalendar
       return; // Don't allow selection of today or past dates
     }
     
-    let newStartDate = startDate;
-    let newEndDate = endDate;
-
-    if (!startDate || (startDate && endDate)) {
-      newStartDate = date;
-      newEndDate = null;
-    } else {
-      if (new Date(date) < new Date(startDate)) {
-        newEndDate = startDate;
-        newStartDate = date;
-      } else {
-        newEndDate = date;
-      }
-    }
-
-    // Format dates for display
-    const formatDate = (dateString: string) => {
-      const d = new Date(dateString);
-      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    };
+    // Always set the selected date as start date
+    const newStartDate = date;
     
-    const formattedStartDate = newStartDate ? formatDate(newStartDate) : null;
-    const formattedEndDate = newEndDate ? formatDate(newEndDate) : null;
+    // Calculate end date based on itinerary length
+    const startDateObj = new Date(date);
+    const endDateObj = new Date(startDateObj);
+    endDateObj.setDate(startDateObj.getDate() + (itineraryLength - 1)); // -1 because start date counts as day 1
+    
+    const newEndDate = endDateObj.toISOString().split('T')[0];
 
     setStartDate(newStartDate);
     setEndDate(newEndDate);
-    onDateRangeChange(formattedStartDate, formattedEndDate);
+    
+    // Send the actual ISO date strings to the parent
+    onDateRangeChange(newStartDate, newEndDate);
   }
 
 
@@ -131,11 +122,11 @@ export default function DateMenuCalendar({ onDateRangeChange }: DateMenuCalendar
           <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
         </button>
         
-        <div className="grid grid-cols-1 gap-x-8 lg:grid-cols-2">
-        {months.map((month, monthIdx) => (
+        <div className="grid grid-cols-1">
+        {months.slice(0, 1).map((month, monthIdx) => (
           <section
             key={monthIdx}
-            className={classNames(monthIdx === months.length - 1 && 'hidden lg:block', 'text-center')}
+            className="text-center"
           >
             <h2 className="text-base font-semibold text-white mb-2">{month.name} {month.days[15].date.split("-")[0]}</h2>
             <div className="grid grid-cols-7 text-xs text-gray-300 mb-1 font-medium">

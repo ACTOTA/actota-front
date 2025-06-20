@@ -95,13 +95,19 @@ export async function makeAuthenticatedRequest(url: string, options: RequestInit
     // Pass the URL to getAuthHeaders so it can generate the correct identity token
     const authHeaders = await getAuthHeaders(url);
     
+    const finalHeaders = {
+      ...authHeaders,
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
+    
+    console.log('Making authenticated request to:', url);
+    console.log('Final headers:', JSON.stringify(finalHeaders, null, 2));
+    console.log('Request body:', options.body);
+    
     const response = await fetch(url, {
       ...options,
-      headers: {
-        ...authHeaders,
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+      headers: finalHeaders,
     });
 
     return response;

@@ -9,11 +9,14 @@ interface DateMenuProps {
   durationValue?: string;
   className?: string;
   onConfirm?: () => void;
+  itineraryLength?: number;
+  initialStartDate?: string | null;
+  initialEndDate?: string | null;
 }
 
-export default function DateMenu({ updateSearchValue, durationValue, className, onConfirm }: DateMenuProps) {
-  const [startDate, setStartDate] = useState<string | null>(null);
-  const [endDate, setEndDate] = useState<string | null>(null);
+export default function DateMenu({ updateSearchValue, durationValue, className, onConfirm, itineraryLength = 1, initialStartDate = null, initialEndDate = null }: DateMenuProps) {
+  const [startDate, setStartDate] = useState<string | null>(initialStartDate);
+  const [endDate, setEndDate] = useState<string | null>(initialEndDate);
   const [startTime, setStartTime] = useState('09:00');
   const [endTime, setEndTime] = useState('17:00');
   const [isMobile, setIsMobile] = useState(false);
@@ -86,15 +89,28 @@ export default function DateMenu({ updateSearchValue, durationValue, className, 
 
   const getDateRangeDisplay = () => {
     if (!startDate && !endDate) return 'Select Date';
-    if (startDate && !endDate) return startDate;
-    if (startDate && endDate && startDate === endDate) return startDate;
-    if (startDate && endDate) return `${startDate} → ${endDate}`;
+    
+    const formatDate = (dateStr: string) => {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    };
+    
+    if (startDate && !endDate) return formatDate(startDate);
+    if (startDate && endDate && startDate === endDate) return formatDate(startDate);
+    if (startDate && endDate) {
+      const durationDays = Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 3600 * 24)) + 1;
+      return `${formatDate(startDate)} - ${formatDate(endDate)} (${durationDays} ${durationDays === 1 ? 'day' : 'days'})`;
+    }
     return 'Select Date';
   };
 
   const handleDateRangeChange = (start: string | null, end: string | null) => {
     setStartDate(start);
     setEndDate(end);
+    // Immediately update when dates change
+    if (start && end) {
+      setTimeout(() => updateDurationSummary(), 0);
+    }
   }
 
   // Validate that end time is after start time
@@ -126,7 +142,12 @@ export default function DateMenu({ updateSearchValue, durationValue, className, 
         <h3 className="text-white text-base font-medium">{getDateRangeDisplay()}</h3>
       </div>
 
-      <DateMenuCalendar onDateRangeChange={handleDateRangeChange} />
+      <DateMenuCalendar 
+        onDateRangeChange={handleDateRangeChange} 
+        itineraryLength={itineraryLength}
+        initialStartDate={startDate}
+        initialEndDate={endDate}
+      />
 
       {/* Time Selectors */}
       <div className='w-full mt-2 border-t border-gray-700 pt-3'>

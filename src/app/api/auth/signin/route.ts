@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import actotaApi from '@/src/lib/apiClient';
-import axios from 'axios';
+import { serverApiClient } from '@/src/lib/serverApiClient';
 import { setAuthCookie } from '@/src/helpers/auth';
 
 export const dynamic = "force-dynamic";
@@ -8,20 +7,21 @@ export async function POST(request: Request) {
   try {
     const payload = (await request.json()) as { email: string; password: string };
 
-    const response = await actotaApi.post(
+    const response = await serverApiClient.post(
       "/auth/signin",
       { email: payload.email, password: payload.password },
     );
+    const responseData = await response.json();
 
-    if (response.data.auth_token) {
-      const authToken = response.data.auth_token;
+    if (responseData.auth_token) {
+      const authToken = responseData.auth_token;
       await setAuthCookie(authToken);
       
       // Store auth token in user data in localStorage
       // This gets saved in the onSuccess handler of login
       
       // Get the session data
-      const sessionResponse = await actotaApi.get(
+      const sessionResponse = await serverApiClient.get(
         "/auth/session",
         {
           headers: {
@@ -29,24 +29,26 @@ export async function POST(request: Request) {
           }
         },
       );
+      const sessionData = await sessionResponse.json();
       
       // Get or create a Stripe customer ID for this user
-      let userData = sessionResponse.data;
+      let userData = sessionData;
       
       if (!userData.customer_id && userData.user_id) {
         try {
-          const customerResponse = await actotaApi.post(
+          const customerResponse = await serverApiClient.post(
             `/account/${userData.user_id}/customer`,
             {},
             {
               headers: {
-                'Authorization': `Bearer ${response.data.auth_token}`,
+                'Authorization': `Bearer ${authToken}`,
               }
             }
           );
+          const customerData = await customerResponse.json();
           
-          if (customerResponse.data && customerResponse.data.customer_id) {
-            userData.customer_id = customerResponse.data.customer_id;
+          if (customerData && customerData.customer_id) {
+            userData.customer_id = customerData.customer_id;
           }
         } catch (customerError) {
           console.error('Failed to get/create customer ID:', customerError);
@@ -62,6 +64,11 @@ export async function POST(request: Request) {
           auth_token: authToken  // Include auth token in response
         },
         { status: 200 }
+      );
+    } else {
+      return NextResponse.json(
+        { success: false, message: responseData.message || 'Login failed' },
+        { status: response.status || 401 }
       );
     }
   } catch (error: any) {

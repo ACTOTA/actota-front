@@ -1,4 +1,4 @@
-import actotaApi from '@/src/lib/apiClient';
+import { serverApiClient } from '@/src/lib/serverApiClient';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 		}
 
 		// Verify booking_id is provided if needed
-		const response = await actotaApi.post("/payment/capture-payment",
+		const response = await serverApiClient.post("/payment/capture-payment",
 			{
 				user_id,
 				payment_intent_id,
@@ -33,12 +33,23 @@ export async function POST(request: NextRequest) {
 			},
 			{
 				headers: {
+					'Content-Type': 'application/json',
 					Authorization: `Bearer ${token}`,
 				},
 			}
 		);
 
-		return NextResponse.json(response.data);
+		const data = await response.json();
+		
+		if (!response.ok) {
+			console.error('Backend API error:', data);
+			return NextResponse.json(
+				{ error: data.error || 'Failed to capture payment' },
+				{ status: response.status }
+			);
+		}
+
+		return NextResponse.json(data);
 
 	} catch (error: any) {
 		console.error('Error creating payment intent:', error);

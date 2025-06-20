@@ -66,6 +66,20 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
     }
   }, [apiResponse]);
 
+  // Update trip dates when dateRange changes
+  useEffect(() => {
+    if (dateRange && dateRange.includes('|')) {
+      try {
+        const jsonPart = dateRange.split('|')[1];
+        const dateData = JSON.parse(jsonPart);
+        setTripStartDate(dateData.arrival_datetime.split('T')[0]);
+        setTripEndDate(dateData.departure_datetime.split('T')[0]);
+      } catch (e) {
+        console.error('Error parsing dateRange for trip dates:', e);
+      }
+    }
+  }, [dateRange]);
+
   const basePrice = (itineraryData?.person_cost ?? 0) * (itineraryData?.min_group ?? 1);
 
 
@@ -79,42 +93,60 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
 
   const handleBooking = () => {
     // Parse dates from the dateRange string
-    let arrivalDate, departureDate;
+    let arrivalDatetime, departureDatetime;
     
-    if (dateRange.includes('-')) {
+    // Check if dateRange contains JSON data (pipe-separated format from DateMenu)
+    if (dateRange.includes('|')) {
+      try {
+        // Extract JSON part after the pipe
+        const jsonPart = dateRange.split('|')[1];
+        const dateData = JSON.parse(jsonPart);
+        arrivalDatetime = dateData.arrival_datetime;
+        departureDatetime = dateData.departure_datetime;
+      } catch (e) {
+        console.error('Error parsing date JSON:', e);
+        // Fallback to old parsing method
+        const displayPart = dateRange.split('|')[0];
+        if (displayPart.includes('-')) {
+          const [start, end] = displayPart.split('-').map(d => d.trim());
+          // Convert display dates back to datetime strings (approximate)
+          const currentYear = new Date().getFullYear();
+          arrivalDatetime = new Date(start + `, ${currentYear} 09:00:00`).toISOString();
+          departureDatetime = new Date(end.replace(/\s*\(\d+\s+days?\)/, '') + `, ${currentYear} 17:00:00`).toISOString();
+        }
+      }
+    } else if (dateRange.includes('-')) {
+      // Old format: "Nov 25 - Nov 30"
       const [start, end] = dateRange.split('-').map(d => d.trim());
-      arrivalDate = start;
-      departureDate = end;
+      // Convert to ISO datetime strings with default times
+      const currentYear = new Date().getFullYear();
+      arrivalDatetime = new Date(start + `, ${currentYear} 09:00:00`).toISOString();
+      departureDatetime = new Date(end.replace(/\s*\(\d+\s+days?\)/, '') + `, ${currentYear} 17:00:00`).toISOString();
     } else {
-      arrivalDate = dateRange.trim();
+      // Single date selected
+      const startDate = dateRange.trim();
+      const currentYear = new Date().getFullYear();
+      arrivalDatetime = new Date(startDate + `, ${currentYear} 09:00:00`).toISOString();
       
       // If only arrival date is selected, use itinerary length to calculate departure
       if (itineraryData.length_days) {
-        // Convert arrival date to Date object
         try {
-          const arrivalDateObj = new Date(arrivalDate);
-          // Add length_days to arrival date
+          const arrivalDateObj = new Date(arrivalDatetime);
           const departureDateObj = new Date(arrivalDateObj);
           departureDateObj.setDate(arrivalDateObj.getDate() + itineraryData.length_days);
-          
-          // Format departure date
-          departureDate = departureDateObj.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-          });
+          departureDatetime = departureDateObj.toISOString();
         } catch (e) {
           console.error('Error calculating departure date:', e);
-          departureDate = ''; // Set empty if calculation fails
+          departureDatetime = ''; // Set empty if calculation fails
         }
       }
     }
     
     // Store selected dates in localStorage to use in payment flow
-    if (arrivalDate && departureDate) {
+    if (arrivalDatetime && departureDatetime) {
       localStorage.setItem('tripDates', JSON.stringify({ 
-        arrival_datetime: arrivalDate,
-        departure_datetime: departureDate
+        arrival_datetime: arrivalDatetime,
+        departure_datetime: departureDatetime
       }));
     }
     
@@ -365,7 +397,7 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
                   >
                     <div className="flex items-center gap-2">
                       <CalendarIcon className="h-5 w-5 text-gray-400" />
-                      <span className='text-sm'>{dateRange || 'Select dates'}</span>
+                      <span className='text-sm'>{dateRange ? dateRange.split('|')[0] : 'Select dates'}</span>
                     </div>
                     <ArrowRightIcon className={`h-4 w-4 text-gray-400 transform transition-transform ${showCalendar ? 'rotate-90' : ''}`} />
                   </div>
@@ -375,6 +407,10 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
                       <DateMenu
                         updateSearchValue={(value) => setDateRange(value)}
                         className="!border-0 !rounded-none !px-3 !py-3 !max-w-full !bg-gray-800"
+                        itineraryLength={itineraryData?.length_days || 1}
+                        onConfirm={() => setShowCalendar(false)}
+                        initialStartDate={tripStartDate}
+                        initialEndDate={tripEndDate}
                       />
                     </div>
                   )}

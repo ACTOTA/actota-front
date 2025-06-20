@@ -180,6 +180,8 @@ const Payment = () => {
 
   const cardAddSuccess = (paymentMethodId: string) => {
     console.log('Card added successfully:', paymentMethodId);
+    // Immediately select the new card
+    setSelectedCard(paymentMethodId);
     // Call the mutation to attach the payment method to the customer
     attachPaymentMethod({
       paymentMethodId,
@@ -189,9 +191,11 @@ const Payment = () => {
         console.log('Payment method attached successfully');
         // Reset form state
         setCardHolderName('');
+        toast.success('Card added successfully!');
       },
       onError: (error) => {
         console.error('Error attaching payment method:', error);
+        toast.error('Failed to save card. Please try again.');
       }
     });
   }
@@ -279,11 +283,35 @@ const Payment = () => {
 
       // Validation checks
       // 1. Payment method selected
-      if (!selectedCard && !paymentMethod.some(method => method.selected && method.name !== "Card")) {
+      const cardMethodSelected = paymentMethod.some(method => method.selected && method.name === "Card");
+      const otherMethodSelected = paymentMethod.some(method => method.selected && method.name !== "Card");
+      
+      // If Card is selected but no card is chosen, try to create a new payment method first
+      if (cardMethodSelected && !selectedCard && !otherMethodSelected) {
+        if (!cardHolderName.trim()) {
+          toast.error("Please enter a card holder name");
+          clearTimeout(timeoutId);
+          if (paymentMethodRef.current) {
+            paymentMethodRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          return;
+        }
+        
+        // Try to create a payment method first before proceeding
+        toast.info("Creating payment method...");
+        // The StripeCardElement should handle this, but we need to trigger it
+        // For now, show an error asking user to add card first
+        toast.error("Please add your card details first by filling out the card form above");
+        clearTimeout(timeoutId);
+        if (paymentMethodRef.current) {
+          paymentMethodRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+      }
+      
+      if (!selectedCard && !otherMethodSelected) {
         toast.error("Please add or select a payment method to continue");
         clearTimeout(timeoutId);
-
-        // Scroll to payment method section
         if (paymentMethodRef.current) {
           paymentMethodRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
@@ -352,14 +380,28 @@ const Payment = () => {
         description: itineraryData?.trip_name
       };
 
+      console.log('Frontend payment data being sent:', JSON.stringify(paymentData, null, 2));
+      console.log('Payment validation details:', {
+        totalAmount,
+        amountInCents: totalAmount * 100,
+        selectedCard,
+        customerId: userInfo.customer_id,
+        userId: userInfo.user_id,
+        tripName: itineraryData?.trip_name
+      });
+
       const response = await fetch('/api/stripe/payment/payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(paymentData),
       });
 
+      console.log('Payment intent response status:', response.status);
+
       if (!response.ok) {
-        throw new Error('Failed to create payment intent');
+        const errorData = await response.json();
+        console.error('Payment intent error response:', errorData);
+        throw new Error(errorData.error || 'Failed to create payment intent');
       }
 
       const paymentIntentData = await response.json();
@@ -482,13 +524,32 @@ const Payment = () => {
       // Load saved trip dates from localStorage
       try {
         const savedTripDates = localStorage.getItem('tripDates');
+        console.log('Raw savedTripDates from localStorage:', savedTripDates);
+        
         if (savedTripDates) {
-          const { arrival_datetime, departure_datetime } = JSON.parse(savedTripDates);
+          const dateData = JSON.parse(savedTripDates);
+          console.log('Parsed date data:', dateData);
+          
+          const { arrival_datetime, departure_datetime } = dateData;
+          
           if (arrival_datetime) {
-            setArrivalDate(new Date(arrival_datetime));
+            const arrivalDate = new Date(arrival_datetime);
+            console.log('Parsed arrival date:', arrivalDate, 'isValid:', !isNaN(arrivalDate.getTime()));
+            if (!isNaN(arrivalDate.getTime())) {
+              setArrivalDate(arrivalDate);
+            } else {
+              console.error('Invalid arrival date:', arrival_datetime);
+            }
           }
+          
           if (departure_datetime) {
-            setDepartureDate(new Date(departure_datetime));
+            const departureDate = new Date(departure_datetime);
+            console.log('Parsed departure date:', departureDate, 'isValid:', !isNaN(departureDate.getTime()));
+            if (!isNaN(departureDate.getTime())) {
+              setDepartureDate(departureDate);
+            } else {
+              console.error('Invalid departure date:', departure_datetime);
+            }
           }
         }
       } catch (e) {
