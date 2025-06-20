@@ -25,11 +25,19 @@ export async function GET(request: NextRequest) {
       }
     );
 
-    // The session response should include the role from the backend
-    console.log('Session response from backend:', JSON.stringify((response as any).data, null, 2));
+    // Parse the response JSON
+    const sessionData = await response.json();
+
+    // Check if response has data
+    if (!sessionData) {
+      return NextResponse.json(
+        { success: false, message: 'No session data returned from backend' },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json(
-      { success: true, data: (response as any).data },
+      { success: true, data: sessionData },
       { status: 200 }
     );
   } catch (error: any) {

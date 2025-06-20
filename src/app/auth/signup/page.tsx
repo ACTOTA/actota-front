@@ -36,7 +36,40 @@ export default function SignUp() {
     const checkAuth = async () => {
       const authStatus = await getAuthCookie();
       if (authStatus) {
-        router.push('/');
+        // Check if we have valid user data
+        const existingUserData = localStorage.getItem('user');
+        if (!existingUserData) {
+          try {
+            // Fetch session data
+            const response = await fetch('/api/auth/session');
+            const sessionData = await response.json();
+            
+            if (sessionData.success && sessionData.data) {
+              const userData = sessionData.data;
+              
+              // Store user data in localStorage
+              const userDataToStore = {
+                user_id: userData._id?.$oid || userData.user_id,
+                first_name: userData.first_name,
+                last_name: userData.last_name,
+                email: userData.email,
+                customer_id: userData.customer_id,
+                role: userData.role || 'user'
+              };
+              
+              localStorage.setItem('user', JSON.stringify(userDataToStore));
+              router.push('/');
+            } else {
+              // Session fetch failed, allow user to sign up
+            }
+          } catch (error) {
+            console.error('Error fetching session data:', error);
+            // Don't redirect on error, allow user to sign up
+          }
+        } else {
+          // User data exists, redirect
+          router.push('/');
+        }
       }
     };
     checkAuth();

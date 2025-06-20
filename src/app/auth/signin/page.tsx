@@ -68,23 +68,31 @@ export default function SignIn() {
                 last_name: userData.last_name,
                 email: userData.email,
                 customer_id: userData.customer_id,
-                auth_token: authStatus,
                 role: userData.role || 'user'
               };
               
-              console.log('Storing OAuth user data:', userDataToStore);
               localStorage.setItem('user', JSON.stringify(userDataToStore));
+              
+              // Only redirect if we successfully got user data
+              if (redirectTo) {
+                router.push(redirectTo);
+              } else {
+                router.push('/');
+              }
+            } else {
+              // Session fetch failed, allow user to sign in again
             }
           } catch (error) {
             console.error('Error fetching session data after OAuth:', error);
+            // Don't redirect on error, allow user to sign in
           }
-        }
-        
-        // If there's a redirect path, go there, otherwise go to home
-        if (redirectTo) {
-          router.push(redirectTo);
         } else {
-          router.push('/');
+          // User data exists, redirect
+          if (redirectTo) {
+            router.push(redirectTo);
+          } else {
+            router.push('/');
+          }
         }
       }
     };
@@ -133,10 +141,6 @@ export default function SignIn() {
           router.back()
 
           // Log the data structure to debug
-          console.log('Login successful data:', JSON.stringify(data, null, 2));
-          console.log('Auth token present:', !!data.auth_token);
-          console.log('User data present:', !!data.data);
-
           const userData = data.data;
           // Store the auth token along with user data for client-side access
           // Note: the role should come from the UserSession response
@@ -146,25 +150,10 @@ export default function SignIn() {
             last_name: userData.last_name,
             email: userData.email,
             customer_id: userData.customer_id,
-            auth_token: data.auth_token, // Include the auth token for client access
             role: userData.role || 'user' // Include the user role from UserSession (default to 'user')
           };
 
-          console.log('userData from API:', userData);
-          console.log('Storing user data with role:', userDataToStore);
-
           localStorage.setItem('user', JSON.stringify(userDataToStore));
-
-          // Log what's being stored in localStorage
-          console.log('Storing in localStorage:', JSON.stringify({
-            user_id: userDataToStore.user_id,
-            first_name: userDataToStore.first_name,
-            last_name: userDataToStore.last_name,
-            email: userDataToStore.email,
-            customer_id: userDataToStore.customer_id,
-            auth_token: userDataToStore.auth_token ? `${userDataToStore.auth_token.substring(0, 10)}...` : 'None', // Log partial token for security
-            role: userDataToStore.role
-          }, null, 2));
 
           // Check if there's a redirectTo parameter in the URL
           const urlParams = new URLSearchParams(window.location.search);

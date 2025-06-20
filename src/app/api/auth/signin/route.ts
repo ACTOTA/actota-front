@@ -15,7 +15,6 @@ export async function POST(request: Request) {
 
     if (response.data.auth_token) {
       const authToken = response.data.auth_token;
-      console.log('Signin: Setting auth cookie for token:', authToken.substring(0, 20) + '...');
       await setAuthCookie(authToken);
       
       // Store auth token in user data in localStorage
@@ -30,9 +29,6 @@ export async function POST(request: Request) {
           }
         },
       );
-      
-      // Log the session response data to see its structure
-      console.log('Session response data:', JSON.stringify(sessionResponse.data, null, 2));
       
       // Get or create a Stripe customer ID for this user
       let userData = sessionResponse.data;

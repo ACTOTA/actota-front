@@ -73,8 +73,39 @@ const Navbar = () => {
                 const isExpired = token ? await isTokenExpired(token) : true;
                 
                 if (token && !isExpired) {
-                    const user = JSON.parse(getLocalStorageItem('user') || '{}');
-                    setCurrentUser(user);
+                    const storedUser = getLocalStorageItem('user');
+                    
+                    if (storedUser) {
+                        // User data exists in localStorage
+                        const user = JSON.parse(storedUser);
+                        setCurrentUser(user);
+                    } else {
+                        // We have a valid token but no localStorage data - fetch from session
+                        try {
+                            const response = await fetch('/api/auth/session');
+                            const sessionData = await response.json();
+                            
+                            if (sessionData.success && sessionData.data) {
+                                const userData = sessionData.data;
+                                
+                                // Store user data in localStorage
+                                const userDataToStore = {
+                                    user_id: userData._id?.$oid || userData.user_id,
+                                    first_name: userData.first_name,
+                                    last_name: userData.last_name,
+                                    email: userData.email,
+                                    customer_id: userData.customer_id,
+                                    role: userData.role || 'user'
+                                };
+                                
+                                localStorage.setItem('user', JSON.stringify(userDataToStore));
+                                setCurrentUser(userDataToStore);
+                            }
+                        } catch (error) {
+                            console.error('Error fetching session data:', error);
+                            setCurrentUser(null);
+                        }
+                    }
                 } else if (token && isExpired) {
                     // Token exists but is expired - handle logout
                     await signOut();

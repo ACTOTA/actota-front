@@ -30,16 +30,13 @@ export default function Hero() {
       setAuthCookie(token);
       getCurrentUser().then((user: any) => {
         if (user) {
-          // Log the user data to see what's available
-          console.log('Google auth user data:', JSON.stringify(user, null, 2));
-          
           localStorage.setItem('user', JSON.stringify({
             user_id: user._id?.$oid || user.user_id,
             first_name: user.first_name,
             last_name: user.last_name,
             email: user.email,
-            customer_id: user.customer_id, // Include customer_id
-            role: user.role || 'user' // Include role
+            customer_id: user.customer_id,
+            role: user.role || 'user'
           }));
           window.location.href = '/';
         } else {
