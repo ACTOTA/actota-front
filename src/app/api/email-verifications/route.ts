@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 
 // Handle PUT requests for verification
 export async function PUT(request: NextRequest) {
-  console.log('=== PUT /api/email-verifications called ===');
+  console.log('=== PUT /email-verifications called ===');
   
   try {
     // Get verification ID from query parameter
@@ -38,8 +38,8 @@ export async function PUT(request: NextRequest) {
     
     // Determine the endpoint based on whether this is a user email change
     const fullUrl = userId 
-      ? `${backendUrl}/api/account/${userId}/email-verifications/${verificationId}`
-      : `${backendUrl}/api/email-verifications/${verificationId}`;
+      ? `${backendUrl}/account/${userId}/email-verifications/${verificationId}`
+      : `${backendUrl}/email-verifications/${verificationId}`;
     console.log('Full backend URL:', fullUrl);
     
     // Build headers
@@ -104,8 +104,8 @@ export async function POST(request: NextRequest) {
 
     // Determine the endpoint based on whether this is a user email change
     const endpoint = userId 
-      ? `${backendUrl}/api/account/${userId}/email-verifications`
-      : `${backendUrl}/api/email-verifications`;
+      ? `${backendUrl}/account/${userId}/email-verifications`
+      : `${backendUrl}/email-verifications`;
 
     // Build headers
     const headers: HeadersInit = {
