@@ -84,8 +84,8 @@ export default function EmailVerification({
 
     try {
       const endpoint = mode === 'signup' 
-        ? '/email-verifications'
-        : `/email-verifications?userId=${userId}`;
+        ? '/api/email-verifications'
+        : `/api/email-verifications?userId=${userId}`;
 
       const headers: HeadersInit = {
         'Content-Type': 'application/json'
@@ -135,8 +135,8 @@ export default function EmailVerification({
 
     try {
       const endpoint = mode === 'signup'
-        ? `/email-verifications?id=${verificationId}`
-        : `/email-verifications?id=${verificationId}&userId=${userId}`;
+        ? `/api/email-verifications?id=${verificationId}`
+        : `/api/email-verifications?id=${verificationId}&userId=${userId}`;
 
       console.log('Submitting code to endpoint:', endpoint);
       console.log('Verification ID:', verificationId);
