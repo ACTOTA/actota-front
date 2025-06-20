@@ -59,71 +59,87 @@ export default function LocationMenu({ updateSearchValue, locationValue, classNa
     }
   };
 
-  const searchLocations = (query: string) => {
-    if (!window.google) return;
-
-    const autoCompleteService = new google.maps.places.AutocompleteService();
-    const geocoder = new google.maps.Geocoder();
-
-    // Removed restrictions to allow all types of places worldwide
-    autoCompleteService.getPlacePredictions(
-      {
-        input: query,
-      },
-      (predictions, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
-          Promise.all(
-            predictions.map((prediction) => {
-              return new Promise<Location>((resolve) => {
-                geocoder.geocode(
-                  { placeId: prediction.place_id },
-                  (results, geoStatus) => {
-                    if (geoStatus === "OK" && results && results[0]) {
-                      const result = results[0];
-                      const addressComponents = result.address_components;
-                      let city = "", state = "";
-                      let lat = result.geometry.location.lat();
-                      let lng = result.geometry.location.lng();
-
-                      // Updated component mapping to handle different location types
-                      addressComponents.forEach((component) => {
-                        if (component.types.includes("locality") ||
-                          component.types.includes("postal_town") ||
-                          component.types.includes("administrative_area_level_3")) {
-                          city = component.long_name;
-                        }
-                        if (component.types.includes("administrative_area_level_1")) {
-                          state = component.long_name; // Changed to long_name for full state/province names
-                        }
-                        // If no city found, use the most specific component
-                        if (!city && component.types.includes("political")) {
-                          city = component.long_name;
-                        }
-                      });
-
-                      // If still no city, use formatted address
-                      if (!city) {
-                        const parts = result.formatted_address.split(',');
-                        city = parts[0].trim();
-                      }
-
-                      resolve({ city, state, lat, lng, country: result.formatted_address.split(',').pop()?.trim() || "" });
-                    } else {
-                      resolve({ city: "", state: "", lat: 0, lng: 0, country: "" });
-                    }
-                  }
-                );
-              });
-            })
-          ).then((locations) => {
-            // Filter only locations that have at least a city name
-            setResults(locations.filter((loc) => loc.city));
-          });
-        } else {
-          setResults([]);
-        }
+  const searchLocations = async (query: string) => {
+    try {
+      // Use our server-side Places API
+      const placesResponse = await fetch(`/api/google-maps/places?input=${encodeURIComponent(query)}&types=address`);
+      
+      if (!placesResponse.ok) {
+        console.error('Places API error:', placesResponse.status);
+        setResults([]);
+        return;
       }
-    );
+
+      const placesData = await placesResponse.json();
+      
+      if (placesData.status === 'OK' && placesData.predictions) {
+        // For each prediction, get the geocoding details
+        const locations = await Promise.all(
+          placesData.predictions.map(async (prediction: any) => {
+            try {
+              // Use our server-side Geocoding API
+              const geocodeResponse = await fetch(`/api/google-maps/geocode?address=${encodeURIComponent(prediction.description)}`);
+              
+              if (!geocodeResponse.ok) {
+                return null;
+              }
+
+              const geocodeData = await geocodeResponse.json();
+              
+              if (geocodeData.status === 'OK' && geocodeData.results && geocodeData.results[0]) {
+                const result = geocodeData.results[0];
+                const addressComponents = result.address_components;
+                let city = "", state = "";
+                const lat = result.geometry.location.lat;
+                const lng = result.geometry.location.lng;
+
+                // Updated component mapping to handle different location types
+                addressComponents.forEach((component: any) => {
+                  if (component.types.includes("locality") ||
+                    component.types.includes("postal_town") ||
+                    component.types.includes("administrative_area_level_3")) {
+                    city = component.long_name;
+                  }
+                  if (component.types.includes("administrative_area_level_1")) {
+                    state = component.long_name; // Changed to long_name for full state/province names
+                  }
+                  // If no city found, use the most specific component
+                  if (!city && component.types.includes("political")) {
+                    city = component.long_name;
+                  }
+                });
+
+                // If still no city, use formatted address
+                if (!city) {
+                  const parts = result.formatted_address.split(',');
+                  city = parts[0].trim();
+                }
+
+                return { 
+                  city, 
+                  state, 
+                  lat, 
+                  lng, 
+                  country: result.formatted_address.split(',').pop()?.trim() || "" 
+                };
+              }
+            } catch (error) {
+              console.error('Geocoding error for prediction:', error);
+            }
+            return null;
+          })
+        );
+        
+        // Filter out null results and locations without city names
+        const validLocations = locations.filter((loc): loc is Location => loc !== null && loc.city !== "");
+        setResults(validLocations);
+      } else {
+        setResults([]);
+      }
+    } catch (error) {
+      console.error('Search locations error:', error);
+      setResults([]);
+    }
   };
 
   const handleLocationSelect = (location: Location) => {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import actotaApi from '@/src/lib/apiClient';
+import { serverApiClient } from '@/src/lib/serverApiClient';
 import { getAuthCookie, signOut } from '@/src/helpers/auth';
 
 export const dynamic = "force-dynamic";
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user session from backend
-    const response = await actotaApi.get(
+    const response = await serverApiClient.get(
       "/auth/session",
       {
         headers: {

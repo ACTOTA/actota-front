@@ -23,9 +23,9 @@ export class ServerApiClient {
   async get(endpoint: string, options?: RequestInit) {
     const url = `${this.baseUrl}${endpoint}`;
     
-    if (this.isLocalhost) {
-      // Direct fetch for localhost (no authentication needed)
-      return fetch(url, {
+    // Try direct request first (for services that allow allUsers)
+    try {
+      return await fetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -33,13 +33,17 @@ export class ServerApiClient {
         },
         ...options,
       });
+    } catch (error) {
+      // If direct request fails and we're not on localhost, try authenticated request
+      if (!this.isLocalhost) {
+        console.log('Direct request failed, trying authenticated request...');
+        return makeAuthenticatedRequest(url, {
+          method: 'GET',
+          ...options,
+        });
+      }
+      throw error;
     }
-    
-    // Use authenticated request for production
-    return makeAuthenticatedRequest(url, {
-      method: 'GET',
-      ...options,
-    });
   }
 
   /**

@@ -5,7 +5,6 @@
 interface RuntimeConfig {
   NEXT_PUBLIC_API_URL: string;
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: string;
-  NEXT_PUBLIC_GOOGLE_MAPS_KEY: string;
   // Add any other NEXT_PUBLIC variables as needed
 }
 
@@ -13,7 +12,6 @@ interface RuntimeConfig {
 const defaultConfig: RuntimeConfig = {
   NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || '',
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
-  NEXT_PUBLIC_GOOGLE_MAPS_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '',
   // Add other default values for NEXT_PUBLIC variables
 };
 

@@ -60,11 +60,26 @@ export async function getGoogleAuthClient() {
  * Get authorization headers for authenticated requests to Cloud Run
  * This should only be called on the server side
  */
-export async function getAuthHeaders() {
+export async function getAuthHeaders(targetUrl?: string) {
   try {
     const client = await getGoogleAuthClient();
-    const headers = await client.getRequestHeaders();
-    return headers;
+    
+    // For Cloud Run, we need an identity token with the correct audience
+    if (targetUrl) {
+      const url = new URL(targetUrl);
+      const audience = `https://${url.host}`;
+      
+      // Generate identity token for Cloud Run
+      const idToken = await client.fetchIdToken(audience);
+      
+      return {
+        'Authorization': `Bearer ${idToken}`,
+      };
+    } else {
+      // Fallback to request headers for other Google APIs
+      const headers = await client.getRequestHeaders();
+      return headers;
+    }
   } catch (error) {
     console.error('Error getting auth headers:', error);
     throw new Error('Failed to get authentication headers');
@@ -77,7 +92,8 @@ export async function getAuthHeaders() {
  */
 export async function makeAuthenticatedRequest(url: string, options: RequestInit = {}) {
   try {
-    const authHeaders = await getAuthHeaders();
+    // Pass the URL to getAuthHeaders so it can generate the correct identity token
+    const authHeaders = await getAuthHeaders(url);
     
     const response = await fetch(url, {
       ...options,
