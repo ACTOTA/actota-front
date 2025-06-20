@@ -26,10 +26,10 @@ export async function GET(request: NextRequest) {
     );
 
     // The session response should include the role from the backend
-    console.log('Session response from backend:', JSON.stringify(response.data, null, 2));
+    console.log('Session response from backend:', JSON.stringify((response as any).data, null, 2));
 
     return NextResponse.json(
-      { success: true, data: response.data },
+      { success: true, data: (response as any).data },
       { status: 200 }
     );
   } catch (error: any) {

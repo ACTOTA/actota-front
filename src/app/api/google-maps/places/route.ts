@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const input = searchParams.get('input');
-    const types = searchParams.get('types') || 'address';
+    const input = request.nextUrl.searchParams.get('input');
+    const types = request.nextUrl.searchParams.get('types') || 'address';
     
     if (!input) {
       return NextResponse.json(

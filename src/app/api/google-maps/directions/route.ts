@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const origin = searchParams.get('origin');
-    const destination = searchParams.get('destination');
-    const waypoints = searchParams.get('waypoints');
-    const mode = searchParams.get('mode') || 'driving';
+    const origin = request.nextUrl.searchParams.get('origin');
+    const destination = request.nextUrl.searchParams.get('destination');
+    const waypoints = request.nextUrl.searchParams.get('waypoints');
+    const mode = request.nextUrl.searchParams.get('mode') || 'driving';
     
     if (!origin || !destination) {
       return NextResponse.json(
