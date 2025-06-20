@@ -15,6 +15,7 @@ export async function POST(request: Request) {
 
     if (response.data.auth_token) {
       const authToken = response.data.auth_token;
+      console.log('Signin: Setting auth cookie for token:', authToken.substring(0, 20) + '...');
       await setAuthCookie(authToken);
       
       // Store auth token in user data in localStorage

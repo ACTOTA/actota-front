@@ -65,13 +65,25 @@ export async function isTokenExpired(token: string | null | undefined): Promise<
 
 
 export async function setAuthCookie(authToken: string, claims?: Claims) {
-  cookies().set('auth_token', authToken, {
+  const isProduction = process.env.NODE_ENV === 'production';
+  const isSecure = process.env.NEXT_PUBLIC_API_URL?.startsWith('https') || isProduction;
+  
+  const cookieOptions = {
     httpOnly: true,
-    secure: true,
-    sameSite: 'strict',
+    secure: isSecure,
+    sameSite: isProduction ? 'lax' : 'strict', // Use 'lax' in production for better compatibility
     expires: new Date(claims ? claims.exp * 1000 : Date.now() + 1000 * 60 * 60 * 24 * 30),
     path: '/'
+  };
+  
+  console.log('Setting auth cookie with options:', {
+    ...cookieOptions,
+    isProduction,
+    isSecure,
+    apiUrl: process.env.NEXT_PUBLIC_API_URL
   });
+  
+  cookies().set('auth_token', authToken, cookieOptions as any);
  
 }
 
