@@ -26,7 +26,7 @@ interface VerifyCodeResponse {
 export const useRequestVerificationMutation = () => {
   return useMutation<EmailVerificationResponse, Error, EmailVerificationRequest>({
     mutationFn: async ({ email }) => {
-      const response = await fetch('/email-verifications', {
+      const response = await fetch('/api/email-verifications', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -48,7 +48,7 @@ export const useRequestVerificationMutation = () => {
 export const useVerifyCodeMutation = () => {
   return useMutation<VerifyCodeResponse, Error, { verificationId: string; code: string }>({
     mutationFn: async ({ verificationId, code }) => {
-      const response = await fetch(`/email-verifications?id=${verificationId}`, {
+      const response = await fetch(`/api/email-verifications?id=${verificationId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
