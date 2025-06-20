@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   try {
     const payload = (await request.json()) as { firstName: string; lastName: string; email: string; password: string };
     const response = await actotaApi.post(
-      "/api/auth/signup",
+      "/auth/signup",
       { first_name: payload.firstName, last_name: payload.lastName, email: payload.email, password: payload.password },
     );
     if (response.data.auth_token) {
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       
       // Get the session data
       const sessionResponse = await actotaApi.get(
-        "/api/auth/session",
+        "/auth/session",
         {
           headers: {
             'Authorization': `Bearer ${response.data.auth_token}`,
