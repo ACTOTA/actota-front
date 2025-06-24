@@ -16,9 +16,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
     if (!apiKey) {
-      console.error('GOOGLE_MAPS_API_KEY is not configured');
+      console.error('NEXT_PUBLIC_GOOGLE_MAPS_API_KEY is not configured');
       return NextResponse.json(
         { error: 'Google Maps API key not configured' },
         { status: 500 }

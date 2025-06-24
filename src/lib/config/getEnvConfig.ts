@@ -4,7 +4,7 @@ import { GetServerSidePropsContext } from 'next';
 export interface RuntimeConfig {
   NEXT_PUBLIC_API_URL: string;
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: string;
-  NEXT_PUBLIC_GOOGLE_MAPS_KEY: string;
+  NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: string;
   // Add any other NEXT_PUBLIC variables as needed
 }
 
@@ -16,7 +16,7 @@ export function getEnvConfig(): RuntimeConfig {
   return {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || '',
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
-    NEXT_PUBLIC_GOOGLE_MAPS_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '',
+    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
     // Add other NEXT_PUBLIC variables as needed
   };
 }
