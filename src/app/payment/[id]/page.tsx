@@ -298,7 +298,7 @@ const Payment = () => {
         }
         
         // Try to create a payment method first before proceeding
-        toast.info("Creating payment method...");
+        toast.loading("Creating payment method...");
         // The StripeCardElement should handle this, but we need to trigger it
         // For now, show an error asking user to add card first
         toast.error("Please add your card details first by filling out the card form above");
