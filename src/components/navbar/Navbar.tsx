@@ -169,7 +169,7 @@ const Navbar = () => {
     return (
         <div>
             <LoadScript
-                googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || ''}
+                googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}
                 libraries={['places', 'drawing', 'visualization', 'marker']}
                 language="en"
                 region="EN"

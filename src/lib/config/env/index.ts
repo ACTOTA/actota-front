@@ -7,7 +7,7 @@ const env = {
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '',
   
   // Google Maps integration
-  NEXT_PUBLIC_GOOGLE_MAPS_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '',
+  NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
   
   // Add any other NEXT_PUBLIC variables used in the app
 };
@@ -22,7 +22,7 @@ const validateEnv = (): EnvType => {
     const requiredVars = [
       'NEXT_PUBLIC_API_URL',
       'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY',
-      'NEXT_PUBLIC_GOOGLE_MAPS_KEY'
+      'NEXT_PUBLIC_GOOGLE_MAPS_API_KEY'
     ];
     
     const missingVars = requiredVars.filter(varName => !env[varName as keyof typeof env]);
