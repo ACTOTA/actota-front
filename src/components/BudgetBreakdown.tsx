@@ -54,17 +54,17 @@ export default function BudgetBreakdown({
 
           <div className='space-y-2 w-full'>
             <div className='flex items-center gap-3'>
-              <div className='w-4 h-4 bg-[#0252D0] rounded' />
+              <div className='w-4 h-4 bg-[#EF4444] rounded' />
               <span className='text-sm flex-1'>Activities</span>
               <span className='text-sm font-medium'>${activityCost.toFixed(2)}</span>
             </div>
             <div className='flex items-center gap-3'>
-              <div className='w-4 h-4 bg-[#C10B2F] rounded' />
+              <div className='w-4 h-4 bg-[#3B82F6] rounded' />
               <span className='text-sm flex-1'>Lodging</span>
               <span className='text-sm font-medium'>${lodgingCost.toFixed(2)}</span>
             </div>
             <div className='flex items-center gap-3'>
-              <div className='w-4 h-4 bg-[#988316] rounded' />
+              <div className='w-4 h-4 bg-[#FFC107] rounded' />
               <span className='text-sm flex-1'>Transport</span>
               <span className='text-sm font-medium'>${transportCost.toFixed(2)}</span>
             </div>

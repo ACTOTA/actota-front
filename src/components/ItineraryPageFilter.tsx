@@ -173,7 +173,7 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
                                 <div className='flex flex-col gap-2 w-full'>
                                     <div className='flex justify-between items-center w-full'>
                                         <p className='text-white text-sm font-normal flex items-center gap-2'>
-                                            <span className='h-2 w-2 rounded-full bg-[#0252D0]' /> Activities
+                                            <span className='h-2 w-2 rounded-full bg-[#EF4444]' /> Activities
                                         </p>
                                         <p className='text-white text-sm font-bold'>
                                             ${Math.round((filters?.budget.max || 5000) * (filters?.budget.allocations?.activities || 40) / 100).toLocaleString()}
@@ -181,7 +181,7 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
                                     </div>
                                     <div className='flex justify-between items-center w-full'>
                                         <p className='text-white text-sm font-normal flex items-center gap-2'>
-                                            <span className='h-2 w-2 rounded-full bg-[#8B5CF6]' /> Lodging
+                                            <span className='h-2 w-2 rounded-full bg-[#3B82F6]' /> Lodging
                                         </p>
                                         <p className='text-white text-sm font-bold'>
                                             ${Math.round((filters?.budget.max || 5000) * (filters?.budget.allocations?.lodging || 35) / 100).toLocaleString()}
@@ -189,7 +189,7 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
                                     </div>
                                     <div className='flex justify-between items-center w-full'>
                                         <p className='text-white text-sm font-normal flex items-center gap-2'>
-                                            <span className='h-2 w-2 rounded-full bg-[#10B981]' /> Transportation
+                                            <span className='h-2 w-2 rounded-full bg-[#FFC107]' /> Transportation
                                         </p>
                                         <p className='text-white text-sm font-bold'>
                                             ${Math.round((filters?.budget.max || 5000) * (filters?.budget.allocations?.transportation || 25) / 100).toLocaleString()}
@@ -224,7 +224,7 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
                                 <div className='space-y-2'>
                                     <div className='flex justify-between items-center'>
                                         <p className='text-white text-sm flex items-center gap-2'>
-                                            <span className='h-2 w-2 rounded-full bg-[#0252D0]' /> Activities
+                                            <span className='h-2 w-2 rounded-full bg-[#EF4444]' /> Activities
                                         </p>
                                         <p className='text-white text-sm font-medium'>{filters?.budget.allocations?.activities || 40}%</p>
                                     </div>
@@ -277,7 +277,7 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
                                 <div className='space-y-2'>
                                     <div className='flex justify-between items-center'>
                                         <p className='text-white text-sm flex items-center gap-2'>
-                                            <span className='h-2 w-2 rounded-full bg-[#8B5CF6]' /> Lodging
+                                            <span className='h-2 w-2 rounded-full bg-[#3B82F6]' /> Lodging
                                         </p>
                                         <p className='text-white text-sm font-medium'>{filters?.budget.allocations?.lodging || 35}%</p>
                                     </div>
@@ -330,7 +330,7 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
                                 <div className='space-y-2'>
                                     <div className='flex justify-between items-center'>
                                         <p className='text-white text-sm flex items-center gap-2'>
-                                            <span className='h-2 w-2 rounded-full bg-[#10B981]' /> Transportation
+                                            <span className='h-2 w-2 rounded-full bg-[#FFC107]' /> Transportation
                                         </p>
                                         <p className='text-white text-sm font-medium'>{filters?.budget.allocations?.transportation || 25}%</p>
                                     </div>

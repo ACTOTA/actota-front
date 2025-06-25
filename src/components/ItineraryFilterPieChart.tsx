@@ -3,7 +3,7 @@
 import React from 'react';
 import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from 'recharts';
 
-const COLORS = ['#0252D0', '#8B5CF6', '#10B981', '#666666'];
+const COLORS = ['#EF4444', '#3B82F6', '#FFC107', '#666666'];
 
 interface ItineraryFilterPieChartProps {
     data?: { name: string; value: number }[];

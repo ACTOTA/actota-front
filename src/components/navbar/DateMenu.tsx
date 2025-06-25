@@ -44,7 +44,7 @@ export default function DateMenu({ updateSearchValue, durationValue, className, 
       const start = new Date(startDate);
       const end = new Date(endDate);
       const timeDiff = end.getTime() - start.getTime();
-      const durationDays = Math.max(1, Math.ceil(timeDiff / (1000 * 3600 * 24)));
+      const durationDays = Math.max(1, Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1);
       
       // Format dates for display
       const formatDate = (dateStr: string) => {
@@ -147,6 +147,7 @@ export default function DateMenu({ updateSearchValue, durationValue, className, 
         itineraryLength={itineraryLength}
         initialStartDate={startDate}
         initialEndDate={endDate}
+        allowManualDateRange={true}
       />
 
       {/* Time Selectors */}
@@ -174,14 +175,14 @@ export default function DateMenu({ updateSearchValue, durationValue, className, 
       <div className="mt-3 px-4 pb-3">
         <button
           onClick={() => {
-            if (startDate) {
+            if (startDate && endDate) {
               updateDurationSummary();
               onConfirm?.();
             }
           }}
-          disabled={!startDate}
+          disabled={!startDate || !endDate}
           className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 shadow-lg ${
-            startDate 
+            startDate && endDate
               ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white hover:shadow-xl transform hover:scale-[1.02]' 
               : 'bg-gray-600 text-gray-400 cursor-not-allowed'
           }`}

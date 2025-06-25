@@ -11,9 +11,10 @@ interface DateMenuCalendarProps {
   itineraryLength?: number; // Number of days for the itinerary
   initialStartDate?: string | null;
   initialEndDate?: string | null;
+  allowManualDateRange?: boolean; // Allow manual selection of date range
 }
 
-export default function DateMenuCalendar({ onDateRangeChange, itineraryLength = 1, initialStartDate = null, initialEndDate = null }: DateMenuCalendarProps) {
+export default function DateMenuCalendar({ onDateRangeChange, itineraryLength = 1, initialStartDate = null, initialEndDate = null, allowManualDateRange = false }: DateMenuCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [startDate, setStartDate] = useState<string | null>(initialStartDate);
@@ -62,21 +63,46 @@ export default function DateMenuCalendar({ onDateRangeChange, itineraryLength = 
       return; // Don't allow selection of today or past dates
     }
     
-    // Always set the selected date as start date
-    const newStartDate = date;
-    
-    // Calculate end date based on itinerary length
-    const startDateObj = new Date(date);
-    const endDateObj = new Date(startDateObj);
-    endDateObj.setDate(startDateObj.getDate() + (itineraryLength - 1)); // -1 because start date counts as day 1
-    
-    const newEndDate = endDateObj.toISOString().split('T')[0];
+    if (allowManualDateRange) {
+      // Manual date range selection mode
+      if (!startDate || (startDate && endDate)) {
+        // No dates selected or both dates already selected - start new selection
+        setStartDate(date);
+        setEndDate(null);
+        onDateRangeChange(date, null);
+      } else if (startDate && !endDate) {
+        // Start date selected, now selecting end date
+        const startDateObj = new Date(startDate);
+        const selectedDateObj = new Date(date);
+        
+        if (selectedDateObj < startDateObj) {
+          // Selected date is before start date - reset to new start date
+          setStartDate(date);
+          setEndDate(null);
+          onDateRangeChange(date, null);
+        } else {
+          // Valid end date
+          setEndDate(date);
+          onDateRangeChange(startDate, date);
+        }
+      }
+    } else {
+      // Automatic date range calculation based on itinerary length
+      const newStartDate = date;
+      
+      // Calculate end date based on itinerary length
+      const startDateObj = new Date(date);
+      const endDateObj = new Date(startDateObj);
+      endDateObj.setDate(startDateObj.getDate() + (itineraryLength - 1)); // -1 because start date counts as day 1
+      
+      const newEndDate = endDateObj.toISOString().split('T')[0];
 
-    setStartDate(newStartDate);
-    setEndDate(newEndDate);
-    
-    // Send the actual ISO date strings to the parent
-    onDateRangeChange(newStartDate, newEndDate);
+      setStartDate(newStartDate);
+      setEndDate(newEndDate);
+      
+      // Send the actual ISO date strings to the parent
+      onDateRangeChange(newStartDate, newEndDate);
+    }
   }
 
 
@@ -105,6 +131,14 @@ export default function DateMenuCalendar({ onDateRangeChange, itineraryLength = 
 
   return (
     <div className="w-full">
+      {/* Selection hint for manual mode */}
+      {allowManualDateRange && (
+        <div className="text-center text-sm text-gray-300 mb-2">
+          {!startDate || (startDate && endDate) 
+            ? "Select start date" 
+            : "Select end date"}
+        </div>
+      )}
       <div className="relative">
         {/* Navigation buttons */}
         <button
