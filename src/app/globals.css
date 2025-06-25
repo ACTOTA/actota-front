@@ -43,6 +43,64 @@ body {
   opacity: 0.5 !important;
 }
 
+/* Budget Allocation Sliders */
+.slider-activities::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #0252D0;
+  cursor: pointer;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.slider-activities::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #0252D0;
+  cursor: pointer;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.slider-lodging::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #8B5CF6;
+  cursor: pointer;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.slider-lodging::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #8B5CF6;
+  cursor: pointer;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.slider-transportation::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #10B981;
+  cursor: pointer;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.slider-transportation::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #10B981;
+  cursor: pointer;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
 @keyframes slideUp {
   from {
     transform: translateY(100%);

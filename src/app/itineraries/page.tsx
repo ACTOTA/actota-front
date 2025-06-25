@@ -9,7 +9,6 @@ import Button from '@/src/components/figma/Button';
 import Newsletter from '@/src/components/Newsletter';
 import Footer from '@/src/components/Footer';
 import ItineraryPageFilter from '@/src/components/ItineraryPageFilter';
-import ItineraryPageAdvanceFilter from '@/src/components/ItineraryPageAdvanceFilter';
 import Dropdown from '@/src/components/figma/Dropdown';
 import Image from 'next/image';
 import ListingCard from '@/src/components/ListingCard';
@@ -27,7 +26,15 @@ const Itineraries = () => {
     
     // Filter states
     const [filters, setFilters] = useState({
-        budget: { max: 5000, enabled: false },
+        budget: { 
+            max: 5000, 
+            enabled: false,
+            allocations: {
+                activities: 40,
+                lodging: 35,
+                transportation: 25
+            }
+        },
         destinations: [''],
         activities: [] as string[],
         lodging: [] as string[],
@@ -143,6 +150,13 @@ const Itineraries = () => {
         filtered = filtered.filter(item => {
             const minGroup = item.min_group || item.min_guests || 1;
             const maxGroup = item.max_group || item.max_guests || 10;
+            
+            // For search results, be more lenient with guest count matching
+            // If min and max are the same, allow some flexibility
+            if (minGroup === maxGroup) {
+                return totalGuests <= maxGroup + 2; // Allow 2 extra guests
+            }
+            
             return totalGuests >= minGroup && totalGuests <= maxGroup;
         });
 
@@ -334,23 +348,13 @@ const Itineraries = () => {
                 </div>
                 
                 <div className={`${showFilter ? '' : 'max-lg:hidden'} md:pt-14 w-[33%] max-lg:w-full`}>
-                    {advanceFilter ?
-                        <ItineraryPageAdvanceFilter 
-                            setShowFilter={setShowFilter} 
-                            advanceFilter={advanceFilter} 
-                            setAdvanceFilter={setAdvanceFilter}
-                            filters={filters}
-                            setFilters={setFilters}
-                        />
-                        :
-                        <ItineraryPageFilter 
-                            setShowFilter={setShowFilter}
-                            advanceFilter={advanceFilter}
-                            setAdvanceFilter={setAdvanceFilter}
-                            filters={filters}
-                            setFilters={setFilters}
-                        />
-                    }
+                    <ItineraryPageFilter 
+                        setShowFilter={setShowFilter}
+                        advanceFilter={advanceFilter}
+                        setAdvanceFilter={setAdvanceFilter}
+                        filters={filters}
+                        setFilters={setFilters}
+                    />
                 </div>
                 <h2 className="text-[40px] font-bold text-white md:hidden">{pageTitle}</h2>
             </div>

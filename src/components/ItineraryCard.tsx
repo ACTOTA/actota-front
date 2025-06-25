@@ -44,7 +44,11 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
     
     return (
         <div 
-            onClick={() => router.push(`/itineraries/${data._id.$oid}`)}
+            onClick={() => {
+                if (data._id?.$oid) {
+                    router.push(`/itineraries/${data._id.$oid}`)
+                }
+            }}
             className='group relative bg-gray-900/50 backdrop-blur-sm rounded-2xl overflow-hidden cursor-pointer 
                        transform transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl hover:bg-gray-900/70
                        border border-gray-800/50 hover:border-gray-700/50 mt-4 max-w-[864px]'
@@ -238,7 +242,9 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
-                                router.push(`?modal=shareModal&itineraryId=${data._id.$oid}`)
+                                if (data._id?.$oid) {
+                                    router.push(`?modal=shareModal&itineraryId=${data._id.$oid}`)
+                                }
                             }}
                             className='w-8 h-8 bg-black/60 backdrop-blur-md rounded-full 
                                      flex items-center justify-center transition-all hover:bg-black/80
@@ -248,7 +254,7 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
                         </button>
                         <LikeDislike 
                             liked={data.isFavorite ? data.isFavorite : false} 
-                            favoriteId={data._id.$oid}
+                            favoriteId={data._id?.$oid || ''}
                             className='w-8 h-8 bg-black/60 backdrop-blur-md border border-white/10'
                         />
                     </div>

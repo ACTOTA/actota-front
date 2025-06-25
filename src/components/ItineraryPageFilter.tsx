@@ -64,7 +64,15 @@ interface ItineraryPageFilterProps {
     advanceFilter: boolean;
     setAdvanceFilter: (value: boolean) => void;
     filters?: {
-        budget: { max: number; enabled: boolean };
+        budget: { 
+            max: number; 
+            enabled: boolean;
+            allocations: {
+                activities: number;
+                lodging: number;
+                transportation: number;
+            };
+        };
         destinations: string[];
         activities: string[];
         lodging: string[];
@@ -160,7 +168,7 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
                             {/* Full Budget Controls */}
                             <div className='flex items-center w-full gap-5'>
                                 <div className='flex-shrink-0'>
-                                    <ItineraryFilterPieChart />
+                                    <ItineraryFilterPieChart allocations={filters?.budget.allocations} />
                                 </div>
                                 <div className='flex flex-col gap-2 w-full'>
                                     <div className='flex justify-between items-center w-full'>
@@ -168,7 +176,7 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
                                             <span className='h-2 w-2 rounded-full bg-[#0252D0]' /> Activities
                                         </p>
                                         <p className='text-white text-sm font-bold'>
-                                            ${Math.round((filters?.budget.max || 5000) * 0.4).toLocaleString()}
+                                            ${Math.round((filters?.budget.max || 5000) * (filters?.budget.allocations?.activities || 40) / 100).toLocaleString()}
                                         </p>
                                     </div>
                                     <div className='flex justify-between items-center w-full'>
@@ -176,7 +184,7 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
                                             <span className='h-2 w-2 rounded-full bg-[#8B5CF6]' /> Lodging
                                         </p>
                                         <p className='text-white text-sm font-bold'>
-                                            ${Math.round((filters?.budget.max || 5000) * 0.35).toLocaleString()}
+                                            ${Math.round((filters?.budget.max || 5000) * (filters?.budget.allocations?.lodging || 35) / 100).toLocaleString()}
                                         </p>
                                     </div>
                                     <div className='flex justify-between items-center w-full'>
@@ -184,7 +192,7 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
                                             <span className='h-2 w-2 rounded-full bg-[#10B981]' /> Transportation
                                         </p>
                                         <p className='text-white text-sm font-bold'>
-                                            ${Math.round((filters?.budget.max || 5000) * 0.25).toLocaleString()}
+                                            ${Math.round((filters?.budget.max || 5000) * (filters?.budget.allocations?.transportation || 25) / 100).toLocaleString()}
                                         </p>
                                     </div>
                                 </div>
@@ -206,6 +214,175 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
                                         }
                                     }}
                                 />
+                            </div>
+
+                            {/* Budget Allocation Sliders */}
+                            <div className='space-y-4 pt-4 border-t border-gray-700/50'>
+                                <p className='text-white font-semibold text-sm'>Adjust Budget Allocation</p>
+                                
+                                {/* Activities Allocation */}
+                                <div className='space-y-2'>
+                                    <div className='flex justify-between items-center'>
+                                        <p className='text-white text-sm flex items-center gap-2'>
+                                            <span className='h-2 w-2 rounded-full bg-[#0252D0]' /> Activities
+                                        </p>
+                                        <p className='text-white text-sm font-medium'>{filters?.budget.allocations?.activities || 40}%</p>
+                                    </div>
+                                    <input
+                                        type='range'
+                                        min='0'
+                                        max='100'
+                                        value={filters?.budget.allocations?.activities || 40}
+                                        onChange={(e) => {
+                                            const newValue = parseInt(e.target.value);
+                                            if (setFilters) {
+                                                setFilters((prev: any) => {
+                                                    const currentAllocations = prev.budget.allocations;
+                                                    const otherTotal = currentAllocations.lodging + currentAllocations.transportation;
+                                                    
+                                                    // Ensure total doesn't exceed 100%
+                                                    if (newValue + otherTotal > 100) {
+                                                        const scale = (100 - newValue) / otherTotal;
+                                                        return {
+                                                            ...prev,
+                                                            budget: {
+                                                                ...prev.budget,
+                                                                allocations: {
+                                                                    activities: newValue,
+                                                                    lodging: Math.round(currentAllocations.lodging * scale),
+                                                                    transportation: Math.round(currentAllocations.transportation * scale)
+                                                                }
+                                                            }
+                                                        };
+                                                    }
+                                                    
+                                                    return {
+                                                        ...prev,
+                                                        budget: {
+                                                            ...prev.budget,
+                                                            allocations: {
+                                                                ...currentAllocations,
+                                                                activities: newValue
+                                                            }
+                                                        }
+                                                    };
+                                                });
+                                            }
+                                        }}
+                                        className='w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider-activities'
+                                    />
+                                </div>
+
+                                {/* Lodging Allocation */}
+                                <div className='space-y-2'>
+                                    <div className='flex justify-between items-center'>
+                                        <p className='text-white text-sm flex items-center gap-2'>
+                                            <span className='h-2 w-2 rounded-full bg-[#8B5CF6]' /> Lodging
+                                        </p>
+                                        <p className='text-white text-sm font-medium'>{filters?.budget.allocations?.lodging || 35}%</p>
+                                    </div>
+                                    <input
+                                        type='range'
+                                        min='0'
+                                        max='100'
+                                        value={filters?.budget.allocations?.lodging || 35}
+                                        onChange={(e) => {
+                                            const newValue = parseInt(e.target.value);
+                                            if (setFilters) {
+                                                setFilters((prev: any) => {
+                                                    const currentAllocations = prev.budget.allocations;
+                                                    const otherTotal = currentAllocations.activities + currentAllocations.transportation;
+                                                    
+                                                    // Ensure total doesn't exceed 100%
+                                                    if (newValue + otherTotal > 100) {
+                                                        const scale = (100 - newValue) / otherTotal;
+                                                        return {
+                                                            ...prev,
+                                                            budget: {
+                                                                ...prev.budget,
+                                                                allocations: {
+                                                                    activities: Math.round(currentAllocations.activities * scale),
+                                                                    lodging: newValue,
+                                                                    transportation: Math.round(currentAllocations.transportation * scale)
+                                                                }
+                                                            }
+                                                        };
+                                                    }
+                                                    
+                                                    return {
+                                                        ...prev,
+                                                        budget: {
+                                                            ...prev.budget,
+                                                            allocations: {
+                                                                ...currentAllocations,
+                                                                lodging: newValue
+                                                            }
+                                                        }
+                                                    };
+                                                });
+                                            }
+                                        }}
+                                        className='w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider-lodging'
+                                    />
+                                </div>
+
+                                {/* Transportation Allocation */}
+                                <div className='space-y-2'>
+                                    <div className='flex justify-between items-center'>
+                                        <p className='text-white text-sm flex items-center gap-2'>
+                                            <span className='h-2 w-2 rounded-full bg-[#10B981]' /> Transportation
+                                        </p>
+                                        <p className='text-white text-sm font-medium'>{filters?.budget.allocations?.transportation || 25}%</p>
+                                    </div>
+                                    <input
+                                        type='range'
+                                        min='0'
+                                        max='100'
+                                        value={filters?.budget.allocations?.transportation || 25}
+                                        onChange={(e) => {
+                                            const newValue = parseInt(e.target.value);
+                                            if (setFilters) {
+                                                setFilters((prev: any) => {
+                                                    const currentAllocations = prev.budget.allocations;
+                                                    const otherTotal = currentAllocations.activities + currentAllocations.lodging;
+                                                    
+                                                    // Ensure total doesn't exceed 100%
+                                                    if (newValue + otherTotal > 100) {
+                                                        const scale = (100 - newValue) / otherTotal;
+                                                        return {
+                                                            ...prev,
+                                                            budget: {
+                                                                ...prev.budget,
+                                                                allocations: {
+                                                                    activities: Math.round(currentAllocations.activities * scale),
+                                                                    lodging: Math.round(currentAllocations.lodging * scale),
+                                                                    transportation: newValue
+                                                                }
+                                                            }
+                                                        };
+                                                    }
+                                                    
+                                                    return {
+                                                        ...prev,
+                                                        budget: {
+                                                            ...prev.budget,
+                                                            allocations: {
+                                                                ...currentAllocations,
+                                                                transportation: newValue
+                                                            }
+                                                        }
+                                                    };
+                                                });
+                                            }
+                                        }}
+                                        className='w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider-transportation'
+                                    />
+                                </div>
+
+                                {/* Total Percentage Check */}
+                                <div className='text-xs text-gray-400 text-center'>
+                                    Total: {(filters?.budget.allocations?.activities || 40) + (filters?.budget.allocations?.lodging || 35) + (filters?.budget.allocations?.transportation || 25)}%
+                                </div>
                             </div>
 
                             {/* Total Trip Cost */}
@@ -355,26 +532,21 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
                     />
                 </div>
                 
-                {/* Advanced Filters Button */}
-                <div className='border-t border-gray-700/50 pt-4 mt-6'>
-                    <Button 
-                        onClick={() => setAdvanceFilter(true)} 
-                        variant='outline' 
-                        className='w-full !bg-gradient-to-r from-blue-600/20 to-purple-600/20 hover:from-blue-600/30 hover:to-purple-600/30 border-blue-500/50 hover:border-blue-400 flex items-center justify-center gap-2 transition-all duration-200 group'
-                    >
-                        <span className='text-blue-400'>✨</span>
-                        <span>Advanced Filters</span>
-                        <GoArrowRight className='size-4 text-blue-400 group-hover:translate-x-1 transition-transform' />
-                    </Button>
-                    <p className='text-xs text-gray-400 text-center mt-2'>More filter options & detailed controls</p>
-                </div>
 
                 {/* Action Buttons */}
                 <div className='flex gap-2 mt-4'>
                     <Button onClick={() => {
                         if (setFilters) {
                             setFilters({
-                                budget: { max: 5000, enabled: false },
+                                budget: { 
+                                    max: 5000, 
+                                    enabled: false,
+                                    allocations: {
+                                        activities: 40,
+                                        lodging: 35,
+                                        transportation: 25
+                                    }
+                                },
                                 destinations: [''],
                                 activities: [],
                                 lodging: [],
