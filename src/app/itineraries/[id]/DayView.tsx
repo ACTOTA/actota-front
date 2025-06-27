@@ -1,17 +1,15 @@
 'use client';
 import React, { useState, useCallback, useEffect } from 'react';
-import { BiSolidMap } from 'react-icons/bi';
 import { GoogleMap, DirectionsService, DirectionsRenderer, Marker, useJsApiLoader } from '@react-google-maps/api';
 import { BsCalendar4 } from 'react-icons/bs';
-import { MdOutlineExplore, MdBed, MdOutlineDirectionsCarFilled, MdFoodBank, MdLocationOn } from 'react-icons/md';
+
 import Button from '@/src/components/figma/Button';
 import ActivityCard, { CardType } from '@/src/components/ActivityCard';
 import FeedbackDrawer from '@/src/components/FeedbackDrawer';
 import DrawerModal from '@/src/components/DrawerModal';
 import { 
   ItineraryData, 
-  PopulatedDayItem, 
-  ActivityItem,
+  PopulatedDayItem,
   isActivity, 
   isAccommodation, 
   isTransportation 
@@ -161,9 +159,9 @@ export default function DayView({ listing, isAuthenticated = true }: DayViewProp
 
 				// Geocode all activities that need it
 				dayActivities.forEach((activity, idx) => {
-					console.log(`Checking geocoding needs for activity ${idx + 1}:`, {
+										console.log(`Checking geocoding needs for activity ${idx + 1}:`, {
 						type: activity.type,
-						name: getItemDisplayName(activity),
+						name: isActivity(activity) ? activity.title : activity.name,
 						hasExistingCoords: !!activity.location?.coordinates
 					});
 
@@ -188,7 +186,7 @@ export default function DayView({ listing, isAuthenticated = true }: DayViewProp
 					// For any other activity without coordinates
 					else {
 						// Try to use the activity name as a last resort
-						const activityName = getItemDisplayName(activity);
+						const activityName = isActivity(activity) ? activity.title : activity.name;
 						if (activityName && activityName !== "Unknown") {
 							addressesToGeocode.push({ address: `${activityName}, Denver, Colorado`, key: `activity-${idx}` });
 							console.log(`Activity ${idx + 1} needs geocoding from activity name:`, activityName);
@@ -294,60 +292,15 @@ export default function DayView({ listing, isAuthenticated = true }: DayViewProp
 		}).format(new Date(date));
 	};
 
-	// Get icon for activity type
-	const getActivityIcon = (item: PopulatedDayItem) => {
-	    // Transportation icon
-	    if (isTransportation(item)) {
-	        return <MdOutlineDirectionsCarFilled className="w-5 h-5 text-white" />;
-	    }
-	    
-	    // Accommodation icon
-	    if (isAccommodation(item)) {
-	        return <MdBed className="w-5 h-5 text-white" />;
-	    }
-	    
-	    // Activity icons based on name
-	    const displayName = isActivity(item) ? item?.title.toLowerCase() : '';
-	    
-	    // Check for food-related activities
-	    if (displayName.includes('breakfast') || displayName.includes('lunch') || 
-	        displayName.includes('dinner') || displayName.includes('restaurant')) {
-	        return <MdFoodBank className="w-5 h-5 text-white" />;
-	    }
-	                        
-		switch (displayName) {
-			case 'hiking':
-				return <MdOutlineExplore className="w-5 h-5 text-white" />;
-			case 'sightseeing':
-				return <BiSolidMap className="w-5 h-5 text-white" />;
-			case 'safari':
-				return <MdOutlineExplore className="w-5 h-5 text-white" />;
-			default:
-				return <BiSolidMap className="w-5 h-5 text-white" />;
-		}
-	};
+  
 
-	// Helper function to get the display name for any day item
-	const getItemDisplayName = (item: PopulatedDayItem): string => {
-		if (isActivity(item)) {
-			return item.title;
-		} else if (isAccommodation(item) || isTransportation(item)) {
-			return item.name;
-		}
-		return "Unknown";
-	};
+  
+
 	
-	// Get background color based on item type
-	const getItemBackgroundColor = (item: PopulatedDayItem): string => {
-		if (isTransportation(item)) {
-			return "bg-[#FEDB25]"; // Yellow for transportation
-		} else if (isAccommodation(item)) {
-			return "bg-[#F10E3B]"; // Red for accommodation
-		} else if (isActivity(item)) {
-			return "bg-[#0553CE]"; // Blue for activities
-		}
-		return "bg-[#262626]"; // Default gray
-	};
+
+	
+	
+	
 
 	// Helper function to validate and fix coordinates
 	const validateAndFixCoordinates = (lat: number, lng: number, source: string) => {
@@ -386,12 +339,12 @@ export default function DayView({ listing, isAuthenticated = true }: DayViewProp
 			// Only add activity locations - no separate start/end markers
 			dayActivities.forEach((activity, idx) => {
 				console.log(`\n--- Processing activity ${idx + 1} ---`);
-				console.log('Activity:', {
+								console.log('Activity:', {
 					type: activity.type,
-					name: getItemDisplayName(activity),
+					name: isActivity(activity) ? activity.title : activity.name,
 					hasLocation: !!activity.location,
 					locationCoords: activity.location?.coordinates,
-					hasAddress: activity.type === 'activity' && 'address' in activity && !!activity.address
+					hasAddress: isActivity(activity) && !!activity.address
 				});
 
 				let coordinatesAdded = false;
@@ -408,7 +361,7 @@ export default function DayView({ listing, isAuthenticated = true }: DayViewProp
 					if (validCoords) {
 						coordinates.push({
 							...validCoords,
-							label: getItemDisplayName(activity)
+							label: isActivity(activity) ? activity.title : activity.name
 						});
 						console.log(`Added activity ${idx + 1} from location.coordinates:`, validCoords);
 						coordinatesAdded = true;
@@ -420,7 +373,7 @@ export default function DayView({ listing, isAuthenticated = true }: DayViewProp
 					// Use geocoded coordinates for activities with addresses (these are already in correct format)
 					coordinates.push({
 						...geocodedLocations[`activity-${idx}`],
-						label: getItemDisplayName(activity)
+						label: isActivity(activity) ? activity.title : activity.name
 					});
 					console.log(`Added activity ${idx + 1} from geocoding:`, geocodedLocations[`activity-${idx}`]);
 					coordinatesAdded = true;
@@ -432,14 +385,14 @@ export default function DayView({ listing, isAuthenticated = true }: DayViewProp
 					const fallbackCoords = generateFallbackCoordinates(idx, dayActivities.length);
 					coordinates.push({
 						...fallbackCoords,
-						label: getItemDisplayName(activity)
+						label: isActivity(activity) ? activity.title : activity.name
 					});
 					console.log(`Added activity ${idx + 1} with fallback coordinates:`, fallbackCoords);
 					
 					// Log why we needed fallback
 					console.log(`Fallback reason for activity ${idx + 1}:`, {
 						type: activity.type,
-						name: getItemDisplayName(activity),
+												name: isActivity(activity) ? activity.title : activity.name,
 						hasLocation: !!activity.location,
 						hasCoordinates: !!activity.location?.coordinates,
 						hasAddress: activity.type === 'activity' && 'address' in activity && !!activity.address,
@@ -458,7 +411,7 @@ export default function DayView({ listing, isAuthenticated = true }: DayViewProp
 			console.error("Error getting coordinates:", error);
 			return [];
 		}
-	}, [selectedDay, listing, geocodedLocations, validateAndFixCoordinates, getItemDisplayName, generateFallbackCoordinates])
+	}, [selectedDay, listing, geocodedLocations, validateAndFixCoordinates, generateFallbackCoordinates])
 
 	// Recalculate coordinates when geocoding changes
 	const pathCoordinates = React.useMemo(() => {
@@ -641,29 +594,16 @@ export default function DayView({ listing, isAuthenticated = true }: DayViewProp
 													{/* Yellow icon circle */}
 													<div className="relative z-10 flex-shrink-0">
 														<div className="w-8 h-8 rounded-full bg-[#FEDB25] flex items-center justify-center">
-															<MdOutlineDirectionsCarFilled className="w-4 h-4 text-black" />
+															{/* Icon handled by ActivityCard */} 
 														</div>
 													</div>
 													
 													{/* Content */}
 													<div className="flex items-center gap-2 flex-1">
 														<h3 className="text-white text-sm font-medium">
-															{getItemDisplayName(activity)}
+															{activity.name}
 														</h3>
-														<span className="text-gray-500">|</span>
-														<span className="text-gray-400 text-sm">
-															{(() => {
-																if (isActivity(activity)) {
-																	const activityItem = activity as ActivityItem;
-																	if (activityItem.duration_minutes) {
-																		const hours = Math.floor(activityItem.duration_minutes / 60);
-																		const minutes = activityItem.duration_minutes % 60;
-																		return `${hours}h${minutes > 0 ? ` ${minutes}m` : ''}`;
-																	}
-																}
-																return '1h';
-															})()}
-														</span>
+														
 													</div>
 												</div>
 											) : (
@@ -679,11 +619,7 @@ export default function DayView({ listing, isAuthenticated = true }: DayViewProp
 														<div className={`w-8 h-8 rounded-full flex items-center justify-center ${
 															isAccomm ? 'bg-[#F10E3B]' : 'bg-[#0553CE]'
 														}`}>
-															{isAccomm ? (
-																<MdBed className="w-4 h-4 text-white" />
-															) : (
-																<MdLocationOn className="w-4 h-4 text-white" />
-															)}
+															{/* Icon handled by ActivityCard */}
 														</div>
 													</div>
 													
@@ -691,7 +627,7 @@ export default function DayView({ listing, isAuthenticated = true }: DayViewProp
 													<div className="flex-1 pt-1">
 														<div className="flex items-baseline gap-2">
 															<h3 className="text-white text-sm font-medium leading-tight">
-																{getItemDisplayName(activity)}
+																{isActivity(activity) ? activity.title : activity.name}
 															</h3>
 															<span className="text-gray-400 text-xs">
 																{formatTime(activity.time)}
@@ -764,7 +700,7 @@ export default function DayView({ listing, isAuthenticated = true }: DayViewProp
 											{/* Custom markers for route stops */}
 											{pathCoordinates.map((position, index) => {
 													const dayActivity = currentDayActivities[index];
-													const activityName = dayActivity ? getItemDisplayName(dayActivity) : `Activity ${index + 1}`;
+													const activityName = dayActivity ? (isActivity(dayActivity) ? dayActivity.title : dayActivity.name) : `Activity ${index + 1}`;
 													const isSelected = selectedActivityIndex === index;
 													
 													// Get color based on activity type
@@ -883,7 +819,7 @@ export default function DayView({ listing, isAuthenticated = true }: DayViewProp
 					</div>
 				</div>
 			) : (
-				<div className="space-y-4 border-l-2 border-dashed border-border-primary ps-6 ms-6">
+				<div className="space-y-6 relative pl-24">
 					{currentDayActivities.map((activity, index) => {
 						// Use type guards to determine the card type
 						const cardType = isAccommodation(activity) 
@@ -898,7 +834,6 @@ export default function DayView({ listing, isAuthenticated = true }: DayViewProp
 								activity={activity}
 								cardType={cardType}
 								formatTime={formatTime}
-								getActivityIcon={() => getActivityIcon(activity)}
 								setIsFeedbackDrawerOpen={setIsDrawerOpen}
 							/>
 						);

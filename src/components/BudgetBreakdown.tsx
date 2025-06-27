@@ -23,13 +23,13 @@ export default function BudgetBreakdown({
   onBooking,
   onLogin
 }: BudgetBreakdownProps) {
-  // Calculate accurate totals
+  // Use actual costs from backend
   const activityCost = itineraryData?.activity_cost || 0;
   const lodgingCost = itineraryData?.lodging_cost || 0;
   const transportCost = itineraryData?.transport_cost || 0;
   const serviceFee = itineraryData?.service_fee || 0;
   const calculatedTotal = activityCost + lodgingCost + transportCost + serviceFee;
-  const displayTotal = calculatedTotal > 0 ? calculatedTotal : basePrice;
+  const displayTotal = calculatedTotal || basePrice;
 
   return (
     <div className='col-span-full mt-8 bg-[#141414] rounded-xl p-8'>
@@ -84,9 +84,9 @@ export default function BudgetBreakdown({
                 <div className='w-12 h-12 mx-auto mb-2 bg-blue-500/20 rounded-lg flex items-center justify-center'>
                   <MdOutlineExplore className='h-6 w-6 text-blue-500' />
                 </div>
-                <p className='text-2xl font-bold'>${itineraryData?.activity_cost || 0}.00</p>
+                <p className='text-2xl font-bold'>${activityCost}.00</p>
               </div>
-              <p className='text-xs text-gray-400'>Activities • {Math.round(((itineraryData?.activity_cost || 0) / basePrice) * 100)}%</p>
+              <p className='text-xs text-gray-400'>Activities • {displayTotal > 0 ? Math.round((activityCost / displayTotal) * 100) : 0}%</p>
             </div>
 
             <div className='text-center'>
@@ -94,9 +94,9 @@ export default function BudgetBreakdown({
                 <div className='w-12 h-12 mx-auto mb-2 bg-green-500/20 rounded-lg flex items-center justify-center'>
                   <GoHome className='h-6 w-6 text-green-500' />
                 </div>
-                <p className='text-2xl font-bold'>${itineraryData?.lodging_cost || 0}.00</p>
+                <p className='text-2xl font-bold'>${lodgingCost}.00</p>
               </div>
-              <p className='text-xs text-gray-400'>Lodging • {Math.round(((itineraryData?.lodging_cost || 0) / basePrice) * 100)}%</p>
+              <p className='text-xs text-gray-400'>Lodging • {displayTotal > 0 ? Math.round((lodgingCost / displayTotal) * 100) : 0}%</p>
             </div>
 
             <div className='text-center'>
@@ -104,9 +104,9 @@ export default function BudgetBreakdown({
                 <div className='w-12 h-12 mx-auto mb-2 bg-red-500/20 rounded-lg flex items-center justify-center'>
                   <MdOutlineDirectionsCarFilled className='h-6 w-6 text-red-500' />
                 </div>
-                <p className='text-2xl font-bold'>${itineraryData?.transport_cost || 0}.00</p>
+                <p className='text-2xl font-bold'>${transportCost}.00</p>
               </div>
-              <p className='text-xs text-gray-400'>Transport • {Math.round(((itineraryData?.transport_cost || 0) / basePrice) * 100)}%</p>
+              <p className='text-xs text-gray-400'>Transport • {displayTotal > 0 ? Math.round((transportCost / displayTotal) * 100) : 0}%</p>
             </div>
 
             <div className='text-center'>
@@ -114,9 +114,9 @@ export default function BudgetBreakdown({
                 <div className='w-12 h-12 mx-auto mb-2 bg-yellow-500/20 rounded-lg flex items-center justify-center'>
                   <BiSolidMap className='h-6 w-6 text-yellow-500' />
                 </div>
-                <p className='text-2xl font-bold'>${itineraryData?.service_fee || 0}.00</p>
+                <p className='text-2xl font-bold'>${serviceFee}.00</p>
               </div>
-              <p className='text-xs text-gray-400'>Service Fee</p>
+              <p className='text-xs text-gray-400'>Service Fee • {displayTotal > 0 ? Math.round((serviceFee / displayTotal) * 100) : 0}%</p>
             </div>
           </div>
 

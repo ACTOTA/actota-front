@@ -49,7 +49,7 @@ const ItineraryCard: React.FC<ListingCardProps> = ({
                     router.push(`/itineraries/${data._id.$oid}`)
                 }
             }}
-            className='group relative bg-gray-900/50 backdrop-blur-sm rounded-2xl overflow-hidden cursor-pointer 
+            className='group relative bg-gray-900/50 backdrop-blur-sm rounded-2xl cursor-pointer 
                        transform transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl hover:bg-gray-900/70
                        border border-gray-800/50 hover:border-gray-700/50 mt-4 max-w-[864px]'
         >

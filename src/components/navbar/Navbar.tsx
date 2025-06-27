@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import Container from "../Container";
 import Logo from "../Logo";
 import { useEffect, useState } from "react";
@@ -174,7 +175,7 @@ const Navbar = () => {
                 language="en"
                 region="EN"
                 version="weekly">
-                <div className={`fixed h-[78px] z-30 w-full bg-black/70 backdrop-blur-sm text-white items-center ${isAuthRoute ? 'hidden' : ''} ${isHomePage ? 'flex' : 'hidden sm:flex'}`}>
+                <div className={`fixed h-[78px] z-40 w-full bg-black/70 backdrop-blur-sm text-white items-center ${isAuthRoute ? 'hidden' : ''} ${isHomePage ? 'flex' : 'hidden sm:flex'}`}>
                     <div className="py-2 w-full h-full px-4" >
                         <div className="flex flex-row items-start justify-between w-full h-full" >
                             <Logo onClick={handleClick} className="hover:cursor-pointer z-50 my-auto" />
@@ -184,47 +185,23 @@ const Navbar = () => {
                                 <div className="mt-1">
                                     <Menu as="div" className="relative inline-block text-left text-white">
                                         <div className="flex items-center gap-2">
-                                            {/* On mobile home page, show only notification button */}
-                                            {isHomePage && isSmallScreen ? (
-                                                <button
-                                                    onClick={() => setIsNotificationDrawerOpen(true)}
-                                                    className="rounded-full text-white flex items-center justify-center p-3.5 border border-[#424242] relative"
-                                                >
-                                                    <Image src="/svg-icons/notification.svg" alt="Notifications" width={28} height={28} className="rounded-full" />
-                                                    <div className="absolute bg-red-500 rounded-full" />
-                                                </button>
-                                            ) : (
-                                                <>
-                                                    {/* Show notification button on larger screens */}
-                                                    {!isSmallScreen && (
-                                                        <button
-                                                            onClick={() => setIsNotificationDrawerOpen(true)}
-                                                            className="rounded-full text-white flex items-center justify-center p-3.5 border border-[#424242] relative"
-                                                        >
-                                                            <Image src="/svg-icons/notification.svg" alt="Notifications" width={28} height={28} className="rounded-full" />
-                                                            <div className="absolute bg-red-500 rounded-full" />
-                                                        </button>
-                                                    )}
-
-                                                    <Menu.Button className="inline-flex w-full justify-center items-center gap-x-1.5 rounded-full p-0.5 text-sm font-semibold text-white shadow-sm border border-[#424242] sm:hover:bg-gray-800 max-sm:border-none">
-                                                        {currentUser.image ?
-                                                            <Image src={currentUser.image} alt="User" width={32} height={32} className="rounded-full" /> :
-                                                            <div className="rounded-full bg-[#00122D] text-white flex items-center justify-center p-3">
-                                                                <LuUser className="w-6 h-6" />
-                                                            </div>
-                                                        }
-                                                        {!isSmallScreen && (
-                                                            <>
-                                                                <p>{(currentUser.first_name && currentUser.last_name) ?
-                                                                    (currentUser.first_name + " " + currentUser.last_name) :
-                                                                    currentUser.email}
-                                                                </p>
-                                                                <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-white" />
-                                                            </>
-                                                        )}
-                                                    </Menu.Button>
-                                                </>
-                                            )}
+                                            <Menu.Button className="inline-flex w-full justify-center items-center gap-x-1.5 rounded-full p-0.5 text-sm font-semibold text-white shadow-sm border border-[#424242] sm:hover:bg-gray-800 max-sm:border-none">
+                                                {currentUser.image ?
+                                                    <Image src={currentUser.image} alt="User" width={32} height={32} className="rounded-full" /> :
+                                                    <div className="rounded-full bg-[#00122D] text-white flex items-center justify-center p-3">
+                                                        <LuUser className="w-6 h-6" />
+                                                    </div>
+                                                }
+                                                {!isSmallScreen && (
+                                                    <>
+                                                        <p>{(currentUser.first_name && currentUser.last_name) ?
+                                                            (currentUser.first_name + " " + currentUser.last_name) :
+                                                            currentUser.email}
+                                                        </p>
+                                                        <ChevronDownIcon aria-hidden="true" className="-mr-1 size-5 text-white" />
+                                                    </>
+                                                )}
+                                            </Menu.Button>
                                         </div>
 
                                         {/* Hide menu items on mobile home page since we only show notifications */}
@@ -243,25 +220,7 @@ const Navbar = () => {
                                                 </div>
                                             )}
 
-                                            {/* Show notifications option on small screens */}
-                                            {isSmallScreen && (
-                                                <div className="">
-                                                    <Menu.Item>
-                                                        <button
-                                                            onClick={() => {
-                                                                setIsNotificationDrawerOpen(true);
-                                                                // Optional: close the menu when opening notifications
-                                                                document.body.click();
-                                                            }}
-                                                            className="w-full text-left px-4 py-2 pt-3 text-sm hover:bg-red-500/20 hover:rounded-t-md flex items-center"
-                                                        >
-                                                            <Image src="/svg-icons/notification.svg" alt="Notifications" width={20} height={20} className="mr-2" />
-                                                            Notifications
-                                                            <div className="ml-2 w-2 h-2 bg-red-500 rounded-full" />
-                                                        </button>
-                                                    </Menu.Item>
-                                                </div>
-                                            )}
+                                            
 
                                             <div className="">
                                                 <Menu.Item>
@@ -315,8 +274,8 @@ const Navbar = () => {
                                 </div>
                             ) : (
                                 <div className="flex gap-2 z-50">
-                                    <Link href='/auth/signin'><Button variant="simple" className="hover:cursor-pointer text-white">Log In</Button></Link>
-                                    <Link href='/auth/signup'><Button variant="primary" className="hover:cursor-pointer bg-white text-black">Get Started</Button></Link>
+                                    <Link href='/auth/signin'><Button variant="simple" className="hover:cursor-pointer text-white text-xs sm:text-sm">Log In</Button></Link>
+                                    <Link href='/auth/signup'><Button variant="primary" className="hover:cursor-pointer bg-white text-black text-xs sm:text-sm">Get Started</Button></Link>
                                 </div>
                             )}
                         </div>

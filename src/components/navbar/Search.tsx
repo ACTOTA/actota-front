@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, Dispatch, SetStateAction } from "react";
+import React, { useEffect, useState, useRef, Dispatch, SetStateAction } from "react";
 import { BiSearch } from 'react-icons/bi';
 import { HiOutlineLocationMarker } from 'react-icons/hi';
 import { AiOutlineCalendar } from 'react-icons/ai';
@@ -35,9 +35,9 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
     
     return `
       ${isSelected ? 'lg:ring-2 lg:ring-white lg:bg-white/10' : ''}
-      ${showDivider && !navbar ? 'lg:after:content-[""] lg:after:absolute lg:after:right-0 lg:after:top-1/2 lg:after:h-8 lg:after:w-[1px] lg:after:bg-white/20 lg:after:-translate-y-1/2' : ''}
+      ${showDivider && !navbar ? 'after:content-[""] after:absolute after:right-0 after:top-1/2 after:h-8 after:w-[1px] after:bg-white/20 after:-translate-y-1/2' : ''}
       rounded-full cursor-pointer z-10 h-full w-full col-span-2
-      flex items-center justify-center px-2 sm:px-3 lg:px-4 relative
+      flex items-center justify-center px-1 sm:px-3 lg:px-4 relative
       hover:bg-white/5 transition-all duration-200
     `.trim();
   };
@@ -49,7 +49,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
 
   // Helper function for text classes
   const getTextClassName = (hasValue: boolean) => {
-    return `font-medium ${hasValue ? 'text-white' : 'text-white/90'} ${currStep != null && !navbar ? 'max-md:text-xs' : ''} ${navbar ? '' : 'text-sm sm:text-base'}`;
+    return `font-medium ${hasValue ? 'text-white' : 'text-white/90'} ${currStep != null && !navbar ? 'max-md:text-xs' : ''} ${navbar ? '' : 'text-xs sm:text-base'}`;
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -185,7 +185,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
     router.push(`/itineraries?${params.toString()}`);
   };
 
-  // Function to get activity count for display
+// Function to get activity count for display
   const getActivityCount = (activities: string[], showDetails: boolean = false) => {
     const count = activities.length;
 
@@ -292,7 +292,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
       )}
 
       <div 
-        className={`relative ${navbar ? '' : `max-lg:fixed max-lg:left-0 max-lg:right-0 max-lg:z-40 max-lg:transition-all max-lg:duration-300 ${currStep != null ? 'max-lg:bottom-16 max-lg:px-2' : 'max-lg:bottom-20 max-lg:px-4'}`}`} 
+        className={`relative ${navbar ? '' : `max-sm:fixed max-sm:left-0 max-sm:right-0 max-sm:transition-all max-sm:duration-300 ${currStep != null ? 'max-sm:bottom-16 max-sm:px-2' : 'max-sm:bottom-20 max-sm:px-1'}`}`} 
         id="search-bar"
         onTouchStart={currStep != null ? handleTouchStart : undefined}
         onTouchMove={currStep != null ? handleTouchMove : undefined}
@@ -305,12 +305,12 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
             padding="none"
             rounded={navbar ? 'full' : 'full'}
             className={`
-              ${navbar ? 'w-[500px] h-[60px] text-primary-gray max-2xl:h-[60px]' : 'w-[760px] max-lg:w-full text-white'} 
+              ${navbar ? 'w-[500px] h-[60px] text-primary-gray max-2xl:h-[60px]' : 'w-[760px] max-sm:w-full text-white max-sm:px-2'} 
               ${isTop && !navbar ? 'h-[86px]' : 'h-[66px]'}
-              ${currStep != null && !navbar ? 'max-lg:h-auto max-lg:max-h-[90vh]' : 'max-lg:h-[64px]'}
-              ${currStep != null && !navbar ? 'max-lg:!rounded-xl' : ''}
-              m-auto z-50
-              ${currStep != null && !navbar ? 'max-lg:transition-[height,max-height] max-lg:duration-300 lg:transition-all lg:duration-300' : 'transition-all duration-300'} 
+              ${currStep != null && !navbar ? 'max-sm:h-auto max-sm:max-h-[90vh]' : 'max-sm:h-[64px]'}
+              ${currStep != null && !navbar ? 'max-sm:!rounded-xl' : ''}
+              m-auto ${navbar ? '' : 'z-50'}
+              ${currStep != null && !navbar ? 'max-sm:transition-[height,max-height] max-sm:duration-300 lg:transition-all lg:duration-300' : 'transition-all duration-300'} 
               ease-in-out ${className}
             `} 
             ref={searchRef}
@@ -503,7 +503,7 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
             </div>
           </section>
 
-          <section className={`${navbar ? 'h-[55px] w-[55px]' : 'm-auto h-[48px] w-[48px] sm:h-[52px] sm:w-[52px] lg:h-[56px] lg:w-[56px]'} col-span-1 flex justify-center items-center`}>
+          <section className={`${navbar ? 'h-[55px] w-[55px]' : 'm-auto h-[48px] w-[48px] sm:h-[52px] sm:w-[52px] lg:h-[56px] lg:w-[56px]'} col-span-1 flex justify-center items-center max-sm:h-[40px] max-sm:w-[40px] pr-1`}>
             <div onClick={() => handleSearch()} className="w-full h-full relative rounded-full bg-gradient-to-r from-blue-500 to-blue-600 cursor-pointer
             hover:from-blue-600 hover:to-blue-700 transition-all duration-300 ease-in-out
             shadow-lg hover:shadow-xl transform hover:scale-105">

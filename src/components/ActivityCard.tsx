@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { BiSolidMap } from 'react-icons/bi';
 import { FaRegClock } from 'react-icons/fa';
-import { MdOutlineDirections, MdOutlineDirectionsCarFilled, MdOutlineExplore } from 'react-icons/md';
+import { MdOutlineDirections, MdOutlineDirectionsCarFilled, MdOutlineExplore, MdBed, MdFoodBank, MdLocationOn } from 'react-icons/md';
 import Image from 'next/image';
 import { IoLocationOutline } from 'react-icons/io5';
 import { AiFillStar } from 'react-icons/ai';
@@ -26,12 +26,54 @@ export enum CardType {
 export interface ActivityCardProps {
   activity: PopulatedDayItem;
   formatTime: (time: string) => string;
-  getActivityIcon: (type: string) => JSX.Element;
   setIsFeedbackDrawerOpen?: (isFeedbackDrawerOpen: boolean) => void;
   cardType?: CardType;
 }
 
-const ActivityCard = ({ activity, formatTime, getActivityIcon, setIsFeedbackDrawerOpen, cardType = CardType.ACTIVITY }: ActivityCardProps) => {
+const ActivityCard = ({ activity, formatTime, setIsFeedbackDrawerOpen, cardType = CardType.ACTIVITY }: ActivityCardProps) => {
+
+  // Helper function to get the display name for any day item
+  const getItemDisplayName = (item: PopulatedDayItem): string => {
+    if (isActivity(item)) {
+      return item.title;
+    } else if (isAccommodation(item) || isTransportation(item)) {
+      return item.name;
+    }
+    return "Unknown";
+  };
+
+  // Get icon for activity type
+  const getActivityIcon = (item: PopulatedDayItem) => {
+    // Transportation icon
+    if (isTransportation(item)) {
+      return <MdOutlineDirectionsCarFilled className="w-5 h-5 text-white" />;
+    }
+
+    // Accommodation icon
+    if (isAccommodation(item)) {
+      return <MdBed className="w-5 h-5 text-white" />;
+    }
+
+    // Activity icons based on name
+    const displayName = isActivity(item) ? item?.title.toLowerCase() : '';
+
+    // Check for food-related activities
+    if (displayName.includes('breakfast') || displayName.includes('lunch') ||
+      displayName.includes('dinner') || displayName.includes('restaurant')) {
+      return <MdFoodBank className="w-5 h-5 text-white" />;
+    }
+
+    switch (displayName) {
+      case 'hiking':
+        return <MdOutlineExplore className="w-5 h-5 text-white" />;
+      case 'sightseeing':
+        return <BiSolidMap className="w-5 h-5 text-white" />;
+      case 'safari':
+        return <MdOutlineExplore className="w-5 h-5 text-white" />;
+      default:
+        return <MdLocationOn className="w-5 h-5 text-white" />;
+    }
+  };
 
   const getBorderGradient = () => {
     switch (cardType) {
@@ -86,16 +128,19 @@ const ActivityCard = ({ activity, formatTime, getActivityIcon, setIsFeedbackDraw
   };
 
   const getDuration = () => {
-      if (isActivity(activity)) {
-        const duration = activity.duration_minutes;
-        if (duration < 60) return `{duration} minutes`;
-        else if (duration == 60) return "1 hour";
+    if (isActivity(activity)) {
+      const duration = activity.duration_minutes;
+      if (duration === undefined || duration === null) return null; // No duration provided
 
-        const hours = Math.floor(duration / 60);
-        const minutes = duration % 60;
-        return `${hours} hours and ${minutes} minutes.`;
-      }
-  }
+      if (duration < 60) return `${duration} minutes`;
+      else if (duration === 60) return "1 hour";
+
+      const hours = Math.floor(duration / 60);
+      const minutes = duration % 60;
+      return `${hours}h ${minutes > 0 ? `${minutes}m` : ''}`.trim();
+    }
+    return null;
+  };
 
 
   useEffect(() => {
@@ -104,16 +149,19 @@ const ActivityCard = ({ activity, formatTime, getActivityIcon, setIsFeedbackDraw
   }, []);
 
   return (
-    <div className="flex flex-col gap-4 border-border-primary">
-      {/* Time Column */}
-      <div className="w-fit -ml-16 text-sm bg-gray-900 rounded-full px-2 py-1">
-        <span className="text-white">{formatTime(activity.time)}</span>
+    <div className="flex items-start gap-4 relative">
+      {/* Timeline dot and line */}
+      <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-border-primary -ml-[25px]"></div>
+      <div className="absolute left-0 top-6 w-3 h-3 bg-blue-500 rounded-full -ml-[31px] border-2 border-black"></div>
+      
+      {/* Time */}
+      <div className="flex-shrink-0 w-20 text-right pr-4">
+        <span className="text-white text-sm">{formatTime(activity.time)}</span>
       </div>
 
       {/* Activity Card */}
       <div className={`flex-1 bg-gradient-to-br ${getBorderGradient()} rounded-xl p-[2px]`}>
         <div className="flex-1 bg-black rounded-xl">
-
           <div className="flex-1 bg-gradient-to-br from-white/20 to-white/5 rounded-xl p-4 relative">
             {cardType === CardType.ACCOMMODATION && (
               <div className="flex justify-between items-start mb-4">
@@ -123,81 +171,70 @@ const ActivityCard = ({ activity, formatTime, getActivityIcon, setIsFeedbackDraw
               </div>
             )}
 
-            <div className="flex justify-between items-end ">
-              {cardType === CardType.TRANSPORTATION ? (
-                <div className="flex items-start gap-10">
-
-                  {/* Location Info */}
-                  <div className="bg-black/30 rounded-lg p-3 w-[250px]">
-                    <div className="flex items-center gap-2 text-white/70 mb-2">
-                      <BiSolidMap className="w-4 h-4" />
-                      <span>Location</span>
-                    </div>
-                    <p className="text-white text-sm">{activity.location.name}</p>
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+              {/* Image/Icon Section */}
+              <div className="flex-shrink-0">
+                {cardType === CardType.TRANSPORTATION ? (
+                  <div className="w-16 h-16 rounded-lg bg-black/30 flex items-center justify-center">
+                    {getActivityIcon(activity)}
                   </div>
-
-                  {/* Duration */}
-                  <div className='flex flex-col gap-1 max-sm:hidden'>
-
-                    <div className="flex items-center gap-2">
-                      <FaRegClock className="w-4 h-4 text-white" />
-                      <span className="text-white text-sm">1 hour</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MdOutlineDirectionsCarFilled className="w-4 h-4 text-white" />
-                      <span className="text-white text-sm">1 hour</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <LuRoute className="w-4 h-4 text-white" />
-                      <span className="text-white text-sm">4.9 miles</span>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-start gap-10">
-
-                  {/* Image Goes Here */}
-                  <div className="bg-black/30 rounded-lg w-[150px] h-[116px] -m-2 relative">
+                ) : (
+                  <div className="bg-black/30 rounded-lg w-24 h-24 relative overflow-hidden">
                     <Image
                       src={getImageSource()}
-                      alt="Activity Picture"
+                      alt={getDisplayName()}
                       layout="fill"
                       objectFit="cover"
                       className="rounded-lg"
                     />
                   </div>
+                )}
+              </div>
 
-                  {/* Duration */}
-                  <div className='flex flex-col gap-1 max-sm:hidden'>
-                    <p><b>{getDisplayName()}</b></p>
+              {/* Content Section */}
+              <div className="flex-1 flex flex-col gap-2">
+                <h3 className="text-white font-bold text-lg">{getDisplayName()}</h3>
 
-                    <div className="flex items-center gap-2">
-                      <FaRegClock className="w-4 h-4 text-white" />
-                      <span className="text-white text-sm">
-                        {isActivity(activity) && `${getDuration()}`}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MdOutlineDirectionsCarFilled className="w-4 h-4 text-white" />
-                      <span className="text-white text-sm">UPDATE THIS</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <LuRoute className="w-4 h-4 text-white" />
-                      <span className="text-white text-sm">4.9 miles</span>
-                    </div>
+                {/* Location */}
+                {(activity.location?.name || (isActivity(activity) && activity.address)) && (
+                  <div className="flex items-center gap-2 text-white/70 text-sm">
+                    <IoLocationOutline className="w-4 h-4" />
+                    <span>
+                      {activity.location?.name ||
+                        (isActivity(activity) && activity.address
+                          ? `${activity.address.street}, ${activity.address.city}`
+                          : '')}
+                    </span>
                   </div>
+                )}
+
+                {/* Duration (only for activities) */}
+                {isActivity(activity) && getDuration() && (
+                  <div className="flex items-center gap-2 text-white/70 text-sm">
+                    <FaRegClock className="w-4 h-4" />
+                    <span>{getDuration()}</span>
+                  </div>
+                )}
+
+                {/* Price */}
+                <div className="flex items-center gap-2 text-white text-sm">
+                  <p className="font-semibold">{getPriceInfo().amount}</p>
+                  <span className="text-primary-gray">{getPriceInfo().label}</span>
+                </div>
+              </div>
+
+              {/* Action/Feedback Button (if needed) */}
+              {setIsFeedbackDrawerOpen && (
+                <div className="flex-shrink-0 mt-4 sm:mt-0">
+                  <Button
+                    variant="primary"
+                    onClick={() => setIsFeedbackDrawerOpen(true)}
+                    className="w-full sm:w-auto"
+                  >
+                    Give Feedback
+                  </Button>
                 </div>
               )}
-
-              {/* Navigation */}
-              <div className="flex flex-col items-end">
-                {/*{setIsFeedbackDrawerOpen && (
-                                    <Button variant='primary' onClick={() => setIsFeedbackDrawerOpen(true)} className='absolute top-4 right-4'> Give Feedback</Button>
-                                )}*/}
-
-                <p className='text-white'>{getPriceInfo().amount}</p>
-                <span className="text-primary-gray text-sm">{getPriceInfo().label}</span>
-              </div>
             </div>
           </div>
         </div>

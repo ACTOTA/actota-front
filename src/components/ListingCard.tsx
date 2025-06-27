@@ -43,8 +43,9 @@ const ListingCard: React.FC<ListingCardProps> = ({
                     router.push(`/itineraries/${data._id.$oid}`)
                 }
             }}
-            className='group relative bg-gray-900 rounded-2xl overflow-hidden cursor-pointer 
-                       transform transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl'
+            className='group relative bg-gray-900 rounded-2xl cursor-pointer overflow-hidden
+                       transform transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl 
+                       hover:shadow-white/10 border border-gray-800/30'
         >
             {/* Image Container with fixed aspect ratio */}
             <div className='relative w-full aspect-[4/5]'>
@@ -53,7 +54,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
                     alt={data.trip_name}
                     layout='fill' 
                     objectFit='cover'
-                    className='transition-transform duration-300 group-hover:scale-105'
+                    className='rounded-2xl transition-transform duration-300 group-hover:scale-105'
                 />
                 
                 {/* Gradient Overlay */}

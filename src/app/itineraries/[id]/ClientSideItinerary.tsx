@@ -31,6 +31,7 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
   const [user, setUser] = useState<any>(null);
   const objectId = pathname.substring(pathname.lastIndexOf('/') + 1);
   const [clientIsAuthenticated, setClientIsAuthenticated] = useState(isAuthenticated);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
     // Access localStorage only on the client side
@@ -47,6 +48,7 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
     } else {
       setClientIsAuthenticated(false);
     }
+    setIsHydrated(true);
   }, []);
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -81,6 +83,15 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
   }, [dateRange]);
 
   const basePrice = (itineraryData?.person_cost ?? 0) * (itineraryData?.min_group ?? 1);
+  
+  // Use actual costs from backend
+  const activityCost = itineraryData?.activity_cost || 0;
+  const lodgingCost = itineraryData?.lodging_cost || 0;
+  const transportCost = itineraryData?.transport_cost || 0;
+  const serviceFee = itineraryData?.service_fee || 0;
+  
+  // Calculate total by adding up all components
+  const calculatedTotal = activityCost + lodgingCost + transportCost + serviceFee;
 
 
   if (error && clientIsAuthenticated) {
@@ -155,11 +166,16 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
   };
 
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
+    if (!date) return 'Select dates';
+    try {
+      return new Date(date).toLocaleDateString('en-US', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+    } catch (error) {
+      return 'Select dates';
+    }
   };
   
   // Handle date selection from DateMenu component
@@ -175,6 +191,15 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
       setDateRange('');
     }
   };
+
+  // Prevent hydration mismatch by not rendering until client state is set
+  if (!isHydrated) {
+    return (
+      <div className='min-h-screen bg-[#0A0A0A] text-white flex items-center justify-center'>
+        <div className='text-white'>Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className='min-h-screen bg-[#0A0A0A] text-white'>
@@ -294,7 +319,7 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
                     <CalendarIcon className='h-5 w-5 text-white' />
                   </div>
                   <div>
-                    <p className='text-xs text-gray-400'>{formatDate(itineraryData.created_at)}</p>
+                    <p className='text-xs text-gray-400'>Trip Duration</p>
                     <p className='text-sm font-medium'>{itineraryData.length_days} days</p>
                   </div>
                 </div>
@@ -304,7 +329,7 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
                     <LuUsers className='h-5 w-5 text-white' />
                   </div>
                   <div>
-                    <p className='text-xs text-gray-400'>3 Adults</p>
+                    <p className='text-xs text-gray-400'>Group Size</p>
                     <p className='text-sm font-medium'>{itineraryData.min_group}-{itineraryData.max_group} People</p>
                   </div>
                 </div>
@@ -314,8 +339,8 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
                     <PiClockDuotone className='h-5 w-5 text-white' />
                   </div>
                   <div>
-                    <p className='text-xs text-gray-400'>6 days 5 nights</p>
-                    <p className='text-sm font-medium'>{itineraryData.length_hours} Hours</p>
+                    <p className='text-xs text-gray-400'>{itineraryData.length_days} days {itineraryData.length_days - 1} nights</p>
+                    <p className='text-sm font-medium'>{itineraryData.length_days} Days</p>
                   </div>
                 </div>
                 
@@ -335,20 +360,6 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
                 </div>
               </div>
               
-              {/* Destination Tags */}
-              <div className='mt-6 flex items-center gap-3'>
-                <span className='text-sm text-gray-400'>Destinations:</span>
-                <div className='flex flex-wrap gap-2'>
-                  <span className='px-3 py-1.5 bg-gray-800 rounded-full text-sm'>
-                    {itineraryData.start_location?.city}, {itineraryData.start_location?.state}
-                  </span>
-                  {itineraryData.end_location?.city !== itineraryData.start_location?.city && (
-                    <span className='px-3 py-1.5 bg-gray-800 rounded-full text-sm'>
-                      {itineraryData.end_location?.city}, {itineraryData.end_location?.state}
-                    </span>
-                  )}
-                </div>
-              </div>
               
               {/* Activity Tags */}
               <div className='mt-4 flex flex-wrap gap-2'>
@@ -420,24 +431,24 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
                 <div className='space-y-4 mb-6'>
                   <div className='flex justify-between text-sm'>
                     <span className='text-gray-400'>Activity costs</span>
-                    <span className='font-medium'>${itineraryData?.activity_cost || 0}.00</span>
+                    <span className='font-medium'>${activityCost}.00</span>
                   </div>
                   <div className='flex justify-between text-sm'>
                     <span className='text-gray-400'>Lodging costs</span>
-                    <span className='font-medium'>${itineraryData?.lodging_cost || 0}.00</span>
+                    <span className='font-medium'>${lodgingCost}.00</span>
                   </div>
                   <div className='flex justify-between text-sm'>
                     <span className='text-gray-400'>Transport costs</span>
-                    <span className='font-medium'>${itineraryData?.transport_cost || 0}.00</span>
+                    <span className='font-medium'>${transportCost}.00</span>
                   </div>
                   <div className='flex justify-between text-sm'>
                     <span className='text-gray-400'>Service fee</span>
-                    <span className='font-medium'>${itineraryData?.service_fee || 0}.00</span>
+                    <span className='font-medium'>${serviceFee}.00</span>
                   </div>
                   <div className="h-px bg-gray-800 my-4"></div>
                   <div className='flex justify-between text-lg font-semibold'>
                     <span>Total amount</span>
-                    <span>${basePrice.toFixed(2)}</span>
+                    <span>${calculatedTotal.toFixed(2)}</span>
                   </div>
                 </div>
                 
@@ -503,7 +514,7 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
         {/* Budget and Breakdown Section */}
         <BudgetBreakdown 
           itineraryData={itineraryData}
-          basePrice={basePrice}
+          basePrice={calculatedTotal}
           clientIsAuthenticated={clientIsAuthenticated}
           onBooking={handleBooking}
           onLogin={() => router.push('/auth/signin')}
