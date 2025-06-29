@@ -66,7 +66,7 @@ const Favorites = () => {
     if (!filteredFavorites.length) return <div>No favorites found</div>;
 
     return (
-      <div>
+      <div className="space-y-4">
         {filteredFavorites.map((favorite: any) => (
           <FavoritesCard key={favorite._id.$oid} data={favorite} />
         ))}

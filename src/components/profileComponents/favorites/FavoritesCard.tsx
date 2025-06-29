@@ -44,7 +44,7 @@ const FavoritesCard: React.FC<FavoritesCardProps> = ({ data }) => {
     };
 
     return (
-        <BaseCard className="mt-4 !p-0 overflow-hidden lg:h-64" onClick={handleCardClick}>
+        <BaseCard className="!p-0 overflow-hidden lg:h-64" onClick={handleCardClick}>
             <div className='flex flex-col lg:flex-row lg:h-full relative'>
                 {/* Mobile/Desktop image section */}
                 <div className='relative lg:w-80 h-48 lg:h-full lg:order-2'>

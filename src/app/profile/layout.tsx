@@ -30,7 +30,7 @@ export default function ProfileLayout({
         <Sidebar onItemClick={() => { setIsSidebarOpen(false) }} />
       </div>
 
-      <div className="w-full text-white p-4 md:p-8 relative">
+      <div className="w-full text-white p-4 md:p-8 relative pt-16 md:pt-8">
 
         {children}
       </div>

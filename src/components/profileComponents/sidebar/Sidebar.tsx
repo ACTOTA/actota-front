@@ -6,7 +6,6 @@ import LuggageIcon from "@/public/sidebar-icons/luggage-icon.svg";
 import HeartIcon from "@/public/sidebar-icons/heart-icon.svg";
 import CreditCardIcon from "@/public/sidebar-icons/credit-card.svg";
 import SettingsIcon from "@/public/sidebar-icons/settings-icon.svg";
-import PlaneIcon from "@/public/sidebar-icons/plane-icon.svg";
 import UserIcon from "@/public/sidebar-icons/user-icon.svg";
 import ProfileImage from "@/public/images/Avatar.png";
 import LogoutIcon from "@/public/sidebar-icons/logout-icon.svg";
@@ -52,11 +51,6 @@ const Sidebar = ({ onItemClick }: SidebarProps) => {
       href: "/profile/preferences",
       icon: SettingsIcon,
       label: "Preferences",
-    },
-    {
-      href: "/profile/itineraries",
-      icon: PlaneIcon,
-      label: "My Itineraries",
     },
   ];
 
