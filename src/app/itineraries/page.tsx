@@ -84,6 +84,37 @@ const Itineraries = () => {
     // Determine if we're in search mode
     const isSearchMode = !!(searchLocation.length || arrivalDateTime || departureDateTime || searchGuests.length || searchActivities.length);
 
+    // Always call both hooks, but conditionally use the data
+    const searchQuery = {
+        locations: searchLocation,
+        arrival_datetime: arrivalDateTime,
+        departure_datetime: departureDateTime,
+        guests: searchGuests.map(g => parseInt(g)).filter(g => !isNaN(g)),
+        activities: searchActivities
+    };
+    
+    const {
+        data: searchItineraries,
+        isLoading: searchLoading,
+        isFetching: searchFetching,
+        error: searchError
+    } = useSearchItineraries(searchQuery);
+    
+    const {
+        data: regularItineraries,
+        isLoading: regularLoading,
+        isFetching: regularFetching,
+        error: regularError
+    } = useItineraries();
+    
+    // Use the appropriate data based on search mode
+    const itineraries = isSearchMode ? searchItineraries : regularItineraries;
+    const itinerariesLoading = isSearchMode ? searchLoading : regularLoading;
+    const itinerariesFetching = isSearchMode ? searchFetching : regularFetching;
+    const itinerariesError = isSearchMode ? searchError : regularError;
+
+    // Determine if we should show loading (either initial loading or fetching new data)
+    const isLoadingOrFetching = itinerariesLoading || itinerariesFetching;
     const { data: favorites, isLoading: favoritesLoading, error: favoritesError } = useFavorites();
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);

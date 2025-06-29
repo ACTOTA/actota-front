@@ -938,7 +938,7 @@ const Payment = () => {
             <div className='bg-[#1A1A1A] rounded-xl border border-gray-800 p-6 space-y-3'>
               <p className='text-gray-300'>Free cancellation for the first 72 hours after payment is confirmed.</p>
               <p className='text-gray-300'>Cancel before August 20 for a partial refund.</p>
-              <p className='text-gray-300'>Your reservation won't be confirmed until an Agent or Guide accepts your request (typically within 24 hours).</p>
+              <p className='text-gray-300'>Your reservation won&apos;t be confirmed until an Agent or Guide accepts your request (typically within 24 hours).</p>
               <button className="flex items-center gap-1 text-[#BBD4FB] hover:text-white transition-colors">
                 <span>Learn more</span>
                 <CgArrowTopRight className="h-4 w-4" />
@@ -1135,7 +1135,7 @@ const Payment = () => {
 
             {/* Terms */}
             <p className="text-gray-400 text-xs text-center">
-              By confirming your reservation, you agree to ACTOTA's{' '}
+              By confirming your reservation, you agree to ACTOTA&apos;s{' '}
               <Link href="/terms" className="text-[#BBD4FB] hover:text-white transition-colors">
                 Terms of Service
               </Link>{' '}

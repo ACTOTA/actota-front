@@ -242,6 +242,8 @@ const Booking = () => {
       />
     );
   });
+  
+  ClientBookingCard.displayName = 'ClientBookingCard';
 
   return (
     <ClientOnly>

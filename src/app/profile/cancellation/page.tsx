@@ -14,7 +14,7 @@ const Cancellation = () => {
       <div className='flex flex-col gap-2'>
           <h3 className='text-white font-semibold text-lg'>Refund Policy</h3>
           <p className='text-primary-gray'>If you cancel your trip, you will receive a 95% refund (5% cancellation fee). Refunds are typically processed within 5-10 business days.</p>
-          <p className='text-primary-gray mt-2'>Cancellations can be made directly from your bookings page by clicking the "Cancel Trip" button on any confirmed or ongoing booking.</p>
+          <p className='text-primary-gray mt-2'>Cancellations can be made directly from your bookings page by clicking the &ldquo;Cancel Trip&rdquo; button on any confirmed or ongoing booking.</p>
       </div>
     </GlassPanel>
   )

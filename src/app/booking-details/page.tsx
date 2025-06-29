@@ -232,7 +232,7 @@ function BookingDetails() {
         <div className='flex flex-wrap gap-4'>
 
           {Array.from({ length: 4 }).map((_, index) => (
-            <div className='flex justify-between items-center gap-4 mt-3'>
+            <div key={index} className='flex justify-between items-center gap-4 mt-3'>
               <div className='relative'>
                 <Image src="/images/hero-bg.jpg" alt="hero background" height={180} width={360} className=' rounded-lg mb-3' />
                 <div className='absolute top-2 right-2 h-[32px] w-[32px] bg-black/50  flex items-center justify-center rounded-[4px]'><RxArrowTopRight /></div>

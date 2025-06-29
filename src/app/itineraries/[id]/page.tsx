@@ -93,7 +93,7 @@ export default async function ItineraryPage({ params }: Props) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center text-white bg-[#05080D]">
         <h1 className="text-2xl font-bold mb-4">Itinerary Not Found</h1>
-        <p className="text-gray-400">The itinerary you're looking for doesn't exist or has been removed.</p>
+        <p className="text-gray-400">The itinerary you&apos;re looking for doesn&apos;t exist or has been removed.</p>
       </div>
     )
   } catch (error: any) {

@@ -195,7 +195,7 @@ function Location() {
               <div className=' w-full h-[40px]   rounded-lg'>
                 <p className='text-primary-gray '>About</p>
                 <p className='text-white text-2xl'>St. Mary’s Glacier</p>
-                <p className='text-primary-gray text-sm mt-10'>Explore this 2.6-km out-and-back trail near Idaho Springs, Colorado. Generally considered a moderately challenging route. This is a very popular area for cross-country skiing, fishing, and hiking, so you'll likely encounter other people while exploring. The best times to visit this trail are April through October. Dogs are welcome, but must be on a leash.</p>
+                <p className='text-primary-gray text-sm mt-10'>Explore this 2.6-km out-and-back trail near Idaho Springs, Colorado. Generally considered a moderately challenging route. This is a very popular area for cross-country skiing, fishing, and hiking, so you&apos;ll likely encounter other people while exploring. The best times to visit this trail are April through October. Dogs are welcome, but must be on a leash.</p>
               </div>
             </div>
             <div className='w-[288px] max-sm:w-full h-[352px] rounded-2xl border border-primary-gray relative overflow-hidden'>
@@ -221,15 +221,15 @@ function Location() {
           </div>
 
           <div className='flex flex-wrap gap-4 mt-16 px-[100px] max-sm:px-[16px]'>
-            {info.map((item) => (
-              <SimpleCard showButton={true} image={item.image} title={item.title} description={item.description} />
+            {info.map((item, index) => (
+              <SimpleCard key={index} showButton={true} image={item.image} title={item.title} description={item.description} />
             ))}
           </div>
 
           <p className='text-xl font-bold mt-10 px-[100px] max-sm:px-[16px]'>Other Popular Activities</p>
           <div className='flex gap-2 items-center flex-wrap mt-4 px-[100px] max-sm:px-[16px]'>
-            {["Cross-country skiing", "Fishing", "Hiking", "Snowshoeing"].map((item) => (
-              <Button variant="outline" size="sm" className='!text-primary-gray text-[16px] font-normal'>{item}</Button>
+            {["Cross-country skiing", "Fishing", "Hiking", "Snowshoeing"].map((item, index) => (
+              <Button key={index} variant="outline" size="sm" className='!text-primary-gray text-[16px] font-normal'>{item}</Button>
             ))}
           </div>
           <div className='flex  flex-wrap gap-8 mt-20 max-sm:flex-col px-[100px] max-sm:px-[16px] '>

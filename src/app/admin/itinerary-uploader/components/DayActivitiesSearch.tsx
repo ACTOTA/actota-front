@@ -329,7 +329,7 @@ const DayActivitiesSearch: React.FC<DayActivitiesSearchProps> = ({
                         {(item as any).available_time_slots && (
                           <div className="mt-1 text-xs text-green-500 flex items-center">
                             <HiOutlineClock className="mr-1" />
-                            <span>Using activity's available time slots</span>
+                            <span>Using activity&apos;s available time slots</span>
                           </div>
                         )}
                         {/* Debug info to check if duration exists */}

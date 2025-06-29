@@ -94,7 +94,7 @@ function BookingDetails() {
               <Image src="/svg-icons/waivers-icon.svg" alt="waivers" height={48} width={48} />
               <div>
                 <p className='text-white text-2xl font-bold'>Waivers</p>
-                <p className='text-primary-gray  mt-1'>You're required to sign all the waivers before the trip.</p>
+                <p className='text-primary-gray  mt-1'>You&apos;re required to sign all the waivers before the trip.</p>
               </div>
 
             </div>
@@ -204,7 +204,7 @@ function BookingDetails() {
       </div>
 
       <div className='mt-8 px-[80px] max-sm:px-6 max-lg:px-10'>
-        <p className='text-white text-2xl font-bold'>Guide's Message</p>
+        <p className='text-white text-2xl font-bold'>Guide&apos;s Message</p>
 
         <video src="/videos/DVbanner.mp4" controls loop className='w-full h-full object-cover rounded-lg mt-4 border border-primary-gray' />
       </div>
