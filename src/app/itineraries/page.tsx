@@ -20,11 +20,13 @@ import { useSearchParams } from 'next/navigation';
 
 const Itineraries = () => {
     const [listings, setListings] = React.useState<any[]>([]);
-    const [filteredListings, setFilteredListings] = React.useState<any[]>([]);
     const [showFilter, setShowFilter] = useState(false)
     const [advanceFilter, setAdvanceFilter] = useState(false)
+    const [currentPage, setCurrentPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
     
-    // Filter states
+    // Filter states - these are the working filters (not applied yet)
     const [filters, setFilters] = useState({
         budget: { 
             max: 5000, 
@@ -36,7 +38,32 @@ const Itineraries = () => {
             }
         },
         destinations: [''],
-        activities: [] as string[],
+        activityTypes: [] as string[],
+        themes: [] as string[],
+        groupSize: '',
+        tripDuration: '',
+        lodging: [] as string[],
+        transportation: [] as string[],
+        guests: { adults: 1, children: 0 },
+        dateRange: null as any
+    });
+
+    // Applied filters - these are the actual filters used for API calls
+    const [appliedFilters, setAppliedFilters] = useState({
+        budget: { 
+            max: 5000, 
+            enabled: false,
+            allocations: {
+                activities: 40,
+                lodging: 35,
+                transportation: 25
+            }
+        },
+        destinations: [''],
+        activityTypes: [] as string[],
+        themes: [] as string[],
+        groupSize: '',
+        tripDuration: '',
         lodging: [] as string[],
         transportation: [] as string[],
         guests: { adults: 1, children: 0 },
@@ -57,182 +84,170 @@ const Itineraries = () => {
     // Determine if we're in search mode
     const isSearchMode = !!(searchLocation.length || arrivalDateTime || departureDateTime || searchGuests.length || searchActivities.length);
 
-    // Use the appropriate query based on whether we're searching or not
-    const {
-        data: itineraries,
-        isLoading: itinerariesLoading,
-        isFetching: itinerariesFetching,
-        error: itinerariesError
-    } = isSearchMode
-            ? useSearchItineraries({
-                locations: searchLocation,
-                arrival_datetime: arrivalDateTime,
-                departure_datetime: departureDateTime,
-                guests: searchGuests.map(g => parseInt(g)).filter(g => !isNaN(g)),
-                activities: searchActivities
-            })
-            : useItineraries();
-
-    // Determine if we should show loading (either initial loading or fetching new data)
-    const isLoadingOrFetching = itinerariesLoading || itinerariesFetching;
-
     const { data: favorites, isLoading: favoritesLoading, error: favoritesError } = useFavorites();
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     const pageTitle = isSearchMode ? 'Search Results' : 'Itineraries for You';
 
-    // Filter and sort functions
-    const applyFilters = (data: any[]) => {
-        let filtered = [...data];
-
-        // Budget filter
-        if (filters.budget.enabled && filters.budget.max) {
-            filtered = filtered.filter(item => {
-                const totalCost = (item.person_cost || 0) * (filters.guests.adults + filters.guests.children);
-                return totalCost <= filters.budget.max;
-            });
-        }
-
-        // Destination filter
-        if (filters.destinations.some(dest => dest.trim() !== '')) {
-            filtered = filtered.filter(item => {
-                const itemLocations = [
-                    item.start_location?.city,
-                    item.start_location?.state,
-                    item.end_location?.city,
-                    item.end_location?.state
-                ].filter(Boolean).map(loc => loc.toLowerCase());
-                
-                return filters.destinations.some(dest => {
-                    if (!dest.trim()) return true;
-                    return itemLocations.some(loc => loc.includes(dest.toLowerCase().trim()));
-                });
-            });
-        }
-
-        // Activities filter
-        if (filters.activities.length > 0) {
-            filtered = filtered.filter(item => {
-                const itemActivities = (item.activities || []).map((act: any) => 
-                    (act.label || act.name || act).toLowerCase()
-                );
-                return filters.activities.some(activity => 
-                    itemActivities.some((itemAct: string) => itemAct.includes(activity.toLowerCase()))
-                );
-            });
-        }
-
-        // Lodging filter
-        if (filters.lodging.length > 0) {
-            filtered = filtered.filter(item => {
-                const itemLodging = (item.lodging || []).map((lodge: any) => 
-                    (lodge.type || lodge.name || lodge).toLowerCase()
-                );
-                return filters.lodging.some(lodging => 
-                    itemLodging.some((itemLodge: string) => itemLodge.includes(lodging.toLowerCase()))
-                );
-            });
-        }
-
-        // Transportation filter
-        if (filters.transportation.length > 0) {
-            filtered = filtered.filter(item => {
-                const itemTransportation = (item.transportation || []).map((transport: any) => 
-                    (transport.type || transport.name || transport).toLowerCase()
-                );
-                return filters.transportation.some(transportation => 
-                    itemTransportation.some((itemTransport: string) => itemTransport.includes(transportation.toLowerCase()))
-                );
-            });
-        }
-
-        // Guest count filter (check if itinerary can accommodate the number of guests)
-        const totalGuests = filters.guests.adults + filters.guests.children;
-        filtered = filtered.filter(item => {
-            const minGroup = item.min_group || item.min_guests || 1;
-            const maxGroup = item.max_group || item.max_guests || 10;
-            
-            // For search results, be more lenient with guest count matching
-            // If min and max are the same, allow some flexibility
-            if (minGroup === maxGroup) {
-                return totalGuests <= maxGroup + 2; // Allow 2 extra guests
+    // Function to fetch itineraries with filters
+    const fetchItineraries = async (page = 1, isLoadMore = false) => {
+        try {
+            if (!isLoadMore) {
+                setIsLoading(true);
+            } else {
+                setIsLoadingMore(true);
             }
-            
-            return totalGuests >= minGroup && totalGuests <= maxGroup;
-        });
+            setError(null);
 
-        return filtered;
-    };
+            let response;
+            let data;
 
-    const applySorting = (data: any[]) => {
-        const sorted = [...data];
-        
-        switch (sortBy) {
-            case 'price-low':
-                return sorted.sort((a, b) => (a.person_cost || 0) - (b.person_cost || 0));
-            case 'price-high':
-                return sorted.sort((a, b) => (b.person_cost || 0) - (a.person_cost || 0));
-            case 'duration-short':
-                return sorted.sort((a, b) => (a.length_days || 0) - (b.length_days || 0));
-            case 'duration-long':
-                return sorted.sort((a, b) => (b.length_days || 0) - (a.length_days || 0));
-            case 'newest':
-                return sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-            case 'popular':
-                return sorted.sort((a, b) => (b.popularity_score || 0) - (a.popularity_score || 0));
-            default:
-                return sorted; // Featured order (default from API)
-        }
-    };
+            if (isSearchMode) {
+                // Use POST for search functionality
+                const searchBody = {
+                    locations: searchLocation,
+                    arrival_datetime: arrivalDateTime,
+                    departure_datetime: departureDateTime,
+                    guests: searchGuests.map(g => parseInt(g)).filter(g => !isNaN(g)),
+                    activities: searchActivities,
+                    // Add filter params to search body
+                    budget_max: appliedFilters.budget.enabled ? appliedFilters.budget.max : undefined,
+                    budget_enabled: appliedFilters.budget.enabled,
+                    destinations: appliedFilters.destinations.filter(dest => dest.trim() !== ''),
+                    activity_types: appliedFilters.activityTypes,
+                    themes: appliedFilters.themes,
+                    group_size: appliedFilters.groupSize || undefined,
+                    trip_duration: appliedFilters.tripDuration || undefined,
+                    lodging: appliedFilters.lodging,
+                    transportation: appliedFilters.transportation,
+                    page: page,
+                    limit: 20,
+                    sort: sortBy
+                };
 
-    // Update filtered listings when data or filters change
-    useEffect(() => {
-        if (listings.length > 0) {
-            let filtered = applyFilters(listings);
-            filtered = applySorting(filtered);
-            setFilteredListings(filtered);
-        } else {
-            setFilteredListings([]);
-        }
-    }, [listings, filters, sortBy]);
+                response = await fetch('/api/itineraries/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(searchBody)
+                });
+            } else {
+                // Use GET for regular itinerary fetching with filters
+                const queryParams = new URLSearchParams();
 
-    // Clear listings when starting a new search
-    useEffect(() => {
-        if (isSearchMode && itinerariesFetching && !itinerariesLoading) {
-            // Clear previous results when fetching new search results
-            setListings([]);
-        }
-    }, [isSearchMode, itinerariesFetching, itinerariesLoading]);
+                // Add applied filter params
+                if (appliedFilters.budget.enabled && appliedFilters.budget.max) {
+                    queryParams.set('budget_max', appliedFilters.budget.max.toString());
+                    queryParams.set('budget_enabled', 'true');
+                }
 
-    useEffect(() => {
-        // Only update listings when we have data and we're not currently fetching
-        if (itineraries && itineraries.data && !isLoadingOrFetching) {
+                if (appliedFilters.destinations.some(dest => dest.trim() !== '')) {
+                    appliedFilters.destinations.forEach(dest => {
+                        if (dest.trim()) queryParams.append('destinations', dest.trim());
+                    });
+                }
 
-            // Check if data is an array or nested in another property
-            let dataToUse = Array.isArray(itineraries.data)
-                ? itineraries.data
-                : itineraries.data || itineraries.data || [];
+                if (appliedFilters.activityTypes.length > 0) {
+                    appliedFilters.activityTypes.forEach(type => queryParams.append('activity_types', type));
+                }
 
-            console.log('Data to use length:', dataToUse.length);
+                if (appliedFilters.themes.length > 0) {
+                    appliedFilters.themes.forEach(theme => queryParams.append('themes', theme));
+                }
 
-            try {
-                const filteredListings = dataToUse.map((listing: any) =>
+                if (appliedFilters.groupSize) {
+                    queryParams.set('group_size', appliedFilters.groupSize);
+                }
+
+                if (appliedFilters.tripDuration) {
+                    queryParams.set('trip_duration', appliedFilters.tripDuration);
+                }
+
+                if (appliedFilters.lodging.length > 0) {
+                    appliedFilters.lodging.forEach(lodging => queryParams.append('lodging', lodging));
+                }
+
+                if (appliedFilters.transportation.length > 0) {
+                    appliedFilters.transportation.forEach(transport => queryParams.append('transportation', transport));
+                }
+
+                // Add pagination and sorting
+                queryParams.set('page', page.toString());
+                queryParams.set('limit', '20');
+                queryParams.set('sort', sortBy);
+
+                response = await fetch(`/api/itineraries?${queryParams.toString()}`);
+            }
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            data = await response.json();
+
+            if (data.success) {
+                const newItineraries = data.data || [];
+                
+                // Add favorite status to itineraries
+                const itinerariesWithFavorites = newItineraries.map((listing: any) =>
                     favorites?.some((favorite: any) => favorite._id?.$oid === listing._id?.$oid)
                         ? { ...listing, isFavorite: true }
                         : listing
                 );
-                console.log('Setting listings:', filteredListings.length);
-                setListings(filteredListings || []);
-            } catch (error) {
-                console.error('Error processing itineraries data:', error);
-                setListings([]);
+
+                if (isLoadMore) {
+                    setListings(prev => [...prev, ...itinerariesWithFavorites]);
+                } else {
+                    setListings(itinerariesWithFavorites);
+                }
+
+                // Update pagination info - for now assume there's more if we got a full page
+                setHasMore(newItineraries.length === 20);
+                setCurrentPage(page);
+            } else {
+                throw new Error(data.message || data.error || 'Failed to fetch itineraries');
             }
-        } else if (!itineraries || !itineraries.data) {
-            console.log('No itineraries data available');
-            if (!isLoadingOrFetching) {
-                setListings([]);
-            }
+        } catch (err) {
+            console.error('Fetch error:', err);
+            setError(err instanceof Error ? err.message : 'An error occurred');
+        } finally {
+            setIsLoading(false);
+            setIsLoadingMore(false);
         }
-    }, [itineraries, favorites, isLoadingOrFetching]);
+    };
+
+    // Function to apply filters
+    const handleApplyFilters = () => {
+        setAppliedFilters({ ...filters });
+        setCurrentPage(1);
+        setHasMore(true);
+    };
+
+    // Function to load more
+    const handleLoadMore = () => {
+        if (!isLoadingMore && hasMore) {
+            fetchItineraries(currentPage + 1, true);
+        }
+    };
+
+    // Initial load and when applied filters change
+    useEffect(() => {
+        fetchItineraries(1, false);
+    }, [appliedFilters, sortBy, isSearchMode, favorites]);
+
+    // Refetch when favorites change
+    useEffect(() => {
+        if (favorites && listings.length > 0) {
+            const updatedListings = listings.map((listing: any) =>
+                favorites.some((favorite: any) => favorite._id?.$oid === listing._id?.$oid)
+                    ? { ...listing, isFavorite: true }
+                    : { ...listing, isFavorite: false }
+            );
+            setListings(updatedListings);
+        }
+    }, [favorites]);
     
     return (
         <div className="max-w-[1440px] mx-auto">
@@ -240,23 +255,23 @@ const Itineraries = () => {
                 <div className={`w-[66%] max-lg:w-full ${showFilter ? 'max-lg:hidden' : ''}`}>
                     <h2 className="text-[40px] font-bold text-white max-md:hidden">{pageTitle}</h2>
                     <div className="flex items-center justify-between flex-wrap gap-2">
-                        <p className="text-white"> <b>{filteredListings.length}</b> Itineraries found.</p>
+                        <p className="text-white"> <b>{listings.length}</b> Itineraries found.</p>
 
                         <div className="flex items-center max-md:justify-between gap-4">
                             <div>
                                 <Dropdown label={<div className="flex items-center gap-1">
                                     <Image src="/svg-icons/leaf.svg" alt="dropdown-arrow" width={24} height={24} />
                                     <p className="text-primary-gray text-sm  mr-5">Theme</p>
-                                </div>} options={["All", "Adventure", "Relaxation", "Culture"]} onSelect={(value) => {
+                                </div>} options={["All", "Adventure", "Relaxation", "Culture", "Nature", "Culinary", "Winter"]} onSelect={(value) => {
                                     if (value !== "All") {
                                         setFilters(prev => ({
                                             ...prev,
-                                            activities: [value as string]
+                                            themes: [value.toLowerCase() as string]
                                         }));
                                     } else {
                                         setFilters(prev => ({
                                             ...prev,
-                                            activities: []
+                                            themes: []
                                         }));
                                     }
                                 }} className="border-none !bg-[#141414] rounded-lg" />
@@ -294,55 +309,54 @@ const Itineraries = () => {
                     </div>
                     
                     <div className='max-sm:hidden'>
-                        {isLoadingOrFetching &&
+                        {isLoading &&
                             <div className="text-white text-center py-10">
                                 {isSearchMode ? "Searching itineraries..." : "Loading itineraries..."}
                             </div>
                         }
-                        {itinerariesError &&
-                            <div className="text-red-500 text-center py-10">Error: {itinerariesError.message}</div>
+                        {error &&
+                            <div className="text-red-500 text-center py-10">Error: {error}</div>
                         }
-                        {!isLoadingOrFetching && !itinerariesError && filteredListings.length === 0 && (
+                        {!isLoading && !error && listings.length === 0 && (
                             <div className="text-white text-center py-10">
-                                {isSearchMode
-                                    ? "No itineraries found matching your search criteria. Try adjusting your filters."
-                                    : listings.length === 0 
-                                        ? "No itineraries available at the moment."
-                                        : "No itineraries match your current filters. Try adjusting your criteria."}
+                                No itineraries found. Try adjusting your filters.
                             </div>
                         )}
-                        {!isLoadingOrFetching && filteredListings.length > 0 && filteredListings.map((listing, i) => (
+                        {!isLoading && listings.length > 0 && listings.map((listing, i) => (
                             <ItineraryCard key={i} data={listing} />
                         ))}
                     </div>
                     
                     <div className='sm:hidden flex flex-col'>
-                        {isLoadingOrFetching &&
+                        {isLoading &&
                             <div className="text-white text-center py-5">
                                 {isSearchMode ? "Searching..." : "Loading..."}
                             </div>
                         }
-                        {itinerariesError &&
-                            <div className="text-red-500 text-center py-5">Error: {itinerariesError.message}</div>
+                        {error &&
+                            <div className="text-red-500 text-center py-5">Error: {error}</div>
                         }
-                        {!isLoadingOrFetching && !itinerariesError && filteredListings.length === 0 && (
+                        {!isLoading && !error && listings.length === 0 && (
                             <div className="text-white text-center py-5">
-                                {isSearchMode
-                                    ? "No itineraries found matching your search criteria."
-                                    : listings.length === 0 
-                                        ? "No itineraries available."
-                                        : "No itineraries match your current filters. Try adjusting your criteria."}
+                                No itineraries found. Try adjusting your filters.
                             </div>
                         )}
-                        {!isLoadingOrFetching && filteredListings.length > 0 && filteredListings.map((listing, i) => (
+                        {!isLoading && listings.length > 0 && listings.map((listing, i) => (
                             <ListingCard key={i} data={listing} />
                         ))}
                     </div>
                     
-                    {!isLoadingOrFetching && filteredListings.length > 0 && (
+                    {!isLoading && listings.length > 0 && hasMore && (
                         <div className="flex justify-center flex-col items-center pt-6">
                             <p className="text-white text-xl font-bold">See More Itineraries</p>
-                            <Button variant="primary" className="bg-white text-black mt-4 ">Load More</Button>
+                            <Button 
+                                variant="primary" 
+                                className="bg-white text-black mt-4"
+                                onClick={handleLoadMore}
+                                disabled={isLoadingMore}
+                            >
+                                {isLoadingMore ? 'Loading...' : 'Load More'}
+                            </Button>
                         </div>
                     )}
                 </div>
@@ -354,6 +368,7 @@ const Itineraries = () => {
                         setAdvanceFilter={setAdvanceFilter}
                         filters={filters}
                         setFilters={setFilters}
+                        onApplyFilters={handleApplyFilters}
                     />
                 </div>
                 <h2 className="text-[40px] font-bold text-white md:hidden">{pageTitle}</h2>

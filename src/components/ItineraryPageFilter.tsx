@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import GlassPanel from './figma/GlassPanel'
 import Toggle from './Toggle/Toggle'
 import Input from './figma/Input'
@@ -11,6 +11,7 @@ import { BiLeftArrow } from 'react-icons/bi'
 import { GoArrowRight } from 'react-icons/go'
 import ItineraryFilterBarGraph from './ItineraryFilterBarGraph'
 import ItineraryFilterPieChart from './ItineraryFilterPieChart'
+import { ACTIVITY_CATEGORIES } from '@/src/utils/activityTagMapping'
 
 
 
@@ -74,42 +75,72 @@ interface ItineraryPageFilterProps {
             };
         };
         destinations: string[];
-        activities: string[];
+        activityTypes: string[];
+        themes: string[];
+        groupSize: string;
+        tripDuration: string;
         lodging: string[];
         transportation: string[];
         guests: { adults: number; children: number };
         dateRange: any;
     };
     setFilters?: (filters: any) => void;
+    onApplyFilters?: () => void;
 }
 
-const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, filters, setFilters }: ItineraryPageFilterProps) => {
+const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, filters, setFilters, onApplyFilters }: ItineraryPageFilterProps) => {
     const [toggle, setToggle] = useState(filters?.budget.enabled || false);
+    const [availableActivities, setAvailableActivities] = useState<any[]>([]);
+    const [loadingActivities, setLoadingActivities] = useState(false);
 
+    // Fetch available activities from Vertex AI search
+    useEffect(() => {
+        const fetchAvailableActivities = async () => {
+            setLoadingActivities(true);
+            try {
+                const response = await fetch('/api/activities/search', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    setAvailableActivities(data.activities || []);
+                }
+            } catch (error) {
+                console.error('Error fetching activities:', error);
+                // Fallback to static list if API fails
+                setAvailableActivities([]);
+            } finally {
+                setLoadingActivities(false);
+            }
+        };
 
+        fetchAvailableActivities();
+    }, []);
 
-    const activities = [
-        { id: 'atving', label: 'ATVing', icon: ATVing },
-        { id: 'backpacking', label: 'Backpacking', icon: Backpacking },
-        { id: 'camping', label: 'Camping', icon: Camping },
-        { id: 'campfire', label: 'Campfire', icon: Campfire },
-        { id: 'caveExploring', label: 'Cave Exploring', icon: CaveExploring },
-        { id: 'fishing', label: 'Fishing', icon: Fishing },
-        { id: 'goldMineTours', label: 'Gold Mine Tours', icon: GoldMineTours },
-        { id: 'hiking', label: 'Hiking', icon: Hiking },
-        { id: 'hotSprings', label: 'Hot Springs', icon: HotSprings },
-        { id: 'horsebackRiding', label: 'Horseback Riding', icon: HorsebackRiding },
-        { id: 'mountainBiking', label: 'Mountain Biking', icon: MountainBiking },
-        { id: 'paddleBoarding', label: 'Paddle Boarding', icon: PaddleBoarding },
-        { id: 'privateChef', label: 'Private Chef', icon: PrivateChef },
-        { id: 'ropesCourse', label: 'Ropes Course', icon: RopesCourse },
-        { id: 'sightSeeing', label: 'Sight Seeing', icon: SightSeeing },
-        { id: 'trainRiding', label: 'Train Riding', icon: TrainRiding },
-        { id: 'whiteWaterRafting', label: 'White Water Rafting', icon: WhiteWaterRafting },
-        { id: 'ziplining', label: 'Ziplining', icon: Ziplining },
-        { id: 'skiing', label: 'Skiing', icon: Skiing, unavailable: true },
-        { id: 'snowmobiling', label: 'Snowmobiling', icon: Snowmobiling, unavailable: true },
-        { id: 'snowshoeing', label: 'Snowshoeing', icon: Snowshoeing, unavailable: true },
+    const themes = [
+        { id: 'adventure', label: 'Adventure', description: 'Thrill-seeking experiences' },
+        { id: 'relaxation', label: 'Relaxation', description: 'Peaceful and restorative' },
+        { id: 'culture', label: 'Culture & History', description: 'Local heritage and traditions' },
+        { id: 'nature', label: 'Nature & Wildlife', description: 'Natural beauty and animals' },
+        { id: 'culinary', label: 'Culinary', description: 'Food and dining experiences' },
+        { id: 'winter', label: 'Winter Sports', description: 'Snow and ice activities' },
+    ];
+
+    const groupSizes = [
+        { id: 'solo', label: 'Solo Travel', description: '1 person' },
+        { id: 'couple', label: 'Couples', description: '2 people' },
+        { id: 'family', label: 'Family', description: '3-6 people' },
+        { id: 'group', label: 'Large Group', description: '7+ people' },
+    ];
+
+    const tripDurations = [
+        { id: 'weekend', label: 'Weekend', description: '2-3 days' },
+        { id: 'week', label: 'Week', description: '4-7 days' },
+        { id: 'extended', label: 'Extended', description: '8+ days' },
     ];
 
     const lodging = [
@@ -468,26 +499,128 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
                     </div>
                 </div>
 
-                {/* Activities Section */}
+                {/* Travel Themes Section */}
                 <div className='space-y-3'>
-                    <p className='text-white font-bold'>Activities</p>
-                    <ActivityDropdown
-                        onSelect={(selectedActivities) => {
-                            if (setFilters) {
-                                const activitiesArray = Array.isArray(selectedActivities) 
-                                    ? selectedActivities 
-                                    : [selectedActivities];
-                                setFilters((prev: any) => ({
-                                    ...prev,
-                                    activities: activitiesArray
-                                }));
-                            }
-                        }}
-                        activities={activities}
-                        title="Activities"
-                        showSaveButton={false}
-                    />
+                    <p className='text-white font-bold'>Travel Themes</p>
+                    <div className='grid grid-cols-2 gap-2'>
+                        {themes.map((theme) => (
+                            <button
+                                key={theme.id}
+                                onClick={() => {
+                                    if (setFilters) {
+                                        const currentThemes = filters?.themes || [];
+                                        const newThemes = currentThemes.includes(theme.id)
+                                            ? currentThemes.filter(t => t !== theme.id)
+                                            : [...currentThemes, theme.id];
+                                        setFilters((prev: any) => ({
+                                            ...prev,
+                                            themes: newThemes
+                                        }));
+                                    }
+                                }}
+                                className={`p-3 rounded-lg border text-left transition-all ${
+                                    filters?.themes?.includes(theme.id)
+                                        ? 'bg-yellow-400/20 border-yellow-400/50 text-yellow-400'
+                                        : 'bg-gray-800/30 border-gray-700/50 text-gray-300 hover:border-gray-600'
+                                }`}
+                            >
+                                <div className='text-sm font-medium'>{theme.label}</div>
+                                <div className='text-xs opacity-70'>{theme.description}</div>
+                            </button>
+                        ))}
+                    </div>
+                </div>
 
+                {/* Activity Types Section */}
+                <div className='space-y-3'>
+                    <div className='flex justify-between items-center'>
+                        <p className='text-white font-bold'>Activity Types</p>
+                        {loadingActivities && (
+                            <div className='text-xs text-gray-400'>Loading...</div>
+                        )}
+                    </div>
+                    <div className='grid grid-cols-1 gap-2'>
+                        {ACTIVITY_CATEGORIES.map((category) => (
+                            <button
+                                key={category.id}
+                                onClick={() => {
+                                    if (setFilters) {
+                                        const currentTypes = filters?.activityTypes || [];
+                                        const newTypes = currentTypes.includes(category.id)
+                                            ? currentTypes.filter(t => t !== category.id)
+                                            : [...currentTypes, category.id];
+                                        setFilters((prev: any) => ({
+                                            ...prev,
+                                            activityTypes: newTypes
+                                        }));
+                                    }
+                                }}
+                                className={`p-3 rounded-lg border text-left transition-all ${
+                                    filters?.activityTypes?.includes(category.id)
+                                        ? 'bg-blue-400/20 border-blue-400/50 text-blue-400'
+                                        : 'bg-gray-800/30 border-gray-700/50 text-gray-300 hover:border-gray-600'
+                                }`}
+                            >
+                                <div className='text-sm font-medium'>{category.label}</div>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Group Size Section */}
+                <div className='space-y-3'>
+                    <p className='text-white font-bold'>Group Size</p>
+                    <div className='grid grid-cols-1 gap-2'>
+                        {groupSizes.map((size) => (
+                            <button
+                                key={size.id}
+                                onClick={() => {
+                                    if (setFilters) {
+                                        setFilters((prev: any) => ({
+                                            ...prev,
+                                            groupSize: prev.groupSize === size.id ? '' : size.id
+                                        }));
+                                    }
+                                }}
+                                className={`p-3 rounded-lg border text-left transition-all ${
+                                    filters?.groupSize === size.id
+                                        ? 'bg-red-400/20 border-red-400/50 text-red-400'
+                                        : 'bg-gray-800/30 border-gray-700/50 text-gray-300 hover:border-gray-600'
+                                }`}
+                            >
+                                <div className='text-sm font-medium'>{size.label}</div>
+                                <div className='text-xs opacity-70'>{size.description}</div>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Trip Duration Section */}
+                <div className='space-y-3'>
+                    <p className='text-white font-bold'>Trip Duration</p>
+                    <div className='grid grid-cols-3 gap-2'>
+                        {tripDurations.map((duration) => (
+                            <button
+                                key={duration.id}
+                                onClick={() => {
+                                    if (setFilters) {
+                                        setFilters((prev: any) => ({
+                                            ...prev,
+                                            tripDuration: prev.tripDuration === duration.id ? '' : duration.id
+                                        }));
+                                    }
+                                }}
+                                className={`p-3 rounded-lg border text-center transition-all ${
+                                    filters?.tripDuration === duration.id
+                                        ? 'bg-yellow-400/20 border-yellow-400/50 text-yellow-400'
+                                        : 'bg-gray-800/30 border-gray-700/50 text-gray-300 hover:border-gray-600'
+                                }`}
+                            >
+                                <div className='text-sm font-medium'>{duration.label}</div>
+                                <div className='text-xs opacity-70'>{duration.description}</div>
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Lodging Section */}
@@ -548,7 +681,10 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
                                     }
                                 },
                                 destinations: [''],
-                                activities: [],
+                                activityTypes: [],
+                                themes: [],
+                                groupSize: '',
+                                tripDuration: '',
                                 lodging: [],
                                 transportation: [],
                                 guests: { adults: 1, children: 0 },
@@ -559,7 +695,16 @@ const ItineraryPageFilter = ({ setShowFilter, advanceFilter, setAdvanceFilter, f
                         setDestination([0]);
                     }} variant='outline' className='flex-1'>Clear All</Button>
 
-                    <Button variant='primary' className='flex-1'>Apply Filters</Button>
+                    <Button 
+                        variant='primary' 
+                        className='flex-1'
+                        onClick={() => {
+                            onApplyFilters?.();
+                            setShowFilter?.(false);
+                        }}
+                    >
+                        Apply Filters
+                    </Button>
                 </div>
             </div>
         </GlassPanel>
