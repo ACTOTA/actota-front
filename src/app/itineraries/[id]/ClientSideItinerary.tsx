@@ -20,6 +20,13 @@ import { ItineraryData } from '@/src/types/itineraries';
 import DateMenu from '@/src/components/navbar/DateMenu';
 import BudgetBreakdown from '@/src/components/BudgetBreakdown';
 
+// Helper function to parse date strings safely in local timezone
+const parseLocalDate = (dateStr: string): Date => {
+  // Parse YYYY-MM-DD format in local timezone instead of UTC
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+
 interface ClientSideItineraryProps {
   initialData: ItineraryData;
   isAuthenticated?: boolean;
@@ -48,6 +55,21 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
     } else {
       setClientIsAuthenticated(false);
     }
+
+    // Check for search parameters for group size
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const adults = urlParams.get('adults');
+      const children = urlParams.get('children');
+      
+      if (adults) {
+        setSelectedAdults(parseInt(adults) || 2);
+      }
+      if (children) {
+        setSelectedChildren(parseInt(children) || 0);
+      }
+    }
+    
     setIsHydrated(true);
   }, []);
 
@@ -57,6 +79,9 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [tripStartDate, setTripStartDate] = useState<string | null>(null);
   const [tripEndDate, setTripEndDate] = useState<string | null>(null);
+  const [selectedAdults, setSelectedAdults] = useState<number>(2);
+  const [selectedChildren, setSelectedChildren] = useState<number>(0);
+  const [showGroupSelector, setShowGroupSelector] = useState<boolean>(false);
 
   const { data: apiResponse, isLoading, error } = useItineraryById(objectId);
 
@@ -82,13 +107,31 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
     }
   }, [dateRange]);
 
-  const basePrice = (itineraryData?.person_cost ?? 0) * (itineraryData?.min_group ?? 1);
+  // Close group selector when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showGroupSelector) {
+        const target = event.target as Element;
+        if (!target.closest('.group-selector-container')) {
+          setShowGroupSelector(false);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showGroupSelector]);
+
+  const totalPeople = selectedAdults + selectedChildren;
+  const basePrice = (itineraryData?.person_cost ?? 0) * totalPeople;
   
-  // Use actual costs from backend
-  const activityCost = itineraryData?.activity_cost || 0;
-  const lodgingCost = itineraryData?.lodging_cost || 0;
-  const transportCost = itineraryData?.transport_cost || 0;
-  const serviceFee = itineraryData?.service_fee || 0;
+  // Use actual costs from backend, scaled by group size
+  const activityCost = (itineraryData?.activity_cost || 0) * totalPeople;
+  const lodgingCost = (itineraryData?.lodging_cost || 0) * totalPeople;
+  const transportCost = (itineraryData?.transport_cost || 0) * totalPeople;
+  const serviceFee = (itineraryData?.service_fee || 0) * totalPeople;
   
   // Calculate total by adding up all components
   const calculatedTotal = activityCost + lodgingCost + transportCost + serviceFee;
@@ -168,7 +211,7 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
   const formatDate = (date: string) => {
     if (!date) return 'Select dates';
     try {
-      return new Date(date).toLocaleDateString('en-US', {
+      return parseLocalDate(date).toLocaleDateString('en-US', {
         day: 'numeric',
         month: 'long',
         year: 'numeric'
@@ -204,7 +247,7 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
   return (
     <div className='min-h-screen bg-[#0A0A0A] text-white'>
       {/* Hero Section with Background Image */}
-      <div className='relative h-[500px] overflow-hidden'>
+      <div className='relative h-[400px] md:h-[600px] overflow-hidden'>
         <div className='absolute inset-0'>
           <Image
             src={itineraryData?.images?.[currentIndex] || itineraryData?.images?.[0] || '/images/default-itinerary.jpeg'}
@@ -218,7 +261,7 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
         </div>
         
         {/* Navigation Breadcrumb */}
-        <div className='relative z-10 p-6'>
+        <div className='relative z-10 pt-20 md:pt-24 px-4 md:px-6'>
           <div className='flex items-center gap-2 text-sm text-white/70'>
             <ArrowLeftIcon 
               className="h-4 w-4 cursor-pointer hover:text-white transition-colors" 
@@ -226,32 +269,32 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
             />
             <span>Itineraries</span>
             <span>/</span>
-            <span className='text-white'>Denver Tour</span>
+            <span className='text-white'>{itineraryData.trip_name}</span>
           </div>
         </div>
         
         {/* Title */}
-        <div className='absolute bottom-24 left-0 right-0 px-6'>
-          <h1 className='text-5xl font-bold mb-2'>{itineraryData.trip_name}</h1>
+        <div className='absolute bottom-20 md:bottom-24 left-0 right-0 px-4 md:px-6'>
+          <h1 className='text-3xl md:text-5xl font-bold mb-2'>{itineraryData.trip_name}</h1>
         </div>
         
         {/* Action Buttons */}
-        <div className='absolute bottom-6 right-6 flex items-center gap-3'>
+        <div className='absolute bottom-4 md:bottom-6 right-4 md:right-6 flex items-center gap-2 md:gap-3'>
           <LikeDislike 
-            className='border border-white/20 rounded-full h-10 w-10 bg-black/30 backdrop-blur-sm hover:bg-black/50 transition-all' 
+            className='border border-white/20 rounded-full h-9 w-9 md:h-10 md:w-10 bg-black/30 backdrop-blur-sm hover:bg-black/50 transition-all' 
             liked={itineraryData?.is_favorite || false} 
             favoriteId={itineraryData?._id.$oid} 
           />
           <Button 
             onClick={() => router.push(`?modal=shareModal&itineraryId=${itineraryData._id.$oid}`)} 
             variant="simple" 
-            className='text-white hover:text-white/80'
+            className='text-white hover:text-white/80 text-sm md:text-base px-3 md:px-4 py-1.5 md:py-2'
           >
             Share
           </Button>
           <Button 
             variant="simple" 
-            className='text-white hover:text-white/80'
+            className='text-white hover:text-white/80 text-sm md:text-base px-3 md:px-4 py-1.5 md:py-2 hidden sm:block'
           >
             Manage Members
           </Button>
@@ -259,12 +302,12 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
         
         {/* Image Thumbnails */}
         {itineraryData?.images?.length > 1 && (
-          <div className='absolute bottom-6 left-6 flex gap-2'>
+          <div className='absolute bottom-4 md:bottom-6 left-4 md:left-6 flex gap-1 md:gap-2'>
             {itineraryData.images.slice(0, 8).map((image, index) => (
               <div 
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className={`relative w-12 h-12 rounded cursor-pointer overflow-hidden transition-all ${
+                className={`relative w-10 h-10 md:w-12 md:h-12 rounded cursor-pointer overflow-hidden transition-all ${
                   currentIndex === index ? 'ring-2 ring-white' : 'opacity-70 hover:opacity-100'
                 }`}
               >
@@ -278,7 +321,7 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
               </div>
             ))}
             {itineraryData.images.length > 8 && (
-              <div className='w-12 h-12 rounded bg-black/50 backdrop-blur-sm flex items-center justify-center text-xs'>
+              <div className='w-10 h-10 md:w-12 md:h-12 rounded bg-black/50 backdrop-blur-sm flex items-center justify-center text-xs'>
                 +{itineraryData.images.length - 8}
               </div>
             )}
@@ -300,115 +343,194 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
         </button>
         
         {/* Image Counter */}
-        <div className='absolute bottom-6 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/30 backdrop-blur-sm rounded-full text-xs'>
+        <div className='absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/30 backdrop-blur-sm rounded-full text-xs'>
           {currentIndex + 1} of {itineraryData.images?.length || 1}
         </div>
       </div>
 
       {/* Main Content */}
-      <section className='max-w-[1400px] mx-auto px-6 py-8'>
-        <div className='grid lg:grid-cols-[1fr_400px] gap-8'>
+      <section className='max-w-[1400px] mx-auto px-4 md:px-6 py-6 md:py-8'>
+        <div className='flex flex-col lg:grid lg:grid-cols-[1fr_400px] gap-6 lg:gap-8'>
           {/* Left Column */}
-          <div className='space-y-6'>
+          <div className='space-y-6 order-1 lg:order-1'>
             {/* Overview Section */}
-            <div>
-              <h2 className='text-2xl font-semibold mb-6'>Overview</h2>
-              <div className='grid grid-cols-2 md:grid-cols-4 gap-6'>
-                <div className='flex items-center gap-3'>
-                  <div className='w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center'>
-                    <CalendarIcon className='h-5 w-5 text-white' />
+            <div className='bg-[#141414] rounded-xl md:rounded-2xl p-6 md:p-8'>
+              <h2 className='text-xl md:text-2xl font-semibold mb-6 md:mb-8'>Overview</h2>
+              <div className='grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 xl:gap-8'>
+                <div className='flex items-start gap-3 md:gap-4'>
+                  <div className='w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/20 flex items-center justify-center border border-blue-500/20'>
+                    <CalendarIcon className='h-5 w-5 md:h-6 md:w-6 text-blue-400' />
                   </div>
                   <div>
-                    <p className='text-xs text-gray-400'>Trip Duration</p>
-                    <p className='text-sm font-medium'>{itineraryData.length_days} days</p>
+                    <p className='text-[10px] md:text-xs text-gray-400 uppercase tracking-wider mb-1'>Duration</p>
+                    <p className='text-sm md:text-base font-semibold text-white'>{itineraryData.length_days} Days</p>
                   </div>
                 </div>
                 
-                <div className='flex items-center gap-3'>
-                  <div className='w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center'>
-                    <LuUsers className='h-5 w-5 text-white' />
+                <div className='flex items-start gap-3 md:gap-4 relative group-selector-container'>
+                  <div className='w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-br from-green-500/20 to-green-600/20 flex items-center justify-center border border-green-500/20'>
+                    <LuUsers className='h-5 w-5 md:h-6 md:w-6 text-green-400' />
                   </div>
-                  <div>
-                    <p className='text-xs text-gray-400'>Group Size</p>
-                    <p className='text-sm font-medium'>{itineraryData.min_group}-{itineraryData.max_group} People</p>
+                  <div className='flex-1'>
+                    <p className='text-[10px] md:text-xs text-gray-400 uppercase tracking-wider mb-1'>Group Size</p>
+                    <button 
+                      onClick={() => setShowGroupSelector(!showGroupSelector)}
+                      className='text-sm md:text-base font-semibold text-white hover:text-green-400 transition-colors text-left'
+                    >
+                      {selectedAdults + selectedChildren} {selectedAdults + selectedChildren === 1 ? 'Person' : 'People'}
+                    </button>
+                    <p className='text-[10px] md:text-xs text-gray-500 mt-0.5'>
+                      {selectedAdults} Adult{selectedAdults !== 1 ? 's' : ''}{selectedChildren > 0 ? `, ${selectedChildren} Child${selectedChildren !== 1 ? 'ren' : ''}` : ''}
+                    </p>
+                    
+                    {/* Group Size Selector Dropdown */}
+                    {showGroupSelector && (
+                      <div className='absolute top-full left-0 mt-2 bg-[#1a1a1a] border border-gray-700 rounded-lg p-4 w-72 z-10 shadow-xl'>
+                        <div className='space-y-4'>
+                          <div className='flex items-center justify-between'>
+                            <span className='text-sm text-gray-300'>Adults</span>
+                            <div className='flex items-center gap-3'>
+                              <button 
+                                onClick={() => setSelectedAdults(Math.max(1, selectedAdults - 1))}
+                                className='w-8 h-8 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center text-white'
+                                disabled={selectedAdults <= 1}
+                              >
+                                -
+                              </button>
+                              <span className='w-8 text-center text-white'>{selectedAdults}</span>
+                              <button 
+                                onClick={() => setSelectedAdults(Math.min(itineraryData.max_group, selectedAdults + 1))}
+                                className='w-8 h-8 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center text-white'
+                                disabled={selectedAdults + selectedChildren >= itineraryData.max_group}
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                          
+                          <div className='flex items-center justify-between'>
+                            <span className='text-sm text-gray-300'>Children</span>
+                            <div className='flex items-center gap-3'>
+                              <button 
+                                onClick={() => setSelectedChildren(Math.max(0, selectedChildren - 1))}
+                                className='w-8 h-8 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center text-white'
+                                disabled={selectedChildren <= 0}
+                              >
+                                -
+                              </button>
+                              <span className='w-8 text-center text-white'>{selectedChildren}</span>
+                              <button 
+                                onClick={() => setSelectedChildren(Math.min(itineraryData.max_group - selectedAdults, selectedChildren + 1))}
+                                className='w-8 h-8 rounded-full bg-gray-700 hover:bg-gray-600 flex items-center justify-center text-white'
+                                disabled={selectedAdults + selectedChildren >= itineraryData.max_group}
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                          
+                          <div className='pt-2 border-t border-gray-700'>
+                            <p className='text-xs text-gray-400'>
+                              Group size: {itineraryData.min_group}-{itineraryData.max_group} people
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
                 
-                <div className='flex items-center gap-3'>
-                  <div className='w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center'>
-                    <PiClockDuotone className='h-5 w-5 text-white' />
+                <div className='flex items-start gap-3 md:gap-4'>
+                  <div className='w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-600/20 flex items-center justify-center border border-purple-500/20'>
+                    <PiClockDuotone className='h-5 w-5 md:h-6 md:w-6 text-purple-400' />
                   </div>
                   <div>
-                    <p className='text-xs text-gray-400'>{itineraryData.length_days} days {itineraryData.length_days - 1} nights</p>
-                    <p className='text-sm font-medium'>{itineraryData.length_days} Days</p>
+                    <p className='text-[10px] md:text-xs text-gray-400 uppercase tracking-wider mb-1'>Schedule</p>
+                    <p className='text-sm md:text-base font-semibold text-white'>
+                      {tripStartDate && tripEndDate ? (
+                        `${formatDate(tripStartDate)}`
+                      ) : (
+                        'Flexible'
+                      )}
+                    </p>
+                    <p className='text-[10px] md:text-xs text-gray-500 mt-0.5'>
+                      {tripStartDate && tripEndDate ? (
+                        `${itineraryData.length_days} day${itineraryData.length_days !== 1 ? 's' : ''} selected`
+                      ) : (
+                        'Choose your dates'
+                      )}
+                    </p>
                   </div>
                 </div>
                 
-                <div className='flex items-center gap-3'>
-                  <div className='w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center'>
-                    <RiMapPinLine className='h-5 w-5 text-white' />
+                <div className='flex items-start gap-3 md:gap-4'>
+                  <div className='w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-br from-orange-500/20 to-orange-600/20 flex items-center justify-center border border-orange-500/20'>
+                    <RiMapPinLine className='h-5 w-5 md:h-6 md:w-6 text-orange-400' />
                   </div>
                   <div>
-                    <p className='text-xs text-gray-400'>DESTINATIONS</p>
-                    <p className='text-sm font-medium'>
+                    <p className='text-[10px] md:text-xs text-gray-400 uppercase tracking-wider mb-1'>Route</p>
+                    <p className='text-xs md:text-sm lg:text-base font-semibold text-white'>
                       {itineraryData.start_location?.city === itineraryData.end_location?.city 
                         ? itineraryData.start_location?.city 
-                        : `${itineraryData.start_location?.city} to ${itineraryData.end_location?.city}`
+                        : `${itineraryData.start_location?.city} → ${itineraryData.end_location?.city}`
                       }
                     </p>
+                    <p className='text-[10px] md:text-xs text-gray-500 mt-0.5'>Colorado</p>
                   </div>
                 </div>
               </div>
               
-              
               {/* Activity Tags */}
-              <div className='mt-4 flex flex-wrap gap-2'>
-                {itineraryData?.activities?.map((activity, i) => {
-                  // Map activities to color schemes
-                  const activityColors: Record<string, { bg: string, text: string }> = {
-                    'hiking': { bg: 'bg-blue-900/30', text: 'text-blue-400' },
-                    'camping': { bg: 'bg-purple-900/30', text: 'text-purple-400' },
-                    'sightseeing': { bg: 'bg-green-900/30', text: 'text-green-400' },
-                    'gold mine tours': { bg: 'bg-yellow-900/30', text: 'text-yellow-400' },
-                    'hot springs': { bg: 'bg-red-900/30', text: 'text-red-400' },
-                    'default': { bg: 'bg-gray-900/30', text: 'text-gray-400' }
-                  };
-                  
-                  const activityKey = activity.label.toLowerCase();
-                  const colors = activityColors[activityKey] || activityColors['default'];
-                  
-                  return (
-                    <span key={i} className={`px-3 py-1.5 ${colors.bg} ${colors.text} rounded-full text-sm flex items-center gap-1.5`}>
-                      <MdOutlineExplore className='h-4 w-4' />
-                      {activity.label}
-                    </span>
-                  );
-                })}
+              <div className='mt-6 md:mt-8 pt-6 md:pt-8 border-t border-gray-800'>
+                <h3 className='text-xs md:text-sm font-medium text-gray-400 mb-3 md:mb-4'>Activities Included</h3>
+                <div className='flex flex-wrap gap-1.5 md:gap-2'>
+                  {itineraryData?.activities?.map((activity, i) => {
+                    // Map activities to color schemes
+                    const activityColors: Record<string, { bg: string, text: string, border: string }> = {
+                      'hiking': { bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/30' },
+                      'camping': { bg: 'bg-purple-500/10', text: 'text-purple-400', border: 'border-purple-500/30' },
+                      'sightseeing': { bg: 'bg-green-500/10', text: 'text-green-400', border: 'border-green-500/30' },
+                      'gold mine tours': { bg: 'bg-yellow-500/10', text: 'text-yellow-400', border: 'border-yellow-500/30' },
+                      'hot springs': { bg: 'bg-red-500/10', text: 'text-red-400', border: 'border-red-500/30' },
+                      'default': { bg: 'bg-gray-500/10', text: 'text-gray-400', border: 'border-gray-500/30' }
+                    };
+                    
+                    const activityKey = activity.label.toLowerCase();
+                    const colors = activityColors[activityKey] || activityColors['default'];
+                    
+                    return (
+                      <span key={i} className={`px-3 md:px-4 py-1.5 md:py-2 ${colors.bg} ${colors.text} ${colors.border} border rounded-md md:rounded-lg text-xs md:text-sm font-medium flex items-center gap-1.5 md:gap-2`}>
+                        <MdOutlineExplore className='h-3 w-3 md:h-4 md:w-4' />
+                        {activity.label}
+                      </span>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
             {/* About Section */}
-            <div>
-              <h2 className='text-2xl font-semibold mb-4'>About</h2>
-              <p className='text-gray-400 leading-relaxed'>{itineraryData.description}</p>
+            <div className='order-2 lg:order-1'>
+              <h2 className='text-xl md:text-2xl font-semibold mb-3 md:mb-4'>About</h2>
+              <p className='text-sm md:text-base text-gray-400 leading-relaxed'>{itineraryData.description}</p>
             </div>
             
           </div>
           {/* Booking Sidebar */}
-          <div>
-            <div className='sticky top-8'>
-              <div className='bg-[#141414] rounded-xl p-6'>
-                <h3 className='text-lg font-semibold mb-6'>Reservation Details</h3>
+          <div className='order-3 lg:order-2 w-full lg:w-auto'>
+            <div className='lg:sticky lg:top-8'>
+              <div className='bg-[#141414] rounded-xl p-5 md:p-6'>
+                <h3 className='text-base md:text-lg font-semibold mb-4 md:mb-6'>Reservation Details</h3>
                 
                 {/* Date Selection */}
-                <div className="mb-6">
+                <div className="mb-4 md:mb-6">
                   <div 
                     onClick={() => setShowCalendar(!showCalendar)}
                     className="w-full cursor-pointer border border-gray-700 bg-gray-800/50 text-white rounded-lg p-3 flex items-center justify-between hover:border-gray-600 transition-colors"
                   >
                     <div className="flex items-center gap-2">
                       <CalendarIcon className="h-5 w-5 text-gray-400" />
-                      <span className='text-sm'>{dateRange ? dateRange.split('|')[0] : 'Select dates'}</span>
+                      <span className='text-sm md:text-base'>{dateRange ? dateRange.split('|')[0] : 'Select dates'}</span>
                     </div>
                     <ArrowRightIcon className={`h-4 w-4 text-gray-400 transform transition-transform ${showCalendar ? 'rotate-90' : ''}`} />
                   </div>
@@ -422,31 +544,32 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
                         onConfirm={() => setShowCalendar(false)}
                         initialStartDate={tripStartDate}
                         initialEndDate={tripEndDate}
+                        allowManualDateRange={false}
                       />
                     </div>
                   )}
                 </div>
                 
                 {/* Cost Breakdown */}
-                <div className='space-y-4 mb-6'>
-                  <div className='flex justify-between text-sm'>
+                <div className='space-y-3 md:space-y-4 mb-4 md:mb-6'>
+                  <div className='flex justify-between text-xs md:text-sm'>
                     <span className='text-gray-400'>Activity costs</span>
                     <span className='font-medium'>${activityCost}.00</span>
                   </div>
-                  <div className='flex justify-between text-sm'>
+                  <div className='flex justify-between text-xs md:text-sm'>
                     <span className='text-gray-400'>Lodging costs</span>
                     <span className='font-medium'>${lodgingCost}.00</span>
                   </div>
-                  <div className='flex justify-between text-sm'>
+                  <div className='flex justify-between text-xs md:text-sm'>
                     <span className='text-gray-400'>Transport costs</span>
                     <span className='font-medium'>${transportCost}.00</span>
                   </div>
-                  <div className='flex justify-between text-sm'>
+                  <div className='flex justify-between text-xs md:text-sm'>
                     <span className='text-gray-400'>Service fee</span>
                     <span className='font-medium'>${serviceFee}.00</span>
                   </div>
                   <div className="h-px bg-gray-800 my-4"></div>
-                  <div className='flex justify-between text-lg font-semibold'>
+                  <div className='flex justify-between text-base md:text-lg font-semibold'>
                     <span>Total amount</span>
                     <span>${calculatedTotal.toFixed(2)}</span>
                   </div>
@@ -457,7 +580,7 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
                     <Button 
                       onClick={handleBooking} 
                       variant='primary' 
-                      className='w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-3 rounded-lg flex items-center justify-center gap-2'
+                      className='w-full bg-yellow-400 hover:bg-yellow-500 text-black font-medium md:font-semibold py-2.5 md:py-3 rounded-lg flex items-center justify-center gap-2 text-sm md:text-base'
                       disabled={!dateRange}
                     >
                       <span>Proceed to Payment</span>
@@ -472,7 +595,7 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
                   <Button 
                     onClick={() => router.push('/auth/signin')} 
                     variant='primary' 
-                    className='w-full bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-3 rounded-lg flex items-center justify-center gap-2'
+                    className='w-full bg-yellow-400 hover:bg-yellow-500 text-black font-medium md:font-semibold py-2.5 md:py-3 rounded-lg flex items-center justify-center gap-2 text-sm md:text-base'
                   >
                     <span>Login to Book</span>
                     <ArrowRightIcon className='h-5 w-5' />
@@ -481,10 +604,10 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
               </div>
               
               {/* Itinerary Members */}
-              <div className='bg-[#141414] rounded-xl p-6 mt-4'>
-                <div className='flex items-center justify-between mb-4'>
-                  <h3 className='text-sm font-semibold'>Itinerary Members</h3>
-                  <button className='text-xs text-gray-400 hover:text-white' disabled={!clientIsAuthenticated}>Copy Invite Link</button>
+              <div className='bg-[#141414] rounded-xl p-5 md:p-6 mt-4'>
+                <div className='flex items-center justify-between mb-3 md:mb-4'>
+                  <h3 className='text-xs md:text-sm font-semibold'>Itinerary Members</h3>
+                  <button className='text-[10px] md:text-xs text-gray-400 hover:text-white' disabled={!clientIsAuthenticated}>Copy Invite Link</button>
                 </div>
                 
                 <div className={`space-y-3 ${!clientIsAuthenticated ? 'blur-sm select-none' : ''}`}>
@@ -493,12 +616,12 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
                       JJ
                     </div>
                     <div className='flex-1'>
-                      <p className='text-sm font-medium'>John James (You)</p>
-                      <p className='text-xs text-gray-400'>Trip Leader</p>
+                      <p className='text-xs md:text-sm font-medium'>John James (You)</p>
+                      <p className='text-[10px] md:text-xs text-gray-400'>Trip Leader</p>
                     </div>
                   </div>
                   
-                  <button className='w-full py-2 border border-gray-700 rounded-lg text-sm text-gray-400 hover:text-white hover:border-gray-600 transition-colors' disabled={!clientIsAuthenticated}>
+                  <button className='w-full py-2 border border-gray-700 rounded-lg text-xs md:text-sm text-gray-400 hover:text-white hover:border-gray-600 transition-colors' disabled={!clientIsAuthenticated}>
                     Invite
                   </button>
                 </div>
@@ -513,7 +636,13 @@ export default function ClientSideItinerary({ initialData, isAuthenticated = tru
         
         {/* Budget and Breakdown Section */}
         <BudgetBreakdown 
-          itineraryData={itineraryData}
+          itineraryData={{
+            ...itineraryData,
+            activity_cost: activityCost,
+            lodging_cost: lodgingCost,
+            transport_cost: transportCost,
+            service_fee: serviceFee
+          }}
           basePrice={calculatedTotal}
           clientIsAuthenticated={clientIsAuthenticated}
           onBooking={handleBooking}

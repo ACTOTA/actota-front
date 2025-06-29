@@ -2,6 +2,13 @@ import generateCalendarData from '@/src/helpers/calendarData';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid'
 import React, { useEffect, useState } from 'react';
 
+// Helper function to parse date strings safely in local timezone
+const parseLocalDate = (dateStr: string): Date => {
+  // Parse YYYY-MM-DD format in local timezone instead of UTC
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+
 function classNames(...classes: (string | boolean | undefined)[]) {
   return classes.filter(Boolean).join(' ')
 }
@@ -51,16 +58,22 @@ export default function DateMenuCalendar({ onDateRangeChange, itineraryLength = 
 
 
   const handleDateSelect = (date: string, isCurrentMonth: boolean) => {
-    if (!isCurrentMonth) return; // Prevent selection of non-current month days
-    
     // Check if date is in the past or today
-    const selectedDate = new Date(date);
+    const selectedDate = parseLocalDate(date);
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
     
     if (selectedDate < tomorrow) {
       return; // Don't allow selection of today or past dates
+    }
+
+    // If selecting a date from adjacent month, navigate to that month
+    if (!isCurrentMonth) {
+      const selectedYear = selectedDate.getFullYear();
+      const selectedMonth = selectedDate.getMonth();
+      setCurrentYear(selectedYear);
+      setCurrentMonth(selectedMonth);
     }
     
     if (allowManualDateRange) {
@@ -72,8 +85,8 @@ export default function DateMenuCalendar({ onDateRangeChange, itineraryLength = 
         onDateRangeChange(date, null);
       } else if (startDate && !endDate) {
         // Start date selected, now selecting end date
-        const startDateObj = new Date(startDate);
-        const selectedDateObj = new Date(date);
+        const startDateObj = parseLocalDate(startDate);
+        const selectedDateObj = parseLocalDate(date);
         
         if (selectedDateObj < startDateObj) {
           // Selected date is before start date - reset to new start date
@@ -91,11 +104,15 @@ export default function DateMenuCalendar({ onDateRangeChange, itineraryLength = 
       const newStartDate = date;
       
       // Calculate end date based on itinerary length
-      const startDateObj = new Date(date);
+      const startDateObj = parseLocalDate(date);
       const endDateObj = new Date(startDateObj);
       endDateObj.setDate(startDateObj.getDate() + (itineraryLength - 1)); // -1 because start date counts as day 1
       
-      const newEndDate = endDateObj.toISOString().split('T')[0];
+      // Format as YYYY-MM-DD in local timezone
+      const year = endDateObj.getFullYear();
+      const month = String(endDateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(endDateObj.getDate()).padStart(2, '0');
+      const newEndDate = `${year}-${month}-${day}`;
 
       setStartDate(newStartDate);
       setEndDate(newEndDate);
@@ -107,22 +124,19 @@ export default function DateMenuCalendar({ onDateRangeChange, itineraryLength = 
 
 
   const isInRange = (date: string, isCurrentMonth: boolean) => {
-    if (!isCurrentMonth) return false;
     if (!startDate || !endDate) return false;
-    const currentDate = new Date(date);
-    return currentDate > new Date(startDate) && currentDate < new Date(endDate);
+    const currentDate = parseLocalDate(date);
+    return currentDate > parseLocalDate(startDate) && currentDate < parseLocalDate(endDate);
   }
   const isStart = (date: string, isCurrentMonth: boolean) => {
-    if (!isCurrentMonth) return false;
     return date === startDate;
   }
   const isEnd = (date: string, isCurrentMonth: boolean) => {
-    if (!isCurrentMonth) return false;
     return date === endDate;
   }
 
   const isPastDate = (date: string) => {
-    const checkDate = new Date(date);
+    const checkDate = parseLocalDate(date);
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
@@ -178,12 +192,12 @@ export default function DateMenuCalendar({ onDateRangeChange, itineraryLength = 
                   key={day.date}
                   type="button"
                   onClick={() => handleDateSelect(day.date, day.isCurrentMonth)}
-                  disabled={!day.isCurrentMonth || isPastDate(day.date)}
+                  disabled={isPastDate(day.date)}
                   className={classNames(
-                    day.isCurrentMonth && !isPastDate(day.date) ? 'text-white font-medium' : 'text-gray-400 cursor-default',
+                    !isPastDate(day.date) ? (day.isCurrentMonth ? 'text-white font-medium' : 'text-gray-300') : 'text-gray-400 cursor-default',
                     isPastDate(day.date) && 'opacity-30 cursor-not-allowed',
                     'relative py-1.5 text-sm',
-                    day.isCurrentMonth && !isPastDate(day.date) && 'hover:bg-blue-500/20 hover:rounded focus:z-10 cursor-pointer',
+                    !isPastDate(day.date) && 'hover:bg-blue-500/20 hover:rounded focus:z-10 cursor-pointer',
                     isStart(day.date, day.isCurrentMonth) && 'bg-blue-500 text-white rounded',
                     isEnd(day.date, day.isCurrentMonth) && 'bg-blue-500 text-white rounded',
                     isInRange(day.date, day.isCurrentMonth) && 'bg-blue-500/20'

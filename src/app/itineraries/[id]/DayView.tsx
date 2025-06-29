@@ -2,6 +2,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { GoogleMap, DirectionsService, DirectionsRenderer, Marker, useJsApiLoader } from '@react-google-maps/api';
 import { BsCalendar4 } from 'react-icons/bs';
+import { FaCar, FaBed } from 'react-icons/fa';
+import { MdOutlineExplore } from 'react-icons/md';
 
 import Button from '@/src/components/figma/Button';
 import ActivityCard, { CardType } from '@/src/components/ActivityCard';
@@ -594,7 +596,7 @@ export default function DayView({ listing, isAuthenticated = true }: DayViewProp
 													{/* Yellow icon circle */}
 													<div className="relative z-10 flex-shrink-0">
 														<div className="w-8 h-8 rounded-full bg-[#FEDB25] flex items-center justify-center">
-															{/* Icon handled by ActivityCard */} 
+															<FaCar className="h-4 w-4 text-black" />
 														</div>
 													</div>
 													
@@ -619,7 +621,11 @@ export default function DayView({ listing, isAuthenticated = true }: DayViewProp
 														<div className={`w-8 h-8 rounded-full flex items-center justify-center ${
 															isAccomm ? 'bg-[#F10E3B]' : 'bg-[#0553CE]'
 														}`}>
-															{/* Icon handled by ActivityCard */}
+															{isAccomm ? (
+																<FaBed className="h-4 w-4 text-white" />
+															) : (
+																<MdOutlineExplore className="h-4 w-4 text-white" />
+															)}
 														</div>
 													</div>
 													
@@ -733,11 +739,10 @@ export default function DayView({ listing, isAuthenticated = true }: DayViewProp
 																</svg>
 															`)}`,
 															scaledSize: new google.maps.Size(markerSize, markerSize * 1.25),
-															anchor: new google.maps.Point(markerAnchor, markerSize * 1.25)
+															anchor: new google.maps.Point(markerAnchor, markerSize)
 														}}
 														title={activityName}
 														onClick={() => setSelectedActivityIndex(index)}
-														animation={isSelected ? google.maps.Animation.BOUNCE : undefined}
 													/>
 												);
 											})}
