@@ -1,8 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import DateMenuCalendar from '../figma/DateMenuCalendar';
 import GlassPanel from '../figma/GlassPanel';
 import { MOBILE_GLASS_PANEL_STYLES, getMobileGlassPanelProps } from './constants';
 import WheelPicker from './WheelPicker';
+
+// Helper function to parse date strings safely in local timezone
+const parseLocalDate = (dateStr: string): Date => {
+  // Parse YYYY-MM-DD format in local timezone instead of UTC
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
 
 interface DateMenuProps {
   updateSearchValue?: (value: string) => void;
@@ -12,9 +19,10 @@ interface DateMenuProps {
   itineraryLength?: number;
   initialStartDate?: string | null;
   initialEndDate?: string | null;
+  allowManualDateRange?: boolean;
 }
 
-export default function DateMenu({ updateSearchValue, durationValue, className, onConfirm, itineraryLength = 1, initialStartDate = null, initialEndDate = null }: DateMenuProps) {
+export default function DateMenu({ updateSearchValue, durationValue, className, onConfirm, itineraryLength = 1, initialStartDate = null, initialEndDate = null, allowManualDateRange = true }: DateMenuProps) {
   const [startDate, setStartDate] = useState<string | null>(initialStartDate);
   const [endDate, setEndDate] = useState<string | null>(initialEndDate);
   const [startTime, setStartTime] = useState('09:00');
@@ -23,32 +31,29 @@ export default function DateMenu({ updateSearchValue, durationValue, className, 
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
+      setIsMobile(window.innerWidth < 768);
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  useEffect(() => {
-    updateDurationSummary();
-  }, [startDate, endDate, startTime, endTime]);
-
-  const updateDurationSummary = () => {
+  const updateDurationSummary = useCallback(() => {
     if (startDate && endDate) {
       // Create ISO datetime strings with time information
       const arrivalDateTime = `${startDate}T${startTime}:00`;
       const departureDateTime = `${endDate}T${endTime}:00`;
       
-      // Calculate duration for display
-      const start = new Date(startDate);
-      const end = new Date(endDate);
+      // Calculate duration for display (inclusive of both start and end dates)
+      const start = parseLocalDate(startDate);
+      const end = parseLocalDate(endDate);
       const timeDiff = end.getTime() - start.getTime();
-      const durationDays = Math.max(1, Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1);
+      const daysDifference = Math.round(timeDiff / (1000 * 3600 * 24));
+      const durationDays = daysDifference + 1; // +1 to include both start and end dates
       
       // Format dates for display
       const formatDate = (dateStr: string) => {
-        const date = new Date(dateStr);
+        const date = parseLocalDate(dateStr);
         return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       };
       
@@ -69,9 +74,10 @@ export default function DateMenu({ updateSearchValue, durationValue, className, 
       const departureDateTime = `${startDate}T${endTime}:00`;
       
       const formatDate = (dateStr: string) => {
-        const date = new Date(dateStr);
+        const date = parseLocalDate(dateStr);
         return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       };
+      
       
       const displayText = `${formatDate(startDate)} (1 day)`;
       
@@ -85,33 +91,36 @@ export default function DateMenu({ updateSearchValue, durationValue, className, 
     } else {
       updateSearchValue?.('');
     }
-  };
+  }, [startDate, endDate, startTime, endTime, updateSearchValue]);
+
+  useEffect(() => {
+    updateDurationSummary();
+  }, [updateDurationSummary]);
 
   const getDateRangeDisplay = () => {
     if (!startDate && !endDate) return 'Select Date';
     
     const formatDate = (dateStr: string) => {
-      const date = new Date(dateStr);
+      const date = parseLocalDate(dateStr);
       return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     };
     
     if (startDate && !endDate) return formatDate(startDate);
     if (startDate && endDate && startDate === endDate) return formatDate(startDate);
     if (startDate && endDate) {
-      const durationDays = Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 3600 * 24)) + 1;
+      const daysDifference = Math.round((parseLocalDate(endDate).getTime() - parseLocalDate(startDate).getTime()) / (1000 * 3600 * 24));
+      const durationDays = daysDifference + 1;
       return `${formatDate(startDate)} - ${formatDate(endDate)} (${durationDays} ${durationDays === 1 ? 'day' : 'days'})`;
     }
     return 'Select Date';
   };
 
-  const handleDateRangeChange = (start: string | null, end: string | null) => {
+  const handleDateRangeChange = useCallback((start: string | null, end: string | null) => {
     setStartDate(start);
     setEndDate(end);
-    // Immediately update when dates change
-    if (start && end) {
-      setTimeout(() => updateDurationSummary(), 0);
-    }
-  }
+    // Update immediately when dates change
+    setTimeout(() => updateDurationSummary(), 0);
+  }, [updateDurationSummary]);
 
   // Validate that end time is after start time
   useEffect(() => {
@@ -147,7 +156,7 @@ export default function DateMenu({ updateSearchValue, durationValue, className, 
         itineraryLength={itineraryLength}
         initialStartDate={startDate}
         initialEndDate={endDate}
-        allowManualDateRange={true}
+        allowManualDateRange={allowManualDateRange}
       />
 
       {/* Time Selectors */}

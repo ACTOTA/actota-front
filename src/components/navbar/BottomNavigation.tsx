@@ -1,9 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { HomeIcon, MagnifyingGlassIcon, TicketIcon, HeartIcon, UserIcon } from '@heroicons/react/24/outline';
 import { HomeIcon as HomeIconSolid, MagnifyingGlassIcon as MagnifyingGlassIconSolid, TicketIcon as TicketIconSolid, HeartIcon as HeartIconSolid, UserIcon as UserIconSolid } from '@heroicons/react/24/solid';
+import { getAuthCookie, isTokenExpired } from '@/src/helpers/auth';
+import { getLocalStorageItem } from '@/src/utils/browserStorage';
 
 interface NavItem {
   id: string;
@@ -11,11 +13,14 @@ interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
   activeIcon: React.ComponentType<{ className?: string }>;
   href: string;
+  requiresAuth?: boolean;
 }
 
 const BottomNavigation = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const navItems: NavItem[] = [
     {
@@ -23,47 +28,79 @@ const BottomNavigation = () => {
       label: 'Home',
       icon: HomeIcon,
       activeIcon: HomeIconSolid,
-      href: '/'
+      href: '/',
+      requiresAuth: false
     },
     {
       id: 'explore',
       label: 'Explore',
       icon: MagnifyingGlassIcon,
       activeIcon: MagnifyingGlassIconSolid,
-      href: '/itineraries'
+      href: '/explore',
+      requiresAuth: false
     },
     {
       id: 'bookings',
       label: 'Trips',
       icon: TicketIcon,
       activeIcon: TicketIconSolid,
-      href: '/profile/bookings'
+      href: '/profile/bookings',
+      requiresAuth: true
     },
     {
       id: 'saved',
       label: 'Saved',
       icon: HeartIcon,
       activeIcon: HeartIconSolid,
-      href: '/profile/favorites'
+      href: '/profile/favorites',
+      requiresAuth: true
     },
     {
       id: 'profile',
       label: 'Profile',
       icon: UserIcon,
       activeIcon: UserIconSolid,
-      href: '/profile'
+      href: '/profile',
+      requiresAuth: true
     }
   ];
 
-  const handleNavigation = (href: string) => {
-    router.push(href);
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const token = await getAuthCookie();
+        if (token) {
+          const isExpired = await isTokenExpired(token);
+          setIsAuthenticated(!isExpired);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error('Error checking auth:', error);
+        setIsAuthenticated(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, [pathname]);
+
+  const handleNavigation = (href: string, requiresAuth?: boolean) => {
+    if (requiresAuth && !isAuthenticated) {
+      router.push('/auth/signin');
+    } else {
+      router.push(href);
+    }
   };
+
+  const visibleNavItems = navItems.filter(item => !item.requiresAuth || isAuthenticated);
 
   // Don't show on desktop
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-black/95 backdrop-blur-md border-t border-gray-800/50 sm:hidden z-50 safe-area-inset-bottom">
+    <div className="fixed bottom-0 left-0 right-0 bg-black/95 backdrop-blur-md border-t border-gray-800/50 md:hidden z-50 safe-area-inset-bottom">
       <div className="flex items-center justify-around h-16 px-2">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const isActive = pathname === item.href || 
                           (item.href !== '/' && pathname.startsWith(item.href));
           const Icon = isActive ? item.activeIcon : item.icon;
@@ -71,7 +108,7 @@ const BottomNavigation = () => {
           return (
             <button
               key={item.id}
-              onClick={() => handleNavigation(item.href)}
+              onClick={() => handleNavigation(item.href, item.requiresAuth)}
               className="flex flex-col items-center justify-center flex-1 py-2 px-1 group relative"
             >
               <Icon 

@@ -286,13 +286,13 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
       {/* Backdrop for mobile when search is active */}
       {currStep != null && !navbar && (
         <div 
-          className="lg:hidden fixed inset-0 bg-black/50 z-40 animate-fade-in"
+          className="md:hidden fixed inset-0 bg-black/50 z-40 animate-fade-in"
           onClick={() => setCurrStep?.(null)}
         />
       )}
 
       <div 
-        className={`relative ${navbar ? '' : `max-sm:fixed max-sm:left-0 max-sm:right-0 max-sm:transition-all max-sm:duration-300 ${currStep != null ? 'max-sm:bottom-16 max-sm:px-2' : 'max-sm:bottom-20 max-sm:px-1'}`}`} 
+        className={`relative ${navbar ? '' : `max-md:fixed max-md:left-0 max-md:right-0 max-md:transition-all max-md:duration-300 ${currStep != null ? 'max-md:bottom-16 max-md:px-2' : 'max-md:bottom-20 max-md:px-1'}`}`} 
         id="search-bar"
         onTouchStart={currStep != null ? handleTouchStart : undefined}
         onTouchMove={currStep != null ? handleTouchMove : undefined}
@@ -305,19 +305,19 @@ export default function Search({ setClasses, currStep, setCurrStep, navbar }: { 
             padding="none"
             rounded={navbar ? 'full' : 'full'}
             className={`
-              ${navbar ? 'w-[500px] h-[60px] text-primary-gray max-2xl:h-[60px]' : 'w-[760px] max-sm:w-full text-white max-sm:px-2'} 
+              ${navbar ? 'w-[500px] h-[60px] text-primary-gray max-2xl:h-[60px]' : 'w-[760px] max-md:w-full text-white max-md:px-2'} 
               ${isTop && !navbar ? 'h-[86px]' : 'h-[66px]'}
-              ${currStep != null && !navbar ? 'max-sm:h-auto max-sm:max-h-[90vh]' : 'max-sm:h-[64px]'}
-              ${currStep != null && !navbar ? 'max-sm:!rounded-xl' : ''}
+              ${currStep != null && !navbar ? 'max-md:h-auto max-md:max-h-[90vh]' : 'max-md:h-[64px]'}
+              ${currStep != null && !navbar ? 'max-md:!rounded-xl' : ''}
               m-auto ${navbar ? '' : 'z-50'}
-              ${currStep != null && !navbar ? 'max-sm:transition-[height,max-height] max-sm:duration-300 lg:transition-all lg:duration-300' : 'transition-all duration-300'} 
+              ${currStep != null && !navbar ? 'max-md:transition-[height,max-height] max-md:duration-300 lg:transition-all lg:duration-300' : 'transition-all duration-300'} 
               ease-in-out ${className}
             `} 
             ref={searchRef}
           >
           {/* Mobile expanded content */}
           {currStep != null && !navbar && (
-            <div className="lg:hidden">
+            <div className="md:hidden">
               {/* Search options content */}
               <div className="pt-2 px-3 pb-3 max-h-[75vh] overflow-y-auto">
                 {/* Mobile header with current selection */}
