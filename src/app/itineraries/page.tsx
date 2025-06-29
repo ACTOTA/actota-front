@@ -297,7 +297,7 @@ const Itineraries = () => {
                                     if (value !== "All") {
                                         setFilters(prev => ({
                                             ...prev,
-                                            themes: [value.toLowerCase() as string]
+                                            themes: [(Array.isArray(value) ? value[0] : value).toLowerCase()]
                                         }));
                                     } else {
                                         setFilters(prev => ({
