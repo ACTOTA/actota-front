@@ -84,7 +84,7 @@ export default function BudgetBreakdown({
                 <div className='w-12 h-12 mx-auto mb-2 bg-blue-500/20 rounded-lg flex items-center justify-center'>
                   <MdOutlineExplore className='h-6 w-6 text-blue-500' />
                 </div>
-                <p className='text-2xl font-bold'>${activityCost}.00</p>
+                <p className='text-2xl font-bold'>${activityCost.toFixed(2)}</p>
               </div>
               <p className='text-xs text-gray-400'>Activities • {displayTotal > 0 ? Math.round((activityCost / displayTotal) * 100) : 0}%</p>
             </div>
@@ -94,7 +94,7 @@ export default function BudgetBreakdown({
                 <div className='w-12 h-12 mx-auto mb-2 bg-green-500/20 rounded-lg flex items-center justify-center'>
                   <GoHome className='h-6 w-6 text-green-500' />
                 </div>
-                <p className='text-2xl font-bold'>${lodgingCost}.00</p>
+                <p className='text-2xl font-bold'>${lodgingCost.toFixed(2)}</p>
               </div>
               <p className='text-xs text-gray-400'>Lodging • {displayTotal > 0 ? Math.round((lodgingCost / displayTotal) * 100) : 0}%</p>
             </div>
@@ -104,7 +104,7 @@ export default function BudgetBreakdown({
                 <div className='w-12 h-12 mx-auto mb-2 bg-red-500/20 rounded-lg flex items-center justify-center'>
                   <MdOutlineDirectionsCarFilled className='h-6 w-6 text-red-500' />
                 </div>
-                <p className='text-2xl font-bold'>${transportCost}.00</p>
+                <p className='text-2xl font-bold'>${transportCost.toFixed(2)}</p>
               </div>
               <p className='text-xs text-gray-400'>Transport • {displayTotal > 0 ? Math.round((transportCost / displayTotal) * 100) : 0}%</p>
             </div>
@@ -114,7 +114,7 @@ export default function BudgetBreakdown({
                 <div className='w-12 h-12 mx-auto mb-2 bg-yellow-500/20 rounded-lg flex items-center justify-center'>
                   <BiSolidMap className='h-6 w-6 text-yellow-500' />
                 </div>
-                <p className='text-2xl font-bold'>${serviceFee}.00</p>
+                <p className='text-2xl font-bold'>${serviceFee.toFixed(2)}</p>
               </div>
               <p className='text-xs text-gray-400'>Service Fee • {displayTotal > 0 ? Math.round((serviceFee / displayTotal) * 100) : 0}%</p>
             </div>
