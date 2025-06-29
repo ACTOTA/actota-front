@@ -219,7 +219,7 @@ const Itineraries = () => {
             data = await response.json();
 
             if (data.success) {
-                const newItineraries = data.data || [];
+                const newItineraries = Array.isArray(data.data) ? data.data : [];
                 
                 // Add favorite status to itineraries
                 const itinerariesWithFavorites = newItineraries.map((listing: any) =>
@@ -263,9 +263,29 @@ const Itineraries = () => {
         }
     };
 
+    // Sync React Query data with listings state
+    useEffect(() => {
+        if (itineraries?.data && !itinerariesLoading && !itinerariesError) {
+            const itineraryData = Array.isArray(itineraries.data) ? itineraries.data : [];
+            const itinerariesWithFavorites = itineraryData.map((listing: any) =>
+                favorites?.some((favorite: any) => favorite._id?.$oid === listing._id?.$oid)
+                    ? { ...listing, isFavorite: true }
+                    : listing
+            );
+            setListings(itinerariesWithFavorites);
+            setIsLoading(false);
+            setError(null);
+        } else if (itinerariesError) {
+            setError(itinerariesError.message);
+            setIsLoading(false);
+        }
+    }, [itineraries, itinerariesLoading, itinerariesError, favorites]);
+
     // Initial load and when applied filters change
     useEffect(() => {
-        fetchItineraries(1, false);
+        if (!isSearchMode) {
+            fetchItineraries(1, false);
+        }
     }, [appliedFilters, sortBy, isSearchMode, favorites]);
 
     // Refetch when favorites change
@@ -340,7 +360,7 @@ const Itineraries = () => {
                     </div>
                     
                     <div className='max-sm:hidden'>
-                        {isLoading &&
+                        {(isLoading || isLoadingOrFetching) &&
                             <div className="text-white text-center py-10">
                                 {isSearchMode ? "Searching itineraries..." : "Loading itineraries..."}
                             </div>
@@ -348,18 +368,18 @@ const Itineraries = () => {
                         {error &&
                             <div className="text-red-500 text-center py-10">Error: {error}</div>
                         }
-                        {!isLoading && !error && listings.length === 0 && (
+                        {!isLoading && !isLoadingOrFetching && !error && listings.length === 0 && (
                             <div className="text-white text-center py-10">
                                 No itineraries found. Try adjusting your filters.
                             </div>
                         )}
-                        {!isLoading && listings.length > 0 && listings.map((listing, i) => (
+                        {!isLoading && !isLoadingOrFetching && listings.length > 0 && listings.map((listing, i) => (
                             <ItineraryCard key={i} data={listing} />
                         ))}
                     </div>
                     
                     <div className='sm:hidden flex flex-col'>
-                        {isLoading &&
+                        {(isLoading || isLoadingOrFetching) &&
                             <div className="text-white text-center py-5">
                                 {isSearchMode ? "Searching..." : "Loading..."}
                             </div>
@@ -367,17 +387,17 @@ const Itineraries = () => {
                         {error &&
                             <div className="text-red-500 text-center py-5">Error: {error}</div>
                         }
-                        {!isLoading && !error && listings.length === 0 && (
+                        {!isLoading && !isLoadingOrFetching && !error && listings.length === 0 && (
                             <div className="text-white text-center py-5">
                                 No itineraries found. Try adjusting your filters.
                             </div>
                         )}
-                        {!isLoading && listings.length > 0 && listings.map((listing, i) => (
+                        {!isLoading && !isLoadingOrFetching && listings.length > 0 && listings.map((listing, i) => (
                             <ListingCard key={i} data={listing} />
                         ))}
                     </div>
                     
-                    {!isLoading && listings.length > 0 && hasMore && (
+                    {!isLoading && !isLoadingOrFetching && listings.length > 0 && hasMore && (
                         <div className="flex justify-center flex-col items-center pt-6">
                             <p className="text-white text-xl font-bold">See More Itineraries</p>
                             <Button 
