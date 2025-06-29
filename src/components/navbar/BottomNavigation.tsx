@@ -61,7 +61,7 @@ const BottomNavigation = () => {
 
   // Don't show on desktop
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-black/95 backdrop-blur-md border-t border-gray-800/50 sm:hidden z-50 safe-area-inset-bottom">
+    <div className="fixed bottom-0 left-0 right-0 bg-black/95 backdrop-blur-md border-t border-gray-800/50 md:hidden z-50 safe-area-inset-bottom">
       <div className="flex items-center justify-around h-16 px-2">
         {navItems.map((item) => {
           const isActive = pathname === item.href || 

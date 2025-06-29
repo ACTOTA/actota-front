@@ -31,7 +31,7 @@ export default function DateMenu({ updateSearchValue, durationValue, className, 
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
+      setIsMobile(window.innerWidth < 768);
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
