@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
     // Forward the request to the backend API
     const response = await actotaApi.post(
-      '/api/admin/itineraries/featured/add',
+      '/admin/itineraries/featured/add',
       payload,
       {
         headers: {

@@ -6,20 +6,10 @@ export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest) {
   try {
     // Extract pagination parameters from query string
-    const { searchParams } = new URL(request.url);
-    const page = searchParams.get('page');
-    const limit = searchParams.get('limit');
+    const searchParams = request.nextUrl.searchParams;
+    const queryString = searchParams.toString();
     
-    // Build query parameters for backend
-    const queryParams = new URLSearchParams();
-    if (page) {
-      queryParams.append('page', page);
-    }
-    if (limit) {
-      queryParams.append('limit', limit);
-    }
-    
-    const backendUrl = `/itineraries/featured${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const backendUrl = `/itineraries${queryString ? `?${queryString}` : ''}`;
     const response = await serverApiClient.get(backendUrl);
 
     const data = await response.json();

@@ -8,9 +8,9 @@ const headers = {
   "Content-Type": "application/json",
 };
 
-// Get API URL - use local /api routes
+// Get API URL - use actual backend API URL
 const getApiUrl = () => {
-  return '/api';
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 };
 
 const actotaApi = axios.create({
